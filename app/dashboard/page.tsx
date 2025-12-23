@@ -23,5 +23,8 @@ export default async function DashboardPage() {
     }
 
     // Redirect to role-specific dashboard
+    if (profile.role === 'admin-dev') {
+        redirect('/dashboard/admin')
+    }
     redirect(`/dashboard/${profile.role}`)
 }

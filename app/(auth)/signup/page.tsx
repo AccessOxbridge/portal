@@ -56,6 +56,7 @@ export default function SignupPage() {
                             <option value="student">Student / Parent</option>
                             <option value="mentor">Mentor</option>
                             <option value="admin">Admin</option>
+                            <option value="admin-dev">Admin (Dev) - Access All</option>
                         </select>
                     </div>
                     <button

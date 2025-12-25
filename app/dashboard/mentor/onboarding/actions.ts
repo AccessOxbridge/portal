@@ -17,26 +17,54 @@ export async function submitOnboarding(formData: FormData) {
     }
 
     const responses: Record<string, any> = {}
-    formData.forEach((value, key) => {
-        if (key.startsWith('$ACTION')) return
+    let cvUrl = ''
+    let photoUrl = ''
 
-        // Handle multiselect (if multiple values for same key)
-        const existing = responses[key]
-        if (existing) {
-            if (Array.isArray(existing)) {
-                responses[key] = [...existing, value]
-            } else {
-                responses[key] = [existing, value]
+    for (const [key, value] of formData.entries()) {
+        if (key.startsWith('$ACTION')) continue
+
+        if (value instanceof File) {
+            if (value.size === 0) continue
+
+            const fileExt = value.name.split('.').pop()
+            const fileName = `${user.id}/${key}-${Math.random()}.${fileExt}`
+            const filePath = `${fileName}`
+
+            const { error: uploadError } = await supabase.storage.from('mentor-assets').upload(filePath, value)
+
+            if (uploadError) {
+                console.error(`Error uploading ${key}:`, uploadError)
+                continue
             }
+
+            const {
+                data: { publicUrl },
+            } = supabase.storage.from('mentor-assets').getPublicUrl(filePath)
+
+            if (key === 'cv') cvUrl = publicUrl
+            if (key === 'photo') photoUrl = publicUrl
+            responses[key] = publicUrl
         } else {
-            responses[key] = value
+            // Handle multiselect
+            const existing = responses[key]
+            if (existing) {
+                if (Array.isArray(existing)) {
+                    responses[key] = [...existing, value]
+                } else {
+                    responses[key] = [existing, value]
+                }
+            } else {
+                responses[key] = value
+            }
         }
-    })
+    }
 
     const { error } = await supabase.from('mentor_applications').insert({
         user_id: user.id,
         responses,
         status: 'pending',
+        cv_url: cvUrl,
+        photo_url: photoUrl,
     })
 
     if (error) {

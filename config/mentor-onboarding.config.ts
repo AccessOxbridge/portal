@@ -1,4 +1,4 @@
-export type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect';
+export type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'file';
 
 export interface OnboardingQuestion {
     id: string;
@@ -48,5 +48,17 @@ export const MENTOR_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
         type: 'text',
         required: false,
         placeholder: 'https://www.linkedin.com/in/yourprofile',
+    },
+    {
+        id: 'photo',
+        label: 'Profile Photo',
+        type: 'file',
+        required: true,
+    },
+    {
+        id: 'cv',
+        label: 'Your CV / Resume',
+        type: 'file',
+        required: true,
     },
 ];

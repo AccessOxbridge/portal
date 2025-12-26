@@ -11,3 +11,8 @@ export async function sendMentorApplicationReceivedEmail(email: string, fullName
     console.log(`[EMAIL MOCK] Sending application received email to ${fullName} (${email})...`)
     return { success: true }
 }
+
+export async function sendMentorshipMatchEmail(email: string, studentName: string, mentorName: string) {
+    console.log(`[EMAIL MOCK] Sending match notification to ${studentName}. Mentor ${mentorName} has accepted!`)
+    return { success: true }
+}

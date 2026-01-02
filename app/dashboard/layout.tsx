@@ -22,7 +22,7 @@ export default async function DashboardLayout({
         .select(`
             full_name, 
             role,
-            mentor_applications (
+            mentors (
                 status
             )
         `)
@@ -35,14 +35,13 @@ export default async function DashboardLayout({
 
     let showSidebar = true
     if (profile.role === 'mentor' || profile.role === 'admin-dev') {
-        const application = profile.mentor_applications?.[0]
+        const mentor = (profile as any).mentors
+        const status = mentor?.status
 
         // Hide sidebar if:
-        // 1. Role is mentor and no application exists yet (onboarding)
-        // 2. Application exists but is not approved
-        if (profile.role === 'mentor' && !application) {
-            showSidebar = false
-        } else if (application && (application.status === 'pending' || application.status === 'dismissed')) {
+        // 1. Role is mentor and no record exists yet (onboarding)
+        // 2. Status is 'details_required' or 'pending_approval'
+        if (profile.role === 'mentor' && (!mentor || status === 'details_required' || status === 'pending_approval')) {
             showSidebar = false
         }
     }
@@ -52,7 +51,8 @@ export default async function DashboardLayout({
             {/* Sidebar with fixed width */}
             {showSidebar && (
                 <Sidebar
-                    role={profile.role}
+                    // we should not default to student! error handling - TODO  
+                    role={profile.role || 'student'}
                     userName={profile.full_name || user.email?.split('@')[0] || 'User'}
                 />
             )}

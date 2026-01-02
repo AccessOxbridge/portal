@@ -19,16 +19,16 @@ export default async function AdminApprovalsPage() {
 
     if (!profile || (profile.role !== 'admin' && profile.role !== 'admin-dev')) return redirect('/dashboard')
 
-    const { data: applications } = await supabase
-        .from('mentor_applications')
+    const { data: mentors } = await supabase
+        .from('mentors')
         .select(`
             *,
-            profiles (
+            profiles:id (
                 full_name,
                 id
             )
         `)
-        .eq('status', 'pending')
+        .eq('status', 'pending_approval')
         .order('created_at', { ascending: false })
 
     return (
@@ -40,12 +40,12 @@ export default async function AdminApprovalsPage() {
                 </div>
                 <div className="flex space-x-2">
                     <span className="bg-rich-beige-accent text-accent px-6 py-3 rounded-2xl text-sm font-bold shadow-inner">
-                        {applications?.length || 0} Pending
+                        {mentors?.length || 0} Pending
                     </span>
                 </div>
             </header>
 
-            {!applications || applications.length === 0 ? (
+            {!mentors || mentors.length === 0 ? (
                 <div className="bg-white border-2 border-dashed border-gray-100 rounded-[40px] p-24 text-center">
                     <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
                         <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export default async function AdminApprovalsPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-8">
-                    {applications.map((app: any) => (
+                    {mentors.map((app: any) => (
                         <div key={app.id} className="bg-white shadow-xl shadow-gray-200/50 rounded-[40px] border border-gray-100 overflow-hidden hover:shadow-indigo-100 transition-all group">
                             <div className="p-10">
                                 <div className="flex justify-between items-start mb-8">
@@ -71,12 +71,12 @@ export default async function AdminApprovalsPage() {
                                         </div>
                                     </div>
                                     <div className="flex gap-3">
-                                        <form action={handleApplication.bind(null, app.id, 'dismissed', app.user_id)}>
+                                        <form action={handleApplication.bind(null, app.id, 'dismissed')}>
                                             <button className="px-8 py-4 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
                                                 Dismiss
                                             </button>
                                         </form>
-                                        <form action={handleApplication.bind(null, app.id, 'approved', app.user_id)}>
+                                        <form action={handleApplication.bind(null, app.id, 'approved')}>
                                             <button className="px-8 py-4 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-1">
                                                 Approve
                                             </button>

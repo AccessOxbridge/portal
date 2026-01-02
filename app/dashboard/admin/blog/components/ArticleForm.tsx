@@ -4,6 +4,10 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createArticle } from '../actions'
 import { Database } from '@/utils/supabase/types'
+import dynamic from 'next/dynamic'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import '@uiw/react-md-editor/markdown-editor.css'
 
 type Article = Database['public']['Tables']['articles']['Row']
 
@@ -11,6 +15,12 @@ interface ArticleFormProps {
     author: string
     article?: Article
 }
+
+// Dynamically import MDEditor to avoid SSR issues
+const MDEditor = dynamic(
+    () => import('@uiw/react-md-editor').then((mod) => mod.default),
+    { ssr: false }
+)
 
 export function ArticleForm({ author, article }: ArticleFormProps) {
     const router = useRouter()
@@ -27,6 +37,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
 
     const categories = [
         'Oxbridge Admissions',
@@ -193,18 +204,118 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
 
                 {/* Content */}
                 <div className="md:col-span-2">
-                    <label htmlFor="body" className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                         Article Content *
                     </label>
-                    <textarea
-                        id="body"
-                        value={formData.body}
-                        onChange={(e) => handleChange('body', e.target.value)}
-                        rows={20}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono text-sm"
-                        placeholder="Write your article content here... (Markdown supported)"
-                        disabled={isPending}
-                    />
+                    
+                    {/* Tabs */}
+                    <div className="flex border-b border-gray-200 mb-4">
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('edit')}
+                            className={`px-6 py-3 font-medium text-sm transition-colors ${
+                                activeTab === 'edit'
+                                    ? 'border-b-2 border-accent text-accent'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                            disabled={isPending}
+                        >
+                            Edit
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('preview')}
+                            className={`px-6 py-3 font-medium text-sm transition-colors ${
+                                activeTab === 'preview'
+                                    ? 'border-b-2 border-accent text-accent'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                            disabled={isPending}
+                        >
+                            Preview
+                        </button>
+                    </div>
+
+                    {/* Editor/Preview Content */}
+                    <div className="border border-gray-200 rounded-xl overflow-hidden min-h-[500px]">
+                        {activeTab === 'edit' ? (
+                            <div data-color-mode="light">
+                                <MDEditor
+                                    value={formData.body}
+                                    onChange={(value) => handleChange('body', value || '')}
+                                    preview="edit"
+                                    hideToolbar={false}
+                                    textareaProps={{
+                                        placeholder: 'Write your article content here using Markdown...',
+                                        disabled: isPending,
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className="p-6 overflow-auto max-h-[600px]">
+                                {formData.body ? (
+                                    <div className="markdown-preview">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            components={{
+                                                h1: ({ children }) => <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">{children}</h1>,
+                                                h2: ({ children }) => <h2 className="text-2xl font-semibold text-gray-900 mb-3 mt-6">{children}</h2>,
+                                                h3: ({ children }) => <h3 className="text-xl font-semibold text-gray-900 mb-2 mt-4">{children}</h3>,
+                                                p: ({ children }) => <p className="text-gray-700 leading-relaxed mb-4">{children}</p>,
+                                                a: ({ href, children }) => (
+                                                    <a href={href} className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
+                                                        {children}
+                                                    </a>
+                                                ),
+                                                code: ({ children, className }) => {
+                                                    const isInline = !className
+                                                    return isInline ? (
+                                                        <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>
+                                                    ) : (
+                                                        <code className={className}>{children}</code>
+                                                    )
+                                                },
+                                                pre: ({ children }) => (
+                                                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                                                        {children}
+                                                    </pre>
+                                                ),
+                                                ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-4 text-gray-700">{children}</ul>,
+                                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-4 text-gray-700">{children}</ol>,
+                                                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                                                blockquote: ({ children }) => (
+                                                    <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-4">
+                                                        {children}
+                                                    </blockquote>
+                                                ),
+                                                strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+                                                em: ({ children }) => <em className="italic">{children}</em>,
+                                                hr: () => <hr className="my-6 border-gray-300" />,
+                                                table: ({ children }) => (
+                                                    <div className="overflow-x-auto mb-4">
+                                                        <table className="min-w-full border-collapse border border-gray-300">
+                                                            {children}
+                                                        </table>
+                                                    </div>
+                                                ),
+                                                thead: ({ children }) => <thead className="bg-gray-100">{children}</thead>,
+                                                tbody: ({ children }) => <tbody>{children}</tbody>,
+                                                tr: ({ children }) => <tr className="border-b border-gray-300">{children}</tr>,
+                                                th: ({ children }) => <th className="border border-gray-300 px-4 py-2 text-left font-semibold text-gray-900">{children}</th>,
+                                                td: ({ children }) => <td className="border border-gray-300 px-4 py-2 text-gray-700">{children}</td>,
+                                            }}
+                                        >
+                                            {formData.body}
+                                        </ReactMarkdown>
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-400 italic text-center py-20">
+                                        Start writing to see the preview...
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     {errors.body && <p className="text-red-500 text-sm mt-1">{errors.body}</p>}
                 </div>
             </div>

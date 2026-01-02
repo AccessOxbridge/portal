@@ -14,13 +14,13 @@ export default async function OnboardingPage() {
     }
 
     // Check if already applied
-    const { data: application } = await supabase
-        .from('mentor_applications')
+    const { data: mentor } = await supabase
+        .from('mentors')
         .select('status')
-        .eq('user_id', user.id)
+        .eq('id', user.id)
         .single()
 
-    if (application) {
+    if (mentor && mentor.status !== 'details_required') {
         return redirect('/dashboard/mentor')
     }
 

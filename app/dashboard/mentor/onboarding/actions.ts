@@ -59,10 +59,18 @@ export async function submitOnboarding(formData: FormData) {
         }
     }
 
-    const { error } = await supabase.from('mentor_applications').insert({
-        user_id: user.id,
-        responses,
-        status: 'pending',
+    const updatedResponses = {
+        ...responses,
+        cv_url: cvUrl,
+        photo_url: photoUrl,
+    }
+
+    const { error } = await supabase.from('mentors').upsert({
+        id: user.id,
+        responses: updatedResponses,
+        status: 'pending_approval',
+        bio: responses.bio || '',
+        expertise: Array.isArray(responses.expertise) ? responses.expertise : (responses.expertise ? [responses.expertise] : []),
         cv_url: cvUrl,
         photo_url: photoUrl,
     })

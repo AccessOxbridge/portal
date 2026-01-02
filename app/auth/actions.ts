@@ -105,3 +105,51 @@ export async function resendEmail(formData: FormData) {
 
     redirect(`/verify-email?email=${encodeURIComponent(email)}&status=resent`)
 }
+
+export async function forgotPassword(formData: FormData) {
+    const supabase = await createClient()
+    const origin = (await headers()).get('origin')
+    const email = formData.get('email') as string
+
+    if (!email) {
+        redirect('/error?message=Email is required to reset password.')
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    })
+
+    if (error) {
+        console.error('Forgot password error:', error.message)
+        redirect(`/error?message=${encodeURIComponent(error.message)}`)
+    }
+
+    // Redirect to a success page or back to login with success message
+    redirect(`/forgot-password?status=sent`)
+}
+
+export async function resetPassword(formData: FormData) {
+    const supabase = await createClient()
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
+
+    if (!password || !confirmPassword) {
+        redirect('/error?message=Both password fields are required.')
+    }
+
+    if (password !== confirmPassword) {
+        redirect('/error?message=Passwords do not match.')
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    })
+
+    if (error) {
+        console.error('Reset password error:', error.message)
+        redirect(`/error?message=${encodeURIComponent(error.message)}`)
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/dashboard')
+}

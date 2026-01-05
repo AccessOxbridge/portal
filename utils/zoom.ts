@@ -43,7 +43,7 @@ export async function getZoomAccessToken(): Promise<string> {
         throw new Error('Missing Zoom credentials. Ensure ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, and ZOOM_CLIENT_SECRET are set.')
     }
 
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+    const credentials = Buffer.from(`${clientId.trim()}:${clientSecret.trim()}`).toString('base64')
 
     const response = await fetch(
         `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${accountId}`,

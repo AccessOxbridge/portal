@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import '@uiw/react-md-editor/markdown-editor.css'
+import { XCircle, ShieldAlert, Clock, ShieldCheck } from 'lucide-react'
 
 type Article = Database['public']['Tables']['articles']['Row']
 
@@ -91,251 +92,226 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-10 max-w-5xl mx-auto pb-8">
             {errors.general && (
-                <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-                    <p className="text-red-700 font-medium">{errors.general}</p>
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                    <XCircle className="w-5 h-5 text-red-500" />
+                    <p className="text-red-700 text-sm font-medium">{errors.general}</p>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Title */}
-                <div className="md:col-span-2">
-                    <label htmlFor="title" className="block text-sm font-bold text-gray-700 mb-2">
-                        Article Title *
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        value={formData.title}
-                        onChange={(e) => handleChange('title', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                        placeholder="Enter an engaging title..."
-                        disabled={isPending}
-                    />
-                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
-                </div>
-
-                {/* Category */}
-                <div>
-                    <label htmlFor="category" className="block text-sm font-bold text-gray-700 mb-2">
-                        Category *
-                    </label>
-                    <select
-                        id="category"
-                        value={formData.category}
-                        onChange={(e) => handleChange('category', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                        disabled={isPending}
-                    >
-                        {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Featured */}
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Featured Article
-                    </label>
-                    <label className="flex items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                {/* Main Content Area */}
+                <div className="md:col-span-2 space-y-10">
+                    {/* Title & Slug Info */}
+                    <div className="space-y-4">
+                        <label htmlFor="title" className="block text-sm font-bold text-gray-900 ml-1">
+                            Article Title
+                        </label>
                         <input
-                            type="checkbox"
-                            checked={formData.featured}
-                            onChange={(e) => handleChange('featured', e.target.checked)}
-                            className="rounded border-gray-300 text-accent focus:ring-accent"
+                            type="text"
+                            id="title"
+                            value={formData.title}
+                            onChange={(e) => handleChange('title', e.target.value)}
+                            className="w-full px-6 py-4 bg-white border border-gray-200 rounded-[20px] text-lg font-semibold text-gray-900 placeholder:text-gray-300 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                            placeholder="e.g. How to Ace Your Oxford Interview"
                             disabled={isPending}
                         />
-                        <span className="ml-2 text-gray-600">Mark as featured</span>
-                    </label>
-                </div>
-
-                {/* Description */}
-                <div className="md:col-span-2">
-                    <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-2">
-                        Description *
-                    </label>
-                    <textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => handleChange('description', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                        placeholder="Brief description of the article..."
-                        disabled={isPending}
-                    />
-                    {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-                </div>
-
-                {/* Tags */}
-                <div className="md:col-span-2">
-                    <label htmlFor="tags" className="block text-sm font-bold text-gray-700 mb-2">
-                        Tags
-                    </label>
-                    <input
-                        type="text"
-                        id="tags"
-                        value={formData.tags}
-                        onChange={(e) => handleChange('tags', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                        placeholder="Enter tags separated by commas..."
-                        disabled={isPending}
-                    />
-                    <p className="text-gray-500 text-sm mt-1">Separate multiple tags with commas</p>
-                </div>
-
-                {/* Image URL */}
-                <div className="md:col-span-2">
-                    <label htmlFor="image" className="block text-sm font-bold text-gray-700 mb-2">
-                        Featured Image URL *
-                    </label>
-                    <input
-                        type="url"
-                        id="image"
-                        value={formData.image}
-                        onChange={(e) => handleChange('image', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                        placeholder="https://example.com/image.jpg"
-                        disabled={isPending}
-                    />
-                    {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
-                </div>
-
-                {/* Content */}
-                <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Article Content *
-                    </label>
-                    
-                    {/* Tabs */}
-                    <div className="flex border-b border-gray-200 mb-4">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('edit')}
-                            className={`px-6 py-3 font-medium text-sm transition-colors ${
-                                activeTab === 'edit'
-                                    ? 'border-b-2 border-accent text-accent'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                            disabled={isPending}
-                        >
-                            Edit
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('preview')}
-                            className={`px-6 py-3 font-medium text-sm transition-colors ${
-                                activeTab === 'preview'
-                                    ? 'border-b-2 border-accent text-accent'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                            disabled={isPending}
-                        >
-                            Preview
-                        </button>
+                        {errors.title && <p className="text-red-500 text-xs font-medium ml-1">{errors.title}</p>}
                     </div>
 
-                    {/* Editor/Preview Content */}
-                    <div className="border border-gray-200 rounded-xl overflow-hidden min-h-[500px]">
-                        {activeTab === 'edit' ? (
-                            <div data-color-mode="light">
-                                <MDEditor
-                                    value={formData.body}
-                                    onChange={(value) => handleChange('body', value || '')}
-                                    preview="edit"
-                                    hideToolbar={false}
-                                    textareaProps={{
-                                        placeholder: 'Write your article content here using Markdown...',
-                                        disabled: isPending,
-                                    }}
-                                />
+                    {/* Metadata Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-8 rounded-[32px] border border-gray-100">
+                        <div className="space-y-4">
+                            <label htmlFor="category" className="block text-sm font-bold text-gray-900 ml-1">
+                                Category
+                            </label>
+                            <select
+                                id="category"
+                                value={formData.category}
+                                onChange={(e) => handleChange('category', e.target.value)}
+                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all cursor-pointer shadow-sm"
+                                disabled={isPending}
+                            >
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="space-y-4">
+                            <label className="block text-sm font-bold text-gray-900 ml-1">
+                                Visibility
+                            </label>
+                            <div className="flex items-center h-[46px]">
+                                <label className="relative inline-flex items-center cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.featured}
+                                        onChange={(e) => handleChange('featured', e.target.checked)}
+                                        className="sr-only peer"
+                                        disabled={isPending}
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                    <span className="ml-3 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Featured Article</span>
+                                </label>
                             </div>
-                        ) : (
-                            <div className="p-6 overflow-auto max-h-[600px]">
-                                {formData.body ? (
-                                    <div className="markdown-preview">
+                        </div>
+
+                        <div className="md:col-span-2 space-y-4">
+                            <label htmlFor="description" className="block text-sm font-bold text-gray-900 ml-1">
+                                Short Summary
+                            </label>
+                            <textarea
+                                id="description"
+                                value={formData.description}
+                                onChange={(e) => handleChange('description', e.target.value)}
+                                rows={2}
+                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 placeholder:text-gray-300 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm resize-none"
+                                placeholder="A brief hook to get readers interested..."
+                                disabled={isPending}
+                            />
+                            {errors.description && <p className="text-red-500 text-xs font-medium ml-1">{errors.description}</p>}
+                        </div>
+
+                        <div className="space-y-4">
+                            <label htmlFor="tags" className="block text-sm font-bold text-gray-900 ml-1">
+                                Tags
+                            </label>
+                            <input
+                                type="text"
+                                id="tags"
+                                value={formData.tags}
+                                onChange={(e) => handleChange('tags', e.target.value)}
+                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                                placeholder="interview, oxford, tips"
+                                disabled={isPending}
+                            />
+                        </div>
+
+                        <div className="space-y-4">
+                            <label htmlFor="image" className="block text-sm font-bold text-gray-900 ml-1">
+                                Cover Image URL
+                            </label>
+                            <input
+                                type="url"
+                                id="image"
+                                value={formData.image}
+                                onChange={(e) => handleChange('image', e.target.value)}
+                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                                placeholder="https://unsplash.com/..."
+                                disabled={isPending}
+                            />
+                            {errors.image && <p className="text-red-500 text-xs font-medium ml-1">{errors.image}</p>}
+                        </div>
+                    </div>
+
+                    {/* Content Editor */}
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between px-1">
+                            <label className="block text-sm font-bold text-gray-900">
+                                Article Content
+                            </label>
+                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('edit')}
+                                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'edit'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    disabled={isPending}
+                                >
+                                    Write
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('preview')}
+                                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'preview'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    disabled={isPending}
+                                >
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-[24px] overflow-hidden focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/5 transition-all shadow-sm min-h-[600px] flex flex-col">
+                            {activeTab === 'edit' ? (
+                                <div data-color-mode="light" className="flex-1 flex flex-col">
+                                    <MDEditor
+                                        value={formData.body}
+                                        onChange={(value) => handleChange('body', value || '')}
+                                        preview="edit"
+                                        hideToolbar={false}
+                                        height="100%"
+                                        className="flex-1 border-none! shadow-none!"
+                                        textareaProps={{
+                                            placeholder: 'Write your masterpiece here...',
+                                            disabled: isPending,
+                                        }}
+                                    />
+                                    <style jsx global>{`
+                                        .w-md-editor { border: none !important; }
+                                        .w-md-editor-toolbar { background: #F9FAFB !important; border-bottom: 1px solid #F3F4F6 !important; border-top-left-radius: 24px !important; border-top-right-radius: 24px !important; padding: 1rem !important; }
+                                        .w-md-editor-content { background: white !important; }
+                                    `}</style>
+                                </div>
+                            ) : (
+                                <div className="p-10 max-w-none overflow-y-auto">
+                                    {formData.body ? (
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
-                                                h1: ({ children }) => <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">{children}</h1>,
-                                                h2: ({ children }) => <h2 className="text-2xl font-semibold text-gray-900 mb-3 mt-6">{children}</h2>,
-                                                h3: ({ children }) => <h3 className="text-xl font-semibold text-gray-900 mb-2 mt-4">{children}</h3>,
-                                                p: ({ children }) => <p className="text-gray-700 leading-relaxed mb-4">{children}</p>,
-                                                a: ({ href, children }) => (
-                                                    <a href={href} className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
-                                                        {children}
-                                                    </a>
-                                                ),
-                                                code: ({ children, className }) => {
-                                                    const isInline = !className
-                                                    return isInline ? (
-                                                        <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>
-                                                    ) : (
-                                                        <code className={className}>{children}</code>
-                                                    )
-                                                },
-                                                pre: ({ children }) => (
-                                                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
-                                                        {children}
-                                                    </pre>
-                                                ),
-                                                ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-4 text-gray-700">{children}</ul>,
-                                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-4 text-gray-700">{children}</ol>,
-                                                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                                                h1: ({ children }) => <h1 className="text-4xl font-extrabold text-gray-900 mb-8 tracking-tight">{children}</h1>,
+                                                h2: ({ children }) => <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-10">{children}</h2>,
+                                                h3: ({ children }) => <h3 className="text-xl font-bold text-gray-900 mb-3 mt-8">{children}</h3>,
+                                                p: ({ children }) => <p className="text-gray-600 leading-loose mb-6 text-lg">{children}</p>,
+                                                li: ({ children }) => <li className="text-gray-600 leading-relaxed mb-2 text-lg">{children}</li>,
                                                 blockquote: ({ children }) => (
-                                                    <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-4">
+                                                    <blockquote className="border-l-4 border-accent bg-accent/5 px-8 py-6 italic text-gray-700 rounded-r-2xl my-8 text-xl">
                                                         {children}
                                                     </blockquote>
                                                 ),
-                                                strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
-                                                em: ({ children }) => <em className="italic">{children}</em>,
-                                                hr: () => <hr className="my-6 border-gray-300" />,
-                                                table: ({ children }) => (
-                                                    <div className="overflow-x-auto mb-4">
-                                                        <table className="min-w-full border-collapse border border-gray-300">
-                                                            {children}
-                                                        </table>
-                                                    </div>
-                                                ),
-                                                thead: ({ children }) => <thead className="bg-gray-100">{children}</thead>,
-                                                tbody: ({ children }) => <tbody>{children}</tbody>,
-                                                tr: ({ children }) => <tr className="border-b border-gray-300">{children}</tr>,
-                                                th: ({ children }) => <th className="border border-gray-300 px-4 py-2 text-left font-semibold text-gray-900">{children}</th>,
-                                                td: ({ children }) => <td className="border border-gray-300 px-4 py-2 text-gray-700">{children}</td>,
                                             }}
                                         >
                                             {formData.body}
                                         </ReactMarkdown>
-                                    </div>
-                                ) : (
-                                    <div className="text-gray-400 italic text-center py-20">
-                                        Start writing to see the preview...
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                    ) : (
+                                        <div className="h-full flex flex-col items-center justify-center text-gray-400 italic py-32">
+                                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                                                <ShieldAlert className="w-8 h-8 text-gray-200" />
+                                            </div>
+                                            Nothing to preview yet
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {errors.body && <p className="text-red-500 text-xs font-semibold ml-1">{errors.body}</p>}
                     </div>
-                    {errors.body && <p className="text-red-500 text-sm mt-1">{errors.body}</p>}
                 </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-4 pt-8 border-t border-gray-100">
-                <button
-                    type="button"
-                    onClick={() => router.back()}
-                    className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    disabled={isPending}
-                >
-                    Cancel
-                </button>
+            <div className="flex gap-3">
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="px-8 py-3 bg-accent text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className={`px-8 py-3 bg-accent text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all flex items-center gap-2 ${isPending ? 'opacity-70 scale-95' : 'hover:-translate-y-1'}`}
                 >
-                    {isPending ? 'Saving...' : (article ? 'Update Article' : 'Create Article')}
+                    {isPending ? (
+                        <>
+                            <Clock className="w-4 h-4 animate-spin" />
+                            <span>Saving...</span>
+                        </>
+                    ) : (
+                        <>
+                            <ShieldCheck className="w-4 h-4" />
+                            <span>{article ? 'Update Article' : 'Publish Article'}</span>
+                        </>
+                    )}
                 </button>
             </div>
         </form>

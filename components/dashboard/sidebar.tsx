@@ -8,14 +8,13 @@ import {
     Calendar,
     Settings,
     LogOut,
-    BookOpen,
     Search,
     CreditCard,
     FileText,
-    CheckCircle
+    CheckCircle,
+    PenBoxIcon
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
-import Image from 'next/image'
 import { Logo } from '../logo'
 
 interface SidebarProps {
@@ -37,19 +36,19 @@ const navigation = {
     ],
     admin: [
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
+        { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
-        { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
+        { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
-        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ],
     'admin-dev': [ // Same as admin for now
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
+        { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
-        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ]
 }
 
@@ -74,51 +73,78 @@ export default function Sidebar({ role, userName }: SidebarProps) {
     }
 
     return (
-        <aside className="w-64 bg-accent text-white flex flex-col h-screen fixed left-0 top-0 shadow-2xl z-50">
-            {/* Logo Section */}
-            <Logo className='mt-8 mr-2' />
+        <aside className="w-64 bg-white border-r border-gray-100 flex flex-col h-screen fixed left-0 top-0 z-50">
+            {/* Top Branding & Search */}
+            <div className="p-6 pb-2">
+                <div className="flex items-center justify-between mb-8">
+                    <Logo className="h-8" />
+                    {/* <div className="flex gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+                        </div>
+                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                        </div>
+                    </div> */}
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative mb-6">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all placeholder:text-gray-400"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white border border-gray-100 rounded-md px-1.5 py-0.5 text-[10px] text-gray-400 font-mono">
+                        ⌘K
+                    </div>
+                </div>
+            </div>
 
             {/* Navigation Section */}
-            <nav className="grow pl-1 py-6 space-y-2 mt-4 overflow-y-auto">
+            <nav className="grow px-3 py-2 space-y-1 overflow-y-auto">
                 {menuItems.map((item) => {
                     const isActive = pathname === item.href
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group ${isActive
-                                ? 'bg-white/15 text-rich-amber-accent shadow-lg shadow-black/10'
-                                : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${isActive
+                                ? 'bg-gray-50 text-accent'
+                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                                 }`}
                         >
-                            <item.icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-rich-amber-accent' : ''}`} />
-                            <span className="font-medium text-lg tracking-wide">{item.name}</span>
-                            {isActive && (
-                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-rich-amber-accent shadow-[0_0_8px_rich-amber-accent]" />
-                            )}
+                            <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                            <span className="font-medium text-sm">{item.name}</span>
                         </Link>
                     )
                 })}
             </nav>
 
-            {/* User Profile & Footer Section */}
-            <div className="pl-1 py-6 border-t border-white/10 bg-black/5">
-                <div className="flex items-center gap-4 mb-6 px-2">
-                    <div className="w-10 h-10 rounded-full bg-rich-amber-accent flex items-center justify-center text-accent font-bold shadow-inner">
-                        {userName?.[0] || 'U'}
+            {/* Footer Section */}
+            <div className="p-3 border-t border-gray-50 bg-gray-50/30">
+                <div className="flex items-center justify-between py-3 px-2 bg-white  rounded-md group cursor-pointer hover:border-accent/10 transition-all">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center text-xs font-bold shrink-0">
+                            {userName?.[0] || 'U'}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-sm font-semibold text-gray-900 truncate">{userName || 'User'}</span>
+                            <span className="text-[10px] text-gray-400 uppercase tracking-tighter truncate">{role}</span>
+                        </div>
                     </div>
-                    <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-sm truncate">{userName || 'User'}</span>
-                        <span className="text-[10px] uppercase tracking-widest text-rich-amber-accent font-bold opacity-80">{role}</span>
-                    </div>
+                    {/* <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg> */}
                 </div>
 
                 <button
                     onClick={handleSignOut}
-                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all group border border-transparent hover:border-red-500/20"
+                    className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all text-sm group"
                 >
                     <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                    <span className="font-medium text-sm">Sign Out</span>
+                    <span>Sign Out</span>
                 </button>
             </div>
         </aside>

@@ -15,8 +15,6 @@
   --color-rich-beige-accent: #ebf3f3;
   --color-rich-purple: #221d35;
 
-  --font-primary: "GT", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
@@ -66,17 +64,6 @@
   ::file-selector-button {
     border-color: var(--color-border);
   }
-}
-
-@layer utilities {
-  body {
-    font-family: var(--font-primary);
-  }
-}
-
-@font-face {
-  font-family: 'GT';
-  src: url('./GTWalsheimPro-Light.woff2');
 }
 
 @layer base {

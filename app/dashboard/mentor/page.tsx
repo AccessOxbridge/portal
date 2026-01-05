@@ -59,6 +59,18 @@ export default async function MentorDashboard() {
         .eq('mentor_id', user.id)
         .eq('status', 'pending')
 
+    // Fetch active sessions for this mentor
+    const { data: activeSessions } = await supabase
+        .from('sessions')
+        .select(`
+            *,
+            student:profiles!sessions_student_id_fkey (
+                full_name
+            )
+        `)
+        .eq('mentor_id', user.id)
+        .eq('status', 'active')
+
     return (
         <div className="space-y-12">
             <header>
@@ -86,6 +98,38 @@ export default async function MentorDashboard() {
                         View Requests <span className="ml-2">→</span>
                     </a>
                 </div>
+
+                {activeSessions && activeSessions.length > 0 && (
+                    <div className="p-8 bg-green-50 rounded-[32px] border border-green-100 shadow-xl shadow-green-200/50">
+                        <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
+                            <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Active Sessions</h2>
+                        <div className="space-y-3">
+                            {activeSessions.map((session: any) => (
+                                <div key={session.id} className="p-4 bg-white rounded-2xl border border-green-100">
+                                    <p className="font-semibold text-gray-900 mb-2">
+                                        Session with {(session.student as any)?.full_name || 'Student'}
+                                    </p>
+                                    {session.zoom_start_url ? (
+                                        <a
+                                            href={session.zoom_start_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors"
+                                        >
+                                            🎥 Start Zoom Meeting
+                                        </a>
+                                    ) : (
+                                        <span className="text-gray-500 text-sm">Zoom link unavailable</span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group">
                     <div className="w-14 h-14 bg-rich-beige-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">

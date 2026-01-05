@@ -37,9 +37,20 @@ export default function StudentDashboardContent({
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Active Mentorship</h2>
                         <p className="text-gray-500 mb-6 leading-relaxed">You are currently paired with <strong>{activeSession.mentor_full_name}</strong>. Start your session now!</p>
-                        <button className="w-full py-4 bg-accent text-white font-bold rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all">
-                            Join Session
-                        </button>
+                        {activeSession.zoom_join_url ? (
+                            <a
+                                href={activeSession.zoom_join_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-full py-4 bg-accent text-white font-bold rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center"
+                            >
+                                🎥 Join Zoom Session
+                            </a>
+                        ) : (
+                            <div className="w-full py-4 bg-gray-100 text-gray-500 font-medium rounded-2xl text-center">
+                                Zoom link will be available soon
+                            </div>
+                        )}
                     </div>
                 ) : pendingRequests.length > 0 ? (
                     <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50">

@@ -48,7 +48,7 @@ export async function handleMentorshipRequest(
         if (fetchError || !request) throw new Error('Request not found')
 
         // 2. Check if already accepted or expired (24h)
-        const createdAt = new Date(request.created_at).getTime()
+        const createdAt = new Date(request.created_at || Date.now()).getTime()
         const now = new Date().getTime()
         if (now - createdAt > 24 * 60 * 60 * 1000) {
             await supabase.from('mentorship_requests').update({ status: 'expired' }).eq('id', requestId)
@@ -98,7 +98,7 @@ export async function handleMentorshipRequest(
                 request_id: request.id,
                 status: 'active',
                 scheduled_at: scheduledAt.toISOString(),
-                selected_slot: selectedSlot,
+                selected_slot: JSON.parse(JSON.stringify(selectedSlot)),
                 zoom_meeting_id: zoomMeeting?.id || null,
                 zoom_join_url: zoomMeeting?.joinUrl || null,
                 zoom_start_url: zoomMeeting?.startUrl || null,

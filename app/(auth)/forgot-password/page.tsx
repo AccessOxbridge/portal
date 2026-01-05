@@ -71,3 +71,5 @@ export default async function ForgotPasswordPage({ searchParams }: { searchParam
     return <ForgotPasswordForm />
 }
 
+
+

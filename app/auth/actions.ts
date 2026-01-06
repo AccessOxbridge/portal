@@ -67,6 +67,13 @@ export async function signup(formData: FormData) {
         redirect(`/error?message=${encodeURIComponent(error.message)}`)
     }
 
+    // Check if user already exists but isn't confirmed or tries to re-signup
+    // Supabase returns a user but empty identities if they already exist
+    if (user && (!user.identities || user.identities.length === 0)) {
+        console.log('User already exists, redirecting to login')
+        redirect('/login?error=' + encodeURIComponent('An account with this email already exists. Please log in instead.'))
+    }
+
     // If we have a session, the user is already logged in (direct signup)
     if (session) {
         console.log('Direct signup successful, redirecting to dashboard')

@@ -231,6 +231,47 @@ export type Database = {
         }
         Relationships: []
       }
+      session_reports: {
+        Row: {
+          action_items: Json | null
+          created_at: string | null
+          id: string
+          key_points: Json | null
+          raw_transcript: string | null
+          session_id: string
+          summary: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_items?: Json | null
+          created_at?: string | null
+          id?: string
+          key_points?: Json | null
+          raw_transcript?: string | null
+          session_id: string
+          summary?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_items?: Json | null
+          created_at?: string | null
+          id?: string
+          key_points?: Json | null
+          raw_transcript?: string | null
+          session_id?: string
+          summary?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           created_at: string | null
@@ -241,9 +282,11 @@ export type Database = {
           selected_slot: Json | null
           status: string
           student_id: string
+          transcript_url: string | null
           updated_at: string | null
           zoom_join_url: string | null
           zoom_meeting_id: string | null
+          zoom_meeting_status: string | null
           zoom_start_url: string | null
         }
         Insert: {
@@ -255,9 +298,11 @@ export type Database = {
           selected_slot?: Json | null
           status?: string
           student_id: string
+          transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null
           zoom_meeting_id?: string | null
+          zoom_meeting_status?: string | null
           zoom_start_url?: string | null
         }
         Update: {
@@ -269,9 +314,11 @@ export type Database = {
           selected_slot?: Json | null
           status?: string
           student_id?: string
+          transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null
           zoom_meeting_id?: string | null
+          zoom_meeting_status?: string | null
           zoom_start_url?: string | null
         }
         Relationships: [

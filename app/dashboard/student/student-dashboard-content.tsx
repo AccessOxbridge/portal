@@ -36,7 +36,21 @@ export default function StudentDashboardContent({
                             </svg>
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Active Mentorship</h2>
-                        <p className="text-gray-500 mb-6 leading-relaxed">You are currently paired with <strong>{activeSession.mentor_full_name}</strong>. Start your session now!</p>
+                        <div className="mb-6">
+                            <p className="text-gray-500 leading-relaxed font-medium">Mentor: <strong>{activeSession.mentor_full_name}</strong></p>
+                            {activeSession.scheduled_at && (
+                                <p className="text-accent font-bold mt-1">
+                                    {new Date(activeSession.scheduled_at).toLocaleDateString('en-GB', {
+                                        weekday: 'long',
+                                        day: 'numeric',
+                                        month: 'short'
+                                    })} at {new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </p>
+                            )}
+                        </div>
                         {activeSession.zoom_join_url ? (
                             <a
                                 href={activeSession.zoom_join_url}
@@ -44,7 +58,10 @@ export default function StudentDashboardContent({
                                 rel="noopener noreferrer"
                                 className="block w-full py-4 bg-accent text-white font-bold rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center"
                             >
-                                🎥 Join Zoom Session
+                                🎥 Join at {activeSession.scheduled_at ? new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'Session'}
                             </a>
                         ) : (
                             <div className="w-full py-4 bg-gray-100 text-gray-500 font-medium rounded-2xl text-center">

@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { createZoomMeeting } from '@/utils/zoom'
-import { sendSessionConfirmationEmail } from '@/utils/email'
+// import { sendSessionConfirmationEmail } from '@/utils/email'
 
 interface TimeSlot {
     date: string      // "2025-01-15"
@@ -119,41 +119,28 @@ export async function handleMentorshipRequest(
             .eq('student_id', request.student_id)
             .eq('status', 'pending')
 
-        // 9. Send email notifications to both parties
-        if (zoomMeeting) {
-            // Email to student
-            if (studentProfile?.email) {
-                await sendSessionConfirmationEmail({
-                    recipientEmail: studentProfile.email,
-                    recipientName: studentProfile.full_name || 'Student',
-                    otherPartyName: mentorProfile?.full_name || 'Mentor',
-                    otherPartyRole: 'mentor',
-                    scheduledAt,
-                    zoomJoinUrl: zoomMeeting.joinUrl,
-                })
-            }
+        // 9. Send email/in-app notifications to both parties via notifications table
+        const formattedTime = scheduledAt.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        const formattedDate = scheduledAt.toLocaleDateString('en-GB', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long'
+        });
 
-            // Email to mentor
-            if (mentorProfile?.email) {
-                await sendSessionConfirmationEmail({
-                    recipientEmail: mentorProfile.email,
-                    recipientName: mentorProfile.full_name || 'Mentor',
-                    otherPartyName: studentProfile?.full_name || 'Student',
-                    otherPartyRole: 'student',
-                    scheduledAt,
-                    zoomJoinUrl: zoomMeeting.joinUrl,
-                })
-            }
-        }
+        const timeDisplay = `${formattedDate} at ${formattedTime}`;
 
-        // 10. Create in-app notification for student
+        // Notification for student
         if (studentProfile?.email) {
             await supabase.from('notifications').insert({
                 recipient_id: request.student_id,
                 recipient_email: studentProfile.email,
                 type: 'match_accepted' as const,
                 title: 'Mentorship Request Accepted!',
-                message: `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your mentorship request and selected a time for your session.`,
+                message: `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your request. Your session is scheduled for ${timeDisplay}.`,
                 data: {
                     mentor_id: request.mentor_id,
                     mentor_name: mentorProfile?.full_name || 'Mentor',
@@ -163,6 +150,49 @@ export async function handleMentorshipRequest(
                 }
             })
         }
+
+        // Notification for mentor
+        if (mentorProfile?.email) {
+            await supabase.from('notifications').insert({
+                recipient_id: request.mentor_id,
+                recipient_email: mentorProfile.email,
+                type: 'session_confirmed' as const,
+                title: 'Session Confirmed!',
+                message: `You have successfully scheduled a session with ${studentProfile?.full_name || 'your student'} for ${timeDisplay}.`,
+                data: {
+                    student_id: request.student_id,
+                    student_name: studentProfile?.full_name || 'Student',
+                    request_id: request.id,
+                    scheduled_at: scheduledAt.toISOString(),
+                    zoom_join_url: zoomMeeting?.joinUrl || null,
+                }
+            })
+        }
+
+        // Legacy direct emails (keeping for high-quality template redundancy)
+        // if (zoomMeeting) {
+        //     if (studentProfile?.email) {
+        //         await sendSessionConfirmationEmail({
+        //             recipientEmail: studentProfile.email,
+        //             recipientName: studentProfile.full_name || 'Student',
+        //             otherPartyName: mentorProfile?.full_name || 'Mentor',
+        //             otherPartyRole: 'mentor',
+        //             scheduledAt,
+        //             zoomJoinUrl: zoomMeeting.joinUrl,
+        //         })
+        //     }
+
+        //     if (mentorProfile?.email) {
+        //         await sendSessionConfirmationEmail({
+        //             recipientEmail: mentorProfile.email,
+        //             recipientName: mentorProfile.full_name || 'Mentor',
+        //             otherPartyName: studentProfile?.full_name || 'Student',
+        //             otherPartyRole: 'student',
+        //             scheduledAt,
+        //             zoomJoinUrl: zoomMeeting.joinUrl,
+        //         })
+        //     }
+        // }
     }
 
     revalidatePath('/dashboard/mentor/requests')

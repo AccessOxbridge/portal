@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "../assets/globals.css";
+import NotificationBell from "@/components/dashboard/notification-bell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} antialiased`}
       >
+        <NotificationBell />
         {children}
       </body>
     </html>

@@ -68,6 +68,191 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_packages: {
+        Row: {
+          created_at: string | null
+          credits: number
+          currency: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          name: string
+          price_cents: number
+          sort_order: number | null
+          stripe_price_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credits: number
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name: string
+          price_cents: number
+          sort_order?: number | null
+          stripe_price_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credits?: number
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name?: string
+          price_cents?: number
+          sort_order?: number | null
+          stripe_price_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      credit_purchases: {
+        Row: {
+          amount_paid_cents: number
+          completed_at: string | null
+          created_at: string | null
+          credits_purchased: number
+          currency: string
+          id: string
+          package_id: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_paid_cents: number
+          completed_at?: string | null
+          created_at?: string | null
+          credits_purchased: number
+          currency?: string
+          id?: string
+          package_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_paid_cents?: number
+          completed_at?: string | null
+          created_at?: string | null
+          credits_purchased?: number
+          currency?: string
+          id?: string
+          package_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_purchases_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "credit_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string | null
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_responses: {
+        Row: {
+          created_at: string | null
+          form_type: string
+          id: string
+          respondent_id: string
+          responses: Json
+          session_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          form_type: string
+          id?: string
+          respondent_id: string
+          responses?: Json
+          session_id: string
+        }
+        Update: {
+          created_at?: string | null
+          form_type?: string
+          id?: string
+          respondent_id?: string
+          responses?: Json
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_responses_respondent_id_fkey"
+            columns: ["respondent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_responses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentors: {
         Row: {
           bio: string | null
@@ -209,24 +394,30 @@ export type Database = {
       }
       profiles: {
         Row: {
+          credits: number | null
           email: string | null
           full_name: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"]
+          stripe_customer_id: string | null
           updated_at: string
         }
         Insert: {
+          credits?: number | null
           email?: string | null
           full_name?: string | null
           id: string
           role?: Database["public"]["Enums"]["user_role"]
+          stripe_customer_id?: string | null
           updated_at?: string
         }
         Update: {
+          credits?: number | null
           email?: string | null
           full_name?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          stripe_customer_id?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -237,6 +428,8 @@ export type Database = {
           created_at: string | null
           id: string
           key_points: Json | null
+          personalized_report: string | null
+          personalized_report_generated_at: string | null
           raw_transcript: string | null
           session_id: string
           summary: string | null
@@ -247,6 +440,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           key_points?: Json | null
+          personalized_report?: string | null
+          personalized_report_generated_at?: string | null
           raw_transcript?: string | null
           session_id: string
           summary?: string | null
@@ -257,6 +452,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           key_points?: Json | null
+          personalized_report?: string | null
+          personalized_report_generated_at?: string | null
           raw_transcript?: string | null
           session_id?: string
           summary?: string | null
@@ -277,6 +474,7 @@ export type Database = {
           created_at: string | null
           id: string
           mentor_id: string
+          reminder_sent: boolean | null
           request_id: string | null
           scheduled_at: string | null
           selected_slot: Json | null
@@ -293,6 +491,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           mentor_id: string
+          reminder_sent?: boolean | null
           request_id?: string | null
           scheduled_at?: string | null
           selected_slot?: Json | null
@@ -309,6 +508,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           mentor_id?: string
+          reminder_sent?: boolean | null
           request_id?: string | null
           scheduled_at?: string | null
           selected_slot?: Json | null
@@ -384,6 +584,7 @@ export type Database = {
         | "mentor_application_denied"
         | "system_alert"
         | "session_confirmed"
+        | "session_reminder"
       user_role: "student" | "mentor" | "admin" | "client" | "admin-dev"
     }
     CompositeTypes: {
@@ -530,6 +731,7 @@ export const Constants = {
         "mentor_application_denied",
         "system_alert",
         "session_confirmed",
+        "session_reminder",
       ],
       user_role: ["student", "mentor", "admin", "client", "admin-dev"],
     },

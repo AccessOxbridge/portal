@@ -12,10 +12,12 @@ import {
     CreditCard,
     FileText,
     CheckCircle,
-    PenBoxIcon
+    PenBoxIcon,
+    Coins
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
+import NotificationBell from './notification-bell'
 
 interface SidebarProps {
     role: string;
@@ -25,6 +27,7 @@ interface SidebarProps {
 const navigation = {
     student: [
         { name: 'Explore', href: '/dashboard/student', icon: Search },
+        { name: 'Credits', href: '/dashboard/student/credits', icon: CreditCard },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ],
@@ -38,6 +41,7 @@ const navigation = {
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
+        { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
@@ -46,6 +50,7 @@ const navigation = {
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
+        { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
@@ -78,14 +83,7 @@ export default function Sidebar({ role, userName }: SidebarProps) {
             <div className="p-6 pb-2">
                 <div className="flex items-center justify-between mb-8">
                     <Logo className="h-8" />
-                    {/* <div className="flex gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-                        </div>
-                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16m-7 6h7" /></svg>
-                        </div>
-                    </div> */}
+                    {/* <NotificationBell /> */}
                 </div>
 
                 {/* Search Bar */}

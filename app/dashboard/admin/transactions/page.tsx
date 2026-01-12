@@ -1,0 +1,50 @@
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
+import TransactionsTabs from './transactions-tabs'
+
+export default async function AdminTransactionsPage() {
+    const supabase = await createClient()
+
+    // Check if user is admin
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+        redirect('/login')
+    }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile || !['admin', 'admin-dev'].includes(profile.role)) {
+        redirect('/dashboard')
+    }
+
+    // Fetch inbound transactions (credit purchases)
+    const { data: purchases } = await supabase
+        .from('credit_purchases')
+        .select(`
+            *,
+            profiles:user_id (full_name, email),
+            credit_packages:package_id (name, credits)
+        `)
+        .eq('status', 'completed')
+        .order('completed_at', { ascending: false })
+        .limit(100)
+
+    return (
+        <div className="max-w-6xl mx-auto">
+            <header className="mb-10">
+                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                    Transactions
+                </h1>
+                <p className="mt-3 text-gray-500 text-lg">
+                    View all inbound and outbound transactions
+                </p>
+            </header>
+
+            <TransactionsTabs purchases={purchases || []} />
+        </div>
+    )
+}

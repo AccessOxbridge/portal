@@ -11,6 +11,7 @@
     "import-mentors-only": "bun run import-mentors-only.ts"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.6.1",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
     "@uiw/react-md-editor": "^4.0.11",
@@ -25,6 +26,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.6.0",
+    "stripe": "^20.1.2",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

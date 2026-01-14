@@ -15,7 +15,8 @@ import {
     PenBoxIcon,
     Coins,
     MessageSquare,
-    MessageCircle
+    MessageCircle,
+    Book
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -34,6 +35,8 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+        { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
+         
     ],
     mentor: [
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },

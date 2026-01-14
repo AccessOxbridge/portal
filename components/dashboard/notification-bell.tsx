@@ -106,7 +106,7 @@ export default function NotificationBell() {
     }
 
     return (
-        <div className=" absolute top-4 right-4" ref={dropdownRef}>
+        <div className=" absolute top-5 right-4" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all group"

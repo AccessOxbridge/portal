@@ -56,12 +56,12 @@ export async function handleMentorshipRequest(
         }
 
         // 3. Parse the selected slot to create a scheduled datetime
-        const scheduledAt = new Date(`${selectedSlot.date}T${selectedSlot.startTime}:00`)
+        // The client now sends UTC ISO strings for startTime and endTime
+        const scheduledAt = new Date(selectedSlot.startTime)
+        const endAt = new Date(selectedSlot.endTime)
 
-        // Calculate duration in minutes
-        const startParts = selectedSlot.startTime.split(':').map(Number)
-        const endParts = selectedSlot.endTime.split(':').map(Number)
-        const durationMinutes = (endParts[0] * 60 + endParts[1]) - (startParts[0] * 60 + startParts[1])
+        // Calculate duration in minutes using Date objects
+        const durationMinutes = Math.round((endAt.getTime() - scheduledAt.getTime()) / (60 * 1000))
 
         // 4. Get both profiles for the meeting and emails
         const { data: studentProfile } = await supabase

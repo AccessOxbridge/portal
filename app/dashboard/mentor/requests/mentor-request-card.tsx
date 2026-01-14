@@ -30,13 +30,19 @@ export function MentorRequestCard({ request }: { request: Request }) {
     const [loading, setLoading] = useState(false)
 
     const formatSlotDisplay = (slot: TimeSlot) => {
-        const date = new Date(slot.date)
-        const formatted = date.toLocaleDateString('en-GB', {
+        // Parse the UTC ISO strings
+        const start = new Date(slot.startTime)
+        const end = new Date(slot.endTime)
+
+        const dateStr = start.toLocaleDateString('en-GB', {
             weekday: 'short',
             day: 'numeric',
             month: 'short'
         })
-        return `${formatted}, ${slot.startTime} - ${slot.endTime}`
+        const startTimeStr = start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        const endTimeStr = end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+
+        return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
     }
 
     const handleAccept = async () => {
@@ -165,8 +171,8 @@ export function MentorRequestCard({ request }: { request: Request }) {
                                     key={index}
                                     onClick={() => setSelectedSlot(slot)}
                                     className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all ${selectedSlot === slot
-                                            ? 'border-accent bg-accent/10 text-accent'
-                                            : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-accent bg-accent/10 text-accent'
+                                        : 'border-gray-200 hover:border-gray-300'
                                         }`}
                                 >
                                     <span className="font-semibold">{formatSlotDisplay(slot)}</span>

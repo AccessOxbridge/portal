@@ -131,9 +131,4 @@ export async function POST(req: Request) {
     }
 }
 
-// Disable body parsing for webhook verification
-export const config = {
-    api: {
-        bodyParser: false
-    }
-}
+

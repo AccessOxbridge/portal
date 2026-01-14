@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Sidebar from '@/components/dashboard/sidebar'
+import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
 
 export default async function DashboardLayout({
     children,
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
         .select(`
             full_name, 
             role,
+            credits,
             mentors (
                 status
             )
@@ -46,6 +48,8 @@ export default async function DashboardLayout({
         }
     }
 
+    const isStudent = profile.role === 'student' || profile.role === 'admin-dev'
+
     return (
         <div className="flex min-h-screen">
             {/* Sidebar with fixed width */}
@@ -63,6 +67,11 @@ export default async function DashboardLayout({
                     {children}
                 </div>
             </main>
+
+            {/* Floating Credits Button for Students */}
+            {isStudent && (
+                <CreditsFloatingButton initialCredits={(profile as any).credits || 0} />
+            )}
         </div>
     )
 }

@@ -43,17 +43,45 @@ export default async function StudentDashboard() {
         .eq('status', 'active')
         .maybeSingle()
 
+    // Fetch upcoming sessions (active sessions with future scheduled_at)
+    const now = new Date().toISOString()
+    const { data: upcomingSessions } = await supabase
+        .from('sessions')
+        .select(`
+            id,
+            scheduled_at,
+            zoom_join_url,
+            mentor:profiles!sessions_mentor_id_fkey (
+                full_name
+            )
+        `)
+        .eq('student_id', user.id)
+        .eq('status', 'active')
+        .gte('scheduled_at', now)
+        .order('scheduled_at', { ascending: true })
+        .limit(3)
+
     // Flatten mentor name if exists
     const sessionWithMentor = activeSession ? {
         ...activeSession,
         mentor_full_name: (activeSession.mentor as any)?.full_name
     } : null
 
+    // Process upcoming sessions
+    const processedUpcomingSessions = (upcomingSessions || []).map((session: any) => ({
+        id: session.id,
+        scheduled_at: session.scheduled_at,
+        zoom_join_url: session.zoom_join_url,
+        mentor_full_name: session.mentor?.full_name || 'Mentor'
+    }))
+
     return (
         <StudentDashboardContent
             profile={profile}
             activeSession={sessionWithMentor}
             pendingRequests={pendingRequests || []}
+            upcomingSessions={processedUpcomingSessions}
         />
     )
 }
+

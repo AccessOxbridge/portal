@@ -14,7 +14,34 @@ export async function POST(req: Request) {
 
         const { strengths, weaknesses, requirements, timeSlots, anythingElse } = await req.json()
 
-        // 2. Prepare text for embedding
+        // 2. Check user's credit balance
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('credits')
+            .eq('id', user.id)
+            .single()
+
+        if (profileError) {
+            return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
+        }
+
+        const currentCredits = (profile as any)?.credits || 0
+        const requiredCredits = timeSlots?.length || 0
+
+        if (requiredCredits === 0) {
+            return NextResponse.json({ error: 'At least one time slot is required' }, { status: 400 })
+        }
+
+        if (currentCredits < requiredCredits) {
+            return NextResponse.json({
+                error: `Insufficient credits. You have ${currentCredits} credits but need ${requiredCredits} for ${timeSlots.length} session${timeSlots.length > 1 ? 's' : ''}.`,
+                insufficientCredits: true,
+                currentCredits,
+                requiredCredits
+            }, { status: 402 }) // 402 Payment Required
+        }
+
+        // 3. Prepare text for embedding
         const studentProfileText = `
             Student Requirements:
             Strengths: ${strengths}
@@ -88,7 +115,33 @@ export async function POST(req: Request) {
             await supabase.from('notifications').insert(notifications)
         }
 
-        return NextResponse.json({ success: true, count: matches.length })
+        // 7. Deduct credits from user
+        const newBalance = currentCredits - requiredCredits
+        const { error: creditUpdateError } = await supabase
+            .from('profiles')
+            .update({ credits: newBalance })
+            .eq('id', user.id)
+
+        if (creditUpdateError) {
+            console.error('Failed to deduct credits:', creditUpdateError)
+            // Don't fail the request, just log it - the matching was successful
+        }
+
+        // 8. Create transaction record for audit
+        await supabase.from('credit_transactions').insert({
+            user_id: user.id,
+            amount: -requiredCredits,
+            balance_after: newBalance,
+            type: 'booking',
+            description: `Booked ${requiredCredits} mentorship session${requiredCredits > 1 ? 's' : ''} with ${matches.length} mentor${matches.length > 1 ? 's' : ''}`
+        })
+
+        return NextResponse.json({
+            success: true,
+            count: matches.length,
+            creditsDeducted: requiredCredits,
+            remainingCredits: newBalance
+        })
 
     } catch (error: any) {
         console.error('Match API Error:', error)

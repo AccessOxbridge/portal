@@ -35,10 +35,37 @@ export async function POST(req: Request) {
 
         else if (event === 'meeting.ended') {
             const meetingId = payload.object.id
-            await supabase
+
+            // Update session status
+            const { data: session } = await supabase
                 .from('sessions')
-                .update({ zoom_meeting_status: 'ended' })
+                .update({ zoom_meeting_status: 'ended', status: 'completed' })
                 .eq('zoom_meeting_id', meetingId.toString())
+                .select('id, mentor_id, student_id')
+                .single()
+
+            // Send notifications for form filling
+            if (session) {
+                // Notify mentor (mandatory report)
+                await supabase.from('notifications').insert({
+                    recipient_id: session.mentor_id,
+                    recipient_email: '', // Will be fetched by notification system
+                    type: 'session_confirmed', // Reusing existing type
+                    title: '📝 Session Report Required',
+                    message: 'Please complete your session report to generate the student\'s personalized feedback.',
+                    data: { session_id: session.id, action: 'mentor_report' }
+                })
+
+                // Notify student (optional feedback)
+                await supabase.from('notifications').insert({
+                    recipient_id: session.student_id,
+                    recipient_email: '',
+                    type: 'session_confirmed',
+                    title: '⭐ Share Your Feedback',
+                    message: 'Your session has ended! We\'d love to hear about your experience (optional).',
+                    data: { session_id: session.id, action: 'student_feedback' }
+                })
+            }
         }
 
         // 3. Handle Transcription Completed

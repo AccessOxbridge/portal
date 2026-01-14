@@ -60,14 +60,27 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
 
     const addTimeSlot = () => {
         if (newSlot.date && newSlot.startTime && newSlot.endTime) {
-            // Validate end time is after start time
+            // Validate end time is after start time (local string comparison is enough for basic check)
             if (newSlot.endTime <= newSlot.startTime) {
                 alert('End time must be after start time')
                 return
             }
+
+            // Normalize to UTC
+            // We construct a date object using the local date and time strings
+            const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
+            const endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
+
             setFormData({
                 ...formData,
-                timeSlots: [...formData.timeSlots, { ...newSlot }]
+                timeSlots: [
+                    ...formData.timeSlots,
+                    {
+                        date: newSlot.date,
+                        startTime: startDateTime.toISOString(), // Store as UTC ISO
+                        endTime: endDateTime.toISOString()     // Store as UTC ISO
+                    }
+                ]
             })
             setNewSlot({ date: '', startTime: '', endTime: '' })
         }
@@ -81,13 +94,19 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
     }
 
     const formatSlotDisplay = (slot: TimeSlot) => {
-        const date = new Date(slot.date)
-        const formatted = date.toLocaleDateString('en-GB', {
+        // Parse the UTC ISO strings
+        const start = new Date(slot.startTime)
+        const end = new Date(slot.endTime)
+
+        const dateStr = start.toLocaleDateString('en-GB', {
             weekday: 'short',
             day: 'numeric',
             month: 'short'
         })
-        return `${formatted}, ${slot.startTime} - ${slot.endTime}`
+        const startTimeStr = start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        const endTimeStr = end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+
+        return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
     }
 
     // Get minimum date (tomorrow)

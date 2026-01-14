@@ -119,10 +119,10 @@ export default function SignupPage() {
                             <option value="student">Student / Parent</option>
                             <option value="mentor">Mentor</option>
                             {
-                                process.env.NODE_ENV === 'development' && (
+                                process.env.NEXT_PUBLIC_ENV === 'dev' && (
                                     <>
-                                        <option value="admin">Admin</option>
-                                        <option value="admin-dev">Admin (Dev) - Access All</option>
+                            <option value="admin">Admin</option>
+                            <option value="admin-dev">Admin (Dev) - Access All</option>
                                     </>
                                 )
                             }

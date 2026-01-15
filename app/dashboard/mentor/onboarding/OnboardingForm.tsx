@@ -1,11 +1,45 @@
 "use client"
 
 import { motion } from "framer-motion";
-import { MENTOR_ONBOARDING_QUESTIONS } from '@/config/mentor-onboarding.config'
+import { useState, useRef, useEffect } from "react";
+import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { submitOnboarding } from './actions'
 import { Logo } from "@/components/logo";
 
+// Flatten all subjects into a single array
+const ALL_SUBJECTS = Object.values(SUBJECT_OPTIONS).flat();
+// Remove duplicates
+const UNIQUE_SUBJECTS = [...new Set(ALL_SUBJECTS)].sort();
+
 export default function OnboardingForm() {
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleSubject = (subject: string) => {
+    setSelectedSubjects(prev =>
+      prev.includes(subject)
+        ? prev.filter(s => s !== subject)
+        : [...prev, subject]
+    );
+  };
+
+  const filteredSubjects = searchQuery.trim()
+    ? UNIQUE_SUBJECTS.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+    : UNIQUE_SUBJECTS;
+
   return (
     <div className="min-h-screen bg-accent text-white">
       <div className="max-w-7xl mx-auto px-8 lg:px-12 ">
@@ -13,7 +47,7 @@ export default function OnboardingForm() {
           {/* Left Side: Header & Form */}
           <div className="space-y-16 mt-12">
             <div className="space-y-8">
-              <Logo className="justify-start"/>
+              <Logo className="justify-start" />
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -95,18 +129,95 @@ export default function OnboardingForm() {
                   )}
 
                   {question.type === 'multiselect' && (
-                    <div className="space-y-3 mt-3">
-                      {question.options?.map((option) => (
-                        <label key={option} className="flex items-center cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            name={question.id}
-                            value={option}
-                            className="h-4 w-4 text-white border-gray-700 rounded focus:ring-white bg-transparent"
-                          />
-                          <span className="ml-3 text-sm text-gray-300 group-hover:text-white transition-colors">{option}</span>
-                        </label>
+                    <div ref={dropdownRef} className="relative">
+                      {/* Hidden inputs for form submission */}
+                      {selectedSubjects.map((subject) => (
+                        <input key={subject} type="hidden" name={question.id} value={subject} />
                       ))}
+
+                      {/* Selected tags */}
+                      {selectedSubjects.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {selectedSubjects.map((subject) => (
+                            <span
+                              key={subject}
+                              className="inline-flex items-center gap-1 bg-white/10 text-white text-xs px-2 py-1 rounded-full"
+                            >
+                              <span className="max-w-[150px] truncate">{subject}</span>
+                              <button
+                                type="button"
+                                onClick={() => toggleSubject(subject)}
+                                className="hover:bg-white/20 rounded-full p-0.5"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Dropdown trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full flex items-center justify-between border-b border-gray-700 py-2 text-left hover:border-white transition-all duration-300"
+                      >
+                        <span className="text-gray-400">
+                          {selectedSubjects.length === 0
+                            ? 'Click to select subjects...'
+                            : `${selectedSubjects.length} subject${selectedSubjects.length > 1 ? 's' : ''} selected`}
+                        </span>
+                        <svg className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {/* Dropdown menu */}
+                      {isDropdownOpen && (
+                        <div className="absolute z-20 mt-2 w-full bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-64 overflow-hidden">
+                          {/* Search */}
+                          <div className="p-2 border-b border-gray-700 sticky top-0 bg-gray-900">
+                            <input
+                              type="text"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder="Search subjects..."
+                              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-white"
+                              autoFocus
+                            />
+                          </div>
+
+                          {/* Options list */}
+                          <div className="overflow-y-auto max-h-48">
+                            {filteredSubjects.map((subject) => (
+                              <button
+                                key={subject}
+                                type="button"
+                                onClick={() => toggleSubject(subject)}
+                                className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-gray-800 transition-colors ${selectedSubjects.includes(subject) ? 'bg-white/10 text-white' : 'text-gray-300'
+                                  }`}
+                              >
+                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedSubjects.includes(subject) ? 'bg-white border-white' : 'border-gray-600'
+                                  }`}>
+                                  {selectedSubjects.includes(subject) && (
+                                    <svg className="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                  )}
+                                </div>
+                                {subject}
+                              </button>
+                            ))}
+                            {filteredSubjects.length === 0 && (
+                              <div className="px-3 py-6 text-center text-gray-500 text-sm">
+                                No subjects found
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

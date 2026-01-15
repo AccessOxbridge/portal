@@ -58,6 +58,7 @@ export default async function DashboardLayout({
                     // we should not default to student! error handling - TODO  
                     role={profile.role || 'student'}
                     userName={profile.full_name || user.email?.split('@')[0] || 'User'}
+                    userId={user.id}
                 />
             )}
 

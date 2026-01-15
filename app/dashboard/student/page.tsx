@@ -75,12 +75,20 @@ export default async function StudentDashboard() {
         mentor_full_name: session.mentor?.full_name || 'Mentor'
     }))
 
+    // Fetch student academic profile for targets
+    const { data: academicProfile } = await supabase
+        .from('student_profiles')
+        .select('target_university, target_course, application_year, subjects')
+        .eq('id', user.id)
+        .single()
+
     return (
         <StudentDashboardContent
             profile={profile}
             activeSession={sessionWithMentor}
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
+            academicProfile={academicProfile}
         />
     )
 }

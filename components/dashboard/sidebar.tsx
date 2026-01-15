@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -16,16 +17,40 @@ import {
     Coins,
     MessageSquare,
     MessageCircle,
-    Book
+    Book,
+    CalendarDays,
+    Video,
+    MapPin,
+    ChevronDown
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
 import NotificationBell from './notification-bell'
+import AcademicProfileCard from './academic-profile-card'
 
 interface SidebarProps {
     role: string;
     userName: string;
+    userId?: string;
 }
+
+// Define section type for expandable sections
+interface NavSection {
+    name: string;
+    icon: React.ElementType;
+    subsections: { name: string; href: string; icon: React.ElementType }[];
+}
+
+const studentSections: NavSection[] = [
+    {
+        name: 'Events',
+        icon: CalendarDays,
+        subsections: [
+            { name: 'Webinars', href: '/dashboard/student/events/webinars', icon: Video },
+            { name: 'In Person Events', href: '/dashboard/student/events/in-person', icon: MapPin },
+        ],
+    },
+]
 
 const navigation = {
     student: [
@@ -34,9 +59,9 @@ const navigation = {
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
-        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+        { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
         { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
-         
+        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ],
     mentor: [
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
@@ -49,6 +74,7 @@ const navigation = {
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
+        { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
         { name: 'Feedbacks', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
@@ -59,6 +85,7 @@ const navigation = {
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
+        { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
         { name: 'Feedbacks', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
@@ -67,9 +94,10 @@ const navigation = {
     ]
 }
 
-export default function Sidebar({ role, userName }: SidebarProps) {
+export default function Sidebar({ role, userName, userId }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
+    const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
 
     // Determine effective role for admin-dev to show relevant sidebar on different dashboard pages
     let effectiveRole = role
@@ -110,6 +138,11 @@ export default function Sidebar({ role, userName }: SidebarProps) {
                 </div>
             </div>
 
+            {/* Academic Profile Card - Students Only */}
+            {effectiveRole === 'student' && userId && (
+                <AcademicProfileCard userId={userId} userName={userName} />
+            )}
+
             {/* Navigation Section */}
             <nav className="grow px-3 py-2 space-y-1 overflow-y-auto">
                 {menuItems.map((item) => {
@@ -126,6 +159,60 @@ export default function Sidebar({ role, userName }: SidebarProps) {
                             <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
                             <span className="font-medium text-sm">{item.name}</span>
                         </Link>
+                    )
+                })}
+
+                {/* Expandable Sections (only for student) */}
+                {effectiveRole === 'student' && studentSections.map((section) => {
+                    const isExpanded = expandedSections.includes(section.name)
+                    const isAnySectionActive = section.subsections.some(sub => pathname === sub.href)
+
+                    return (
+                        <div key={section.name} className="pt-2">
+                            <button
+                                onClick={() => {
+                                    setExpandedSections(prev =>
+                                        prev.includes(section.name)
+                                            ? prev.filter(s => s !== section.name)
+                                            : [...prev, section.name]
+                                    )
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group ${isAnySectionActive
+                                    ? 'bg-gray-50 text-accent'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <section.icon className={`w-5 h-5 transition-colors ${isAnySectionActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                                    <span className="font-medium text-sm">{section.name}</span>
+                                </div>
+                                <ChevronDown
+                                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                />
+                            </button>
+
+                            {/* Subsections */}
+                            <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <div className="pl-4 pt-1 space-y-0.5">
+                                    {section.subsections.map((sub) => {
+                                        const isSubActive = pathname === sub.href
+                                        return (
+                                            <Link
+                                                key={sub.href}
+                                                href={sub.href}
+                                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all group ${isSubActive
+                                                    ? 'bg-blue-50 text-blue-600'
+                                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                                    }`}
+                                            >
+                                                <sub.icon className={`w-4 h-4 transition-colors ${isSubActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                                                <span className="font-medium text-sm">{sub.name}</span>
+                                            </Link>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
                     )
                 })}
             </nav>

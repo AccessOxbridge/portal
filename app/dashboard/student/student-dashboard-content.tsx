@@ -12,18 +12,27 @@ interface UpcomingSession {
     mentor_full_name: string
 }
 
+interface AcademicProfile {
+    target_university: string | null
+    target_course: string | null
+    application_year: number | null
+    subjects: { name: string; predicted_grade: string }[] | null
+}
+
 interface StudentDashboardContentProps {
     profile: any
     activeSession: any
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
+    academicProfile: AcademicProfile | null
 }
 
 export default function StudentDashboardContent({
     profile,
     activeSession,
     pendingRequests,
-    upcomingSessions
+    upcomingSessions,
+    academicProfile
 }: StudentDashboardContentProps) {
     const [showOnboarding, setShowOnboarding] = useState(false)
 
@@ -59,6 +68,34 @@ export default function StudentDashboardContent({
                         Student Dashboard
                     </h1>
                     <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
+
+                    {/* Targets Section */}
+                    {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
+                        <div className="mt-4 flex flex-wrap items-center gap-3">
+                            {academicProfile.target_university && (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    {academicProfile.target_university}
+                                </span>
+                            )}
+                            {academicProfile.target_course && (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    {academicProfile.target_course}
+                                </span>
+                            )}
+                            {academicProfile.application_year && (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                                    <Calendar className="w-4 h-4" />
+                                    {academicProfile.application_year} Entry
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -154,8 +191,8 @@ export default function StudentDashboardContent({
                                 <div
                                     key={session.id}
                                     className={`p-4 rounded-2xl border transition-all ${isSessionSoon(session.scheduled_at)
-                                            ? 'bg-green-50 border-green-200'
-                                            : 'bg-gray-50 border-gray-100 hover:border-accent/30'
+                                        ? 'bg-green-50 border-green-200'
+                                        : 'bg-gray-50 border-gray-100 hover:border-accent/30'
                                         }`}
                                 >
                                     <div className="flex items-center justify-between gap-3">

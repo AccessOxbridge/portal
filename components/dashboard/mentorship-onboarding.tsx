@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
+import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 
 interface TimeSlot {
     date: string      // ISO date format: "2025-01-15"
@@ -14,12 +15,28 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
-        strengths: '',
+        strengths: [] as string[],
         weaknesses: '',
         requirements: '',
         timeSlots: [] as TimeSlot[],
         anythingElse: ''
     })
+
+    // State for subject dropdown
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const dropdownRef = useRef<HTMLDivElement>(null)
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     // State for the slot picker
     const [newSlot, setNewSlot] = useState<TimeSlot>({
@@ -116,12 +133,36 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
         return tomorrow.toISOString().split('T')[0]
     }
 
+    // Toggle subject selection
+    const toggleSubject = (subject: string) => {
+        setFormData(prev => ({
+            ...prev,
+            strengths: prev.strengths.includes(subject)
+                ? prev.strengths.filter(s => s !== subject)
+                : [...prev.strengths, subject]
+        }))
+    }
+
+    // Filter subjects based on search query
+    const getFilteredOptions = () => {
+        if (!searchQuery.trim()) return SUBJECT_OPTIONS
+        const query = searchQuery.toLowerCase()
+        const filtered: Record<string, string[]> = {}
+        Object.entries(SUBJECT_OPTIONS).forEach(([category, subjects]) => {
+            const matchingSubjects = subjects.filter(s => s.toLowerCase().includes(query))
+            if (matchingSubjects.length > 0) {
+                filtered[category] = matchingSubjects
+            }
+        })
+        return filtered
+    }
+
     const steps = [
         {
-            title: "Your Strengths",
-            description: "What are you naturally good at? (e.g., Mathematics, Writing, Problem Solving)",
+            title: "Your Subjects",
+            description: "Select the subjects you'd like help with (select at least 1)",
             field: "strengths",
-            type: "text"
+            type: "multiselect"
         },
         {
             title: "Your Weaknesses",
@@ -155,6 +196,9 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
         if (currentStep.type === 'slots') {
             return formData.timeSlots.length >= 3
         }
+        if (currentStep.type === 'multiselect') {
+            return formData.strengths.length >= 1
+        }
         return ((formData as any)[currentStep.field] as string).trim() !== ''
     }
 
@@ -186,7 +230,107 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                             className="w-full h-40 p-6 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700 text-lg"
                             placeholder="Type your response here..."
                         />
-                    ) : (
+                    ) : currentStep.type === 'multiselect' ? (
+                        <div className="space-y-4">
+                            {/* Selected subjects display */}
+                            {formData.strengths.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {formData.strengths.map((subject) => (
+                                        <div
+                                            key={subject}
+                                            className="flex items-center gap-2 bg-accent/10 text-accent px-3 py-1.5 rounded-xl text-sm font-medium"
+                                        >
+                                            <span className="truncate max-w-[200px]">{subject}</span>
+                                            <button
+                                                onClick={() => toggleSubject(subject)}
+                                                className="hover:bg-accent/20 rounded-full p-0.5 transition-colors flex-shrink-0"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Dropdown selector */}
+                            <div ref={dropdownRef} className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white text-left flex items-center justify-between hover:border-accent/50 transition-colors"
+                                >
+                                    <span className="text-gray-500">
+                                        {formData.strengths.length === 0
+                                            ? 'Click to select subjects...'
+                                            : `${formData.strengths.length} subject${formData.strengths.length > 1 ? 's' : ''} selected`}
+                                    </span>
+                                    <svg className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+
+                                {isDropdownOpen && (
+                                    <div className="absolute z-10 mt-2 w-full bg-white rounded-2xl shadow-xl border border-gray-100 max-h-80 overflow-hidden">
+                                        {/* Search input */}
+                                        <div className="p-3 border-b border-gray-100 sticky top-0 bg-white">
+                                            <input
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                placeholder="Search subjects..."
+                                                className="w-full px-4 py-2 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-accent focus:bg-white outline-none text-sm"
+                                                autoFocus
+                                            />
+                                        </div>
+
+                                        {/* Groups */}
+                                        <div className="overflow-y-auto max-h-60">
+                                            {Object.entries(getFilteredOptions()).map(([category, subjects]) => (
+                                                <div key={category}>
+                                                    <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider sticky top-0">
+                                                        {category}
+                                                    </div>
+                                                    {subjects.map((subject) => (
+                                                        <button
+                                                            key={subject}
+                                                            type="button"
+                                                            onClick={() => toggleSubject(subject)}
+                                                            className={`w-full px-4 py-2.5 text-left text-sm hover:bg-accent/5 flex items-center gap-3 transition-colors ${formData.strengths.includes(subject) ? 'bg-accent/10 text-accent' : 'text-gray-700'
+                                                                }`}
+                                                        >
+                                                            <div className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${formData.strengths.includes(subject) ? 'bg-accent border-accent' : 'border-gray-300'
+                                                                }`}>
+                                                                {formData.strengths.includes(subject) && (
+                                                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                    </svg>
+                                                                )}
+                                                            </div>
+                                                            <span>{subject}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                            {Object.keys(getFilteredOptions()).length === 0 && (
+                                                <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                                                    No subjects found matching "{searchQuery}"
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Selection count */}
+                            <div className={`text-sm font-medium ${formData.strengths.length >= 1 ? 'text-green-600' : 'text-amber-600'}`}>
+                                {formData.strengths.length >= 1
+                                    ? `✓ ${formData.strengths.length} subject${formData.strengths.length > 1 ? 's' : ''} selected`
+                                    : 'Select at least 1 subject'}
+                            </div>
+                        </div>
+                    ) : currentStep.type === 'slots' ? (
                         <div className="space-y-6">
                             {/* Existing Slots */}
                             {formData.timeSlots.length > 0 && (
@@ -263,7 +407,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                 }
                             </div>
                         </div>
-                    )}
+                    ) : null}
 
                     <div className="flex justify-between mt-10">
                         {step > 1 ? (

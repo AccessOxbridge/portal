@@ -44,7 +44,7 @@ export default async function AcademicProfilePage() {
             <AcademicProfileContent
                 userId={user.id}
                 userName={profile.full_name || 'Student'}
-                existingProfile={academicProfile}
+                existingProfile={academicProfile as any}
             />
         </div>
     )

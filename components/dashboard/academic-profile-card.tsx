@@ -10,7 +10,7 @@ interface StudentProfile {
     year_group: string | null
     target_university: string | null
     target_course: string | null
-    is_complete: boolean
+    is_complete: boolean | null
 }
 
 interface AcademicProfileCardProps {
@@ -57,8 +57,8 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
         <Link
             href="/dashboard/student/profile"
             className={`mx-3 mb-4 block p-4 rounded-2xl transition-all group hover:shadow-md ${isIncomplete
-                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 hover:border-amber-300'
-                    : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 hover:border-blue-200'
+                ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 hover:border-amber-300'
+                : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 hover:border-blue-200'
                 }`}
         >
             <div className="flex items-center justify-between gap-3">

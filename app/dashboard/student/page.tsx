@@ -88,7 +88,7 @@ export default async function StudentDashboard() {
             activeSession={sessionWithMentor}
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
-            academicProfile={academicProfile}
+            academicProfile={academicProfile as any}
         />
     )
 }

@@ -91,7 +91,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
 
             const { error } = await supabase
                 .from('student_profiles')
-                .upsert(profileData)
+                .upsert(profileData as any)
 
             if (error) throw error
 
@@ -206,7 +206,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                         <input
                             type="number"
                             value={formData.application_year || ''}
-                            onChange={(e) => setFormData({ ...formData, application_year: parseInt(e.target.value) || null })}
+                            onChange={(e) => setFormData({ ...formData, application_year: parseInt(e.target.value) || new Date().getFullYear() + 1 })}
                             min={new Date().getFullYear()}
                             max={new Date().getFullYear() + 5}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
@@ -328,8 +328,8 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                     onClick={handleSave}
                     disabled={saving}
                     className={`inline-flex items-center gap-2 px-6 py-3 font-bold rounded-xl transition-all ${saved
-                            ? 'bg-green-500 text-white'
-                            : 'bg-accent text-white hover:scale-[1.02] shadow-lg shadow-accent/20'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-accent text-white hover:scale-[1.02] shadow-lg shadow-accent/20'
                         } disabled:opacity-50`}
                 >
                     {saving ? (

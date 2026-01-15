@@ -10,8 +10,8 @@ interface Message {
     conversation_id: string
     sender_id: string
     content: string
-    is_read: boolean
-    created_at: string
+    is_read: boolean | null
+    created_at: string | null
 }
 
 interface ChatWindowProps {
@@ -257,8 +257,8 @@ export default function ChatWindow({
                                 key={message.id}
                                 content={message.content}
                                 isSent={isSent}
-                                timestamp={message.created_at}
-                                isRead={message.is_read}
+                                timestamp={message.created_at || new Date().toISOString()}
+                                isRead={message.is_read ?? false}
                                 senderName={isSent ? undefined : otherUser.full_name || 'User'}
                                 showAvatar={!isSent && isFirstFromSender}
                                 avatarUrl={otherUser.photo_url}

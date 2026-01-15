@@ -8,7 +8,7 @@ interface Event {
     id: string
     title: string
     description: string | null
-    event_type: 'webinar' | 'in_person'
+    event_type: string  // 'webinar' | 'in_person'
     date: string
     end_time: string | null
     duration_minutes: number | null
@@ -74,7 +74,7 @@ export default function EventsManager({ initialEvents }: Props) {
         setFormData({
             title: event.title,
             description: event.description || '',
-            event_type: event.event_type,
+            event_type: event.event_type as 'webinar' | 'in_person',
             date: event.date ? new Date(event.date).toISOString().slice(0, 16) : '',
             end_time: event.end_time ? new Date(event.end_time).toISOString().slice(0, 16) : '',
             duration_minutes: event.duration_minutes || 60,

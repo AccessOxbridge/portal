@@ -65,19 +65,38 @@ export async function submitOnboarding(formData: FormData) {
         photo_url: photoUrl,
     }
 
-    const { error } = await supabase.from('mentors').upsert({
-        id: user.id,
-        responses: updatedResponses,
-        status: 'pending_approval',
-        bio: responses.bio || '',
-        expertise: Array.isArray(responses.expertise) ? responses.expertise : (responses.expertise ? [responses.expertise] : []),
-        cv_url: cvUrl,
-        photo_url: photoUrl,
-    })
+    // const { error } = await supabase.from('mentors').upsert({
+    //     id: user.id,
+    //     responses: updatedResponses,
+    //     status: 'pending_approval',
+    //     bio: responses.bio || '',
+    //     expertise: Array.isArray(responses.expertise) ? responses.expertise : (responses.expertise ? [responses.expertise] : []),
+    //     cv_url: cvUrl,
+    //     photo_url: photoUrl,
+    // })
+    // Note: we intentionally UPDATE (not UPSERT). RLS policies allow mentors to update their own row,
+    // but do not allow INSERT, and Postgres checks INSERT policies even for UPSERT-on-conflict updates.
+    const { data: updatedMentors, error } = await supabase
+        .from('mentors')
+        .update({
+            responses: updatedResponses,
+            status: 'pending_approval',
+            bio: responses.bio || '',
+            expertise: Array.isArray(responses.expertise) ? responses.expertise : (responses.expertise ? [responses.expertise] : []),
+            cv_url: cvUrl,
+            photo_url: photoUrl,
+        })
+        .eq('id', user.id)
+        .select('id')
 
     if (error) {
         console.error('Error submitting application:', error)
         throw new Error('Failed to submit application. Please try again.')
+    }
+
+    if (!updatedMentors || updatedMentors.length === 0) {
+        console.error('Mentor row not found for user during onboarding:', { userId: user.id })
+        throw new Error('Your mentor profile is not initialized yet. Please sign out and sign back in, then try again.')
     }
 
     // Mock email

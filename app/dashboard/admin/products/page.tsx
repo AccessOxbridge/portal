@@ -31,10 +31,10 @@ export default async function AdminCreditsPage() {
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
                 <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Manage Credit Packages
+                    Manage Products
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    Create, edit, and manage credit packages that students can purchase
+                    Create, edit, and manage Products that students can purchase
                 </p>
             </header>
 

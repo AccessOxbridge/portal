@@ -56,7 +56,7 @@ const studentSections: NavSection[] = [
 const navigation = {
     student: [
         { name: 'Home', href: '/dashboard/student', icon: Home },
-        { name: 'Credits', href: '/dashboard/student/credits', icon: CreditCard },
+        { name: 'Services', href: '/dashboard/student/credits', icon: CreditCard },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
@@ -75,7 +75,7 @@ const navigation = {
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
-        { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
+        { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Feedbacks', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
@@ -86,7 +86,7 @@ const navigation = {
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
-        { name: 'Credits', href: '/dashboard/admin/credits', icon: Coins },
+        { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Feedbacks', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },

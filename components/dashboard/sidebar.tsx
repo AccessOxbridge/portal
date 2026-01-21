@@ -68,7 +68,7 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
         { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
         { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
-        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+        // { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ],
     admin: [
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
@@ -215,20 +215,6 @@ export default function Sidebar({ role, userName, userId }: SidebarProps) {
                         </div>
                     )
                 })}
-
-                {/* Settings for student */}
-                {effectiveRole === 'student' && (
-                    <Link
-                        href="/dashboard/settings"
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${pathname === '/dashboard/settings'
-                            ? 'bg-gray-50 text-accent'
-                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                            }`}
-                    >
-                        <Settings className={`w-5 h-5 transition-colors ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
-                        <span className="font-medium text-sm">Settings</span>
-                    </Link>
-                )}
             </nav>
 
             {/* Footer Section */}

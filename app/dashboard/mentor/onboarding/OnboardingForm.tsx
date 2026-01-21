@@ -6,6 +6,9 @@ import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-on
 import { submitOnboarding } from './actions'
 import { Logo } from "@/components/logo";
 
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 // Flatten all subjects into a single array
 const ALL_SUBJECTS = Object.values(SUBJECT_OPTIONS).flat();
 // Remove duplicates
@@ -15,6 +18,7 @@ export default function OnboardingForm() {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [fileErrors, setFileErrors] = useState<Record<string, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -39,6 +43,42 @@ export default function OnboardingForm() {
   const filteredSubjects = searchQuery.trim()
     ? UNIQUE_SUBJECTS.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
     : UNIQUE_SUBJECTS;
+
+  const hasFileErrors = Object.values(fileErrors).some(Boolean);
+
+  const validateFileSize =
+    (questionId: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      // Clear any previous error when user clears selection
+      if (!file) {
+        setFileErrors(prev => ({ ...prev, [questionId]: '' }));
+        return;
+      }
+
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        setFileErrors(prev => ({
+          ...prev,
+          [questionId]: `Max file size is ${MAX_FILE_SIZE_MB}MB.`,
+        }));
+        // Clear the input so the form can't submit the oversized file
+        e.target.value = '';
+        return;
+      }
+
+      setFileErrors(prev => ({ ...prev, [questionId]: '' }));
+    };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!hasFileErrors) return;
+    e.preventDefault();
+
+    const firstErrorField = Object.entries(fileErrors).find(([, msg]) => Boolean(msg))?.[0];
+    if (firstErrorField) {
+      const el = document.getElementById(firstErrorField) as HTMLInputElement | null;
+      el?.focus();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-accent text-white">
@@ -71,6 +111,7 @@ export default function OnboardingForm() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               action={submitOnboarding}
+              onSubmit={handleSubmit}
               className="space-y-8 max-w-md"
             >
               {MENTOR_ONBOARDING_QUESTIONS.map((question) => (
@@ -102,14 +143,27 @@ export default function OnboardingForm() {
                   )}
 
                   {question.type === 'file' && (
-                    <input
-                      type="file"
-                      id={question.id}
-                      name={question.id}
-                      required={question.required}
-                      accept={question.id === 'photo' ? 'image/*' : '.pdf,.doc,.docx'}
-                      className="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none focus:border-white transition-all duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600"
-                    />
+                    <div className="space-y-1">
+                      <input
+                        type="file"
+                        id={question.id}
+                        name={question.id}
+                        required={question.required}
+                        accept={question.id === 'photo' ? 'image/*' : '.pdf,.doc,.docx'}
+                        onChange={validateFileSize(question.id)}
+                        aria-invalid={Boolean(fileErrors[question.id])}
+                        aria-describedby={`${question.id}-help ${question.id}-error`}
+                        className="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none focus:border-white transition-all duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600"
+                      />
+                      <p id={`${question.id}-help`} className="text-xs text-gray-400">
+                        Max file size is {MAX_FILE_SIZE_MB}MB.
+                      </p>
+                      {fileErrors[question.id] && (
+                        <p id={`${question.id}-error`} className="text-xs text-red-400">
+                          {fileErrors[question.id]}
+                        </p>
+                      )}
+                    </div>
                   )}
 
                   {question.type === 'select' && (
@@ -225,6 +279,7 @@ export default function OnboardingForm() {
 
               <button
                 type="submit"
+                disabled={hasFileErrors}
                 className="w-full bg-[#4a4a4a] hover:bg-[#5a5a5a] text-white py-4 transition-all duration-300 font-medium tracking-widest text-sm uppercase mt-8"
               >
                 Submit Application

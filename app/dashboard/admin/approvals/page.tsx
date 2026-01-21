@@ -2,6 +2,14 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { handleApplication } from './actions'
 
+function formatResponseKey(key: string) {
+    return key.replace(/_/g, ' ')
+}
+
+function isProbablyUrl(value: unknown): value is string {
+    return typeof value === 'string' && /^https?:\/\//i.test(value)
+}
+
 export default async function AdminApprovalsPage() {
     const supabase = await createClient()
 
@@ -32,14 +40,14 @@ export default async function AdminApprovalsPage() {
         .order('created_at', { ascending: false })
 
     return (
-        <div className="space-y-12">
-            <header className="flex justify-between items-center">
+        <div className="space-y-10">
+            <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                 <div>
-                    <h1 className="text-5xl font-extrabold text-accent tracking-tight">Application Approvals</h1>
-                    <p className="mt-4 text-gray-500 text-xl font-medium">Review and manage mentor onboarding applications.</p>
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-accent tracking-tight">Application Approvals</h1>
+                    <p className="mt-2 sm:mt-3 text-gray-500 text-base sm:text-lg font-medium">Review and manage mentor onboarding applications.</p>
                 </div>
                 <div className="flex space-x-2">
-                    <span className="bg-rich-beige-accent text-accent px-6 py-3 rounded-2xl text-sm font-bold shadow-inner">
+                    <span className="bg-rich-beige-accent text-accent px-4 py-2 rounded-2xl text-sm font-bold shadow-inner">
                         {mentors?.length || 0} Pending
                     </span>
                 </div>
@@ -58,50 +66,107 @@ export default async function AdminApprovalsPage() {
             ) : (
                 <div className="grid grid-cols-1 gap-8">
                     {mentors.map((app: any) => (
+                        (() => {
+                            const avatarUrl: string | null =
+                                app.photo_url ||
+                                app.responses?.photo_url ||
+                                app.responses?.photo ||
+                                null
+
+                            const resumeUrl: string | null =
+                                app.cv_url ||
+                                app.responses?.cv_url ||
+                                app.responses?.cv ||
+                                null
+
+                            const responseEntries = Object.entries(app.responses ?? {}).filter(([key]) => {
+                                // Avoid showing raw asset URLs in the responses grid
+                                return !['cv', 'photo', 'cv_url', 'photo_url'].includes(key)
+                            })
+
+                            return (
                         <div key={app.id} className="bg-white shadow-xl shadow-gray-200/50 rounded-[40px] border border-gray-100 overflow-hidden hover:shadow-indigo-100 transition-all group">
-                            <div className="p-10">
-                                <div className="flex justify-between items-start mb-8">
+                            <div className="p-6 sm:p-8 lg:p-10">
+                                <div className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start mb-8">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
-                                            {app.profiles?.full_name?.[0] || '?'}
-                                        </div>
+                                        {avatarUrl ? (
+                                            <img
+                                                src={avatarUrl}
+                                                alt={app.profiles?.full_name || 'Mentor'}
+                                                className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-110 transition-transform"
+                                            />
+                                        ) : (
+                                            <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                                {app.profiles?.full_name?.[0] || '?'}
+                                            </div>
+                                        )}
                                         <div>
                                             <h3 className="text-2xl font-bold text-gray-900">{app.profiles?.full_name || 'Unknown User'}</h3>
                                             <p className="text-gray-400 font-medium">{new Date(app.created_at).toLocaleDateString()}</p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-3">
+                                    <div className="flex flex-wrap items-center gap-3 justify-start sm:justify-end">
+                                        {resumeUrl ? (
+                                            <a
+                                                href={resumeUrl}
+                                                target="_blank"
+                                                rel="noreferrer noopener"
+                                                className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline break-all"
+                                            >
+                                                Mentor&apos;s Resume
+                                            </a>
+                                        ) : null}
                                         <form action={handleApplication.bind(null, app.id, 'dismissed')}>
-                                            <button className="px-8 py-4 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
+                                            <button className="px-4 py-2.5 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
                                                 Dismiss
                                             </button>
                                         </form>
                                         <form action={handleApplication.bind(null, app.id, 'approved')}>
-                                            <button className="px-8 py-4 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-1">
+                                            <button className="px-4 py-2.5 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-0.5">
                                                 Approve
                                             </button>
                                         </form>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 rounded-[32px] p-8 border border-gray-100 shadow-inner">
-                                    {Object.entries(app.responses).map(([key, value]: [string, any]) => (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-[32px] p-6 sm:p-8 border border-gray-100 shadow-inner">
+                                    {responseEntries.map(([key, value]: [string, any]) => (
                                         <div key={key}>
-                                            <span className="block text-[10px] font-black text-accent uppercase tracking-widest mb-2 opacity-60">{key.replace('_', ' ')}</span>
-                                            <div className="text-gray-900 font-semibold leading-relaxed">
+                                            <span className="block text-[10px] font-black text-accent uppercase tracking-widest mb-2 opacity-60">
+                                                {formatResponseKey(key)}
+                                            </span>
+                                            <div className="text-gray-900 font-semibold leading-relaxed wrap-break-word">
                                                 {Array.isArray(value) ? (
                                                     <div className="flex flex-wrap gap-2 mt-2">
-                                                        {value.map(v => (
-                                                            <span key={v} className="bg-white border border-gray-200 px-4 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm">{v}</span>
+                                                        {value.map((v: any, idx: number) => (
+                                                            <span
+                                                                key={`${String(v)}-${idx}`}
+                                                                className="bg-white border border-gray-200 px-4 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
+                                                            >
+                                                                {String(v)}
+                                                            </span>
                                                         ))}
                                                     </div>
-                                                ) : value}
+                                                ) : isProbablyUrl(value) ? (
+                                                    <a
+                                                        href={value}
+                                                        target="_blank"
+                                                        rel="noreferrer noopener"
+                                                        className="text-blue-600 hover:text-blue-700 hover:underline break-all"
+                                                    >
+                                                        {value}
+                                                    </a>
+                                                ) : (
+                                                    <span className="whitespace-pre-wrap">{String(value)}</span>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
+                            )
+                        })()
                     ))}
                 </div>
             )}

@@ -12,7 +12,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { strengths, weaknesses, requirements, timeSlots, anythingElse } = await req.json()
+        const body = await req.json()
+        const {
+            // New student onboarding fields
+            schoolName,
+            schoolCountry,
+            curriculum,
+            curriculumOther,
+            subjects,
+            targetUniversities,
+            timezone,
+            academicInterests,
+            extracurriculars,
+            anythingElse,
+
+            // Backwards-compatible fields (if older clients still send them)
+            strengths,
+            weaknesses,
+            requirements,
+            timeSlots: timeSlotsFromBody
+        } = body
+
+        const timeSlots = timeSlotsFromBody || body?.availability || []
 
         // 2. Check user's credit balance
         const { data: profile, error: profileError } = await supabase
@@ -42,12 +63,52 @@ export async function POST(req: Request) {
         }
 
         // 3. Prepare text for embedding
+        const subjectText = Array.isArray(subjects)
+            ? subjects.map((s: any) => `${s?.name || ''}: ${s?.predicted_grade || ''}`).filter(Boolean).join(', ')
+            : ''
+
+        const targetsText = Array.isArray(targetUniversities) ? targetUniversities.join(', ') : ''
+
+        const availabilityText = Array.isArray(timeSlots)
+            ? timeSlots
+                .map((s: any) => {
+                    // Preferred/legacy format: ISO strings
+                    if (s?.startTime && typeof s.startTime === 'string' && s.startTime.includes('T')) {
+                        const start = new Date(s.startTime)
+                        const end = new Date(s.endTime)
+                        const dateStr = isNaN(start.getTime()) ? (s?.date || '') : start.toISOString().slice(0, 10)
+                        const startStr = isNaN(start.getTime()) ? (s?.startTime || '') : start.toISOString()
+                        const endStr = isNaN(end.getTime()) ? (s?.endTime || '') : end.toISOString()
+                        return `${dateStr} ${startStr} - ${endStr}`
+                    }
+
+                    // Weekly-style format (fallback)
+                    if (s?.day) {
+                        return `${s?.day || ''} ${s?.startTime || ''}-${s?.endTime || ''}`.trim()
+                    }
+
+                    return `${s?.date || ''} ${s?.startTime || ''}-${s?.endTime || ''}`.trim()
+                })
+                .filter(Boolean)
+                .join('; ')
+            : ''
+
         const studentProfileText = `
-            Student Requirements:
-            Strengths: ${strengths}
-            Weaknesses: ${weaknesses}
-            Mentor Requirements: ${requirements}
-            Additional Info: ${anythingElse}
+Student onboarding:
+School: ${schoolName || ''} (${schoolCountry || ''})
+Curriculum: ${curriculum || ''}${curriculum === 'Other' ? ` - ${curriculumOther || ''}` : ''}
+Subjects & predicted grades: ${subjectText}
+Target universities: ${targetsText}
+Timezone: ${timezone || ''}
+Weekly availability: ${availabilityText}
+Academic interests: ${academicInterests || ''}
+Extracurriculars: ${extracurriculars || ''}
+Anything else: ${anythingElse || ''}
+
+Legacy fields (if provided):
+Strengths: ${strengths || ''}
+Weaknesses: ${weaknesses || ''}
+Mentor requirements: ${requirements || ''}
         `.trim()
 
         // 3. Generate Embedding
@@ -81,7 +142,23 @@ export async function POST(req: Request) {
         const requests = matches.map((mentor: any) => ({
             student_id: user.id,
             mentor_id: mentor.id,
-            responses: { strengths, weaknesses, requirements, timeSlots, anythingElse },
+            responses: {
+                schoolName,
+                schoolCountry,
+                curriculum,
+                curriculumOther,
+                subjects,
+                targetUniversities,
+                timezone,
+                timeSlots,
+                academicInterests,
+                extracurriculars,
+                anythingElse,
+                // legacy
+                strengths,
+                weaknesses,
+                requirements
+            },
             status: 'pending'
         }))
 

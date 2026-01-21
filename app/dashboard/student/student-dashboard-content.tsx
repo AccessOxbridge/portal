@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
-import MentorshipOnboarding from '@/components/dashboard/mentorship-onboarding'
 
 interface UpcomingSession {
     id: string
@@ -34,8 +32,6 @@ export default function StudentDashboardContent({
     upcomingSessions,
     academicProfile
 }: StudentDashboardContentProps) {
-    const [showOnboarding, setShowOnboarding] = useState(false)
-
     const formatDate = (dateString: string) => {
         const date = new Date(dateString)
         return date.toLocaleDateString('en-GB', {
@@ -163,14 +159,16 @@ export default function StudentDashboardContent({
                                 </svg>
                             </div>
                             <h2 className="text-2xl font-bold text-white mb-4 italic">Unlock Personalized Mentorship</h2>
-                            <p className="text-white/70 mb-8 text-sm leading-relaxed">Tell us about your goals and strengths, and we&apos;ll use AI to match you with the perfect mentor from our exclusive network.</p>
+                            <p className="text-white/70 mb-8 text-sm leading-relaxed">
+                                Tell us about your background, targets, and availability. Our strategist team will review your responses and allocate you to mentors who can guide you to success.
+                            </p>
                         </div>
-                        <button
-                            onClick={() => setShowOnboarding(true)}
-                            className="bg-rich-amber-accent text-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
+                        <Link
+                            href="/dashboard/student/onboarding"
+                            className="bg-rich-amber-accent text-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center"
                         >
-                            Get Mentorship Now
-                        </button>
+                            Complete Onboarding
+                        </Link>
                     </div>
                 )}
 
@@ -239,10 +237,6 @@ export default function StudentDashboardContent({
                     </div>
                 </div>
             </div>
-
-            {showOnboarding && (
-                <MentorshipOnboarding onClose={() => setShowOnboarding(false)} />
-            )}
         </div>
     )
 }

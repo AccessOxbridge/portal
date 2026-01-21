@@ -21,7 +21,8 @@ import {
     CalendarDays,
     Video,
     MapPin,
-    ChevronDown
+    ChevronDown,
+    Home
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -54,14 +55,13 @@ const studentSections: NavSection[] = [
 
 const navigation = {
     student: [
-        { name: 'Explore', href: '/dashboard/student', icon: Search },
+        { name: 'Home', href: '/dashboard/student', icon: Home },
         { name: 'Credits', href: '/dashboard/student/credits', icon: CreditCard },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
         { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
-        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
     ],
     mentor: [
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
@@ -215,6 +215,20 @@ export default function Sidebar({ role, userName, userId }: SidebarProps) {
                         </div>
                     )
                 })}
+
+                {/* Settings for student */}
+                {effectiveRole === 'student' && (
+                    <Link
+                        href="/dashboard/settings"
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${pathname === '/dashboard/settings'
+                            ? 'bg-gray-50 text-accent'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                            }`}
+                    >
+                        <Settings className={`w-5 h-5 transition-colors ${pathname === '/dashboard/settings' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                        <span className="font-medium text-sm">Settings</span>
+                    </Link>
+                )}
             </nav>
 
             {/* Footer Section */}

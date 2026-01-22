@@ -64,12 +64,6 @@ export default function FeedbackTable({ feedbacks }: Props) {
                         <span className="text-lg text-gray-400 ml-1">/ 5</span>
                     </p>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Unique Mentors</p>
-                    <p className="text-3xl font-black text-gray-900">
-                        {new Set(feedbacks.map(f => f.mentorId)).size}
-                    </p>
-                </div>
             </div>
 
             {/* Search */}

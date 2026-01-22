@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
         <div className="space-y-8 max-w-6xl mx-auto">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Home</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Admin Home</h1>
                     <p className="text-gray-500 mt-1">Welcome back, {profile?.full_name?.split(' ')[0] || 'Admin'}</p>
                 </div>
                 {/* <div className="flex gap-3">

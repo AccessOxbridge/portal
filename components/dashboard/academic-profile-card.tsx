@@ -56,28 +56,28 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
     return (
         <Link
             href="/dashboard/student/profile"
-            className={`mx-3 mb-4 block p-4 rounded-2xl transition-all group hover:shadow-md ${isIncomplete
-                ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 hover:border-amber-300'
-                : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 hover:border-blue-200'
+            className={`block p-4 rounded-2xl transition-all group hover:bg-white/5 mb-4 ${isIncomplete
+                ? 'bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/20'
+                : 'bg-white/5 border border-white/5 hover:border-white/10'
                 }`}
         >
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-100' : 'bg-blue-100'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-500/10' : 'bg-white/10'
                         }`}>
                         {isIncomplete ? (
-                            <AlertCircle className="w-5 h-5 text-amber-600" />
+                            <AlertCircle className="w-5 h-5 text-amber-500" />
                         ) : (
-                            <GraduationCap className="w-5 h-5 text-blue-600" />
+                            <GraduationCap className="w-5 h-5 text-white/80" />
                         )}
                     </div>
                     <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-900 truncate">
-                            {isIncomplete ? 'Complete Your Profile' : 'My Academic Profile'}
+                        <p className={`text-sm font-bold truncate ${isIncomplete ? 'text-amber-500' : 'text-white'}`}>
+                            {isIncomplete ? 'Complete Your Profile' : 'Academic Profile'}
                         </p>
-                        <p className={`text-xs truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-500'}`}>
+                        <p className={`text-[11px] truncate ${isIncomplete ? 'text-amber-500/60' : 'text-white/40'}`}>
                             {isIncomplete
-                                ? 'Required for mentor matching'
+                                ? 'Required for matching'
                                 : profile?.target_university
                                     ? `Target: ${profile.target_university}`
                                     : userName
@@ -85,19 +85,19 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
                         </p>
                     </div>
                 </div>
-                <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${isIncomplete ? 'text-amber-500' : 'text-gray-400'
+                <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${isIncomplete ? 'text-amber-500/40' : 'text-white/20'
                     }`} />
             </div>
 
             {isIncomplete && (
                 <div className="mt-3 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-amber-200 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1 bg-amber-500/10 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-amber-500 rounded-full transition-all"
-                            style={{ width: profile ? '30%' : '0%' }}
+                            style={{ width: profile ? '30%' : '5%' }}
                         />
                     </div>
-                    <span className="text-[10px] text-amber-600 font-medium">
+                    <span className="text-[10px] text-amber-500/80 font-medium">
                         {profile ? 'In Progress' : 'Not Started'}
                     </span>
                 </div>

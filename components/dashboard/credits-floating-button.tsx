@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Clock } from 'lucide-react'
+import { Clock, Plus } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
 interface Props {
@@ -63,15 +63,34 @@ export default function CreditsFloatingButton({ initialCredits = 0 }: Props) {
 
     return (
         <Link
-            href="/dashboard/student/credits"
-            className="fixed top-5 right-16 z-50 flex items-center gap-3 px-4 py-2 rounded-lg 
-            bg-accent text-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-accent/30"
+            href="/dashboard/student/services"
+            className="fixed top-5 right-20 md:right-24 z-100 group flex items-center gap-4 px-5 py-2 rounded-2xl 
+            bg-white/70 backdrop-blur-md border border-white/40 transition-all duration-300 hover:scale-[1.02] 
+            active:scale-[0.98] shadow-2xl shadow-black/5"
         >
-            <Clock className="w-4 h-4 text-white" />
-            <p className="text-lg font-black leading-none">{credits}</p>
-            <p className="text-[10px] font-medium text-white/80">
-                {credits === 1 ? 'hour' : 'hours'} left
-            </p>
+            <div className="flex items-center justify-center p-2 rounded-xl bg-accent text-white shadow-lg shadow-accent/20 transition-colors duration-300 group-hover:bg-accent/90">
+                <Clock className="w-5 h-5" />
+            </div>
+
+            <div className="flex flex-col">
+                <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold tracking-tight text-gray-900">
+                        {credits}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wider font-bold opacity-60 text-gray-500">
+                        {credits === 1 ? 'Hour' : 'Hours'}
+                    </span>
+                </div>
+                <p className="text-[9px] font-semibold tracking-wide text-gray-400 opacity-70 transition-opacity duration-300 group-hover:opacity-100">
+                    REMAINING
+                </p>
+            </div>
+
+            <div className="h-8 w-px mx-1 bg-gray-200" />
+
+            <div className="p-1 rounded-full text-accent transition-transform group-hover:translate-x-1">
+                <Plus className="w-4 h-4" />
+            </div>
         </Link>
     )
 }

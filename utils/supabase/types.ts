@@ -398,6 +398,116 @@ export type Database = {
           },
         ]
       }
+      mentor_payout_items: {
+        Row: {
+          amount_cents: number
+          created_at: string | null
+          duration_minutes: number
+          hourly_rate_cents: number
+          id: string
+          payout_id: string
+          session_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string | null
+          duration_minutes: number
+          hourly_rate_cents: number
+          id?: string
+          payout_id: string
+          session_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string | null
+          duration_minutes?: number
+          hourly_rate_cents?: number
+          id?: string
+          payout_id?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_payout_items_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_payouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_payout_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_payouts: {
+        Row: {
+          amount_cents: number
+          created_at: string | null
+          currency: string
+          failure_message: string | null
+          id: string
+          mentor_id: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          processed_at: string | null
+          sessions_count: number
+          status: string
+          stripe_payout_id: string | null
+          stripe_transfer_id: string | null
+          total_minutes: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string | null
+          currency?: string
+          failure_message?: string | null
+          id?: string
+          mentor_id: string
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          processed_at?: string | null
+          sessions_count?: number
+          status?: string
+          stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
+          total_minutes?: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string | null
+          currency?: string
+          failure_message?: string | null
+          id?: string
+          mentor_id?: string
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          processed_at?: string | null
+          sessions_count?: number
+          status?: string
+          stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
+          total_minutes?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_payouts_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentors: {
         Row: {
           bio: string | null
@@ -405,11 +515,14 @@ export type Database = {
           cv_url: string | null
           embedding: string | null
           expertise: string[] | null
+          hourly_rate_cents: number | null
           id: string
           is_active: boolean | null
+          payouts_enabled: boolean | null
           photo_url: string | null
           responses: Json | null
           status: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id: string | null
           updated_at: string
         }
         Insert: {
@@ -418,11 +531,14 @@ export type Database = {
           cv_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
+          hourly_rate_cents?: number | null
           id: string
           is_active?: boolean | null
+          payouts_enabled?: boolean | null
           photo_url?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -431,11 +547,14 @@ export type Database = {
           cv_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
+          hourly_rate_cents?: number | null
           id?: string
           is_active?: boolean | null
+          payouts_enabled?: boolean | null
           photo_url?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -659,6 +778,7 @@ export type Database = {
       sessions: {
         Row: {
           created_at: string | null
+          duration_minutes: number | null
           id: string
           mentor_id: string
           reminder_sent: boolean | null
@@ -676,6 +796,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          duration_minutes?: number | null
           id?: string
           mentor_id: string
           reminder_sent?: boolean | null
@@ -693,6 +814,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          duration_minutes?: number | null
           id?: string
           mentor_id?: string
           reminder_sent?: boolean | null

@@ -60,10 +60,10 @@ export default function AdminMessagesContent({
     const filteredConversations = conversations.filter(conv => {
         const term = searchTerm.toLowerCase()
         return (
-            conv.student.full_name.toLowerCase().includes(term) ||
-            conv.mentor.full_name.toLowerCase().includes(term) ||
-            conv.student.email.toLowerCase().includes(term) ||
-            conv.mentor.email.toLowerCase().includes(term)
+            (conv.student.full_name?.toLowerCase() || '').includes(term) ||
+            (conv.mentor.full_name?.toLowerCase() || '').includes(term) ||
+            (conv.student.email?.toLowerCase() || '').includes(term) ||
+            (conv.mentor.email?.toLowerCase() || '').includes(term)
         )
     })
 
@@ -80,7 +80,12 @@ export default function AdminMessagesContent({
                 .order('created_at', { ascending: true })
 
             if (!error && data) {
-                setMessages(data)
+                const formattedMessages: Message[] = data.map(m => ({
+                    ...m,
+                    is_read: m.is_read || false,
+                    created_at: m.created_at || new Date().toISOString()
+                }))
+                setMessages(formattedMessages)
             }
             setIsLoadingMessages(false)
         }
@@ -99,10 +104,15 @@ export default function AdminMessagesContent({
                     filter: `conversation_id=eq.${selectedConversation.id}`
                 },
                 (payload) => {
-                    const newMessage = payload.new as Message
+                    const newMessage = payload.new as any
+                    const formattedMessage: Message = {
+                        ...newMessage,
+                        is_read: newMessage.is_read || false,
+                        created_at: newMessage.created_at || new Date().toISOString()
+                    }
                     setMessages(prev => {
-                        if (prev.some(m => m.id === newMessage.id)) return prev
-                        return [...prev, newMessage]
+                        if (prev.some(m => m.id === formattedMessage.id)) return prev
+                        return [...prev, formattedMessage]
                     })
                 }
             )
@@ -148,8 +158,8 @@ export default function AdminMessagesContent({
     const getSenderName = (senderId: string) => {
         if (!selectedConversation) return 'Unknown'
         if (senderId === currentUserId) return 'Admin'
-        if (senderId === selectedConversation.student_id) return selectedConversation.student.full_name
-        if (senderId === selectedConversation.mentor_id) return selectedConversation.mentor.full_name
+        if (senderId === selectedConversation.student_id) return selectedConversation.student.full_name || 'Student'
+        if (senderId === selectedConversation.mentor_id) return selectedConversation.mentor.full_name || 'Mentor'
         return 'Unknown'
     }
 
@@ -292,8 +302,8 @@ export default function AdminMessagesContent({
                                                         </span>
                                                     </div>
                                                     <div className={`px-4 py-2.5 rounded-2xl ${role === 'student'
-                                                            ? 'bg-blue-500 text-white rounded-bl-md'
-                                                            : 'bg-green-500 text-white rounded-br-md'
+                                                        ? 'bg-blue-500 text-white rounded-bl-md'
+                                                        : 'bg-green-500 text-white rounded-br-md'
                                                         }`}>
                                                         <p className="text-sm">{message.content}</p>
                                                     </div>

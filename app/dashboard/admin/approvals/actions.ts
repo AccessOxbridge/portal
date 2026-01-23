@@ -43,9 +43,9 @@ export async function handleApplication(userId: string, status: 'approved' | 'di
         const responses = mentor.responses as unknown as MentorResponses
 
         // Generate real embedding using OpenAI
-        const apiKey = process.env.OPEN_AI_API_KEYS
+        const apiKey = process.env.OPEN_AI_API_KEY
         if (!apiKey) {
-            throw new Error('OPEN_AI_API_KEYS is not configured')
+            throw new Error('OPEN_AI_API_KEY is not configured')
         }
 
         const openai = new OpenAI({

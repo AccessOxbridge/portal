@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Sidebar from '@/components/dashboard/sidebar'
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
+import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
     children,
@@ -9,6 +10,7 @@ export default async function DashboardLayout({
     children: React.ReactNode
 }) {
     const supabase = await createClient()
+    const headerList = await headers();
 
     const {
         data: { user },
@@ -48,7 +50,7 @@ export default async function DashboardLayout({
         }
     }
 
-    const isStudent = profile.role === 'student' || profile.role === 'admin-dev'
+    const isStudent = profile.role === 'student' || (profile.role === 'admin-dev' && headerList.get('referer')?.includes('student'))
 
     return (
         <div className="flex min-h-screen">

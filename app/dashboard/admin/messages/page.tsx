@@ -67,8 +67,8 @@ export default async function AdminMessagesPage() {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
-                last_message_at: conv.last_message_at,
-                created_at: conv.created_at,
+                last_message_at: conv.last_message_at || conv.created_at || new Date().toISOString(),
+                created_at: conv.created_at || new Date().toISOString(),
                 student: {
                     id: conv.student?.id || conv.student_id,
                     full_name: conv.student?.full_name || 'Unknown Student',
@@ -80,7 +80,10 @@ export default async function AdminMessagesPage() {
                     email: conv.mentor?.email || ''
                 },
                 message_count: messageCount || 0,
-                last_message: lastMessage || null
+                last_message: lastMessage ? {
+                    ...lastMessage,
+                    created_at: lastMessage.created_at || new Date().toISOString()
+                } : null
             }
         })
     )

@@ -20,9 +20,9 @@ export default async function OnboardingPage() {
         .eq('id', user.id)
         .single()
 
-    if (mentor && mentor.status !== 'details_required') {
-        return redirect('/dashboard/mentor')
-    }
+    // if (mentor && mentor.status !== 'details_required') {
+    //     return redirect('/dashboard/mentor')
+    // }
 
     return <OnboardingForm />
 }

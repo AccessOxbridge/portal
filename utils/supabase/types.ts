@@ -361,6 +361,7 @@ export type Database = {
           created_at: string | null
           form_type: string
           id: string
+          rating: number | null
           respondent_id: string
           responses: Json
           session_id: string
@@ -369,6 +370,7 @@ export type Database = {
           created_at?: string | null
           form_type: string
           id?: string
+          rating?: number | null
           respondent_id: string
           responses?: Json
           session_id: string
@@ -377,6 +379,7 @@ export type Database = {
           created_at?: string | null
           form_type?: string
           id?: string
+          rating?: number | null
           respondent_id?: string
           responses?: Json
           session_id?: string
@@ -519,6 +522,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           payouts_enabled: boolean | null
+          phone: string | null
           photo_url: string | null
           responses: Json | null
           status: Database["public"]["Enums"]["mentor_status"] | null
@@ -535,6 +539,7 @@ export type Database = {
           id: string
           is_active?: boolean | null
           payouts_enabled?: boolean | null
+          phone?: string | null
           photo_url?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
@@ -551,6 +556,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           payouts_enabled?: boolean | null
+          phone?: string | null
           photo_url?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
@@ -836,6 +842,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_mentor_id_mentors_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
             referencedColumns: ["id"]
           },
           {

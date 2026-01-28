@@ -36,6 +36,7 @@ interface SidebarProps {
     role: string;
     userName: string;
     userId?: string;
+    pendingReportsCount?: number;
 }
 
 // Define section type for expandable sections
@@ -70,6 +71,7 @@ const navigation = {
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
         { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
         { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
+        { name: 'Reports', href: '/dashboard/mentor/reports', icon: FileText },
         { name: 'Payouts', href: '/dashboard/mentor/payouts', icon: Banknote },
         { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
     ],
@@ -105,7 +107,7 @@ const navigation = {
     ]
 }
 
-export default function Sidebar({ role, userName, userId }: SidebarProps) {
+export default function Sidebar({ role, userName, userId, pendingReportsCount = 0 }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
@@ -180,17 +182,25 @@ export default function Sidebar({ role, userName, userId }: SidebarProps) {
             <nav className="grow px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
+                    const showBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${isActive
+                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group ${isActive
                                 ? 'bg-white/15 text-white shadow-sm'
                                 : 'text-white/70 hover:bg-white/10 hover:text-white'
                                 }`}
                         >
-                            <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
-                            <span className="font-medium text-sm">{item.name}</span>
+                            <div className="flex items-center gap-3">
+                                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                                <span className="font-medium text-sm">{item.name}</span>
+                            </div>
+                            {showBadge && (
+                                <span className="px-1.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                    {pendingReportsCount}
+                                </span>
+                            )}
                         </Link>
                     )
                 })}

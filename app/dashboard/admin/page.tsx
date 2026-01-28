@@ -75,14 +75,25 @@ export default async function AdminDashboard() {
 
             {/* Action Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/dashboard/admin/approvals" className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
-                    <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <Link href="/dashboard/admin/clients" className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
+                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" /></svg>
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">User Approvals</h2>
-                    <p className="text-gray-500 text-sm mb-8 grow">Review and manage mentor onboarding applications. ({pendingApprovalsCount || 0} pending)</p>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Client Management</h2>
+                    <p className="text-gray-500 text-sm mb-8 grow">Manage client accounts, subscriptions, and support tickets.</p>
                     <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
-                        View Applications
+                        Manage Clients
+                    </span>
+                </Link>
+
+                <Link href="/dashboard/admin/mentors" className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
+                    <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z m0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z m-4 6v-7.5l4-2.222" /></svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Mentor Management</h2>
+                    <p className="text-gray-500 text-sm mb-8 grow">Oversee mentor profiles, availability, and performance metrics.</p>
+                    <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
+                        Manage Mentors
                     </span>
                 </Link>
 
@@ -96,17 +107,6 @@ export default async function AdminDashboard() {
                         Manage Articles
                     </span>
                 </Link>
-
-                <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
-                    <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Analytics Overview</h2>
-                    <p className="text-gray-500 text-sm mb-8 grow">Monitor student engagement and mentor response rates.</p>
-                    <span className="w-full py-3 bg-blue-600 text-white text-center rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
-                        View Analytics
-                    </span>
-                </div>
             </div>
 
             {/* Detailed Stats Section */}

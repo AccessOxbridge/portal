@@ -51,6 +51,41 @@ export default async function DashboardLayout({
     }
 
     const isStudent = profile.role === 'student' || (profile.role === 'admin-dev' && headerList.get('referer')?.includes('student'))
+    const isMentor = profile.role === 'mentor' || (profile.role === 'admin-dev' && headerList.get('referer')?.includes('mentor'))
+
+    // Calculate pending reports count for mentors
+    let pendingReportsCount = 0
+    if (isMentor && showSidebar) {
+        const now = new Date().toISOString()
+
+        // Get all past/ended sessions for this mentor
+        const { data: sessions } = await supabase
+            .from('sessions')
+            .select('id, scheduled_at, status, zoom_meeting_status')
+            .eq('mentor_id', user.id)
+            .or(`scheduled_at.lt.${now},zoom_meeting_status.eq.ended,status.eq.completed`)
+
+        if (sessions && sessions.length > 0) {
+            const sessionIds = sessions.map(s => s.id)
+
+            // Get submitted reports
+            const { data: submittedReports } = await supabase
+                .from('form_responses')
+                .select('session_id')
+                .eq('respondent_id', user.id)
+                .eq('form_type', 'mentor_report')
+                .in('session_id', sessionIds)
+
+            const submittedSessionIds = new Set(submittedReports?.map(r => r.session_id) || [])
+
+            // Count sessions that need reports
+            pendingReportsCount = sessions.filter(session => {
+                const isPast = session.scheduled_at && new Date(session.scheduled_at) < new Date()
+                const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
+                return (isPast || isEnded) && !submittedSessionIds.has(session.id)
+            }).length
+        }
+    }
 
     return (
         <div className="flex min-h-screen">
@@ -61,6 +96,7 @@ export default async function DashboardLayout({
                     role={profile.role || 'student'}
                     userName={profile.full_name || user.email?.split('@')[0] || 'User'}
                     userId={user.id}
+                    pendingReportsCount={pendingReportsCount}
                 />
             )}
 

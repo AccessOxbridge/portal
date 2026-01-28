@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 
 export default async function MentorDashboard() {
     const supabase = await createClient()
@@ -148,17 +149,37 @@ export default async function MentorDashboard() {
                     </div>
                 )}
 
-                <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group">
+                <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group relative">
                     <div className="w-14 h-14 bg-rich-beige-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
                         <svg className="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Earnings</h2>
-                    <p className="text-gray-500 mb-6 leading-relaxed text-sm">Track your hourly sessions, completed milestones, and payouts.</p>
-                    <button className="text-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
-                        View Wallet <span className="ml-2">→</span>
-                    </button>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Earnings & Payouts</h2>
+                    {mentor.payouts_enabled ? (
+                        <>
+                            <p className="text-gray-500 mb-2 leading-relaxed text-sm">Track your sessions & view your earnings.</p>
+                            <div className="flex items-center gap-2 text-green-600 font-semibold text-sm mb-4">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Connected to Stripe
+                            </div>
+                            <a href="/dashboard/mentor/payouts" className="text-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
+                                View Payouts <span className="ml-2">→</span>
+                            </a>
+                        </>
+                    ) : mentor.stripe_account_id ? (
+                        <>
+                            <p className="text-gray-500 mb-4 leading-relaxed text-sm">Complete your payment setup to start receiving payouts.</p>
+                            <StripeOnboardingButton variant="continue" />
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-gray-500 mb-4 leading-relaxed text-sm">Set up your payment account to receive fortnightly payouts for your sessions.</p>
+                            <StripeOnboardingButton variant="setup" />
+                        </>
+                    )}
                 </div>
 
                 <div className="p-8 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between">

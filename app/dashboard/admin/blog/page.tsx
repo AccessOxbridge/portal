@@ -39,7 +39,7 @@ export default async function AdminBlogPage() {
 
             <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
                 <div className="p-8 border-b border-gray-50 bg-gray-50/30">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-center items-center">
                         <h2 className="text-lg font-bold text-gray-900">All Articles</h2>
                         <span className="bg-white border border-gray-100 text-gray-600 px-3 py-1 rounded-lg text-sm font-semibold">
                             {articles?.length || 0} Articles

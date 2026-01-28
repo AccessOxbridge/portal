@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { sendMentorApplicationReceivedEmail } from '@/utils/email'
 
-export async function submitOnboarding(formData: FormData) {
+export async function submitOnboarding(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
     const {
@@ -91,12 +91,12 @@ export async function submitOnboarding(formData: FormData) {
 
     if (error) {
         console.error('Error submitting application:', error)
-        throw new Error('Failed to submit application. Please try again.')
+        return { error: 'Failed to submit application. Please try again.' }
     }
 
     if (!updatedMentors || updatedMentors.length === 0) {
         console.error('Mentor row not found for user during onboarding:', { userId: user.id })
-        throw new Error('Your mentor profile is not initialized yet. Please sign out and sign back in, then try again.')
+        return { error: 'Your mentor profile is not initialized yet. Please sign out and sign back in, then try again.' }
     }
 
     // Mock email

@@ -1,7 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { submitOnboarding } from './actions'
 import { Logo } from "@/components/logo";
@@ -15,6 +16,7 @@ const ALL_SUBJECTS = Object.values(SUBJECT_OPTIONS).flat();
 const UNIQUE_SUBJECTS = [...new Set(ALL_SUBJECTS)].sort();
 
 export default function OnboardingForm() {
+  const [state, formAction] = useActionState(submitOnboarding, null);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,13 +72,27 @@ export default function OnboardingForm() {
     };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (!hasFileErrors) return;
-    e.preventDefault();
+    // 1. Check for file errors (file size etc)
+    if (hasFileErrors) {
+      e.preventDefault();
+      const firstErrorField = Object.entries(fileErrors).find(([, msg]) => Boolean(msg))?.[0];
+      if (firstErrorField) {
+        document.getElementById(firstErrorField)?.focus();
+      }
+      return;
+    }
 
-    const firstErrorField = Object.entries(fileErrors).find(([, msg]) => Boolean(msg))?.[0];
-    if (firstErrorField) {
-      const el = document.getElementById(firstErrorField) as HTMLInputElement | null;
-      el?.focus();
+    // 2. Check for required multiselects (like subjects)
+    // Since these are custom components, native HTML validation might not catch them
+    const requiredQuestions = MENTOR_ONBOARDING_QUESTIONS.filter(q => q.required);
+    for (const q of requiredQuestions) {
+      if (q.type === 'multiselect' && q.id === 'expertise' && selectedSubjects.length === 0) {
+        e.preventDefault();
+        setIsDropdownOpen(true);
+        // Scroll to the dropdown trigger
+        dropdownRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
     }
   };
 
@@ -110,10 +126,15 @@ export default function OnboardingForm() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              action={submitOnboarding}
+              action={formAction}
               onSubmit={handleSubmit}
               className="space-y-8 max-w-md"
             >
+              {state?.error && (
+                <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-lg text-sm">
+                  {state.error}
+                </div>
+              )}
               {MENTOR_ONBOARDING_QUESTIONS.map((question) => (
                 <div key={question.id} className="group">
                   <label htmlFor={question.id} className="block text-sm text-gray-400 mb-1 group-focus-within:text-white transition-colors">
@@ -277,13 +298,7 @@ export default function OnboardingForm() {
                 </div>
               ))}
 
-              <button
-                type="submit"
-                disabled={hasFileErrors}
-                className="w-full bg-[#4a4a4a] hover:bg-[#5a5a5a] text-white py-4 transition-all duration-300 font-medium tracking-widest text-sm uppercase mt-8"
-              >
-                Submit Application
-              </button>
+              <SubmitButton hasFileErrors={hasFileErrors} />
 
               <p className="text-center text-xs text-gray-400 mt-6">
                 By submitting, you agree to our terms of service and mentor guidelines.
@@ -317,5 +332,33 @@ export default function OnboardingForm() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SubmitButton({ hasFileErrors }: { hasFileErrors: boolean }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending || hasFileErrors}
+      className={`w-full py-4 transition-all duration-300 font-medium tracking-widest text-sm uppercase mt-8 flex items-center justify-center gap-2
+        ${pending || hasFileErrors
+          ? 'bg-[#333333] text-gray-500 cursor-not-allowed'
+          : 'bg-white text-black hover:bg-gray-100 active:scale-[0.98]'
+        }`}
+    >
+      {pending ? (
+        <>
+          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Processing...
+        </>
+      ) : (
+        "Submit Application"
+      )}
+    </button>
   );
 }

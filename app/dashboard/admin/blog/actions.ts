@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 interface CreateArticleData {
     title: string
     description: string
-    category: string
+    categories: string[]
     tags: string[]
     image: string
     featured: boolean
@@ -54,7 +54,7 @@ export async function createArticle(data: CreateArticleData) {
             title: data.title,
             description: data.description,
             author: data.author,
-            category: data.category as Database['public']['Enums']['blog_category'],
+            categories: data.categories as Database['public']['Enums']['blog_category'][],
             tags: data.tags,
             image: data.image,
             featured: data.featured,

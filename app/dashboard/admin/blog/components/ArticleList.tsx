@@ -22,10 +22,12 @@ export function ArticleList({ articles }: ArticleListProps) {
                 <div key={article.id} className="group relative bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-md transition-all">
                     <div className="flex flex-col md:flex-row justify-between gap-6">
                         <div className="flex-1 space-y-4">
-                            <div className="flex items-center gap-3">
-                                <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold uppercase tracking-wider">
-                                    {article.category}
-                                </span>
+                            <div className="flex flex-wrap items-center gap-3">
+                                {article.categories?.map((cat) => (
+                                    <span key={cat} className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                        {cat}
+                                    </span>
+                                ))}
                                 {article.featured && (
                                     <span className="px-2.5 py-1 bg-amber-50 text-amber-600 rounded-lg text-xs font-bold uppercase tracking-wider">
                                         Featured

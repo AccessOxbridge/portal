@@ -30,7 +30,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
     const [formData, setFormData] = useState({
         title: article?.title || '',
         description: article?.description || '',
-        category: article?.category || 'Oxbridge Admissions',
+        categories: (article?.categories as string[]) || ['Oxbridge Admissions'],
         tags: article?.tags?.join(', ') || '',
         image: article?.image || '',
         featured: article?.featured || false,
@@ -45,7 +45,8 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
         'Interview Tips',
         'Personal Statement',
         'UK Universities',
-        'Student Stories'
+        'Student Stories',
+        'Admissions Guide'
     ]
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +85,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
         })
     }
 
-    const handleChange = (field: string, value: string | boolean) => {
+    const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }))
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: '' }))
@@ -122,21 +123,36 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
 
                     {/* Metadata Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-8 rounded-[32px] border border-gray-100">
-                        <div className="space-y-4">
-                            <label htmlFor="category" className="block text-sm font-bold text-gray-900 ml-1">
-                                Category
+                        <div className="md:col-span-2 space-y-4">
+                            <label className="block text-sm font-bold text-gray-900 ml-1">
+                                Categories
                             </label>
-                            <select
-                                id="category"
-                                value={formData.category}
-                                onChange={(e) => handleChange('category', e.target.value)}
-                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all cursor-pointer shadow-sm"
-                                disabled={isPending}
-                            >
-                                {categories.map((cat) => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
+                            <div className="flex flex-wrap gap-2">
+                                {categories.map((cat) => {
+                                    const isSelected = formData.categories.includes(cat)
+                                    return (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() => {
+                                                const newCategories = isSelected
+                                                    ? formData.categories.filter(c => c !== cat)
+                                                    : [...formData.categories, cat]
+                                                if (newCategories.length > 0) {
+                                                    handleChange('categories', newCategories)
+                                                }
+                                            }}
+                                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${isSelected
+                                                ? 'bg-accent text-white border-accent shadow-lg shadow-accent/20'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-accent/30'
+                                                }`}
+                                            disabled={isPending}
+                                        >
+                                            {cat}
+                                        </button>
+                                    )
+                                })}
+                            </div>
                         </div>
 
                         <div className="space-y-4">

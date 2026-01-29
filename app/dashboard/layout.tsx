@@ -27,7 +27,15 @@ export default async function DashboardLayout({
             role,
             credits,
             mentors (
-                status
+                status,
+                bio,
+                photo_url,
+                payouts_enabled,
+                training_completed_at,
+                quiz_completed_at,
+                contract_signed_at,
+                dbs_certificate_url,
+                profile_completed_at
             )
         `)
         .eq('id', user.id)
@@ -38,6 +46,8 @@ export default async function DashboardLayout({
     }
 
     let showSidebar = true
+    let onboardingIncomplete = false
+
     if (profile.role === 'mentor' || profile.role === 'admin-dev') {
         const mentor = (profile as any).mentors
         const status = mentor?.status
@@ -47,6 +57,19 @@ export default async function DashboardLayout({
         // 2. Status is 'details_required' or 'pending_approval'
         if (profile.role === 'mentor' && (!mentor || status === 'details_required' || status === 'pending_approval')) {
             showSidebar = false
+        }
+
+        // Check if mentor training/onboarding is incomplete
+        if (mentor && showSidebar) {
+            // Check training completion - if any of these are missing, training is incomplete
+            const trainingComplete = !!mentor.training_completed_at
+            const quizComplete = !!mentor.quiz_completed_at
+            const contractSigned = !!mentor.contract_signed_at
+            const dbsUploaded = !!mentor.dbs_certificate_url
+            const paymentSetup = !!mentor.payouts_enabled
+            const profileComplete = !!mentor.profile_completed_at || (!!mentor.bio && !!mentor.photo_url)
+
+            onboardingIncomplete = !trainingComplete || !quizComplete || !contractSigned || !dbsUploaded || !paymentSetup || !profileComplete
         }
     }
 
@@ -97,6 +120,7 @@ export default async function DashboardLayout({
                     userName={profile.full_name || user.email?.split('@')[0] || 'User'}
                     userId={user.id}
                     pendingReportsCount={pendingReportsCount}
+                    onboardingIncomplete={onboardingIncomplete}
                 />
             )}
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
+import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 
 interface UpcomingSession {
     id: string
@@ -23,6 +24,8 @@ interface StudentDashboardContentProps {
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
     academicProfile: AcademicProfile | null
+    userId: string
+    userName: string
 }
 
 export default function StudentDashboardContent({
@@ -30,7 +33,9 @@ export default function StudentDashboardContent({
     activeSession,
     pendingRequests,
     upcomingSessions,
-    academicProfile
+    academicProfile,
+    userId,
+    userName
 }: StudentDashboardContentProps) {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString)
@@ -94,6 +99,11 @@ export default function StudentDashboardContent({
                     )}
                 </div>
             </header>
+
+            {/* Academic Profile Card */}
+            <div className="mb-6">
+                <AcademicProfileCard userId={userId} userName={userName} />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {activeSession ? (

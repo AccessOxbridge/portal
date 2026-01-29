@@ -59,7 +59,7 @@ export default async function StudentDashboard() {
         .eq('status', 'active')
         .gte('scheduled_at', now)
         .order('scheduled_at', { ascending: true })
-        .limit(3)
+        .limit(15)
 
     // Flatten mentor name if exists
     const sessionWithMentor = activeSession ? {
@@ -89,6 +89,8 @@ export default async function StudentDashboard() {
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
             academicProfile={academicProfile as any}
+            userId={user.id}
+            userName={profile.full_name}
         />
     )
 }

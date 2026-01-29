@@ -39,7 +39,7 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
 
     if (loading) {
         return (
-            <div className="mx-3 mb-4 p-4 bg-gray-50 rounded-2xl animate-pulse">
+            <div className="p-4 bg-gray-50 rounded-2xl animate-pulse">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-xl" />
                     <div className="flex-1">
@@ -56,26 +56,26 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
     return (
         <Link
             href="/dashboard/student/profile"
-            className={`block p-4 rounded-2xl transition-all group hover:bg-white/5 mb-4 ${isIncomplete
-                ? 'bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/20'
-                : 'bg-white/5 border border-white/5 hover:border-white/10'
+            className={`block p-6 bg-white rounded-[32px] border shadow-xl shadow-gray-200/50 transition-all group hover:shadow-indigo-100 ${isIncomplete
+                ? 'border-amber-200 bg-amber-50/50 hover:border-amber-300'
+                : 'border-gray-100 hover:border-accent/30'
                 }`}
         >
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-500/10' : 'bg-white/10'
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-100' : 'bg-accent/10'
                         }`}>
                         {isIncomplete ? (
-                            <AlertCircle className="w-5 h-5 text-amber-500" />
+                            <AlertCircle className="w-6 h-6 text-amber-600" />
                         ) : (
-                            <GraduationCap className="w-5 h-5 text-white/80" />
+                            <GraduationCap className="w-6 h-6 text-accent" />
                         )}
                     </div>
                     <div className="min-w-0">
-                        <p className={`text-sm font-bold truncate ${isIncomplete ? 'text-amber-500' : 'text-white'}`}>
+                        <p className={`text-base font-bold truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-900'}`}>
                             {isIncomplete ? 'Complete Your Profile' : 'Academic Profile'}
                         </p>
-                        <p className={`text-[11px] truncate ${isIncomplete ? 'text-amber-500/60' : 'text-white/40'}`}>
+                        <p className={`text-sm truncate mt-0.5 ${isIncomplete ? 'text-amber-600/80' : 'text-gray-500'}`}>
                             {isIncomplete
                                 ? 'Required for matching'
                                 : profile?.target_university
@@ -85,19 +85,19 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
                         </p>
                     </div>
                 </div>
-                <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${isIncomplete ? 'text-amber-500/40' : 'text-white/20'
+                <ChevronRight className={`w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1 ${isIncomplete ? 'text-amber-500' : 'text-gray-400'
                     }`} />
             </div>
 
             {isIncomplete && (
-                <div className="mt-3 flex items-center gap-2">
-                    <div className="flex-1 h-1 bg-amber-500/10 rounded-full overflow-hidden">
+                <div className="mt-4 flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-amber-100 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-amber-500 rounded-full transition-all"
                             style={{ width: profile ? '30%' : '5%' }}
                         />
                     </div>
-                    <span className="text-[10px] text-amber-500/80 font-medium">
+                    <span className="text-xs text-amber-600 font-semibold">
                         {profile ? 'In Progress' : 'Not Started'}
                     </span>
                 </div>

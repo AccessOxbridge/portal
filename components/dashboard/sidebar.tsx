@@ -30,7 +30,6 @@ import {
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
 import NotificationBell from './notification-bell'
-import AcademicProfileCard from './academic-profile-card'
 
 interface SidebarProps {
     role: string;
@@ -170,13 +169,6 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                     </div>
                 </div>
             </div>
-
-            {/* Academic Profile Card - Students Only */}
-            {effectiveRole === 'student' && userId && (
-                <div className="px-3">
-                    <AcademicProfileCard userId={userId} userName={userName} />
-                </div>
-            )}
 
             {/* Navigation Section */}
             <nav className="grow px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">

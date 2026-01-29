@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatPrice } from '@/utils/stripe'
 import { StripeDashboardButton } from '@/components/dashboard/stripe-dashboard-button'
+import ReportIssueForm from './report-issue-form'
 
 export default async function MentorPayoutsPage() {
     const supabase = await createClient()
@@ -16,10 +17,6 @@ export default async function MentorPayoutsPage() {
         .eq('id', user.id)
         .single()
 
-    // if (!profile || (profile.role !== 'mentor' && profile.role !== 'admin-dev')) {
-    //     return redirect('/dashboard')
-    // }
-
     // Get mentor's Stripe Connect status
     const { data: mentor } = await supabase
         .from('mentors')
@@ -33,6 +30,13 @@ export default async function MentorPayoutsPage() {
         .select('*')
         .eq('mentor_id', user.id)
         .order('created_at', { ascending: false })
+
+    // Calculate payment summaries
+    const paidPayouts = payouts?.filter(p => p.status === 'paid') || []
+    const pendingPayouts = payouts?.filter(p => p.status === 'pending' || p.status === 'processing') || []
+
+    const totalPaid = paidPayouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
+    const totalPending = pendingPayouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
 
     // Get completed session count this month
     const startOfMonth = new Date()
@@ -58,6 +62,65 @@ export default async function MentorPayoutsPage() {
                     Track your sessions and view your payout history
                 </p>
             </header>
+
+            {/* Pending Payments Banner */}
+            {totalPending > 0 && (
+                <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[24px] text-white shadow-xl">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-blue-100 text-sm font-medium mb-1">Pending Payments</p>
+                            <p className="text-4xl font-bold">
+                                {formatPrice(totalPending)}
+                            </p>
+                            <p className="text-blue-200 text-sm mt-2">
+                                {pendingPayouts.length} payment{pendingPayouts.length !== 1 ? 's' : ''} being processed
+                            </p>
+                        </div>
+                        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Payment Breakdown */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Total Paid</p>
+                            <p className="text-2xl font-bold text-green-600">{formatPrice(totalPaid)}</p>
+                        </div>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                        {paidPayouts.length} completed payment{paidPayouts.length !== 1 ? 's' : ''}
+                    </p>
+                </div>
+
+                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">To Be Paid</p>
+                            <p className="text-2xl font-bold text-amber-600">{formatPrice(totalPending)}</p>
+                        </div>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                        {pendingPayouts.length} pending payment{pendingPayouts.length !== 1 ? 's' : ''}
+                    </p>
+                </div>
+            </section>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -165,6 +228,11 @@ export default async function MentorPayoutsPage() {
                     </div>
                 )}
             </section>
+
+            {/* Report Issue Section */}
+            <section>
+                <ReportIssueForm mentorId={user.id} />
+            </section>
         </div>
     )
 }
@@ -183,4 +251,3 @@ function PayoutStatusBadge({ status }: { status: string }) {
         </span>
     )
 }
-

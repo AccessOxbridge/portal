@@ -25,7 +25,9 @@ import {
     MapPin,
     ChevronDown,
     Home,
-    Briefcase
+    Briefcase,
+    GraduationCap,
+    AlertCircle
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -36,6 +38,7 @@ interface SidebarProps {
     userName: string;
     userId?: string;
     pendingReportsCount?: number;
+    onboardingIncomplete?: boolean;
 }
 
 // Define section type for expandable sections
@@ -67,6 +70,7 @@ const navigation = {
         { name: 'Resources', href: process.env.NEXT_PUBLIC_HOME_PAGE_URL + '/admissions-resources', icon: Book },
     ],
     mentor: [
+        { name: 'Training', href: '/dashboard/mentor/training', icon: GraduationCap },
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
         { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
         { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
@@ -87,6 +91,7 @@ const navigation = {
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
         { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
+        { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },
         { name: 'Legal', href: '/dashboard/admin/legal', icon: Briefcase },
     ],
     'admin-dev': [ // Same as admin for now
@@ -102,11 +107,12 @@ const navigation = {
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
         { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
+        { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },
         { name: 'Legal', href: '/dashboard/admin/legal', icon: Briefcase },
     ]
 }
 
-export default function Sidebar({ role, userName, userId, pendingReportsCount = 0 }: SidebarProps) {
+export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
@@ -174,7 +180,8 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
             <nav className="grow px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
-                    const showBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
+                    const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
+                    const showTrainingBadge = item.name === 'Training' && effectiveRole === 'mentor' && onboardingIncomplete
                     return (
                         <Link
                             key={item.href}
@@ -188,9 +195,14 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                                 <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
                                 <span className="font-medium text-sm">{item.name}</span>
                             </div>
-                            {showBadge && (
+                            {showReportsBadge && (
                                 <span className="px-1.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
                                     {pendingReportsCount}
+                                </span>
+                            )}
+                            {showTrainingBadge && (
+                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                    <AlertCircle className="w-3 h-3" />
                                 </span>
                             )}
                         </Link>

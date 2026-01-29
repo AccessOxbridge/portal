@@ -18,7 +18,7 @@ export type Database = {
         Row: {
           author: string
           body: string
-          category: Database["public"]["Enums"]["blog_category"]
+          categories: Database["public"]["Enums"]["blog_category"][]
           created_at: string | null
           description: string
           featured: boolean | null
@@ -35,7 +35,7 @@ export type Database = {
         Insert: {
           author: string
           body: string
-          category: Database["public"]["Enums"]["blog_category"]
+          categories?: Database["public"]["Enums"]["blog_category"][]
           created_at?: string | null
           description: string
           featured?: boolean | null
@@ -52,7 +52,7 @@ export type Database = {
         Update: {
           author?: string
           body?: string
-          category?: Database["public"]["Enums"]["blog_category"]
+          categories?: Database["public"]["Enums"]["blog_category"][]
           created_at?: string | null
           description?: string
           featured?: boolean | null
@@ -361,6 +361,7 @@ export type Database = {
           created_at: string | null
           form_type: string
           id: string
+          rating: number | null
           respondent_id: string
           responses: Json
           session_id: string
@@ -369,6 +370,7 @@ export type Database = {
           created_at?: string | null
           form_type: string
           id?: string
+          rating?: number | null
           respondent_id: string
           responses?: Json
           session_id: string
@@ -377,6 +379,7 @@ export type Database = {
           created_at?: string | null
           form_type?: string
           id?: string
+          rating?: number | null
           respondent_id?: string
           responses?: Json
           session_id?: string
@@ -398,44 +401,190 @@ export type Database = {
           },
         ]
       }
+      mentor_payout_items: {
+        Row: {
+          amount_cents: number
+          created_at: string | null
+          duration_minutes: number
+          hourly_rate_cents: number
+          id: string
+          payout_id: string
+          session_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string | null
+          duration_minutes: number
+          hourly_rate_cents: number
+          id?: string
+          payout_id: string
+          session_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string | null
+          duration_minutes?: number
+          hourly_rate_cents?: number
+          id?: string
+          payout_id?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_payout_items_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_payouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_payout_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_payouts: {
+        Row: {
+          amount_cents: number
+          created_at: string | null
+          currency: string
+          failure_message: string | null
+          id: string
+          mentor_id: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          processed_at: string | null
+          sessions_count: number
+          status: string
+          stripe_payout_id: string | null
+          stripe_transfer_id: string | null
+          total_minutes: number
+          updated_at: string | null
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string | null
+          currency?: string
+          failure_message?: string | null
+          id?: string
+          mentor_id: string
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          processed_at?: string | null
+          sessions_count?: number
+          status?: string
+          stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
+          total_minutes?: number
+          updated_at?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string | null
+          currency?: string
+          failure_message?: string | null
+          id?: string
+          mentor_id?: string
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          processed_at?: string | null
+          sessions_count?: number
+          status?: string
+          stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
+          total_minutes?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_payouts_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentors: {
         Row: {
           bio: string | null
+          contract_signature: string | null
+          contract_signed_at: string | null
           created_at: string
           cv_url: string | null
+          dbs_certificate_url: string | null
           embedding: string | null
           expertise: string[] | null
+          hourly_rate_cents: number | null
           id: string
           is_active: boolean | null
+          payouts_enabled: boolean | null
+          phone: string | null
           photo_url: string | null
+          profile_completed_at: string | null
+          quiz_answers: Json | null
+          quiz_completed_at: string | null
           responses: Json | null
           status: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id: string | null
+          training_completed_at: string | null
+          university: string | null
           updated_at: string
         }
         Insert: {
           bio?: string | null
+          contract_signature?: string | null
+          contract_signed_at?: string | null
           created_at?: string
           cv_url?: string | null
+          dbs_certificate_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
+          hourly_rate_cents?: number | null
           id: string
           is_active?: boolean | null
+          payouts_enabled?: boolean | null
+          phone?: string | null
           photo_url?: string | null
+          profile_completed_at?: string | null
+          quiz_answers?: Json | null
+          quiz_completed_at?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id?: string | null
+          training_completed_at?: string | null
+          university?: string | null
           updated_at?: string
         }
         Update: {
           bio?: string | null
+          contract_signature?: string | null
+          contract_signed_at?: string | null
           created_at?: string
           cv_url?: string | null
+          dbs_certificate_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
+          hourly_rate_cents?: number | null
           id?: string
           is_active?: boolean | null
+          payouts_enabled?: boolean | null
+          phone?: string | null
           photo_url?: string | null
+          profile_completed_at?: string | null
+          quiz_answers?: Json | null
+          quiz_completed_at?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id?: string | null
+          training_completed_at?: string | null
+          university?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -659,6 +808,7 @@ export type Database = {
       sessions: {
         Row: {
           created_at: string | null
+          duration_minutes: number | null
           id: string
           mentor_id: string
           reminder_sent: boolean | null
@@ -676,6 +826,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          duration_minutes?: number | null
           id?: string
           mentor_id: string
           reminder_sent?: boolean | null
@@ -693,6 +844,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          duration_minutes?: number | null
           id?: string
           mentor_id?: string
           reminder_sent?: boolean | null
@@ -717,6 +869,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sessions_mentor_id_mentors_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sessions_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
@@ -728,6 +887,145 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_profiles: {
+        Row: {
+          application_year: number | null
+          created_at: string | null
+          extracurriculars: string | null
+          gcse_results: Json | null
+          id: string
+          interests: string | null
+          is_complete: boolean | null
+          school_name: string | null
+          subjects: Json | null
+          target_course: string | null
+          target_university: string | null
+          updated_at: string | null
+          year_group: string | null
+        }
+        Insert: {
+          application_year?: number | null
+          created_at?: string | null
+          extracurriculars?: string | null
+          gcse_results?: Json | null
+          id: string
+          interests?: string | null
+          is_complete?: boolean | null
+          school_name?: string | null
+          subjects?: Json | null
+          target_course?: string | null
+          target_university?: string | null
+          updated_at?: string | null
+          year_group?: string | null
+        }
+        Update: {
+          application_year?: number | null
+          created_at?: string | null
+          extracurriculars?: string | null
+          gcse_results?: Json | null
+          id?: string
+          interests?: string | null
+          is_complete?: boolean | null
+          school_name?: string | null
+          subjects?: Json | null
+          target_course?: string | null
+          target_university?: string | null
+          updated_at?: string | null
+          year_group?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_issues: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          description: string
+          id: string
+          issue_type: string
+          payout_id: string | null
+          priority: string
+          reporter_id: string
+          reporter_type: string
+          resolved_at: string | null
+          resolved_by: string | null
+          session_id: string | null
+          status: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          issue_type: string
+          payout_id?: string | null
+          priority?: string
+          reporter_id: string
+          reporter_type: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          session_id?: string | null
+          status?: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          issue_type?: string
+          payout_id?: string | null
+          priority?: string
+          reporter_id?: string
+          reporter_type?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          session_id?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_issues_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_payouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_issues_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_issues_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_issues_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -760,6 +1058,8 @@ export type Database = {
         | "Personal Statement"
         | "UK Universities"
         | "Student Stories"
+        | "Admissions Guide"
+        | "International Students"
       mentor_status: "active" | "pending_approval" | "details_required"
       notification_type:
         | "mentorship_request"
@@ -906,6 +1206,8 @@ export const Constants = {
         "Personal Statement",
         "UK Universities",
         "Student Stories",
+        "Admissions Guide",
+        "International Students",
       ],
       mentor_status: ["active", "pending_approval", "details_required"],
       notification_type: [

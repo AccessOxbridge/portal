@@ -514,8 +514,11 @@ export type Database = {
       mentors: {
         Row: {
           bio: string | null
+          contract_signature: string | null
+          contract_signed_at: string | null
           created_at: string
           cv_url: string | null
+          dbs_certificate_url: string | null
           embedding: string | null
           expertise: string[] | null
           hourly_rate_cents: number | null
@@ -524,15 +527,23 @@ export type Database = {
           payouts_enabled: boolean | null
           phone: string | null
           photo_url: string | null
+          profile_completed_at: string | null
+          quiz_answers: Json | null
+          quiz_completed_at: string | null
           responses: Json | null
           status: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id: string | null
+          training_completed_at: string | null
+          university: string | null
           updated_at: string
         }
         Insert: {
           bio?: string | null
+          contract_signature?: string | null
+          contract_signed_at?: string | null
           created_at?: string
           cv_url?: string | null
+          dbs_certificate_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
           hourly_rate_cents?: number | null
@@ -541,15 +552,23 @@ export type Database = {
           payouts_enabled?: boolean | null
           phone?: string | null
           photo_url?: string | null
+          profile_completed_at?: string | null
+          quiz_answers?: Json | null
+          quiz_completed_at?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id?: string | null
+          training_completed_at?: string | null
+          university?: string | null
           updated_at?: string
         }
         Update: {
           bio?: string | null
+          contract_signature?: string | null
+          contract_signed_at?: string | null
           created_at?: string
           cv_url?: string | null
+          dbs_certificate_url?: string | null
           embedding?: string | null
           expertise?: string[] | null
           hourly_rate_cents?: number | null
@@ -558,9 +577,14 @@ export type Database = {
           payouts_enabled?: boolean | null
           phone?: string | null
           photo_url?: string | null
+          profile_completed_at?: string | null
+          quiz_answers?: Json | null
+          quiz_completed_at?: string | null
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id?: string | null
+          training_completed_at?: string | null
+          university?: string | null
           updated_at?: string
         }
         Relationships: [

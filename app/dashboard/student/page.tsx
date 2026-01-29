@@ -90,7 +90,7 @@ export default async function StudentDashboard() {
             upcomingSessions={processedUpcomingSessions}
             academicProfile={academicProfile as any}
             userId={user.id}
-            userName={profile.full_name}
+            userName={profile.full_name || 'Student'}
         />
     )
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
+import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 
 interface UpcomingSession {
     id: string
@@ -100,6 +101,11 @@ export default function StudentDashboardContent({
                 </div>
             </header>
 
+            {/* Weekly Calendar */}
+            <div className="mb-10">
+                <WeeklyCalendar sessions={upcomingSessions} />
+            </div>
+
             {/* Academic Profile Card */}
             <div className="mb-6">
                 <AcademicProfileCard userId={userId} userName={userName} />
@@ -182,56 +188,6 @@ export default function StudentDashboardContent({
                     </div>
                 )}
 
-                {/* Upcoming Sessions Widget */}
-                {upcomingSessions.length > 0 && (
-                    <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900">Upcoming Sessions</h2>
-                            <Link
-                                href="/dashboard/student/sessions"
-                                className="text-accent font-semibold text-sm hover:underline flex items-center gap-1"
-                            >
-                                View all <ArrowRight className="w-4 h-4" />
-                            </Link>
-                        </div>
-                        <div className="space-y-3">
-                            {upcomingSessions.map((session) => (
-                                <div
-                                    key={session.id}
-                                    className={`p-4 rounded-2xl border transition-all ${isSessionSoon(session.scheduled_at)
-                                        ? 'bg-green-50 border-green-200'
-                                        : 'bg-gray-50 border-gray-100 hover:border-accent/30'
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="min-w-0">
-                                            <p className="font-semibold text-gray-900 truncate">
-                                                {session.mentor_full_name}
-                                            </p>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
-                                                <Calendar className="w-3.5 h-3.5 shrink-0" />
-                                                <span>{formatDate(session.scheduled_at)}</span>
-                                                <Clock className="w-3.5 h-3.5 shrink-0 ml-1" />
-                                                <span>{formatTime(session.scheduled_at)}</span>
-                                            </div>
-                                        </div>
-                                        {session.zoom_join_url && isSessionSoon(session.scheduled_at) && (
-                                            <a
-                                                href={session.zoom_join_url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors"
-                                            >
-                                                <Video className="w-4 h-4" />
-                                                Join
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
 
                 <div className={`p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group ${upcomingSessions.length === 0 ? 'lg:col-span-2' : ''}`}>
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Learning Resources</h2>

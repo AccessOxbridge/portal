@@ -25,12 +25,37 @@ interface Mentor {
     status: string | null
     phone: string | null
     created_at: string
+    photo_url: string | null
+    training_completed_at: string | null
+    quiz_completed_at: string | null
+    contract_signed_at: string | null
+    dbs_certificate_url: string | null
+    payouts_enabled: boolean | null
+    profile_completed_at: string | null
     profile: {
         full_name: string | null
         email: string | null
     } | null
     sessions_completed: number
     avg_rating: number | null
+}
+
+// Helper to calculate onboarding completion
+function getOnboardingStatus(mentor: Mentor): { completed: number; total: number; label: string } {
+    const steps = [
+        !!mentor.training_completed_at,
+        !!mentor.quiz_completed_at,
+        !!mentor.contract_signed_at,
+        !!mentor.dbs_certificate_url,
+        !!mentor.payouts_enabled,
+        !!mentor.profile_completed_at || (!!mentor.bio && !!mentor.photo_url)
+    ]
+    const completed = steps.filter(Boolean).length
+    const total = steps.length
+
+    if (completed === total) return { completed, total, label: 'Complete' }
+    if (completed === 0) return { completed, total, label: 'Not Started' }
+    return { completed, total, label: `${completed}/${total}` }
 }
 
 const statusColors: Record<string, string> = {
@@ -123,7 +148,7 @@ export default function AdminMentorsPage() {
             ...m,
             sessions_completed: sessionCountMap[m.id] || 0,
             avg_rating: avgRatingMap[m.id] || null
-        })) as Mentor[]
+        })) as unknown as Mentor[]
 
         // Apply status filter
         if (statusFilter !== 'all') {
@@ -240,7 +265,7 @@ export default function AdminMentorsPage() {
                                     <tr className="bg-gray-50/50 border-b border-gray-100">
                                         <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
                                         <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Bio</th>
+                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Onboarding</th>
                                         <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Sessions</th>
                                         <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Avg Rating</th>
                                         <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Contact</th>
@@ -268,13 +293,21 @@ export default function AdminMentorsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <Link
-                                                        href={`/dashboard/admin/mentors/${mentor.id}`}
-                                                        className="inline-flex items-center gap-1.5 text-accent hover:text-accent/80 text-sm font-medium transition-colors"
-                                                    >
-                                                        <FileText className="w-3.5 h-3.5" />
-                                                        View Bio
-                                                    </Link>
+                                                    {(() => {
+                                                        const onboarding = getOnboardingStatus(mentor)
+                                                        const isComplete = onboarding.completed === onboarding.total
+                                                        return (
+                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${isComplete
+                                                                    ? 'bg-green-50 text-green-700 border-green-100'
+                                                                    : onboarding.completed === 0
+                                                                        ? 'bg-gray-50 text-gray-500 border-gray-100'
+                                                                        : 'bg-amber-50 text-amber-700 border-amber-100'
+                                                                }`}>
+                                                                {isComplete && <CheckCircle2 className="w-3.5 h-3.5" />}
+                                                                {onboarding.label}
+                                                            </span>
+                                                        )
+                                                    })()}
                                                 </td>
                                                 <td className="px-5 py-4">
                                                     <span className="text-sm font-semibold text-gray-900">{mentor.sessions_completed}</span>

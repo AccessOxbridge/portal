@@ -169,27 +169,24 @@ export default async function MentorDashboard() {
                                 View Payouts <span className="ml-2">→</span>
                             </a>
                         </>
-                    ) : mentor.stripe_account_id ? (
-                        <>
-                            <p className="text-gray-500 mb-4 leading-relaxed text-sm">Complete your payment setup to start receiving payouts.</p>
-                            <StripeOnboardingButton variant="continue" />
-                        </>
                     ) : (
                         <>
-                            <p className="text-gray-500 mb-4 leading-relaxed text-sm">Set up your payment account to receive fortnightly payouts for your sessions.</p>
-                            <StripeOnboardingButton variant="setup" />
+                            <p className="text-gray-500 mb-4 leading-relaxed text-sm">Complete your onboarding to set up payment and start receiving payouts.</p>
+                            <a href="/dashboard/mentor/training" className="inline-flex items-center gap-2 text-accent font-bold hover:translate-x-1 transition-transform">
+                                Complete Onboarding <span className="ml-2">→</span>
+                            </a>
                         </>
                     )}
                 </div>
 
                 <div className="p-8 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-white mb-4">Complete Profile</h2>
-                        <p className="text-white/70 mb-8 text-sm leading-relaxed">Maximize your visibility to students by completing your full profile details.</p>
+                        <h2 className="text-2xl font-bold text-white mb-4">Complete Onboarding</h2>
+                        <p className="text-white/70 mb-8 text-sm leading-relaxed">Finish your training, sign contract, and complete your profile to start receiving allocations.</p>
                     </div>
-                    <button className="bg-rich-amber-accent text-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10">
-                        Edit Profile
-                    </button>
+                    <a href="/dashboard/mentor/training" className="bg-rich-amber-accent text-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center">
+                        Go to Training
+                    </a>
                 </div>
             </div>
         </div>

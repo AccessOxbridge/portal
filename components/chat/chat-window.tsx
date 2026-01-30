@@ -22,12 +22,23 @@ interface ChatWindowProps {
         full_name: string | null
         photo_url?: string | null
     }
+    adminUser?: {
+        id: string
+        full_name: string
+    }
+    allParticipants?: {
+        student_id: string
+        mentor_id: string
+        admin_id?: string
+    }
 }
 
 export default function ChatWindow({
     conversationId,
     currentUserId,
-    otherUser
+    otherUser,
+    adminUser,
+    allParticipants
 }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -229,12 +240,30 @@ export default function ChatWindow({
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                     )}
                 </div>
-                <div>
-                    <h3 className="font-semibold text-gray-900">{otherUser.full_name || 'User'}</h3>
-                    <p className={`text-xs ${isOtherUserOnline ? 'text-green-500' : 'text-gray-400'}`}>
-                        {isOtherUserOnline ? 'Online' : 'Offline'}
-                    </p>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-gray-900">{otherUser.full_name || 'Mentor'}</h3>
+                        {adminUser && (
+                            <>
+                                <span className="text-gray-400">•</span>
+                                <span className="text-sm font-medium text-purple-600">Senior Strategist</span>
+                            </>
+                        )}
+                    </div>
+                    {adminUser ? (
+                        <p className="text-xs text-gray-400">Group Chat</p>
+                    ) : (
+                        <p className={`text-xs ${isOtherUserOnline ? 'text-green-500' : 'text-gray-400'}`}>
+                            {isOtherUserOnline ? 'Online' : 'Offline'}
+                        </p>
+                    )}
                 </div>
+                {adminUser && (
+                    <div className="flex items-center gap-1 px-3 py-1.5 bg-purple-50 rounded-full">
+                        <div className="w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center text-white text-[10px] font-bold">S</div>
+                        <span className="text-xs font-medium text-purple-700">+1</span>
+                    </div>
+                )}
             </div>
 
             {/* Messages */}

@@ -15,8 +15,8 @@ interface Issue {
     status: string
     priority: string
     admin_notes: string | null
-    created_at: string
-    updated_at: string
+    created_at: string | null
+    updated_at: string | null
 }
 
 interface IssuesTableProps {
@@ -172,11 +172,11 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                     </div>
                                     <div className="flex items-center gap-1 text-sm text-gray-400">
                                         <Clock className="w-4 h-4" />
-                                        {new Date(issue.created_at).toLocaleDateString('en-GB', {
+                                        {issue.created_at ? new Date(issue.created_at).toLocaleDateString('en-GB', {
                                             day: 'numeric',
                                             month: 'short',
                                             year: 'numeric',
-                                        })}
+                                        }) : 'N/A'}
                                     </div>
                                 </div>
                             </div>
@@ -285,8 +285,8 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
 
                                 {/* Timestamps */}
                                 <div className="pt-4 border-t border-gray-100 text-xs text-gray-400 space-y-1">
-                                    <p>Created: {new Date(selectedIssue.created_at).toLocaleString('en-GB')}</p>
-                                    <p>Updated: {new Date(selectedIssue.updated_at).toLocaleString('en-GB')}</p>
+                                    <p>Created: {selectedIssue.created_at ? new Date(selectedIssue.created_at).toLocaleString('en-GB') : 'N/A'}</p>
+                                    <p>Updated: {selectedIssue.updated_at ? new Date(selectedIssue.updated_at).toLocaleString('en-GB') : 'N/A'}</p>
                                 </div>
                             </div>
                         </div>

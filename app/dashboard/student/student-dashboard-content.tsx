@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
+import ApplicationTimeline from '@/components/dashboard/application-timeline'
 
 interface UpcomingSession {
     id: string
@@ -100,6 +101,9 @@ export default function StudentDashboardContent({
                     )}
                 </div>
             </header>
+
+            {/* Application Timeline */}
+            <ApplicationTimeline applicationYear={academicProfile?.application_year} />
 
             {/* Weekly Calendar */}
             <div className="mb-10">

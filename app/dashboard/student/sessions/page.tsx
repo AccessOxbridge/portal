@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import StudentSessionsContent from './student-sessions-content'
+import JourneyTimeline from './journey-timeline'
 
 export default async function StudentSessionsPage() {
     const supabase = await createClient()
@@ -22,6 +23,15 @@ export default async function StudentSessionsPage() {
     if (!profile || (profile.role !== 'student' && profile.role !== 'admin-dev')) {
         return redirect('/dashboard')
     }
+
+    // Fetch academic profile to check if complete
+    const { data: academicProfile } = await supabase
+        .from('student_profiles')
+        .select('target_university, target_course')
+        .eq('id', user.id)
+        .single()
+
+    const hasProfile = !!(academicProfile?.target_university || academicProfile?.target_course)
 
     // Fetch pending mentorship requests
     const { data: pendingRequests } = await supabase
@@ -119,16 +129,30 @@ export default async function StudentSessionsPage() {
         return new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()
     })
 
+    // Calculate journey stages
+    const hasPendingRequests = processedPendingRequests.length > 0
+    const hasActiveMentorship = upcomingSessions.length > 0
+    const hasScheduledSession = upcomingSessions.some(s => s.scheduled_at)
+    const hasCompletedSession = pastSessions.some(s => s.status === 'completed')
+
     return (
         <div className="max-w-4xl mx-auto">
-            <header className="mb-10">
+            <header className="mb-8">
                 <h1 className="text-4xl font-extrabold text-accent tracking-tight">
                     My Sessions
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    View your scheduled and completed mentorship sessions
+                    Track your mentorship journey and sessions
                 </p>
             </header>
+
+            <JourneyTimeline
+                hasProfile={hasProfile}
+                hasPendingRequests={hasPendingRequests}
+                hasActiveMentorship={hasActiveMentorship}
+                hasScheduledSession={hasScheduledSession}
+                hasCompletedSession={hasCompletedSession}
+            />
 
             <StudentSessionsContent
                 upcomingSessions={upcomingSessions}

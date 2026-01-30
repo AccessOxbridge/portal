@@ -6,15 +6,17 @@ import { ChevronLeft, ChevronRight, Video, Clock, Calendar as CalendarIcon, Exte
 interface Session {
     id: string
     scheduled_at: string
-    zoom_join_url: string | null
-    mentor_full_name: string
+    zoom_url: string | null
+    person_name: string
 }
 
 interface WeeklyCalendarProps {
     sessions: Session[]
+    personLabel?: string // e.g., "Mentor" or "Student"
+    zoomButtonLabel?: string
 }
 
-export default function WeeklyCalendar({ sessions }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom' }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
 
@@ -148,16 +150,16 @@ export default function WeeklyCalendar({ sessions }: WeeklyCalendarProps) {
                             <div
                                 key={session.id}
                                 className="group relative bg-white border border-gray-100 p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
-                                onClick={() => session.zoom_join_url && window.open(session.zoom_join_url, '_blank')}
+                                onClick={() => session.zoom_url && window.open(session.zoom_url, '_blank')}
                             >
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent font-bold text-xl">
-                                            {session.mentor_full_name?.[0] || 'M'}
+                                            {session.person_name?.[0] || personLabel[0]}
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-gray-900 group-hover:text-accent transition-colors">
-                                                Session with {session.mentor_full_name}
+                                                Session with {session.person_name}
                                             </h4>
                                             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 font-medium">
                                                 <Clock className="w-3.5 h-3.5" />
@@ -171,11 +173,11 @@ export default function WeeklyCalendar({ sessions }: WeeklyCalendarProps) {
                                         </div>
                                     </div>
 
-                                    {session.zoom_join_url ? (
+                                    {session.zoom_url ? (
                                         <div className="flex items-center gap-2">
                                             <button className="bg-accent text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform">
                                                 <Video className="w-4 h-4" />
-                                                Join Zoom
+                                                {zoomButtonLabel}
                                             </button>
                                         </div>
                                     ) : (

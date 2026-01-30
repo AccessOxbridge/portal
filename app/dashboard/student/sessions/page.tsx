@@ -23,6 +23,21 @@ export default async function StudentSessionsPage() {
         return redirect('/dashboard')
     }
 
+    // Fetch pending mentorship requests
+    const { data: pendingRequests } = await supabase
+        .from('mentorship_requests')
+        .select(`
+            id,
+            created_at,
+            status,
+            mentor:profiles!mentorship_requests_mentor_id_fkey (
+                full_name
+            )
+        `)
+        .eq('student_id', user.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+
     // Fetch all sessions for this student
     const { data: sessions } = await supabase
         .from('sessions')
@@ -76,6 +91,13 @@ export default async function StudentSessionsPage() {
         has_report: reportSet.has(session.id)
     }))
 
+    // Process pending requests
+    const processedPendingRequests = (pendingRequests || []).map((req: any) => ({
+        id: req.id,
+        created_at: req.created_at,
+        mentor_full_name: req.mentor?.full_name || 'Mentor'
+    }))
+
     // Split into upcoming and past
     const upcomingSessions = processedSessions.filter(session => {
         if (session.status !== 'active') return false
@@ -111,6 +133,7 @@ export default async function StudentSessionsPage() {
             <StudentSessionsContent
                 upcomingSessions={upcomingSessions}
                 pastSessions={pastSessions}
+                pendingRequests={processedPendingRequests}
             />
         </div>
     )

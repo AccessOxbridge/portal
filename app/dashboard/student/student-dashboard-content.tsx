@@ -103,7 +103,15 @@ export default function StudentDashboardContent({
 
             {/* Weekly Calendar */}
             <div className="mb-10">
-                <WeeklyCalendar sessions={upcomingSessions} />
+                <WeeklyCalendar
+                    sessions={upcomingSessions.map(s => ({
+                        id: s.id,
+                        scheduled_at: s.scheduled_at,
+                        zoom_url: s.zoom_join_url,
+                        person_name: s.mentor_full_name
+                    }))}
+                    personLabel="Mentor"
+                />
             </div>
 
             {/* Academic Profile Card */}
@@ -152,6 +160,12 @@ export default function StudentDashboardContent({
                                 Zoom link will be available soon
                             </div>
                         )}
+                        <Link
+                            href="/dashboard/student/sessions"
+                            className="mt-4 block w-full py-3 text-accent font-semibold text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
+                        >
+                            View All Sessions
+                        </Link>
                     </div>
                 ) : pendingRequests.length > 0 ? (
                     <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50">
@@ -162,9 +176,18 @@ export default function StudentDashboardContent({
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Requests Pending</h2>
                         <p className="text-gray-500 mb-6 leading-relaxed">We've sent your request to the top 5 matching mentors. We'll notify you once one of them accepts!</p>
-                        <div className="px-6 py-3 bg-amber-50 rounded-2xl text-amber-700 text-sm font-bold flex items-center gap-2">
-                            24h Acceptance Window active
-                        </div>
+                        <Link
+                            href="/dashboard/student/sessions"
+                            className="block w-full py-4 bg-accent text-white font-bold rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
+                        >
+                            View Pending Requests
+                        </Link>
+                        <Link
+                            href="/dashboard/student/onboarding"
+                            className="block w-full py-3 text-accent font-semibold text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
+                        >
+                            + Book Another Session
+                        </Link>
                     </div>
                 ) : (
                     <div className="p-8 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group">

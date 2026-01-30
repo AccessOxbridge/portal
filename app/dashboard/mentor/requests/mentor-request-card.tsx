@@ -13,11 +13,17 @@ interface Request {
     id: string
     created_at: string
     responses: {
-        strengths: string
-        weaknesses: string
-        requirements: string
+        subjects?: string[]
+        timezone?: string
         timeSlots: TimeSlot[]
+        curriculum?: string
+        curriculumOther?: string
+        schoolName?: string
+        schoolCountry?: string
         anythingElse?: string
+        extracurriculars?: string
+        academicInterests?: string
+        targetUniversities?: string[]
     }
     student: {
         full_name: string
@@ -84,6 +90,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
     }
 
     const timeSlots = request.responses?.timeSlots || []
+    const responses = request.responses || {}
 
     return (
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
@@ -99,20 +106,57 @@ export function MentorRequestCard({ request }: { request: Request }) {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <div className="space-y-1">
-                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Strengths</h4>
-                        <p className="text-gray-700 leading-relaxed font-medium">{request.responses.strengths}</p>
-                    </div>
-                    <div className="space-y-1">
-                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Weaknesses</h4>
-                        <p className="text-gray-700 leading-relaxed font-medium">{request.responses.weaknesses}</p>
-                    </div>
-                    <div className="space-y-1 sm:col-span-2">
-                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">What they are looking for</h4>
-                        <p className="text-gray-700 leading-relaxed font-medium">{request.responses.requirements}</p>
-                    </div>
+                    {responses.academicInterests && (
+                        <div className="space-y-1 sm:col-span-2">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Academic Interests</h4>
+                            <p className="text-gray-700 leading-relaxed font-medium">{responses.academicInterests}</p>
+                        </div>
+                    )}
+                    {responses.extracurriculars && (
+                        <div className="space-y-1 sm:col-span-2">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Extracurriculars</h4>
+                            <p className="text-gray-700 leading-relaxed font-medium">{responses.extracurriculars}</p>
+                        </div>
+                    )}
+                    {responses.subjects && responses.subjects.length > 0 && (
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Subjects</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {responses.subjects.map((subj, idx) => (
+                                    <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">{subj}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {responses.targetUniversities && responses.targetUniversities.length > 0 && (
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Target Universities</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {responses.targetUniversities.map((uni, idx) => (
+                                    <span key={idx} className="bg-accent/10 text-accent px-3 py-1 rounded-lg text-sm font-medium">{uni}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {(responses.curriculum || responses.curriculumOther) && (
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Curriculum</h4>
+                            <p className="text-gray-700 leading-relaxed font-medium">{responses.curriculum || responses.curriculumOther}</p>
+                        </div>
+                    )}
+                    {(responses.schoolName || responses.schoolCountry) && (
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">School</h4>
+                            <p className="text-gray-700 leading-relaxed font-medium">
+                                {[responses.schoolName, responses.schoolCountry].filter(Boolean).join(', ')}
+                            </p>
+                        </div>
+                    )}
                     <div className="space-y-1 sm:col-span-2">
                         <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Available Time Slots</h4>
+                        {responses.timezone && (
+                            <p className="text-xs text-gray-500 mb-2">Timezone: {responses.timezone}</p>
+                        )}
                         <div className="flex flex-wrap gap-2 mt-2">
                             {timeSlots.length > 0 ? (
                                 timeSlots.map((slot, index) => (
@@ -128,10 +172,10 @@ export function MentorRequestCard({ request }: { request: Request }) {
                             )}
                         </div>
                     </div>
-                    {request.responses.anythingElse && (
+                    {responses.anythingElse && (
                         <div className="space-y-1 sm:col-span-2">
                             <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Anything Else</h4>
-                            <p className="text-gray-700 leading-relaxed font-medium">{request.responses.anythingElse}</p>
+                            <p className="text-gray-700 leading-relaxed font-medium">{responses.anythingElse}</p>
                         </div>
                     )}
                 </div>

@@ -70,6 +70,7 @@ export type Database = {
       }
       conversations: {
         Row: {
+          admin_id: string | null
           created_at: string | null
           id: string
           last_message_at: string | null
@@ -79,6 +80,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          admin_id?: string | null
           created_at?: string | null
           id?: string
           last_message_at?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          admin_id?: string | null
           created_at?: string | null
           id?: string
           last_message_at?: string | null
@@ -97,6 +100,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "conversations_mentor_id_fkey"
             columns: ["mentor_id"]

@@ -1,55 +1,205 @@
+'use client'
+
 import Link from 'next/link'
+import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { login } from '../../auth/actions'
+import { motion } from 'framer-motion'
+
+const DYNAMIC_WORDS = [
+    "Securing Futures",
+    "Join the Community",
+    "Learn from Admissions Officers",
+    "Exclusive Workshops",
+    "Speak to Graduates"
+]
+
+function TypewriterEffect() {
+    const [index, setIndex] = useState(0)
+    const [subIndex, setSubIndex] = useState(0)
+    const [reverse, setReverse] = useState(false)
+    const [blink, setBlink] = useState(true)
+
+    useEffect(() => {
+        if (subIndex === DYNAMIC_WORDS[index].length + 1 && !reverse) {
+            setReverse(true)
+            return
+        }
+
+        if (subIndex === 0 && reverse) {
+            setReverse(false)
+            setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
+            return
+        }
+
+        const timeout = setTimeout(() => {
+            setSubIndex((prev) => prev + (reverse ? -1 : 1))
+        }, Math.max(reverse ? 75 : subIndex === DYNAMIC_WORDS[index].length ? 2000 : 150, parseInt((Math.random() * 50).toString()) + 50))
+
+        return () => clearTimeout(timeout)
+    }, [subIndex, index, reverse])
+
+    useEffect(() => {
+        const timeout2 = setTimeout(() => {
+            setBlink((prev) => !prev)
+        }, 500)
+        return () => clearTimeout(timeout2)
+    }, [blink])
+
+    return (
+        <p className="text-xl md:text-2xl text-white/80 font-light min-h-[1.5em] tracking-wide">
+            {`${DYNAMIC_WORDS[index].substring(0, subIndex)}${blink ? "|" : " "}`}
+        </p>
+    )
+}
 
 export default function LoginPage() {
+    const [isLoading, setIsLoading] = useState(false)
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">
-            <div className="p-8 bg-white shadow-md rounded-lg w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Log in to your account</h1>
-                <form className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700" htmlFor="email">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700" htmlFor="password">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-                    <button
-                        formAction={login}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Log in
-                    </button>
-                </form>
-                <div className="mt-4 text-center">
-                    <Link href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500">
-                        Forgot your password?
-                    </Link>
+        <div className="flex min-h-screen bg-white selection:bg-accent/30 selection:text-accent">
+            {/* Left Section - Decorative Branding */}
+            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
                 </div>
-                <p className="mt-4 text-center text-sm text-gray-600">
-                    Don't have an account?{' '}
-                    <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-                        Sign up
-                    </Link>
-                </p>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="z-10"
+                >
+                    <div className="flex items-center gap-4 mb-12">
+                        <Image
+                            src="/logo.webp"
+                            alt="Logo"
+                            width={60}
+                            height={60}
+                            className="rounded-xl shadow-2xl"
+                        />
+                        <motion.span
+                            animate={{
+                                scale: [1, 1.02, 1],
+                                opacity: [0.9, 1, 0.9]
+                            }}
+                            transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                            className="text-3xl font-bold text-white tracking-tight"
+                        >
+                            Access Oxbridge
+                        </motion.span>
+                    </div>
+
+                    <div className="mt-20">
+                        <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+                            Welcome Back <br />
+                            To Your Future.
+                        </h2>
+                        <TypewriterEffect />
+                    </div>
+                </motion.div>
+
+                <div className="z-10 text-white/60 text-sm font-medium">
+                    © {new Date().getFullYear()} Access Oxbridge. All rights reserved.
+                </div>
+            </div>
+
+            {/* Right Section - Login Form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-16">
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="w-full max-w-md"
+                >
+                    <div className="lg:hidden mb-8 flex flex-col items-center">
+                        <Image
+                            src="/logo.webp"
+                            alt="Logo"
+                            width={50}
+                            height={50}
+                            className="mb-4 rounded-xl shadow-lg"
+                        />
+                        <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
+                    </div>
+
+                    <div className="mb-10 text-center lg:text-left">
+                        <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Login</h1>
+                        <p className="text-gray-500 font-medium">Please enter your details to sign in.</p>
+                    </div>
+
+                    <form className="space-y-6" onSubmit={() => setIsLoading(true)}>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="email">
+                                Email Address
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                placeholder="name@example.com"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center ml-1">
+                                <label className="text-sm font-semibold text-gray-700" htmlFor="password">
+                                    Password
+                                </label>
+                                <Link href="/forgot-password" className="text-xs font-bold text-accent hover:underline decoration-2 underline-offset-4">
+                                    Forgot password?
+                                </Link>
+                            </div>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                placeholder="••••••••"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
+                            />
+                        </div>
+
+                        <button
+                            formAction={login}
+                            disabled={isLoading}
+                            className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${!isLoading
+                                ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
+                                : 'bg-gray-300 cursor-not-allowed shadow-none'
+                                } flex items-center justify-center gap-2`}
+                        >
+                            {isLoading ? (
+                                <span className="flex items-center gap-2">
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Signing in...
+                                </span>
+                            ) : (
+                                "Sign In"
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 text-center border-t border-gray-100 pt-8">
+                        <p className="text-gray-600 font-medium">
+                            Don&apos;t have an account?{' '}
+                            <Link href="/signup" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
+                                Create one
+                            </Link>
+                        </p>
+                    </div>
+                </motion.div>
             </div>
         </div>
     )
 }
+

@@ -5,6 +5,7 @@ import { Bell, X, Check, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { formatDistanceToNow } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePathname } from 'next/navigation'
 
 interface Notification {
     id: string
@@ -16,13 +17,22 @@ interface Notification {
 }
 
 export default function NotificationBell() {
+    const pathname = usePathname()
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
     const supabase = createClient()
     const dropdownRef = useRef<HTMLDivElement>(null)
 
+    // Hide notification bell on auth pages
+    const isAuthPage = pathname?.includes('/login') ||
+        pathname?.includes('/signup') ||
+        pathname?.includes('/forgot-password') ||
+        pathname?.includes('/reset-password') ||
+        pathname?.includes('/verify-email')
+
     useEffect(() => {
+        if (isAuthPage) return
         fetchNotifications()
 
         // Subscribe to real-time updates
@@ -46,7 +56,7 @@ export default function NotificationBell() {
         return () => {
             supabase.removeChannel(channel)
         }
-    }, [])
+    }, [isAuthPage])
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -104,6 +114,8 @@ export default function NotificationBell() {
             setUnreadCount(0)
         }
     }
+
+    if (isAuthPage) return null
 
     return (
         <div className="fixed top-5 right-4 bg-white/70 shadow rounded-full p-3 backdrop-blur-md z-999

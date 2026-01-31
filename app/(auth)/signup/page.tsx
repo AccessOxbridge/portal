@@ -27,38 +27,49 @@ function TypewriterEffect() {
     const [reverse, setReverse] = useState(false)
     const [blink, setBlink] = useState(true)
 
-    // Typewriter effect logic
+    // Main typewriter loop - simplified for stability
     useEffect(() => {
-        if (subIndex === DYNAMIC_WORDS[index].length + 1 && !reverse) {
-            setReverse(true)
-            return
-        }
-
-        if (subIndex === 0 && reverse) {
-            setReverse(false)
-            setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
-            return
-        }
+        const typingSpeed = reverse ? 40 : 100
+        const pauseTime = 2000
 
         const timeout = setTimeout(() => {
+            if (!reverse && subIndex === DYNAMIC_WORDS[index].length) {
+                // Pause at the end of the word
+                setTimeout(() => setReverse(true), pauseTime)
+                return
+            }
+
+            if (reverse && subIndex === 0) {
+                setReverse(false)
+                setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
+                return
+            }
+
             setSubIndex((prev) => prev + (reverse ? -1 : 1))
-        }, Math.max(reverse ? 75 : subIndex === DYNAMIC_WORDS[index].length ? 2000 : 150, parseInt((Math.random() * 50).toString()) + 50))
+        }, typingSpeed)
 
         return () => clearTimeout(timeout)
     }, [subIndex, index, reverse])
 
     // Cursor blink logic
     useEffect(() => {
-        const timeout2 = setTimeout(() => {
+        const interval = setInterval(() => {
             setBlink((prev) => !prev)
         }, 500)
-        return () => clearTimeout(timeout2)
-    }, [blink])
+        return () => clearInterval(interval)
+    }, [])
 
     return (
-        <p className="text-xl md:text-2xl text-white/80 font-light min-h-[1.5em] tracking-wide">
-            {`${DYNAMIC_WORDS[index].substring(0, subIndex)}${blink ? "|" : " "}`}
-        </p>
+        <div className="flex items-center min-h-[1.5em] mt-4">
+            <p className="text-xl md:text-2xl text-white/80 font-light tracking-wide">
+                {DYNAMIC_WORDS[index].substring(0, subIndex)}
+            </p>
+            <motion.span
+                animate={{ opacity: blink ? 1 : 0 }}
+                transition={{ duration: 0 }}
+                className="inline-block w-[2px] h-[1.2em] bg-white/80 ml-1"
+            />
+        </div>
     )
 }
 
@@ -129,7 +140,7 @@ export default function SignupPage() {
                     </div>
 
                     <div className="mt-20">
-                        <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+                        <h2 className="text-5xl font-bold text-white mb-2 leading-tight">
                             Start Your Journey <br />
                             To Excellence.
                         </h2>
@@ -156,14 +167,14 @@ export default function SignupPage() {
                             alt="Logo"
                             width={50}
                             height={50}
-                            className="mb-4 rounded-xl shadow-lg"
+                            className="mb-4 rounded-xl p-2 shadow-lg bg-accent"
                         />
                         <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
                     </div>
 
                     <div className="mb-10 text-center lg:text-left">
-                        <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Create Account</h1>
-                        <p className="text-gray-500 font-medium">Join our community of future leaders and experts.</p>
+                        <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Create My Account</h1>
+                        <p className="text-gray-500 font-medium">Join 100s of offer holders and admissions experts.</p>
                     </div>
 
                     <form className="space-y-6" onSubmit={() => setIsLoading(true)}>
@@ -195,8 +206,8 @@ export default function SignupPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 onFocus={() => setIsEmailTouched(true)}
                                 className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showEmailError
-                                        ? 'border-red-300 focus:ring-red-100'
-                                        : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
+                                    ? 'border-red-300 focus:ring-red-100'
+                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
                                     }`}
                             />
                             {showEmailError && (
@@ -220,8 +231,8 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 onFocus={() => setIsTouched(true)}
                                 className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showValidation
-                                        ? 'border-red-300 focus:ring-red-100'
-                                        : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
+                                    ? 'border-red-300 focus:ring-red-100'
+                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
                                     }`}
                             />
                             {showValidation && (
@@ -289,8 +300,8 @@ export default function SignupPage() {
                             formAction={signup}
                             disabled={!isPasswordValid || !isEmailValid || isLoading}
                             className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${isPasswordValid && isEmailValid && !isLoading
-                                    ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
-                                    : 'bg-gray-300 cursor-not-allowed shadow-none'
+                                ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
+                                : 'bg-gray-300 cursor-not-allowed shadow-none'
                                 } flex items-center justify-center gap-2`}
                         >
                             {isLoading ? (
@@ -302,7 +313,7 @@ export default function SignupPage() {
                                     Creating account...
                                 </span>
                             ) : (
-                                "Create Account"
+                                "Create My Account"
                             )}
                         </button>
                     </form>

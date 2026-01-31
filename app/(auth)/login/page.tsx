@@ -20,36 +20,49 @@ function TypewriterEffect() {
     const [reverse, setReverse] = useState(false)
     const [blink, setBlink] = useState(true)
 
+    // Main typewriter loop - simplified for stability
     useEffect(() => {
-        if (subIndex === DYNAMIC_WORDS[index].length + 1 && !reverse) {
-            setReverse(true)
-            return
-        }
-
-        if (subIndex === 0 && reverse) {
-            setReverse(false)
-            setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
-            return
-        }
+        const typingSpeed = reverse ? 40 : 100
+        const pauseTime = 2000
 
         const timeout = setTimeout(() => {
+            if (!reverse && subIndex === DYNAMIC_WORDS[index].length) {
+                // Pause at the end of the word
+                setTimeout(() => setReverse(true), pauseTime)
+                return
+            }
+
+            if (reverse && subIndex === 0) {
+                setReverse(false)
+                setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
+                return
+            }
+
             setSubIndex((prev) => prev + (reverse ? -1 : 1))
-        }, Math.max(reverse ? 75 : subIndex === DYNAMIC_WORDS[index].length ? 2000 : 150, parseInt((Math.random() * 50).toString()) + 50))
+        }, typingSpeed)
 
         return () => clearTimeout(timeout)
     }, [subIndex, index, reverse])
 
+    // Cursor blink logic
     useEffect(() => {
-        const timeout2 = setTimeout(() => {
+        const interval = setInterval(() => {
             setBlink((prev) => !prev)
         }, 500)
-        return () => clearTimeout(timeout2)
-    }, [blink])
+        return () => clearInterval(interval)
+    }, [])
 
     return (
-        <p className="text-xl md:text-2xl text-white/80 font-light min-h-[1.5em] tracking-wide">
-            {`${DYNAMIC_WORDS[index].substring(0, subIndex)}${blink ? "|" : " "}`}
-        </p>
+        <div className="flex items-center min-h-[1.5em] mt-4">
+            <p className="text-xl md:text-2xl text-white/80 font-light tracking-wide">
+                {DYNAMIC_WORDS[index].substring(0, subIndex)}
+            </p>
+            <motion.span
+                animate={{ opacity: blink ? 1 : 0 }}
+                transition={{ duration: 0 }}
+                className="inline-block w-[2px] h-[1.2em] bg-white/80 ml-1"
+            />
+        </div>
     )
 }
 
@@ -96,7 +109,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="mt-20">
-                        <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+                        <h2 className="text-5xl font-bold text-white mb-2 leading-tight">
                             Welcome Back <br />
                             To Your Future.
                         </h2>
@@ -123,7 +136,7 @@ export default function LoginPage() {
                             alt="Logo"
                             width={50}
                             height={50}
-                            className="mb-4 rounded-xl shadow-lg"
+                            className="mb-4 rounded-xl shadow-lg bg-accent p-2"
                         />
                         <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
                     </div>

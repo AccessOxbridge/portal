@@ -113,11 +113,18 @@ export default async function AdminDashboard() {
             <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                     <h3 className="text-lg font-bold text-gray-900">Platform Performance</h3>
-                    <select className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none">
-                        <option>Last 30 days</option>
-                        <option>Last 7 days</option>
-                        <option>All time</option>
-                    </select>
+                    <div className="relative">
+                        <select className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 focus:outline-none appearance-none pr-8">
+                            <option>Last 30 days</option>
+                            <option>Last 7 days</option>
+                            <option>All time</option>
+                        </select>
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {stats.map((stat) => (

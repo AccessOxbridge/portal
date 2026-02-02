@@ -55,16 +55,23 @@ export function MentorFilters({ initialSearch, initialStatus }: { initialSearch:
                 />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
-                <select
-                    className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 focus:outline-none w-full md:w-auto cursor-pointer"
-                    onChange={(e) => handleStatusChange(e.target.value)}
-                    defaultValue={initialStatus}
-                >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="pending_approval">Pending Approval</option>
-                    <option value="details_required">Details Required</option>
-                </select>
+                <div className="relative w-full md:w-auto">
+                    <select
+                        className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10"
+                        onChange={(e) => handleStatusChange(e.target.value)}
+                        defaultValue={initialStatus}
+                    >
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="pending_approval">Pending Approval</option>
+                        <option value="details_required">Details Required</option>
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </div>
+                </div>
             </div>
         </div>
     )

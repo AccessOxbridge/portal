@@ -263,16 +263,23 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-2">Curriculum</label>
-                                        <select
-                                            value={formData.curriculum}
-                                            onChange={(e) => setFormData({ ...formData, curriculum: e.target.value as any })}
-                                            className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
-                                        >
-                                            <option value="">Select IB / A-Level / Other</option>
-                                            <option value="IB">IB</option>
-                                            <option value="A-Level">A-Level</option>
-                                            <option value="Other">Other</option>
-                                        </select>
+                                        <div className="relative">
+                                            <select
+                                                value={formData.curriculum}
+                                                onChange={(e) => setFormData({ ...formData, curriculum: e.target.value as any })}
+                                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
+                                            >
+                                                <option value="">Select IB / A-Level / Other</option>
+                                                <option value="IB">IB</option>
+                                                <option value="A-Level">A-Level</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </div>
+                                        </div>
                                     </div>
                                     {formData.curriculum === 'Other' && (
                                         <div>
@@ -482,16 +489,23 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         <div>
                                             <label className="block text-sm font-bold text-gray-500 mb-2">Day</label>
-                                            <select
-                                                value={newSlot.day}
-                                                onChange={(e) => setNewSlot({ ...newSlot, day: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
-                                            >
-                                                <option value="">Select day</option>
-                                                {DAYS.map(d => (
-                                                    <option key={d} value={d}>{d}</option>
-                                                ))}
-                                            </select>
+                                            <div className="relative">
+                                                <select
+                                                    value={newSlot.day}
+                                                    onChange={(e) => setNewSlot({ ...newSlot, day: e.target.value })}
+                                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
+                                                >
+                                                    <option value="">Select day</option>
+                                                    {DAYS.map(d => (
+                                                        <option key={d} value={d}>{d}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-gray-500 mb-2">Start Time</label>

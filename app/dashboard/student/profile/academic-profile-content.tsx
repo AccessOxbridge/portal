@@ -112,7 +112,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
         <div className="space-y-8">
             {/* Welcome Banner for new users */}
             {isNew && (
-                <div className="p-6 bg-gradient-to-r from-accent to-blue-600 rounded-2xl text-white">
+                <div className="p-6 bg-linear-to-r from-accent to-blue-600 rounded-2xl text-white">
                     <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                             <Sparkles className="w-6 h-6" />
@@ -152,16 +152,23 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Year Group</label>
-                        <select
-                            value={formData.year_group}
-                            onChange={(e) => setFormData({ ...formData, year_group: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
-                        >
-                            <option value="">Select year group</option>
-                            {YEAR_GROUPS.map(year => (
-                                <option key={year} value={year}>{year}</option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                value={formData.year_group}
+                                onChange={(e) => setFormData({ ...formData, year_group: e.target.value })}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                            >
+                                <option value="">Select year group</option>
+                                {YEAR_GROUPS.map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -180,16 +187,23 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                 <div className="p-6 space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Target University</label>
-                        <select
-                            value={formData.target_university}
-                            onChange={(e) => setFormData({ ...formData, target_university: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
-                        >
-                            <option value="">Select target</option>
-                            {TARGET_UNIVERSITIES.map(uni => (
-                                <option key={uni} value={uni}>{uni}</option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                value={formData.target_university}
+                                onChange={(e) => setFormData({ ...formData, target_university: e.target.value })}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                            >
+                                <option value="">Select target</option>
+                                {TARGET_UNIVERSITIES.map(uni => (
+                                    <option key={uni} value={uni}>{uni}</option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Target Course</label>
@@ -261,16 +275,23 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             placeholder="Subject name"
                             className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                         />
-                        <select
-                            value={newSubject.predicted_grade}
-                            onChange={(e) => setNewSubject({ ...newSubject, predicted_grade: e.target.value })}
-                            className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
-                        >
-                            <option value="">Grade</option>
-                            {GRADE_OPTIONS.map(grade => (
-                                <option key={grade} value={grade}>{grade}</option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                value={newSubject.predicted_grade}
+                                onChange={(e) => setNewSubject({ ...newSubject, predicted_grade: e.target.value })}
+                                className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
+                            >
+                                <option value="">Grade</option>
+                                {GRADE_OPTIONS.map(grade => (
+                                    <option key={grade} value={grade}>{grade}</option>
+                                ))}
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
                         <button
                             onClick={addSubject}
                             disabled={!newSubject.name || !newSubject.predicted_grade}

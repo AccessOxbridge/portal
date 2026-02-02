@@ -232,15 +232,22 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Currency</label>
-                            <select
-                                value={formData.currency}
-                                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
-                            >
-                                <option value="gbp">GBP (£)</option>
-                                <option value="usd">USD ($)</option>
-                                <option value="eur">EUR (€)</option>
-                            </select>
+                            <div className="relative">
+                                <select
+                                    value={formData.currency}
+                                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
+                                >
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Sort Order</label>

@@ -128,6 +128,65 @@ export async function uploadDBS(formData: FormData) {
     return { success: true, url: publicUrl }
 }
 
+/** Submit background checks: confirmation required; DBS file optional. Sets background_check_confirmed_at; if file provided, also uploads and sets dbs_certificate_url. */
+export async function submitBackgroundCheck(formData: FormData) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        return { error: 'Not authenticated' }
+    }
+
+    if (!formData.get('background_check_confirm')) {
+        return { error: 'Please confirm you have no criminal convictions or cautions that would make you unsuitable to work with students.' }
+    }
+
+    const file = formData.get('dbs_certificate') as File | null
+    if (file && file.size > 0) {
+        if (file.size > 10 * 1024 * 1024) {
+            return { error: 'File size must be less than 10MB' }
+        }
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${user.id}/dbs_certificate.${fileExt}`
+
+        const { error: uploadError } = await supabase.storage
+            .from('mentor-assets')
+            .upload(fileName, file, { upsert: true })
+
+        if (uploadError) {
+            return { error: uploadError.message }
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('mentor-assets')
+            .getPublicUrl(fileName)
+
+        const { error } = await supabase
+            .from('mentors')
+            .update({
+                dbs_certificate_url: publicUrl,
+                background_check_confirmed_at: new Date().toISOString()
+            } as any)
+            .eq('id', user.id)
+
+        if (error) {
+            return { error: error.message }
+        }
+    } else {
+        const { error } = await supabase
+            .from('mentors')
+            .update({ background_check_confirmed_at: new Date().toISOString() } as any)
+            .eq('id', user.id)
+
+        if (error) {
+            return { error: error.message }
+        }
+    }
+
+    revalidatePath('/dashboard/mentor/training')
+    return { success: true }
+}
+
 export async function completeProfile(formData: FormData) {
     const supabase = await createClient()
 

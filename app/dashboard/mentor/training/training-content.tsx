@@ -14,7 +14,7 @@ import {
     BookOpen,
     AlertCircle
 } from 'lucide-react'
-import { completeTraining, completeQuiz, signContract, uploadDBS, completeProfile } from './actions'
+import { completeTraining, completeQuiz, signContract, uploadDBS, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 
 interface OnboardingStatus {
@@ -50,7 +50,7 @@ const STEPS = [
     { id: 'training', title: 'Training', icon: BookOpen },
     { id: 'quiz', title: 'Quiz', icon: FileText },
     { id: 'contract', title: 'Contract', icon: FileText },
-    { id: 'dbs', title: 'DBS Check', icon: Shield },
+    { id: 'dbs', title: 'Background Checks', icon: Shield },
     { id: 'payment', title: 'Payment', icon: CreditCard },
     { id: 'profile', title: 'Profile', icon: User },
 ]
@@ -106,6 +106,7 @@ export default function TrainingContent({
     const [signature, setSignature] = useState(existingData.contractSignature || '')
     const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
     const [quizSubmitted, setQuizSubmitted] = useState(onboardingStatus.quiz)
+    const [backgroundCheckConfirmed, setBackgroundCheckConfirmed] = useState(false)
 
     // Local status for optimistic updates
     const [localStatus, setLocalStatus] = useState(onboardingStatus)
@@ -168,9 +169,27 @@ export default function TrainingContent({
         e.preventDefault()
         setError(null)
         const formData = new FormData(e.currentTarget)
+        formData.set('background_check_confirm', backgroundCheckConfirmed ? '1' : '')
 
         startTransition(async () => {
-            const result = await uploadDBS(formData)
+            const result = await submitBackgroundCheck(formData)
+            if (result.error) {
+                setError(result.error)
+            } else {
+                setLocalStatus(prev => ({ ...prev, dbs: true }))
+                setCurrentStep(5) // Move to payment
+            }
+        })
+    }
+
+    const handleBackgroundCheckSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setError(null)
+        const formData = new FormData(e.currentTarget)
+        formData.set('background_check_confirm', backgroundCheckConfirmed ? '1' : '')
+
+        startTransition(async () => {
+            const result = await submitBackgroundCheck(formData)
             if (result.error) {
                 setError(result.error)
             } else {
@@ -269,8 +288,8 @@ export default function TrainingContent({
                         </p>
                         <div className="bg-rich-beige-accent/50 rounded-2xl p-6 text-left space-y-4">
                             <p className="text-gray-700 leading-relaxed">
-                                At Access Oxbridge we care about the future of our students. To maximise student outcomes,
-                                we require all of our team members to complete this onboarding and training.
+                                At accessoxbridge we will do everything we possibly can to ensure the success of our students.
+                                We require all of our team members to complete this onboarding and training.
                             </p>
                             <p className="text-accent font-semibold">
                                 As soon as this 25 minute training is done, you can start receiving allocations immediately!
@@ -313,18 +332,10 @@ export default function TrainingContent({
                             </div>
                         ) : (
                             <>
-                                {/* Placeholder for training content - to be replaced */}
                                 <div className="bg-gray-50 rounded-2xl p-8 border-2 border-dashed border-gray-200">
-                                    <p className="text-center text-gray-500 mb-6">
-                                        📚 Training content will be provided here
+                                    <p className="text-center text-gray-600 text-lg">
+                                        We will provide more details shortly
                                     </p>
-                                    <div className="space-y-4 text-gray-600">
-                                        <p>• Introduction to Access Oxbridge mission and values</p>
-                                        <p>• Understanding your role as a mentor</p>
-                                        <p>• Best practices for student engagement</p>
-                                        <p>• Session structure and reporting guidelines</p>
-                                        <p>• Safeguarding and professional conduct</p>
-                                    </div>
                                 </div>
 
                                 <div className="flex justify-end">
@@ -460,7 +471,7 @@ export default function TrainingContent({
                                     onClick={() => setCurrentStep(4)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
-                                    Continue to DBS Check
+                                    Continue to Background Checks
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
                             </div>
@@ -530,7 +541,7 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 4: DBS Check */}
+                {/* Step 4: Background Checks */}
                 {currentStep === 4 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
@@ -538,15 +549,15 @@ export default function TrainingContent({
                                 <Shield className="w-7 h-7 text-purple-600" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">DBS Certificate</h2>
-                                <p className="text-gray-500">Upload your DBS check certificate</p>
+                                <h2 className="text-2xl font-bold text-gray-900">Background Checks</h2>
+                                <p className="text-gray-500">DBS and confirmation</p>
                             </div>
                         </div>
 
                         {localStatus.dbs ? (
                             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                                 <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">DBS Certificate Uploaded!</p>
+                                <p className="text-green-700 font-semibold">Background Checks Complete!</p>
                                 <button
                                     onClick={() => setCurrentStep(5)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
@@ -557,17 +568,14 @@ export default function TrainingContent({
                             </div>
                         ) : (
                             <>
-                                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                                    <p className="text-amber-800 text-sm">
-                                        <strong>Note:</strong> A valid DBS certificate is required for all mentors working with students.
-                                        Please upload a copy of your enhanced DBS check.
-                                    </p>
-                                </div>
+                                <p className="text-gray-700">
+                                    If you have been explicitly required to provide us with a DBS, please attach DBS below.
+                                </p>
 
-                                <form onSubmit={handleUploadDBS} className="space-y-4">
+                                <form onSubmit={handleBackgroundCheckSubmit} className="space-y-6">
                                     <label className="block">
                                         <span className="text-sm font-medium text-gray-700">
-                                            Upload DBS Certificate (PDF, JPG, or PNG - Max 10MB)
+                                            Upload DBS Certificate (PDF, JPG, or PNG - Max 10MB) — optional if not required
                                         </span>
                                         <div className="mt-2 flex items-center justify-center w-full">
                                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -582,26 +590,39 @@ export default function TrainingContent({
                                                     name="dbs_certificate"
                                                     accept=".pdf,.jpg,.jpeg,.png"
                                                     className="hidden"
-                                                    required
                                                 />
                                             </label>
                                         </div>
                                     </label>
 
+                                    <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-accent/30 transition-colors cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="background_check_confirm"
+                                            checked={backgroundCheckConfirmed}
+                                            onChange={(e) => setBackgroundCheckConfirmed(e.target.checked)}
+                                            className="mt-1 w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                            required
+                                        />
+                                        <span className="text-gray-700">
+                                            I confirm that I have no criminal convictions or cautions that would make me unsuitable to work with students.
+                                        </span>
+                                    </label>
+
                                     <div className="flex justify-end">
                                         <button
                                             type="submit"
-                                            disabled={isPending}
+                                            disabled={isPending || !backgroundCheckConfirmed}
                                             className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
                                         >
                                             {isPending ? (
                                                 <>
                                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                                    Uploading...
+                                                    Saving...
                                                 </>
                                             ) : (
                                                 <>
-                                                    Upload Certificate
+                                                    Confirm & Continue
                                                     <ChevronRight className="w-5 h-5" />
                                                 </>
                                             )}

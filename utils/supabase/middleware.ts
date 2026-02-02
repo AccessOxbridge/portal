@@ -15,10 +15,8 @@ export async function updateSession(request: NextRequest) {
                     return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
-                    supabaseResponse = NextResponse.next({
-                        request,
-                    });
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+                    // Mutate the same response so we don't lose cookies from previous setAll calls
                     cookiesToSet.forEach(({ name, value, options }) =>
                         supabaseResponse.cookies.set(name, value, options)
                     );
@@ -27,7 +25,7 @@ export async function updateSession(request: NextRequest) {
         }
     );
 
-    // refreshing the auth token
+    // Refreshing the auth token so it's available to Server Components
     await supabase.auth.getUser();
 
     return supabaseResponse;

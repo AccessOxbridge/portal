@@ -20,7 +20,7 @@ export default async function DashboardLayout({
         return redirect('/login')
     }
 
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
         .from('profiles')
         .select(`
             full_name, 
@@ -35,14 +35,76 @@ export default async function DashboardLayout({
                 quiz_completed_at,
                 contract_signed_at,
                 dbs_certificate_url,
+                background_check_confirmed_at,
                 profile_completed_at
             )
         `)
         .eq('id', user.id)
         .single()
 
+    // User exists in auth but no profile returned (either missing or initial select failed e.g. join).
     if (!profile) {
-        return redirect('/login')
+        const { error: insertError } = await supabase.from('profiles').insert({
+            id: user.id,
+            full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User',
+            role: 'student',
+            email: user.email ?? '',
+        })
+        if (insertError) {
+            // 23505 = unique_violation: profile already exists, initial select likely failed (e.g. join)
+            if (insertError.code === '23505') {
+                const { data: existingProfile } = await supabase
+                    .from('profiles')
+                    .select('full_name, role, credits')
+                    .eq('id', user.id)
+                    .single()
+                if (existingProfile) {
+                    let mentorsData: { status: string | null; bio: string | null; photo_url: string | null; payouts_enabled: boolean | null; training_completed_at: string | null; quiz_completed_at: string | null; contract_signed_at: string | null; dbs_certificate_url: string | null; background_check_confirmed_at: string | null; profile_completed_at: string | null } | null = null
+                    if (existingProfile.role === 'mentor' || existingProfile.role === 'admin-dev') {
+                        const { data: mentorRow } = await supabase
+                            .from('mentors')
+                            .select('status, bio, photo_url, payouts_enabled, training_completed_at, quiz_completed_at, contract_signed_at, dbs_certificate_url, background_check_confirmed_at, profile_completed_at')
+                            .eq('id', user.id)
+                            .single()
+                        mentorsData = mentorRow
+                    }
+                    profile = { ...existingProfile, mentors: mentorsData } as NonNullable<typeof profile>
+                }
+            }
+            if (!profile) {
+                return redirect(`/error?message=${encodeURIComponent('Your account has no profile. Please contact support.')}`)
+            }
+        } else {
+            const { data: newProfile } = await supabase
+                .from('profiles')
+                .select(`
+                    full_name, 
+                    role,
+                    credits,
+                    mentors (
+                        status,
+                        bio,
+                        photo_url,
+                        payouts_enabled,
+                        training_completed_at,
+                        quiz_completed_at,
+                        contract_signed_at,
+                        dbs_certificate_url,
+                        background_check_confirmed_at,
+                        profile_completed_at
+                    )
+                `)
+                .eq('id', user.id)
+                .single()
+            if (!newProfile) {
+                return redirect(`/error?message=${encodeURIComponent('Could not load your profile.')}`)
+            }
+            profile = newProfile
+        }
+    }
+
+    if (!profile) {
+        return redirect(`/error?message=${encodeURIComponent('Could not load your profile.')}`)
     }
 
     let showSidebar = true
@@ -65,11 +127,11 @@ export default async function DashboardLayout({
             const trainingComplete = !!mentor.training_completed_at
             const quizComplete = !!mentor.quiz_completed_at
             const contractSigned = !!mentor.contract_signed_at
-            const dbsUploaded = !!mentor.dbs_certificate_url
+            const dbsComplete = !!mentor.dbs_certificate_url || !!mentor.background_check_confirmed_at
             const paymentSetup = !!mentor.payouts_enabled
             const profileComplete = !!mentor.profile_completed_at || (!!mentor.bio && !!mentor.photo_url)
 
-            onboardingIncomplete = !trainingComplete || !quizComplete || !contractSigned || !dbsUploaded || !paymentSetup || !profileComplete
+            onboardingIncomplete = !trainingComplete || !quizComplete || !contractSigned || !dbsComplete || !paymentSetup || !profileComplete
         }
     }
 

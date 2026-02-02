@@ -523,6 +523,7 @@ export type Database = {
       }
       mentors: {
         Row: {
+          background_check_confirmed_at: string | null
           bio: string | null
           contract_signature: string | null
           contract_signed_at: string | null
@@ -548,6 +549,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          background_check_confirmed_at?: string | null
           bio?: string | null
           contract_signature?: string | null
           contract_signed_at?: string | null
@@ -573,6 +575,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          background_check_confirmed_at?: string | null
           bio?: string | null
           contract_signature?: string | null
           contract_signed_at?: string | null

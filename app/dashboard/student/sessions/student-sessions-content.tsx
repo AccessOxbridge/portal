@@ -204,7 +204,7 @@ export default function StudentSessionsContent({
                         </p>
                         {activeTab === 'upcoming' && (
                             <Link
-                                href="/dashboard/student"
+                                href="/dashboard/student/onboarding"
                                 className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                             >
                                 Find a Mentor

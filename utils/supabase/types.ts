@@ -130,6 +130,36 @@ export type Database = {
           },
         ]
       }
+      creators: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          referrals_count: number | null
+          tracking_code: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          referrals_count?: number | null
+          tracking_code: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          referrals_count?: number | null
+          tracking_code?: string
+        }
+        Relationships: []
+      }
       credit_packages: {
         Row: {
           created_at: string | null
@@ -747,6 +777,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          member_code: string | null
           role: Database["public"]["Enums"]["user_role"]
           stripe_customer_id: string | null
           updated_at: string
@@ -756,6 +787,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          member_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
           updated_at?: string
@@ -765,6 +797,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          member_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           stripe_customer_id?: string | null
           updated_at?: string

@@ -37,6 +37,7 @@ export async function signup(formData: FormData) {
     const password = formData.get('password') as string
     const full_name = formData.get('full_name') as string
     const role = formData.get('role') as string
+    const member_code = formData.get('member_code') as string || null
 
     const data = {
         email,
@@ -45,12 +46,13 @@ export async function signup(formData: FormData) {
             data: {
                 full_name,
                 role,
+                member_code,
             },
             emailRedirectTo: `${origin}/auth/callback`,
         },
     }
 
-    console.log('Signup attempt:', { email, role, full_name })
+    console.log('Signup attempt:', { email, role, full_name, member_code })
 
     const result = await supabase.auth.signUp(data)
     const { data: { user, session }, error } = result

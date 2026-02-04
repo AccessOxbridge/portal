@@ -60,6 +60,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
     const totalSteps = STEP_ORDER.length
 
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const [formData, setFormData] = useState<StudentOnboardingData>(EMPTY_DATA)
 
     const [newSubject, setNewSubject] = useState<SubjectWithGrade>({ name: '', predicted_grade: '' })
@@ -233,6 +234,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
 
     const handleSubmit = async () => {
         setLoading(true)
+        setError(null)
         try {
             const response = await fetch('/api/match-mentors', {
                 method: 'POST',
@@ -241,7 +243,14 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
             })
 
             const result = await response.json()
-            if (result.error) throw new Error(result.error)
+
+            if (!response.ok) {
+                if (response.status === 402) {
+                    setError(result.error || 'Insufficient credits to complete this booking.')
+                    return
+                }
+                throw new Error(result.error || 'Failed to submit onboarding data.')
+            }
 
             try {
                 window.localStorage.removeItem(STORAGE_KEY)
@@ -251,9 +260,9 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
 
             router.refresh()
             router.push('/dashboard/student')
-        } catch (err) {
+        } catch (err: any) {
             console.error('Submission failed:', err)
-            alert('Failed to submit. Please try again.')
+            setError(err.message || 'An unexpected error occurred. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -290,6 +299,36 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
                         <p className="text-gray-500 mt-3 text-lg leading-relaxed">{stepMeta.description}</p>
                     </div>
                 </div>
+
+                {error && (
+                    <div className="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-red-600">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-red-900 font-bold text-lg mb-1">Something went wrong</h3>
+                            <p className="text-red-700 leading-relaxed">{error}</p>
+                            {error.toLowerCase().includes('credits') && (
+                                <button
+                                    onClick={() => router.push('/dashboard/student/services')}
+                                    className="mt-4 px-6 py-2 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                >
+                                    Get More Credits
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setError(null)}
+                            className="text-red-400 hover:text-red-600 transition-colors"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
 
                 {stepId === 'basic' ? (
                     <div className="space-y-6">

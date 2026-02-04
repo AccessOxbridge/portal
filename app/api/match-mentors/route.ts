@@ -116,23 +116,32 @@ Mentor requirements: ${requirements || ''}
             apiKey: process.env.OPEN_AI_API_KEY,
         })
 
-        const embeddingResponse = await openai.embeddings.create({
-            model: 'text-embedding-3-small',
-            input: studentProfileText,
-        })
-        const embedding = embeddingResponse.data[0].embedding
+        let embedding
+        try {
+            const embeddingResponse = await openai.embeddings.create({
+                model: 'text-embedding-3-small',
+                input: studentProfileText,
+            })
+            embedding = embeddingResponse.data[0].embedding
+        } catch (openaiErr: any) {
+            console.error('OpenAI Embedding Error:', openaiErr)
+            return NextResponse.json({ error: 'Failed to process your profile for matching. Please try again later.' }, { status: 503 })
+        }
 
         // 4. Search for top 5 mentors via RPC
         const { data: matches, error: matchError } = await supabase.rpc('match_mentors', {
             query_embedding: `[${embedding.join(',')}]`,
-            match_threshold: 0.2,
+            match_threshold: 0.1, // Lowered threshold slightly to ensure matches
             match_count: 4,
         })
 
         console.log('\n\nMatches:\n', JSON.stringify(matches, null, 2), '\n\n')
         console.log('\n\nMatch Error:\n', JSON.stringify(matchError, null, 2), '\n\n')
 
-        if (matchError) throw matchError
+        if (matchError) {
+            console.error('Match RPC Error:', matchError)
+            return NextResponse.json({ error: 'Database error while matching mentors. Please try again.' }, { status: 500 })
+        }
 
         if (!matches || matches.length === 0) {
             return NextResponse.json({ error: 'No suitable mentors found at this time.' }, { status: 404 })

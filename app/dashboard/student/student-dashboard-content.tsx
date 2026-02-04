@@ -72,6 +72,11 @@ export default function StudentDashboardContent({
                     </h1>
                     <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
 
+                    {/* Academic Profile Card */}
+                    <div className="my-3 -ml-3">
+                        <AcademicProfileCard userId={userId} userName={userName} />
+                    </div>
+
                     {/* Targets Section */}
                     {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
                         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -116,11 +121,6 @@ export default function StudentDashboardContent({
                     }))}
                     personLabel="Mentor"
                 />
-            </div>
-
-            {/* Academic Profile Card */}
-            <div className="mb-6">
-                <AcademicProfileCard userId={userId} userName={userName} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

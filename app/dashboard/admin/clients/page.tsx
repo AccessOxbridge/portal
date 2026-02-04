@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState, useTransition } from 'react'
-import { format } from 'date-fns'
 import {
     Search,
     Users,
@@ -21,7 +20,7 @@ interface PremiumClient {
     id: string
     full_name: string | null
     email: string | null
-    created_at: string
+    // created_at: string
 }
 
 export default function AdminClientsPage() {
@@ -38,9 +37,9 @@ export default function AdminClientsPage() {
 
         const { data, error } = await supabase
             .from('profiles')
-            .select('id, full_name, email, created_at')
+            .select('id, full_name, email')
             .eq('role', 'client')
-            .order('created_at', { ascending: false })
+            .order('updated_at', { ascending: false })
 
         if (!error && data) {
             let filtered = data as PremiumClient[]
@@ -165,9 +164,9 @@ export default function AdminClientsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5 text-sm text-gray-500 font-medium">
+                                        {/* <td className="px-8 py-5 text-sm text-gray-500 font-medium">
                                             {format(new Date(client.created_at), 'MMMM dd, yyyy')}
-                                        </td>
+                                        </td> */}
                                         <td className="px-8 py-5">
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold ring-1 ring-inset ring-green-100">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />

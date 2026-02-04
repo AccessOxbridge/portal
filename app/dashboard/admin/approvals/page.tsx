@@ -31,7 +31,7 @@ export default async function AdminApprovalsPage() {
         .from('mentors')
         .select(`
             *,
-            profiles:id (
+            profiles:profiles!mentors_id_fkey (
                 full_name,
                 id
             )
@@ -85,86 +85,86 @@ export default async function AdminApprovalsPage() {
                             })
 
                             return (
-                        <div key={app.id} className="bg-white shadow-xl shadow-gray-200/50 rounded-[40px] border border-gray-100 overflow-hidden hover:shadow-indigo-100 transition-all group">
-                            <div className="p-6 sm:p-8 lg:p-10">
-                                <div className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start mb-8">
-                                    <div className="flex items-center gap-4">
-                                        {avatarUrl ? (
-                                            <img
-                                                src={avatarUrl}
-                                                alt={app.profiles?.full_name || 'Mentor'}
-                                                className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-110 transition-transform"
-                                            />
-                                        ) : (
-                                            <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
-                                                {app.profiles?.full_name?.[0] || '?'}
-                                            </div>
-                                        )}
-                                        <div>
-                                            <h3 className="text-2xl font-bold text-gray-900">{app.profiles?.full_name || 'Unknown User'}</h3>
-                                            <p className="text-gray-400 font-medium">{new Date(app.created_at).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-wrap items-center gap-3 justify-start sm:justify-end">
-                                        {resumeUrl ? (
-                                            <a
-                                                href={resumeUrl}
-                                                target="_blank"
-                                                rel="noreferrer noopener"
-                                                className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline break-all"
-                                            >
-                                                Mentor&apos;s Resume
-                                            </a>
-                                        ) : null}
-                                        <form action={handleApplication.bind(null, app.id, 'dismissed')}>
-                                            <button className="px-4 py-2.5 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
-                                                Dismiss
-                                            </button>
-                                        </form>
-                                        <form action={handleApplication.bind(null, app.id, 'approved')}>
-                                            <button className="px-4 py-2.5 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-0.5">
-                                                Approve
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-[32px] p-6 sm:p-8 border border-gray-100 shadow-inner">
-                                    {responseEntries.map(([key, value]: [string, any]) => (
-                                        <div key={key}>
-                                            <span className="block text-[10px] font-black text-accent uppercase tracking-widest mb-2 opacity-60">
-                                                {formatResponseKey(key)}
-                                            </span>
-                                            <div className="text-gray-900 font-semibold leading-relaxed wrap-break-word">
-                                                {Array.isArray(value) ? (
-                                                    <div className="flex flex-wrap gap-2 mt-2">
-                                                        {value.map((v: any, idx: number) => (
-                                                            <span
-                                                                key={`${String(v)}-${idx}`}
-                                                                className="bg-white border border-gray-200 px-4 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
-                                                            >
-                                                                {String(v)}
-                                                            </span>
-                                                        ))}
+                                <div key={app.id} className="bg-white shadow-xl shadow-gray-200/50 rounded-[40px] border border-gray-100 overflow-hidden hover:shadow-indigo-100 transition-all group">
+                                    <div className="p-6 sm:p-8 lg:p-10">
+                                        <div className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start mb-8">
+                                            <div className="flex items-center gap-4">
+                                                {avatarUrl ? (
+                                                    <img
+                                                        src={avatarUrl}
+                                                        alt={app.profiles?.full_name || 'Mentor'}
+                                                        className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-110 transition-transform"
+                                                    />
+                                                ) : (
+                                                    <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                                        {app.profiles?.full_name?.[0] || '?'}
                                                     </div>
-                                                ) : isProbablyUrl(value) ? (
+                                                )}
+                                                <div>
+                                                    <h3 className="text-2xl font-bold text-gray-900">{app.profiles?.full_name || 'Unknown User'}</h3>
+                                                    <p className="text-gray-400 font-medium">{new Date(app.created_at).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-3 justify-start sm:justify-end">
+                                                {resumeUrl ? (
                                                     <a
-                                                        href={value}
+                                                        href={resumeUrl}
                                                         target="_blank"
                                                         rel="noreferrer noopener"
-                                                        className="text-blue-600 hover:text-blue-700 hover:underline break-all"
+                                                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline break-all"
                                                     >
-                                                        {value}
+                                                        Mentor&apos;s Resume
                                                     </a>
-                                                ) : (
-                                                    <span className="whitespace-pre-wrap">{String(value)}</span>
-                                                )}
+                                                ) : null}
+                                                <form action={handleApplication.bind(null, app.id, 'dismissed')}>
+                                                    <button className="px-4 py-2.5 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
+                                                        Dismiss
+                                                    </button>
+                                                </form>
+                                                <form action={handleApplication.bind(null, app.id, 'approved')}>
+                                                    <button className="px-4 py-2.5 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-0.5">
+                                                        Approve
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
-                                    ))}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-[32px] p-6 sm:p-8 border border-gray-100 shadow-inner">
+                                            {responseEntries.map(([key, value]: [string, any]) => (
+                                                <div key={key}>
+                                                    <span className="block text-[10px] font-black text-accent uppercase tracking-widest mb-2 opacity-60">
+                                                        {formatResponseKey(key)}
+                                                    </span>
+                                                    <div className="text-gray-900 font-semibold leading-relaxed wrap-break-word">
+                                                        {Array.isArray(value) ? (
+                                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                                {value.map((v: any, idx: number) => (
+                                                                    <span
+                                                                        key={`${String(v)}-${idx}`}
+                                                                        className="bg-white border border-gray-200 px-4 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
+                                                                    >
+                                                                        {String(v)}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        ) : isProbablyUrl(value) ? (
+                                                            <a
+                                                                href={value}
+                                                                target="_blank"
+                                                                rel="noreferrer noopener"
+                                                                className="text-blue-600 hover:text-blue-700 hover:underline break-all"
+                                                            >
+                                                                {value}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="whitespace-pre-wrap">{String(value)}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
                             )
                         })()
                     ))}

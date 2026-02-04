@@ -170,6 +170,9 @@ export const SUBJECT_OPTIONS: Record<string, string[]> = {
         'Interview Technique',
         'Problem Solving & Critical Thinking',
         'Subject-Specific Interview Prep'
+    ],
+    'Other': [
+        'Other'
     ]
 };
 
@@ -180,6 +183,13 @@ export const MENTOR_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
         type: 'textarea',
         required: true,
         placeholder: 'Tell us about your experience and why you want to be a mentor...',
+    },
+    {
+        id: 'phone_number',
+        label: 'Phone Number',
+        type: 'text',
+        required: true,
+        placeholder: '+44 7000 000000',
     },
     {
         id: 'expertise',

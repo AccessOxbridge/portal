@@ -20,6 +20,7 @@ export default function OnboardingForm() {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [customExpertise, setCustomExpertise] = useState('');
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -214,8 +215,11 @@ export default function OnboardingForm() {
                     <div ref={dropdownRef} className="relative">
                       {/* Hidden inputs for form submission */}
                       {selectedSubjects.map((subject) => (
-                        <input key={subject} type="hidden" name={question.id} value={subject} />
+                        subject === 'Other' ? null : <input key={subject} type="hidden" name={question.id} value={subject} />
                       ))}
+                      {selectedSubjects.includes('Other') && (
+                        <input type="hidden" name={question.id} value={customExpertise} />
+                      )}
 
                       {/* Selected tags */}
                       {selectedSubjects.length > 0 && (
@@ -301,6 +305,28 @@ export default function OnboardingForm() {
                         </div>
                       )}
                     </div>
+                  )}
+
+                  {question.id === 'expertise' && selectedSubjects.includes('Other') && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4"
+                    >
+                      <label htmlFor="custom-expertise" className="block text-sm text-gray-400 mb-1">
+                        Please specify your expertise <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="custom-expertise"
+                        value={customExpertise}
+                        onChange={(e) => setCustomExpertise(e.target.value)}
+                        required
+                        placeholder="e.g. Underwater Basket Weaving"
+                        className="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none focus:border-white transition-all duration-300"
+                      />
+                    </motion.div>
                   )}
                 </div>
               ))}

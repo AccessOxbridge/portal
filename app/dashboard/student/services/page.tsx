@@ -11,10 +11,16 @@ export default async function CreditsPage() {
         redirect('/login')
     }
 
-    // Fetch user's current credits
+    // Fetch user's current credits and profile details
     const { data: profile } = await supabase
         .from('profiles')
-        .select('credits')
+        .select(`
+            credits,
+            student_profiles (
+                target_university,
+                target_course
+            )
+        `)
         .eq('id', user.id)
         .single()
 
@@ -25,20 +31,24 @@ export default async function CreditsPage() {
         .eq('is_active', true)
         .order('sort_order', { ascending: true })
 
+    const profileData: any = profile
+    const studentProfile = Array.isArray(profileData?.student_profiles)
+        ? profileData?.student_profiles[0]
+        : profileData?.student_profiles
+
     return (
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
             <header className="mb-10">
                 <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Credits & Payments
+                    Expert Guidance, For You
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
-                    Purchase credits to book mentorship sessions with our expert tutors
-                </p>
             </header>
 
             <CreditPackages
                 packages={packages || []}
                 currentCredits={profile?.credits || 0}
+                targetUniversity={studentProfile?.target_university}
+                targetCourse={studentProfile?.target_course}
             />
         </div>
     )

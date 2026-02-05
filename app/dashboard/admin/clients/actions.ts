@@ -8,10 +8,15 @@ export async function registerPremiumClient(formData: FormData) {
 
     const email = formData.get('email') as string
     const full_name = formData.get('full_name') as string
+    const role = formData.get('role') as string
 
     if (!email || !full_name) {
         return { error: 'Email and Name are required' }
     }
+
+    // Validate role - only allow 'client' or 'admin'
+    const validRoles = ['client', 'admin']
+    const selectedRole = validRoles.includes(role) ? role : 'client'
 
     // Generate a random password using crypto.randomUUID()
     const password = crypto.randomUUID().split('-')[0].toUpperCase() +
@@ -24,7 +29,7 @@ export async function registerPremiumClient(formData: FormData) {
         email_confirm: true,
         user_metadata: {
             full_name,
-            role: 'client'
+            role: selectedRole
         }
     })
 
@@ -40,13 +45,14 @@ export async function registerPremiumClient(formData: FormData) {
     // We'll wait a brief moment or just proceed to insert the notification.
 
     // Trigger welcome email by inserting into notifications table
+    const roleLabel = selectedRole === 'admin' ? 'Admin' : 'Premium Client'
     const { error: notifyError } = await supabase
         .from('notifications')
         .insert({
             recipient_id: userId,
             recipient_email: email,
-            title: 'Welcome to the Oxbridge Premium Portal',
-            message: `Hello ${full_name},\n\nWelcome to the Oxford-Bridge Premium Portal. Your account has been successfully created.\n\nYou can log in using your email and the following auto-generated password:\n\nPassword: ${password}\n\nPlease log in at: https://portal.oxford-bridge.com/login\n\nWe recommend changing your password immediately after your first login for security purposes.\n\nBest regards,\nThe Oxford-Bridge Team`,
+            title: `Welcome to the Oxbridge ${roleLabel} Portal`,
+            message: `Hello ${full_name},\n\nWelcome to the Oxford-Bridge ${roleLabel} Portal. Your ${roleLabel.toLowerCase()} account has been successfully created.\n\nYou can log in using your email and the following auto-generated password:\n\nPassword: ${password}\n\nPlease log in at: https://portal.oxford-bridge.com/login\n\nWe recommend changing your password immediately after your first login for security purposes.\n\nBest regards,\nThe Oxford-Bridge Team`,
             type: 'system_alert'
         })
 

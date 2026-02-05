@@ -12,7 +12,8 @@ import {
     Mail,
     User,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    Shield
 } from 'lucide-react'
 import { registerPremiumClient } from './actions'
 
@@ -218,6 +219,25 @@ export default function AdminClientsPage() {
                                             placeholder="Jane Doe"
                                             className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
                                         />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Role</label>
+                                    <div className="relative">
+                                        <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <select
+                                            name="role"
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="client">Premium Client</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
 

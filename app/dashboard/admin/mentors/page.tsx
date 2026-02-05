@@ -1,9 +1,7 @@
 'use client'
 
-import { createClient } from '@/utils/supabase/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { format } from 'date-fns'
 import {
     Search,
     CheckCircle2,
@@ -14,31 +12,9 @@ import {
     Star,
     Mail,
     Phone,
-    FileText
 } from 'lucide-react'
 import { MentorActions } from './components/MentorActions'
-
-interface Mentor {
-    id: string
-    bio: string | null
-    expertise: string[] | null
-    status: string | null
-    phone: string | null
-    created_at: string
-    photo_url: string | null
-    training_completed_at: string | null
-    quiz_completed_at: string | null
-    contract_signed_at: string | null
-    dbs_certificate_url: string | null
-    payouts_enabled: boolean | null
-    profile_completed_at: string | null
-    profile: {
-        full_name: string | null
-        email: string | null
-    } | null
-    sessions_completed: number
-    avg_rating: number | null
-}
+import { fetchMentors, Mentor } from './actions'
 
 // Helper to calculate onboarding completion
 function getOnboardingStatus(mentor: Mentor): { completed: number; total: number; label: string } {
@@ -71,7 +47,6 @@ const statusIcons: Record<string, any> = {
 }
 
 export default function AdminMentorsPage() {
-    const supabase = createClient()
     const [mentors, setMentors] = useState<Mentor[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -80,103 +55,22 @@ export default function AdminMentorsPage() {
     const [totalCount, setTotalCount] = useState(0)
     const limit = 10
 
-    const fetchMentors = async () => {
+    const loadMentors = useCallback(async () => {
         setIsLoading(true)
-
-        // Fetch mentors with profiles
-        const { data: mentorsData, error } = await supabase
-            .from('mentors')
-            .select(`
-                *,
-                profile:profiles!mentors_id_fkey (
-                    full_name,
-                    email
-                )
-            `)
-            .order('created_at', { ascending: false })
-
-        if (error || !mentorsData) {
+        try {
+            const result = await fetchMentors(statusFilter, searchTerm, page, limit)
+            setMentors(result.mentors)
+            setTotalCount(result.totalCount)
+        } catch (error) {
+            console.error('Error loading mentors:', error)
+        } finally {
             setIsLoading(false)
-            return
         }
-
-        // Fetch session counts (completed sessions per mentor)
-        const { data: sessionCounts } = await supabase
-            .from('sessions')
-            .select('mentor_id')
-            .eq('status', 'completed')
-
-        const sessionCountMap: Record<string, number> = {}
-        sessionCounts?.forEach(s => {
-            sessionCountMap[s.mentor_id] = (sessionCountMap[s.mentor_id] || 0) + 1
-        })
-
-        // Fetch ratings from form_responses (using dedicated rating column)
-        const { data: feedbackData } = await supabase
-            .from('form_responses')
-            .select('session_id, rating')
-            .eq('form_type', 'student_feedback')
-            .not('rating', 'is', null)
-
-        // Get session -> mentor mapping
-        const { data: sessionsData } = await supabase
-            .from('sessions')
-            .select('id, mentor_id')
-
-        const sessionMentorMap: Record<string, string> = {}
-        sessionsData?.forEach(s => {
-            sessionMentorMap[s.id] = s.mentor_id
-        })
-
-        // Calculate average ratings per mentor
-        const ratingMap: Record<string, number[]> = {}
-        feedbackData?.forEach(fb => {
-            const mentorId = sessionMentorMap[fb.session_id]
-            if (mentorId && fb.rating) {
-                if (!ratingMap[mentorId]) ratingMap[mentorId] = []
-                ratingMap[mentorId].push(fb.rating)
-            }
-        })
-
-        const avgRatingMap: Record<string, number> = {}
-        Object.entries(ratingMap).forEach(([mentorId, ratings]) => {
-            avgRatingMap[mentorId] = ratings.reduce((a, b) => a + b, 0) / ratings.length
-        })
-
-        // Enrich mentor data
-        let enrichedMentors = mentorsData.map(m => ({
-            ...m,
-            sessions_completed: sessionCountMap[m.id] || 0,
-            avg_rating: avgRatingMap[m.id] || null
-        })) as unknown as Mentor[]
-
-        // Apply status filter
-        if (statusFilter !== 'all') {
-            enrichedMentors = enrichedMentors.filter(m => m.status === statusFilter)
-        }
-
-        // Apply search filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase()
-            enrichedMentors = enrichedMentors.filter(mentor => {
-                const nameMatch = mentor.profile?.full_name?.toLowerCase().includes(term)
-                const expertiseMatch = mentor.expertise?.some(exp => exp.toLowerCase().includes(term))
-                return nameMatch || expertiseMatch
-            })
-        }
-
-        // Paginate
-        const offset = (page - 1) * limit
-        const paginatedMentors = enrichedMentors.slice(offset, offset + limit)
-
-        setMentors(paginatedMentors)
-        setTotalCount(enrichedMentors.length)
-        setIsLoading(false)
-    }
+    }, [statusFilter, searchTerm, page])
 
     useEffect(() => {
-        fetchMentors()
-    }, [searchTerm, statusFilter, page])
+        loadMentors()
+    }, [loadMentors])
 
     // Debounce search
     const [debouncedSearch, setDebouncedSearch] = useState('')

@@ -14,7 +14,7 @@ interface CreditPackagesProps {
 export default function CreditPackages({ packages, currentCredits, targetUniversity, targetCourse }: CreditPackagesProps) {
     const [loading, setLoading] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [lastHourCount, setLastHourCount] = useState(37)
+    const [lastHourCount, setLastHourCount] = useState(11)
 
     useEffect(() => {
         // Subtle random update to the "last hour" count to make it feel alive
@@ -72,17 +72,17 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
     return (
         <div className="space-y-12 pb-20">
             {/* Top Banner Section */}
-            <div className="p-8 bg-gradient-to-br from-accent to-blue-600 rounded-[32px]
-             text-white shadow-xl shadow-blue-900/10">
+            <div className="p-8 bg-white text-black rounded-[32px]
+             shadow-xl shadow-blue-900/10">
                 <div className="grid md:grid-cols-1 gap-4 items-center">
                     {/* Left: Balance */}
                     <div className="flex items-center gap-6 mb-6">
                         <div className="w-24 h-24 bg-white/10 rounded-3xl flex items-center justify-center shrink-0 backdrop-blur-sm">
-                            <GraduationCap className="w-12 h-12 text-white" />
+                            <GraduationCap className="w-12 h-12" />
                         </div>
                         <div>
                             <p className="text-6xl font-black tracking-tight">{currentCredits}</p>
-                            <p className="text-blue-100 font-medium text-lg opacity-90">
+                            <p className=" font-medium text-lg opacity-90">
                                 {currentCredits === 1 ? 'Credit' : 'Credits'} Available
                             </p>
                         </div>
@@ -91,15 +91,15 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                     {/* Right: CTA & Stats */}
                     <div className="space-y-6">
                         <div className="space-y-4">
-                            <p className="text-lg leading-relaxed font-medium text-blue-50">
-                                On average students who take bespoke mentorship with us are <span className="text-white font-bold decoration-blue-300 underline underline-offset-4">4x more likely</span> to gain a place at their number 1 choice university. We don't want you to miss out.
+                            <p className="text-lg leading-relaxed font-medium">
+                                On average students who take bespoke mentorship with us are <span className="font-bold decoration-blue-300 underline underline-offset-4">4x more likely</span> to gain a place at their number 1 choice university. We don't want you to miss out.
                             </p>
-                            <p className="text-blue-100 text-sm leading-relaxed">
+                            <p className="text-sm leading-relaxed">
                                 We recommend making use of your free consultation first, as we want to ensure that you enroll on the programme that is the best fit for you. We don't believe in one-size-fits-all approaches. We believe in tailored pathway creation.
                             </p>
                         </div>
 
-                        <button className="group w-full bg-white text-accent hover:bg-blue-50 px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
+                        <button className="group w-full bg-accent text-white hover:bg-blue-50 px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
                             <span>Speak to {strategistText} Strategist</span>
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>

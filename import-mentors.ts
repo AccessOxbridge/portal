@@ -34,25 +34,75 @@ interface MentorUpsertData {
   id: string;
   bio: string | null;
   embedding?: string;
+  status: 'active' | 'pending_approval' | 'details_required';
+  responses?: Record<string, unknown>;
+  phone?: string | null;
 }
 
-// Parse CSV data
+// Parse CSV data correctly handling quoted fields with commas and newlines
 function parseCSV(csvContent: string): MentorData[] {
-  const lines = csvContent.split('\n').filter(line => line.trim());
-  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentField = '';
+  let inQuotes = false;
 
-  const rows: MentorData[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
-    const row: Partial<MentorData> = {};
-    headers.forEach((header, index) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (row as any)[header] = values[index] || '';
-    });
-    rows.push(row as MentorData);
+  for (let i = 0; i < csvContent.length; i++) {
+    const char = csvContent[i];
+    const nextChar = csvContent[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        // Escaped quote
+        currentField += '"';
+        i++;
+      } else {
+        // Toggle quotes
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      // Field separator
+      currentRow.push(currentField.trim());
+      currentField = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      // Row separator
+      if (currentField !== '' || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      }
+      // Handle \r\n
+      if (char === '\r' && nextChar === '\n') {
+        i++;
+      }
+    } else {
+      currentField += char;
+    }
   }
 
-  return rows;
+  // Add the last field/row if exists
+  if (currentField !== '' || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    rows.push(currentRow);
+  }
+
+  if (rows.length < 2) return [];
+
+  const headers = rows[0];
+  const mentorData: MentorData[] = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const item: any = {};
+    headers.forEach((header, index) => {
+      item[header] = row[index] || '';
+    });
+    if (Object.keys(item).length > 0 && (item['What is your Full Name?'] || item['What is your Email?'])) {
+      mentorData.push(item as MentorData);
+    }
+  }
+
+  return mentorData;
 }
 
 // Generate a temporary password for mentors
@@ -67,7 +117,33 @@ async function importMentors(csvFilePath?: string): Promise<void> {
     const csvContent = readFileSync(csvPath, 'utf-8');
 
     const mentors = parseCSV(csvContent);
-    console.log(`Found ${mentors.length} mentor records to import`);
+    console.log(`Found ${mentors.length} mentor records in CSV`);
+
+    // Fetch all existing users to avoid redundant lookups
+    console.log('Fetching existing auth users...');
+    const existingUsersMap = new Map<string, string>();
+    let page = 1;
+    const perPage = 1000;
+
+    while (true) {
+      const { data, error } = await supabase.auth.admin.listUsers({
+        page,
+        perPage
+      });
+
+      if (error) {
+        console.error('Error fetching auth users:', error);
+        break;
+      }
+
+      data.users.forEach(user => {
+        if (user.email) existingUsersMap.set(user.email.toLowerCase(), user.id);
+      });
+
+      if (data.users.length < perPage) break;
+      page++;
+    }
+    console.log(`Found ${existingUsersMap.size} existing auth users`);
 
     let successCount = 0;
     let errorCount = 0;
@@ -75,8 +151,11 @@ async function importMentors(csvFilePath?: string): Promise<void> {
     for (const mentor of mentors) {
       try {
         const name = mentor['What is your Full Name?'];
-        const email = mentor['What is your Email?'];
+        const email = mentor['What is your Email?']?.toLowerCase().trim();
         const experience = mentor['What tutoring/mentoring experience do you have?'];
+        const university = mentor['Which University do you/did you/will you attend?'];
+        const course = mentor['What is your course? (Name and Year of Study)'];
+        const phone = mentor['What is your Phone Number?'];
 
         // Skip if missing essential data
         if (!name || !email) {
@@ -87,56 +166,33 @@ async function importMentors(csvFilePath?: string): Promise<void> {
 
         console.log(`Processing mentor: ${name} (${email})`);
 
-        // Create auth user
-        const tempPassword = generateTempPassword();
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: email,
-          password: tempPassword,
-          email_confirm: true,
-          user_metadata: {
-            full_name: name,
-            role: 'mentor'
-          }
-        });
-
         let userId: string;
 
-        if (authError) {
-          // Check if user already exists - try to get existing user
-          if (authError.message.includes('already registered') || authError.message.includes('User already registered')) {
-            console.log(`User ${email} already exists, getting user ID...`);
-
-            // Try to list users and find by email (this might not work with anon key)
-            try {
-              const { data: users, error: listError } = await supabase.auth.admin.listUsers();
-
-              if (listError) {
-                console.error(`Error listing users: ${listError.message}`);
-                errorCount++;
-                continue;
-              }
-
-              const existingUser = users.users.find(u => u.email === email);
-              if (!existingUser) {
-                console.error(`User ${email} exists but couldn't find in user list`);
-                errorCount++;
-                continue;
-              }
-
-              userId = existingUser.id;
-              console.log(`Found existing user with ID: ${userId}`);
-            } catch (listError) {
-              console.error(`Error finding existing user ${email}:`, listError);
-              errorCount++;
-              continue;
+        // Check if user already exists
+        if (existingUsersMap.has(email)) {
+          userId = existingUsersMap.get(email)!;
+          console.log(`User ${email} already exists with ID: ${userId}`);
+        } else {
+          // Create auth user
+          const tempPassword = generateTempPassword();
+          const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email: email,
+            password: tempPassword,
+            email_confirm: true,
+            user_metadata: {
+              full_name: name,
+              role: 'mentor'
             }
-          } else {
+          });
+
+          if (authError) {
             console.error(`Error creating auth user for ${email}:`, authError);
             errorCount++;
             continue;
           }
-        } else {
+
           userId = authData.user!.id;
+          existingUsersMap.set(email, userId);
           console.log(`Created auth user with ID: ${userId}`);
         }
 
@@ -156,7 +212,7 @@ async function importMentors(csvFilePath?: string): Promise<void> {
           continue;
         }
 
-        // Generate embedding for mentor bio
+        // Generate embedding for mentor bio (OPTIONAL)
         let embedding: number[] | null = null;
         if (experience && experience.trim()) {
           try {
@@ -168,28 +224,25 @@ async function importMentors(csvFilePath?: string): Promise<void> {
             embedding = embeddingResponse.data[0].embedding;
           } catch (embeddingError) {
             console.error(`Error generating embedding for ${email}:`, embeddingError);
-            console.log(`Skipping mentor ${name} due to embedding failure`);
-            errorCount++;
-            continue;
+            // Don't skip, just proceed without embedding
+            console.log(`Proceeding without embedding for ${name}`);
           }
         } else {
-          console.log(`Skipping mentor ${name} - no tutoring experience provided`);
-          errorCount++;
-          continue;
-        }
-
-        // Skip if embedding is null (shouldn't happen due to above logic, but safety check)
-        if (!embedding) {
-          console.log(`Skipping mentor ${name} - embedding generation failed`);
-          errorCount++;
-          continue;
+          console.log(`No tutoring experience provided for ${name}, skipping embedding.`);
         }
 
         // Create or update mentor record
         const mentorData: MentorUpsertData = {
           id: userId,
           bio: experience || null,
-          embedding: `[${embedding.join(',')}]`
+          embedding: embedding ? `[${embedding.join(',')}]` : undefined,
+          status: 'pending_approval',
+          responses: {
+            university: university || null,
+            course: course || null,
+            experience: experience || null,
+          },
+          phone: phone || null,
         };
 
         const { error: mentorError } = await supabase

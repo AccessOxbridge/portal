@@ -16,7 +16,7 @@ export default async function StudentSessionsPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, credits')
         .eq('id', user.id)
         .single()
 
@@ -158,6 +158,7 @@ export default async function StudentSessionsPage() {
                 upcomingSessions={upcomingSessions}
                 pastSessions={pastSessions}
                 pendingRequests={processedPendingRequests}
+                credits={profile?.credits || 0}
             />
         </div>
     )

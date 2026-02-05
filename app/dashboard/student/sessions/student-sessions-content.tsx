@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass } from 'lucide-react'
+import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins } from 'lucide-react'
 
 interface Session {
     id: string
@@ -26,12 +26,14 @@ interface StudentSessionsContentProps {
     upcomingSessions: Session[]
     pastSessions: Session[]
     pendingRequests: PendingRequest[]
+    credits: number
 }
 
 export default function StudentSessionsContent({
     upcomingSessions,
     pastSessions,
-    pendingRequests
+    pendingRequests,
+    credits
 }: StudentSessionsContentProps) {
     const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'past'>(
         pendingRequests.length > 0 ? 'pending' : 'upcoming'
@@ -65,23 +67,34 @@ export default function StudentSessionsContent({
         return sessionTime - now <= oneHour && sessionTime > now
     }
 
-    const getTimeRemaining = (createdAt: string) => {
-        const created = new Date(createdAt).getTime()
-        const now = Date.now()
-        const expiry = created + 24 * 60 * 60 * 1000
-        const remaining = expiry - now
-
-        if (remaining <= 0) return 'Expired'
-
-        const hours = Math.floor(remaining / (60 * 60 * 1000))
-        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))
-        return `${hours}h ${minutes}m`
-    }
-
     const sessions = activeTab === 'upcoming' ? upcomingSessions : pastSessions
 
     return (
         <div className="space-y-8">
+            {/* Credit Status Banner */}
+            {credits === 0 && (pendingRequests.length > 0 || upcomingSessions.length > 0) && (
+                <div className="p-6 bg-linear-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                    <div className="flex items-center gap-4 text-center md:text-left">
+                        <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                            <Clock className="w-6 h-6 text-amber-600" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900">
+                                Ready to start your sessions?
+                            </h3>
+                            <p className="text-gray-600">
+                                You have {pendingRequests.length + upcomingSessions.length} mentorship request(s) waiting. Add credits now to ensure your sessions are confirmed.
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/dashboard/student/services"
+                        className="px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20 whitespace-nowrap"
+                    >
+                        Top up Credits
+                    </Link>
+                </div>
+            )}
             {/* Tab Switcher */}
             <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
                 <button
@@ -171,10 +184,6 @@ export default function StudentSessionsContent({
                                                     {formatDate(request.created_at)}
                                                 </span>
                                             </div>
-                                            <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold">
-                                                <Clock className="w-3 h-3" />
-                                                Expires in {getTimeRemaining(request.created_at)}
-                                            </span>
                                         </div>
                                     </div>
                                     <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold">
@@ -258,16 +267,16 @@ export default function StudentSessionsContent({
                                         {activeTab === 'upcoming' ? (
                                             session.zoom_join_url ? (
                                                 <a
-                                                    href={session.zoom_join_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                                    href={credits > 0 ? session.zoom_join_url : '/dashboard/student/services'}
+                                                    target={credits > 0 ? "_blank" : undefined}
+                                                    rel={credits > 0 ? "noopener noreferrer" : undefined}
                                                     className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
                                                         ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
                                                         : 'bg-accent text-white hover:scale-[1.02]'
                                                         }`}
                                                 >
-                                                    <Video className="w-4 h-4" />
-                                                    Join Session
+                                                    {credits > 0 ? <Video className="w-4 h-4" /> : <Coins className="w-4 h-4" />}
+                                                    {credits > 0 ? 'Join Session' : 'Top up Credits to Join'}
                                                 </a>
                                             ) : (
                                                 <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">

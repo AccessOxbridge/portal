@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { handleMentorshipRequest } from './actions'
+import { Info, AlertTriangle } from 'lucide-react'
 
 interface TimeSlot {
     date: string
@@ -33,6 +34,7 @@ interface Request {
 export function MentorRequestCard({ request }: { request: Request }) {
     const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
     const [showSlotPicker, setShowSlotPicker] = useState(false)
+    const [showRejectDialog, setShowRejectDialog] = useState(false)
     const [loading, setLoading] = useState(false)
 
     const formatSlotDisplay = (slot: TimeSlot) => {
@@ -68,26 +70,28 @@ export function MentorRequestCard({ request }: { request: Request }) {
         setLoading(true)
         try {
             await handleMentorshipRequest(request.id, 'reject')
+            setShowRejectDialog(false)
         } catch (error) {
             console.error('Failed to reject:', error)
+            alert('Failed to decline request. Please try again.')
         } finally {
             setLoading(false)
         }
     }
 
-    // Calculate time remaining
-    const getTimeRemaining = () => {
-        const created = new Date(request.created_at).getTime()
-        const now = Date.now()
-        const expiry = created + 24 * 60 * 60 * 1000
-        const remaining = expiry - now
+    // // Calculate time remaining
+    // const getTimeRemaining = () => {
+    //     const created = new Date(request.created_at).getTime()
+    //     const now = Date.now()
+    //     const expiry = created + 24 * 60 * 60 * 1000
+    //     const remaining = expiry - now
 
-        if (remaining <= 0) return 'Expired'
+    //     if (remaining <= 0) return 'Expired'
 
-        const hours = Math.floor(remaining / (60 * 60 * 1000))
-        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))
-        return `${hours}h ${minutes}m`
-    }
+    //     const hours = Math.floor(remaining / (60 * 60 * 1000))
+    //     const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))
+    //     return `${hours}h ${minutes}m`
+    // }
 
     const timeSlots = request.responses?.timeSlots || []
     const responses = request.responses || {}
@@ -182,12 +186,12 @@ export function MentorRequestCard({ request }: { request: Request }) {
             </div>
 
             <div className="p-10 bg-gray-50/50 w-full md:w-80 flex flex-col justify-center gap-4">
-                <div className="mb-6">
+                {/* <div className="mb-6">
                     <div className="text-sm font-bold text-gray-400 mb-2">EXPIRES IN</div>
                     <div className="text-3xl font-black text-gray-900 tabular-nums">
                         {getTimeRemaining()}
                     </div>
-                </div>
+                </div> */}
 
                 {!showSlotPicker ? (
                     <>
@@ -199,7 +203,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                             Select a Time Slot
                         </button>
                         <button
-                            onClick={handleReject}
+                            onClick={() => setShowRejectDialog(true)}
                             disabled={loading}
                             className="w-full py-4 text-gray-400 font-bold hover:text-red-500 transition-colors disabled:opacity-50"
                         >
@@ -209,7 +213,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                 ) : (
                     <div className="space-y-4">
                         <h4 className="text-sm font-bold text-gray-600">Choose a Time Slot</h4>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
                             {timeSlots.map((slot, index) => (
                                 <button
                                     key={index}
@@ -222,6 +226,9 @@ export function MentorRequestCard({ request }: { request: Request }) {
                                     <span className="font-semibold">{formatSlotDisplay(slot)}</span>
                                 </button>
                             ))}
+                            <p className='text-xs text-gray-400'>
+                                <Info className='inline-block w-4 h-4 mr-2' /> You can chat with the student to propose a new time slot
+                            </p>
                         </div>
 
                         <button
@@ -244,6 +251,41 @@ export function MentorRequestCard({ request }: { request: Request }) {
                     </div>
                 )}
             </div>
+
+            {/* Reject Confirmation Dialog */}
+            {showRejectDialog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+                        onClick={() => !loading && setShowRejectDialog(false)}
+                    />
+                    <div className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden p-10 animate-in zoom-in slide-in-from-bottom-4 duration-300">
+                        <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center text-red-600 mb-8 mx-auto shadow-inner">
+                            <AlertTriangle className="w-10 h-10" />
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-900 text-center mb-3">Decline Request?</h3>
+                        <p className="text-gray-500 text-center mb-10 font-medium leading-relaxed">
+                            Are you sure you want to decline this request from <span className="text-gray-900 font-bold">{request.student?.full_name}</span>? This action cannot be undone.
+                        </p>
+                        <div className="flex flex-col gap-4">
+                            <button
+                                onClick={handleReject}
+                                disabled={loading}
+                                className="w-full py-5 bg-red-600 text-white font-black rounded-2xl shadow-[0_8px_30px_rgb(220,38,38,0.2)] hover:bg-red-700 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            >
+                                {loading ? 'Declining...' : 'Yes, Decline Request'}
+                            </button>
+                            <button
+                                onClick={() => setShowRejectDialog(false)}
+                                disabled={loading}
+                                className="w-full py-3 text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

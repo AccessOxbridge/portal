@@ -35,32 +35,16 @@ export async function POST(req: Request) {
 
         const timeSlots = timeSlotsFromBody || body?.availability || []
 
-        // 2. Check user's credit balance
-        const { data: profile, error: profileError } = await supabase
+        // 2. Check user's credit balance (REMOVED - moved to sessions page)
+        const { data: profile } = await supabase
             .from('profiles')
             .select('credits')
             .eq('id', user.id)
             .single()
 
-        if (profileError) {
-            return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
-        }
-
         const currentCredits = (profile as any)?.credits || 0
         const requiredCredits = timeSlots?.length || 0
 
-        if (requiredCredits === 0) {
-            return NextResponse.json({ error: 'At least one time slot is required' }, { status: 400 })
-        }
-
-        if (currentCredits < requiredCredits) {
-            return NextResponse.json({
-                error: `Insufficient credits. You have ${currentCredits} credits but need ${requiredCredits} for ${timeSlots.length} session${timeSlots.length > 1 ? 's' : ''}.`,
-                insufficientCredits: true,
-                currentCredits,
-                requiredCredits
-            }, { status: 402 }) // 402 Payment Required
-        }
 
         // 3. Prepare text for embedding
         const subjectText = Array.isArray(subjects)
@@ -132,7 +116,7 @@ Mentor requirements: ${requirements || ''}
         const { data: matches, error: matchError } = await supabase.rpc('match_mentors', {
             query_embedding: `[${embedding.join(',')}]`,
             match_threshold: 0.1, // Lowered threshold slightly to ensure matches
-            match_count: 4,
+            match_count: 100,
         })
 
         console.log('\n\nMatches:\n', JSON.stringify(matches, null, 2), '\n\n')
@@ -201,19 +185,19 @@ Mentor requirements: ${requirements || ''}
             await supabase.from('notifications').insert(notifications)
         }
 
-        // 7. Deduct credits from user
-        const newBalance = currentCredits - requiredCredits
-        const { error: creditUpdateError } = await supabase
-            .from('profiles')
-            .update({ credits: newBalance })
-            .eq('id', user.id)
+        // 7. Deduct credits from user (REMOVED - moved to sessions page)
+        // const newBalance = currentCredits - requiredCredits
+        // const { error: creditUpdateError } = await supabase
+        //     .from('profiles')
+        //     .update({ credits: newBalance })
+        //     .eq('id', user.id)
 
-        if (creditUpdateError) {
-            console.error('Failed to deduct credits:', creditUpdateError)
-            // Don't fail the request, just log it - the matching was successful
-        }
+        // if (creditUpdateError) {
+        //     console.error('Failed to deduct credits:', creditUpdateError)
+        // }
 
-        // 8. Create transaction record for audit
+        // 8. Create transaction record for audit (REMOVED - moved to sessions page)
+        /*
         await supabase.from('credit_transactions').insert({
             user_id: user.id,
             amount: -requiredCredits,
@@ -221,12 +205,11 @@ Mentor requirements: ${requirements || ''}
             type: 'booking',
             description: `Booked ${requiredCredits} mentorship session${requiredCredits > 1 ? 's' : ''} with ${matches.length} mentor${matches.length > 1 ? 's' : ''}`
         })
+        */
 
         return NextResponse.json({
             success: true,
-            count: matches.length,
-            creditsDeducted: requiredCredits,
-            remainingCredits: newBalance
+            count: matches.length
         })
 
     } catch (error: any) {

@@ -15,7 +15,9 @@ import {
     Clock,
     XCircle,
     Loader2,
-    Users
+    Users,
+    School,
+    FileText
 } from 'lucide-react'
 
 interface MentorProfile {
@@ -32,6 +34,9 @@ interface MentorProfile {
     } | null
     sessions_completed: number
     avg_rating: number | null
+    university: string | null
+    photo_url: string | null
+    cv_url: string | null
 }
 
 const statusColors: Record<string, string> = {
@@ -155,16 +160,28 @@ export default function MentorProfilePage() {
             {/* Header Card */}
             <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                 <div className="flex items-start gap-6">
-                    <div className="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0">
-                        {mentor.profile?.full_name?.[0] || 'M'}
+                    <div className="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden">
+                        {mentor.photo_url ? (
+                            <img src={mentor.photo_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                            mentor.profile?.full_name?.[0] || 'M'
+                        )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-col mb-4">
                             <h1 className="text-2xl font-bold text-gray-900">{mentor.profile?.full_name || 'Unknown'}</h1>
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[currentStatus]}`}>
-                                <StatusIcon className="w-3.5 h-3.5" />
-                                {currentStatus.replace('_', ' ')}
-                            </span>
+                            <div className="flex items-center gap-3 mt-1">
+                                {mentor.university && (
+                                    <span className="flex items-center gap-1.5 text-gray-600 font-medium">
+                                        <School className="w-4 h-4" />
+                                        {mentor.university}
+                                    </span>
+                                )}
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[currentStatus]}`}>
+                                    <StatusIcon className="w-3.5 h-3.5" />
+                                    {currentStatus.replace('_', ' ')}
+                                </span>
+                            </div>
                         </div>
 
                         {/* Contact Info */}
@@ -186,6 +203,18 @@ export default function MentorProfilePage() {
                                 Joined {format(new Date(mentor.created_at), 'MMM dd, yyyy')}
                             </span>
                         </div>
+
+                        {mentor.cv_url && (
+                            <a
+                                href={mentor.cv_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors mb-4"
+                            >
+                                <FileText className="w-4 h-4" />
+                                View CV
+                            </a>
+                        )}
 
                         {/* Stats */}
                         <div className="flex gap-6">

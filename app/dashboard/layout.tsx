@@ -172,6 +172,19 @@ export default async function DashboardLayout({
         }
     }
 
+    // Calculate student help count for admins
+    let studentHelpCount = 0
+    const isAdmin = profile.role === 'admin' || profile.role === 'admin-dev'
+    if (isAdmin) {
+        const { count } = await supabase
+            .from('user_issues')
+            .select('*', { count: 'exact', head: true })
+            .eq('issue_type', 'student_help')
+            .eq('status', 'open')
+
+        studentHelpCount = count || 0
+    }
+
     return (
         <div className="flex min-h-screen">
             {/* Sidebar with fixed width */}
@@ -183,6 +196,7 @@ export default async function DashboardLayout({
                     userId={user.id}
                     pendingReportsCount={pendingReportsCount}
                     onboardingIncomplete={onboardingIncomplete}
+                    studentHelpCount={studentHelpCount}
                 />
             )}
 

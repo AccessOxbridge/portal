@@ -22,6 +22,7 @@ export interface Mentor {
     } | null
     sessions_completed: number
     avg_rating: number | null
+    university: string | null
 }
 
 export interface FetchMentorsResult {
@@ -32,6 +33,8 @@ export interface FetchMentorsResult {
 export async function fetchMentors(
     statusFilter: string,
     searchTerm: string,
+    universityFilter: string,
+    subjectFilter: string,
     page: number,
     limit: number
 ): Promise<FetchMentorsResult> {
@@ -107,6 +110,20 @@ export async function fetchMentors(
     // Apply status filter
     if (statusFilter !== 'all') {
         enrichedMentors = enrichedMentors.filter(m => m.status === statusFilter)
+    }
+
+    // Apply university filter
+    if (universityFilter && universityFilter !== 'all') {
+        enrichedMentors = enrichedMentors.filter(m =>
+            m.university?.toLowerCase().includes(universityFilter.toLowerCase())
+        )
+    }
+
+    // Apply subject filter
+    if (subjectFilter && subjectFilter !== 'all') {
+        enrichedMentors = enrichedMentors.filter(m =>
+            m.expertise?.some(exp => exp.toLowerCase().includes(subjectFilter.toLowerCase()))
+        )
     }
 
     // Apply search filter

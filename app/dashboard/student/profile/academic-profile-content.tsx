@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
-import { Save, School, Target, BookOpen, Trophy, Sparkles } from 'lucide-react'
+import { Save, School, Target, BookOpen, Trophy, Sparkles, Globe, Clock } from 'lucide-react'
+import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 
 interface Subject {
     name: string
@@ -13,7 +14,10 @@ interface Subject {
 interface AcademicProfile {
     id: string
     school_name: string | null
+    school_country: string | null
     year_group: string | null
+    curriculum: string | null
+    curriculum_other: string | null
     target_university: string | null
     target_course: string | null
     subjects: Subject[]
@@ -21,6 +25,8 @@ interface AcademicProfile {
     application_year: number | null
     interests: string | null
     extracurriculars: string | null
+    timezone: string | null
+    additional_notes: string | null
     is_complete: boolean
 }
 
@@ -33,6 +39,7 @@ interface Props {
 const YEAR_GROUPS = ['Year 11', 'Year 12', 'Year 13', 'Gap Year', 'University']
 const TARGET_UNIVERSITIES = ['Oxford', 'Cambridge', 'Both Oxford & Cambridge', 'Other Top UK', 'US Universities', 'Undecided']
 const GRADE_OPTIONS = ['A*', 'A', 'B', 'C', 'D', 'E', 'Predicted']
+const CURRICULUM_OPTIONS = ['A-Level', 'IB', 'Other']
 
 export default function AcademicProfileContent({ userId, userName, existingProfile }: Props) {
     const router = useRouter()
@@ -40,16 +47,41 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
 
+    const defaultTimezone = useMemo(() => {
+        try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+        } catch {
+            return ''
+        }
+    }, [])
+
+    const ALL_SUBJECTS = useMemo(() => {
+        const flat = Object.values(SUBJECT_OPTIONS).flat()
+        return [...new Set(flat)].sort()
+    }, [])
+
     const [formData, setFormData] = useState({
         school_name: existingProfile?.school_name || '',
+        school_country: existingProfile?.school_country || '',
         year_group: existingProfile?.year_group || '',
+        curriculum: existingProfile?.curriculum || '',
+        curriculum_other: existingProfile?.curriculum_other || '',
         target_university: existingProfile?.target_university || '',
         target_course: existingProfile?.target_course || '',
         subjects: existingProfile?.subjects || [] as Subject[],
         application_year: existingProfile?.application_year || new Date().getFullYear() + 1,
         interests: existingProfile?.interests || '',
-        extracurriculars: existingProfile?.extracurriculars || ''
+        extracurriculars: existingProfile?.extracurriculars || '',
+        timezone: existingProfile?.timezone || '',
+        additional_notes: existingProfile?.additional_notes || ''
     })
+
+    // Initialize timezone on mount
+    useEffect(() => {
+        if (!formData.timezone && defaultTimezone) {
+            setFormData(prev => ({ ...prev, timezone: defaultTimezone }))
+        }
+    }, [defaultTimezone, formData.timezone])
 
     const [newSubject, setNewSubject] = useState({ name: '', predicted_grade: '' })
 
@@ -73,9 +105,15 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
     const isProfileComplete = () => {
         return (
             formData.school_name.trim() !== '' &&
+            formData.school_country.trim() !== '' &&
             formData.year_group !== '' &&
+            formData.curriculum !== '' &&
+            (formData.curriculum !== 'Other' || formData.curriculum_other.trim() !== '') &&
             formData.target_university !== '' &&
-            formData.subjects.length >= 1
+            formData.subjects.length >= 1 &&
+            formData.timezone.trim() !== '' &&
+            formData.interests.trim() !== '' &&
+            formData.extracurriculars.trim() !== ''
         )
     }
 
@@ -140,36 +178,107 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                     </div>
                 </div>
                 <div className="p-6 space-y-5">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">School Name</label>
-                        <input
-                            type="text"
-                            value={formData.school_name}
-                            onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
-                            placeholder="e.g., Westminster School"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">School Name</label>
+                            <input
+                                type="text"
+                                value={formData.school_name}
+                                onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
+                                placeholder="e.g., Westminster School"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">School Country</label>
+                            <input
+                                type="text"
+                                value={formData.school_country}
+                                onChange={(e) => setFormData({ ...formData, school_country: e.target.value })}
+                                placeholder="e.g., United Kingdom"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Year Group</label>
-                        <div className="relative">
-                            <select
-                                value={formData.year_group}
-                                onChange={(e) => setFormData({ ...formData, year_group: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
-                            >
-                                <option value="">Select year group</option>
-                                {YEAR_GROUPS.map(year => (
-                                    <option key={year} value={year}>{year}</option>
-                                ))}
-                            </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Year Group</label>
+                            <div className="relative">
+                                <select
+                                    value={formData.year_group}
+                                    onChange={(e) => setFormData({ ...formData, year_group: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                                >
+                                    <option value="">Select year group</option>
+                                    {YEAR_GROUPS.map(year => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Curriculum</label>
+                            <div className="relative">
+                                <select
+                                    value={formData.curriculum}
+                                    onChange={(e) => setFormData({ ...formData, curriculum: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                                >
+                                    <option value="">Select curriculum</option>
+                                    {CURRICULUM_OPTIONS.map(curr => (
+                                        <option key={curr} value={curr}>{curr}</option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {formData.curriculum === 'Other' && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Specify Curriculum</label>
+                            <input
+                                type="text"
+                                value={formData.curriculum_other}
+                                onChange={(e) => setFormData({ ...formData, curriculum_other: e.target.value })}
+                                placeholder="e.g., AP, National Curriculum..."
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            />
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Timezone */}
+            <section className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                        <Globe className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900">Timezone</h3>
+                        <p className="text-sm text-gray-500">For scheduling mentorship sessions</p>
+                    </div>
+                </div>
+                <div className="p-6">
+                    <input
+                        type="text"
+                        value={formData.timezone}
+                        onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                        placeholder="e.g., Europe/London"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                        Tip: use an IANA timezone like <span className="font-semibold">Europe/London</span>, <span className="font-semibold">America/New_York</span>, <span className="font-semibold">Asia/Dubai</span>.
+                    </p>
                 </div>
             </section>
 
@@ -269,12 +378,18 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                     {/* Add Subject Form */}
                     <div className="flex gap-3">
                         <input
+                            list="subject-options"
                             type="text"
                             value={newSubject.name}
                             onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
                             placeholder="Subject name"
                             className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                         />
+                        <datalist id="subject-options">
+                            {ALL_SUBJECTS.map((s) => (
+                                <option key={s} value={s} />
+                            ))}
+                        </datalist>
                         <div className="relative">
                             <select
                                 value={newSubject.predicted_grade}
@@ -310,8 +425,8 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                         <Trophy className="w-5 h-5 text-amber-600" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">Additional Information</h3>
-                        <p className="text-sm text-gray-500">Optional but helps with matching</p>
+                        <h3 className="font-bold text-gray-900">Interests & Activities</h3>
+                        <p className="text-sm text-gray-500">Helps us match you with the right mentor</p>
                     </div>
                 </div>
                 <div className="p-6 space-y-5">
@@ -320,7 +435,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                         <textarea
                             value={formData.interests}
                             onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
-                            placeholder="Tell us about your academic interests and what you'd like to explore..."
+                            placeholder="Topics you're curious about, areas you want to explore, books/papers you've read..."
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
                     </div>
@@ -329,7 +444,16 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                         <textarea
                             value={formData.extracurriculars}
                             onChange={(e) => setFormData({ ...formData, extracurriculars: e.target.value })}
-                            placeholder="Sports, music, clubs, volunteering, competitions..."
+                            placeholder="Clubs, competitions, leadership, volunteering, work experience, sports, music, projects..."
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+                        <textarea
+                            value={formData.additional_notes}
+                            onChange={(e) => setFormData({ ...formData, additional_notes: e.target.value })}
+                            placeholder="Any constraints, preferred mentor style, deadlines, or context we should know..."
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
                     </div>

@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { handleApplication } from './actions'
+import { ApprovalButtons } from './approval-buttons'
 
 function formatResponseKey(key: string) {
     return key.replace(/_/g, ' ')
@@ -116,16 +116,7 @@ export default async function AdminApprovalsPage() {
                                                         Mentor&apos;s Resume
                                                     </a>
                                                 ) : null}
-                                                <form action={handleApplication.bind(null, app.id, 'dismissed')}>
-                                                    <button className="px-4 py-2.5 rounded-2xl border border-gray-100 text-gray-500 font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all">
-                                                        Dismiss
-                                                    </button>
-                                                </form>
-                                                <form action={handleApplication.bind(null, app.id, 'approved')}>
-                                                    <button className="px-4 py-2.5 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-0.5">
-                                                        Approve
-                                                    </button>
-                                                </form>
+                                                <ApprovalButtons applicationId={app.id} />
                                             </div>
                                         </div>
 

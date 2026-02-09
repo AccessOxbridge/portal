@@ -27,7 +27,8 @@ import {
     Home,
     Briefcase,
     GraduationCap,
-    AlertCircle
+    AlertCircle,
+    HelpCircle
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -39,6 +40,7 @@ interface SidebarProps {
     userId?: string;
     pendingReportsCount?: number;
     onboardingIncomplete?: boolean;
+    studentHelpCount?: number;
 }
 
 // Define section type for expandable sections
@@ -83,6 +85,7 @@ const navigation = {
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
         { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
+        { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
@@ -99,6 +102,7 @@ const navigation = {
         { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
         { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
         { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
+        { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
@@ -112,7 +116,7 @@ const navigation = {
     ]
 }
 
-export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false }: SidebarProps) {
+export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false, studentHelpCount = 0 }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
@@ -182,6 +186,8 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
                     const showTrainingBadge = item.name === 'Training' && effectiveRole === 'mentor' && onboardingIncomplete
+                    const showStudentHelpBadge = item.name === 'Student Help' && (effectiveRole === 'admin' || effectiveRole === 'admin-dev') && studentHelpCount > 0
+
                     return (
                         <Link
                             key={item.href}
@@ -204,6 +210,9 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     <AlertCircle className="w-3 h-3" />
                                 </span>
+                            )}
+                            {showStudentHelpBadge && (
+                                <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50" />
                             )}
                         </Link>
                     )

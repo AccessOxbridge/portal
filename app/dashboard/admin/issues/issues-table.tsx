@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { AlertCircle, CheckCircle, Clock, MessageSquare, User, Mail, Loader2 } from 'lucide-react'
 
-interface Issue {
+export interface Issue {
     id: string
     reporter_id: string
     reporter_name: string
@@ -19,7 +19,7 @@ interface Issue {
     updated_at: string | null
 }
 
-interface IssuesTableProps {
+export interface IssuesTableProps {
     issues: Issue[]
 }
 
@@ -97,12 +97,13 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
             payment: { bg: 'bg-green-50 text-green-700', icon: '💳' },
             session: { bg: 'bg-purple-50 text-purple-700', icon: '📅' },
             technical: { bg: 'bg-orange-50 text-orange-700', icon: '⚙️' },
+            student_help: { bg: 'bg-indigo-50 text-indigo-700', icon: '🆘' },
             other: { bg: 'bg-gray-50 text-gray-700', icon: '📝' },
         }
         const style = styles[type] || styles.other
         return (
             <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${style.bg}`}>
-                {style.icon} {type.charAt(0).toUpperCase() + type.slice(1)}
+                {style.icon} {type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
         )
     }
@@ -116,8 +117,8 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                         key={f}
                         onClick={() => setFilter(f)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filter === f
-                                ? 'bg-accent text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-accent text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         {f === 'all' ? 'All' : f.replace('_', ' ').charAt(0).toUpperCase() + f.replace('_', ' ').slice(1)}
@@ -143,8 +144,8 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                     setAdminNotes(issue.admin_notes || '')
                                 }}
                                 className={`p-5 bg-white rounded-[20px] border-2 transition-all cursor-pointer hover:shadow-md ${selectedIssue?.id === issue.id
-                                        ? 'border-accent shadow-lg'
-                                        : 'border-gray-100 hover:border-gray-200'
+                                    ? 'border-accent shadow-lg'
+                                    : 'border-gray-100 hover:border-gray-200'
                                     }`}
                             >
                                 <div className="flex items-start justify-between gap-4">

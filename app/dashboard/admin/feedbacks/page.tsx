@@ -33,14 +33,25 @@ export default async function AdminFeedbacksPage() {
     // If we have feedbacks, fetch the related sessions
     const sessionIds = feedbacks?.map(f => f.session_id).filter(Boolean) || []
 
-    let sessionMap = new Map<string, { mentor_id: string | null; student_id: string | null; scheduled_at: string | null }>()
+    let sessionMap = new Map<string, { mentor_id: string | null; student_id: string | null; scheduled_at: string | null; transcript_url: string | null }>()
     if (sessionIds.length > 0) {
         const { data: sessions } = await supabase
             .from('sessions')
-            .select('id, scheduled_at, mentor_id, student_id')
+            .select('id, scheduled_at, mentor_id, student_id, transcript_url')
             .in('id', sessionIds)
 
         sessionMap = new Map(sessions?.map(s => [s.id, s]) || [])
+    }
+
+    // Fetch session reports for transcripts
+    let reportMap = new Map<string, { raw_transcript: string | null; summary: string | null }>()
+    if (sessionIds.length > 0) {
+        const { data: reports } = await supabase
+            .from('session_reports')
+            .select('session_id, raw_transcript, summary')
+            .in('session_id', sessionIds)
+
+        reportMap = new Map(reports?.map(r => [r.session_id, r]) || [])
     }
 
     // Get unique mentor and student IDs from sessions
@@ -74,6 +85,7 @@ export default async function AdminFeedbacksPage() {
     // Transform data for table
     const tableData = feedbacks?.map(f => {
         const session = sessionMap.get(f.session_id)
+        const report = reportMap.get(f.session_id)
         const responses = f.responses as Record<string, any>
         return {
             id: f.id,
@@ -84,7 +96,10 @@ export default async function AdminFeedbacksPage() {
             helpful: responses?.session_helpful || 'N/A',
             experience: responses?.experience || '',
             sessionDate: session?.scheduled_at || null,
-            submittedAt: f.created_at
+            submittedAt: f.created_at,
+            transcript: report?.raw_transcript || null,
+            transcriptUrl: session?.transcript_url || null,
+            summary: report?.summary || null
         }
     }) || []
 

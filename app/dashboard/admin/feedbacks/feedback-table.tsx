@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { Star, Search, ChevronDown, ChevronUp, FileText } from 'lucide-react'
 
 interface Feedback {
     id: string
@@ -13,6 +13,9 @@ interface Feedback {
     experience: string
     sessionDate: string | null
     submittedAt: string | null
+    transcript: string | null
+    transcriptUrl: string | null
+    summary: string | null
 }
 
 interface Props {
@@ -85,9 +88,10 @@ export default function FeedbackTable({ feedbacks }: Props) {
                         <tr>
                             <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Student</th>
                             <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Mentor</th>
+                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Session Date</th>
                             <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Rating</th>
                             <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Helpful?</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Date</th>
+                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Submitted</th>
                             <th className="text-right px-6 py-4 text-sm font-bold text-gray-600">Details</th>
                         </tr>
                     </thead>
@@ -97,6 +101,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                 <tr key={feedback.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 font-medium text-gray-900">{feedback.studentName}</td>
                                     <td className="px-6 py-4 text-gray-700">{feedback.mentorName}</td>
+                                    <td className="px-6 py-4 text-gray-500 text-sm">{formatDate(feedback.sessionDate)}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-1">
                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -119,8 +124,11 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                     <td className="px-6 py-4 text-right">
                                         <button
                                             onClick={() => setExpandedId(expandedId === feedback.id ? null : feedback.id)}
-                                            className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
+                                            className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors inline-flex items-center gap-1"
                                         >
+                                            {(feedback.experience || feedback.transcript || feedback.summary) && (
+                                                <FileText className="w-4 h-4" />
+                                            )}
                                             {expandedId === feedback.id ? (
                                                 <ChevronUp className="w-4 h-4" />
                                             ) : (
@@ -131,10 +139,42 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                 </tr>
                                 {expandedId === feedback.id && feedback.experience && (
                                     <tr key={`${feedback.id}-exp`} className="bg-gray-50">
-                                        <td colSpan={6} className="px-6 py-4">
+                                        <td colSpan={7} className="px-6 py-4">
                                             <div className="p-4 bg-white rounded-xl border border-gray-100">
                                                 <p className="text-sm font-bold text-gray-700 mb-2">Experience Feedback:</p>
                                                 <p className="text-gray-600">{feedback.experience}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                                {expandedId === feedback.id && (feedback.transcript || feedback.summary) && (
+                                    <tr key={`${feedback.id}-transcript`} className="bg-gray-50">
+                                        <td colSpan={7} className="px-6 py-4">
+                                            <div className="p-4 bg-white rounded-xl border border-gray-100">
+                                                <p className="text-sm font-bold text-gray-700 mb-2">Session Transcript:</p>
+                                                {feedback.summary && (
+                                                    <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+                                                        <p className="text-sm font-semibold text-blue-700 mb-1">Summary:</p>
+                                                        <p className="text-gray-600 text-sm">{feedback.summary}</p>
+                                                    </div>
+                                                )}
+                                                {feedback.transcript && (
+                                                    <div className="max-h-64 overflow-y-auto">
+                                                        <pre className="text-sm text-gray-600 whitespace-pre-wrap font-mono bg-gray-50 p-3 rounded-lg">
+                                                            {feedback.transcript}
+                                                        </pre>
+                                                    </div>
+                                                )}
+                                                {feedback.transcriptUrl && !feedback.transcript && (
+                                                    <a
+                                                        href={feedback.transcriptUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-accent hover:underline text-sm"
+                                                    >
+                                                        View Transcript on Zoom →
+                                                    </a>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -143,7 +183,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                         ))}
                         {filtered.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                     {feedbacks.length === 0 ? 'No feedback received yet' : 'No matching results'}
                                 </td>
                             </tr>

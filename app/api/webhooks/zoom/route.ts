@@ -12,14 +12,15 @@ export async function POST(req: Request) {
 
         // 1. Handle URL Validation (Initial Setup)
         if (event === 'endpoint.url_validation') {
-            const secretToken = process.env.ZOOM_WEBHOOK_SECRET_TOKEN
-            if (!secretToken) {
-                console.error('ZOOM_WEBHOOK_SECRET_TOKEN is not set')
-                return NextResponse.json({ error: 'Config error' }, { status: 500 })
-            }
+            // const secretToken = process.env.ZOOM_WEBHOOK_SECRET_TOKEN
+            // if (!secretToken) {
+            //     console.error('ZOOM_WEBHOOK_SECRET_TOKEN is not set')
+            //     return NextResponse.json({ error: 'Config error' }, { status: 500 })
+            // }
 
-            const response = verifyZoomWebhook(secretToken, event, payload.plainToken)
-            return NextResponse.json(response, { status: 200 })
+            // const response = verifyZoomWebhook(secretToken, event, payload.plainToken)
+            // return NextResponse.json(response, { status: 200 })
+            return new NextResponse("", { status: 200 })
         }
 
         // 2. Handle Meeting Events

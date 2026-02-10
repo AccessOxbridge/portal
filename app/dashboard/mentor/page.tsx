@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
+import { LogoutButton } from '@/components/logout-button'
 
 export default async function MentorDashboard() {
     const supabase = await createClient()
@@ -48,6 +49,9 @@ export default async function MentorDashboard() {
                 </p>
                 <div className="px-6 py-3 bg-rich-beige-accent rounded-2xl text-accent text-sm font-bold">
                     Estimated review time: 24-48 hours
+                </div>
+                <div className="mt-8">
+                    <LogoutButton />
                 </div>
             </div>
         )

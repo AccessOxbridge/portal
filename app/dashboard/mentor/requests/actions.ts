@@ -48,12 +48,12 @@ export async function handleMentorshipRequest(
         if (fetchError || !request) throw new Error('Request not found')
 
         // 2. Check if already accepted or expired (24h)
-        const createdAt = new Date(request.created_at || Date.now()).getTime()
-        const now = new Date().getTime()
-        if (now - createdAt > 24 * 60 * 60 * 1000) {
-            await supabase.from('mentorship_requests').update({ status: 'expired' }).eq('id', requestId)
-            throw new Error('Request has expired (24h window passed)')
-        }
+        // const createdAt = new Date(request.created_at || Date.now()).getTime()
+        // const now = new Date().getTime()
+        // if (now - createdAt > 24 * 60 * 60 * 1000) {
+        //     await supabase.from('mentorship_requests').update({ status: 'expired' }).eq('id', requestId)
+        //     throw new Error('Request has expired (24h window passed)')
+        // }
 
         // 3. Parse the selected slot to create a scheduled datetime
         // The client now sends UTC ISO strings for startTime and endTime

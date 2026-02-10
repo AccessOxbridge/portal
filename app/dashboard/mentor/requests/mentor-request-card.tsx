@@ -10,11 +10,16 @@ interface TimeSlot {
     endTime: string
 }
 
+interface Subject {
+    name: string
+    predicted_grade?: string
+}
+
 interface Request {
     id: string
     created_at: string
     responses: {
-        subjects?: string[]
+        subjects?: (string | Subject)[]
         timezone?: string
         timeSlots: TimeSlot[]
         curriculum?: string
@@ -126,9 +131,17 @@ export function MentorRequestCard({ request }: { request: Request }) {
                         <div className="space-y-1">
                             <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Subjects</h4>
                             <div className="flex flex-wrap gap-2">
-                                {responses.subjects.map((subj, idx) => (
-                                    <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">{subj}</span>
-                                ))}
+                                {responses.subjects.map((subj, idx) => {
+                                    const label = typeof subj === 'string'
+                                        ? subj
+                                        : `${subj.name}${subj.predicted_grade ? ` (${subj.predicted_grade})` : ''}`
+
+                                    return (
+                                        <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">
+                                            {label}
+                                        </span>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}

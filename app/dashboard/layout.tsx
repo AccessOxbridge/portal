@@ -121,6 +121,8 @@ export default async function DashboardLayout({
             showSidebar = false
         }
 
+
+
         // Check if mentor training/onboarding is incomplete
         if (mentor && showSidebar) {
             // Check training completion - if any of these are missing, training is incomplete

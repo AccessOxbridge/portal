@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { submitOnboarding } from './actions'
 import { Logo } from "@/components/logo";
+import { LogoutButton } from "@/components/logout-button";
 
 const MAX_FILE_SIZE_MB = 10;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -104,7 +105,10 @@ export default function OnboardingForm() {
           {/* Left Side: Header & Form */}
           <div className="space-y-16 mt-12">
             <div className="space-y-8">
-              <Logo className="justify-start" />
+              <div className="flex items-center justify-between">
+                <Logo className="justify-start"  textColor="white"/>
+                <LogoutButton className="text-white/50 hover:text-white" />
+              </div>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

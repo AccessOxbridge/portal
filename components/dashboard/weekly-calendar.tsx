@@ -14,9 +14,10 @@ interface WeeklyCalendarProps {
     sessions: Session[]
     personLabel?: string // e.g., "Mentor" or "Student"
     zoomButtonLabel?: string
+    credits?: number
 }
 
-export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom' }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits = 0 }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
 
@@ -150,7 +151,11 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                             <div
                                 key={session.id}
                                 className="group relative bg-white border border-gray-100 p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
-                                onClick={() => session.zoom_url && window.open(session.zoom_url, '_blank')}
+                                onClick={() => {
+                                    if (session.zoom_url) {
+                                        window.open(credits > 0 ? session.zoom_url : '/dashboard/student/services', credits > 0 ? '_blank' : '_self')
+                                    }
+                                }}
                             >
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
@@ -175,9 +180,9 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
 
                                     {session.zoom_url ? (
                                         <div className="flex items-center gap-2">
-                                            <button className="bg-accent text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform">
+                                            <button className={`${credits > 0 ? 'bg-accent' : 'bg-amber-500'} text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
                                                 <Video className="w-4 h-4" />
-                                                {zoomButtonLabel}
+                                                {credits > 0 ? zoomButtonLabel : 'Top up to Join'}
                                             </button>
                                         </div>
                                     ) : (

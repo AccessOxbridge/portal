@@ -1,6 +1,5 @@
-import { createClient } from './supabase/server'
+import { createAdminClient } from './supabase/admin'
 import OpenAI from 'openai'
-import { getZoomAccessToken } from './zoom'
 
 /**
  * Clean VTT content to plain text with speaker names
@@ -24,8 +23,8 @@ export function parseVTT(vttContent: string): string {
 /**
  * Process a transcript: download, parse, and generate AI report
  */
-export async function processTranscript(meetingId: string, downloadUrl: string) {
-    const supabase = await createClient()
+export async function processTranscript(meetingId: string, downloadUrl: string, downloadToken: string) {
+    const supabase = createAdminClient()
     const openai = new OpenAI({
         apiKey: process.env.OPEN_AI_API_KEY,
     })
@@ -34,16 +33,17 @@ export async function processTranscript(meetingId: string, downloadUrl: string) 
         console.log(`[REPORTS] Starting process for meeting: ${meetingId}`)
 
         // 1. Download VTT file
-        // Note: Zoom download URLs from webhooks usually require the access token in Bearer auth
-        const accessToken = await getZoomAccessToken()
+        // Use the download_token from webhook (expires in 24 hours)
+        console.log(`[REPORTS] Downloading transcript with download token`)
         const response = await fetch(downloadUrl, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${downloadToken}`
             }
         })
 
         if (!response.ok) {
-            throw new Error(`Failed to download transcript: ${response.statusText}`)
+            console.error(`[REPORTS] Download failed with status: ${response.status} ${response.statusText}`)
+            throw new Error(`Failed to download transcript: ${response.status} ${response.statusText}`)
         }
 
         const vttContent = await response.text()
@@ -69,13 +69,20 @@ export async function processTranscript(meetingId: string, downloadUrl: string) 
         const reportData = JSON.parse(completion.choices[0].message.content || '{}')
 
         // 3. Save to database
-        // Get session ID first
+        // Get session ID first - meetingId is the numeric ID
+        console.log(`[REPORTS] Looking up session for zoom_meeting_id: ${meetingId}`)
         const { data: session, error: fetchError } = await supabase
             .from('sessions')
             .select('id')
-            .eq('zoom_meeting_id', meetingId)
+            .eq('zoom_meeting_id', meetingId.toString())
             .single()
 
+        if (fetchError) {
+            console.error(`[REPORTS] DB error looking up session:`, fetchError)
+        }
+        if (!session) {
+            console.error(`[REPORTS] No session found for zoom_meeting_id: ${meetingId}`)
+        }
         if (fetchError || !session) throw new Error('Session not found for transcript')
 
         const { error: insertError } = await supabase

@@ -141,6 +141,7 @@ export default function StudentDashboardContent({
                             person_name: s.mentor_full_name
                         }))}
                         personLabel="Mentor"
+                        credits={profile?.credits || 0}
                     />
                 </div>
 
@@ -170,15 +171,16 @@ export default function StudentDashboardContent({
                             </div>
                             {activeSession.zoom_join_url ? (
                                 <a
-                                    href={activeSession.zoom_join_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block w-full py-4 bg-accent text-white font-bold rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center"
+                                    href={(profile?.credits || 0) > 0 ? activeSession.zoom_join_url : '/dashboard/student/services'}
+                                    target={(profile?.credits || 0) > 0 ? '_blank' : undefined}
+                                    rel={(profile?.credits || 0) > 0 ? 'noopener noreferrer' : undefined}
+                                    className={`block w-full py-4 text-white font-bold rounded-2xl shadow-lg transition-all text-center ${(profile?.credits || 0) > 0 ? 'bg-accent shadow-accent/20 hover:scale-[1.02]' : 'bg-amber-500 hover:bg-amber-600'}`}
                                 >
-                                    🎥 Join at {activeSession.scheduled_at ? new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
+                                    {(profile?.credits || 0) > 0 ? '🎥 ' : ''}
+                                    {(profile?.credits || 0) > 0 ? `Join at ${activeSession.scheduled_at ? new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                    }) : 'Session'}
+                                    }) : 'Session'}` : 'Top up to Join'}
                                 </a>
                             ) : (
                                 <div className="w-full py-4 bg-gray-100 text-gray-500 font-medium rounded-2xl text-center">

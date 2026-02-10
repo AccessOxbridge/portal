@@ -45,6 +45,18 @@ export async function POST(req: Request) {
                     break
                 }
 
+                // Check for idempotency - if purchase is already completed, skip
+                const { data: existingPurchase } = await supabaseAdmin
+                    .from('credit_purchases')
+                    .select('status')
+                    .eq('id', purchaseId)
+                    .single()
+
+                if (existingPurchase?.status === 'completed') {
+                    console.log(`Purchase ${purchaseId} already completed, skipping.`)
+                    break
+                }
+
                 // 1. Get current user credits
                 const { data: profile, error: profileError } = await supabaseAdmin
                     .from('profiles')

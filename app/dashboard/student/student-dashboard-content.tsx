@@ -263,13 +263,18 @@ export default function StudentDashboardContent({
                     <div className={`p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group ${upcomingSessions.length === 0 ? 'lg:col-span-2' : ''}`}>
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Learning Resources</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {['Oxbridge Strategy', 'Personal Statement Guide', 'Interview Mastery', 'Subject Deep Dives'].map((resource) => (
-                                <div key={resource} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-accent/30 transition-colors flex items-center justify-between cursor-pointer group/item">
-                                    <span className="font-semibold text-gray-700">{resource}</span>
+                            {[
+                                { label: 'Oxbridge Strategy', slug: 'oxbridge-admissions' },
+                                { label: 'Personal Statement Guide', slug: 'personal-statement' },
+                                { label: 'Interview Mastery', slug: 'interview-tips' },
+                                { label: 'Subject Deep Dives', slug: 'uk-universities' },
+                            ].map(({ label, slug }) => (
+                                <Link key={slug} href={`/dashboard/student/resources?category=${slug}`} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-accent/30 transition-colors flex items-center justify-between group/item">
+                                    <span className="font-semibold text-gray-700">{label}</span>
                                     <svg className="w-5 h-5 text-gray-300 group-hover/item:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                     </svg>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>

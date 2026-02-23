@@ -69,7 +69,7 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
-        { name: 'Resources', href: process.env.NEXT_PUBLIC_HOME_PAGE_URL + '/admissions-resources', icon: Book },
+        { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
     ],
     mentor: [
         { name: 'Training', href: '/dashboard/mentor/training', icon: GraduationCap },

@@ -25,7 +25,8 @@ BEGIN
     -- If role is mentor, insert into mentors table
     IF (NEW.raw_user_meta_data->>'role' = 'mentor') THEN
         INSERT INTO public.mentors (id, status)
-        VALUES (NEW.id, 'details_required');
+        VALUES (NEW.id, 'details_required')
+        ON CONFLICT (id) DO NOTHING;
     END IF;
 
     RETURN NEW;

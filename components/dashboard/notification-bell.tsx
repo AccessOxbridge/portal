@@ -24,12 +24,13 @@ export default function NotificationBell() {
     const supabase = createClient()
     const dropdownRef = useRef<HTMLDivElement>(null)
 
-    // Hide notification bell on auth pages
+    // Hide notification bell on auth pages and mentor onboarding
     const isAuthPage = pathname?.includes('/login') ||
         pathname?.includes('/signup') ||
         pathname?.includes('/forgot-password') ||
         pathname?.includes('/reset-password') ||
-        pathname?.includes('/verify-email')
+        pathname?.includes('/verify-email') ||
+        pathname?.includes('/onboarding')
 
     useEffect(() => {
         if (isAuthPage) return

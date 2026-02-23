@@ -25,7 +25,10 @@ export default function OnboardingForm() {
   const [customExpertise, setCustomExpertise] = useState('');
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
+  const [selectValues, setSelectValues] = useState<Record<string, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const customSelectRef = useRef<HTMLDivElement>(null);
 
   // Phone input state
   const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'GB')!
@@ -52,6 +55,10 @@ export default function OnboardingForm() {
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
         setIsCountryDropdownOpen(false);
         setCountrySearch('');
+      }
+      // Close any open custom select if clicking outside
+      if (customSelectRef.current && !customSelectRef.current.contains(event.target as Node)) {
+        setOpenSelectId(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -130,7 +137,18 @@ export default function OnboardingForm() {
     }
     setFieldErrors(prev => ({ ...prev, linkedin_url: '' }));
 
-    // 3. Check for required multiselects (like subjects)
+    // 3. Validate required custom selects
+    const requiredSelects = MENTOR_ONBOARDING_QUESTIONS.filter(q => q.type === 'select' && q.required);
+    for (const q of requiredSelects) {
+      if (!selectValues[q.id]) {
+        e.preventDefault();
+        setOpenSelectId(q.id);
+        document.querySelector<HTMLButtonElement>(`button[data-select-id="${q.id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+
+    // 4. Check for required multiselects (like subjects)
     // Since these are custom components, native HTML validation might not catch them
     const requiredQuestions = MENTOR_ONBOARDING_QUESTIONS.filter(q => q.required);
     for (const q of requiredQuestions) {
@@ -145,16 +163,20 @@ export default function OnboardingForm() {
   };
 
   return (
-    <div className="min-h-screen bg-accent text-white">
+    <div className="min-h-screen bg-accent text-white relative">
+      {/* Logo – aligned with grid content */}
+      <div className="max-w-7xl mx-auto px-8 lg:px-12 pt-10">
+        <Logo className="justify-start" textColor="white" />
+      </div>
+      {/* Sign Out – absolute top-right of the blue section */}
+      <div className="absolute top-10 right-8 lg:right-12">
+        <LogoutButton className="text-white/50 hover:text-white bg-white/5 border border-white/10 rounded-xl px-3 py-1.5" />
+      </div>
       <div className="max-w-7xl mx-auto px-8 lg:px-12 ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
           {/* Left Side: Header & Form */}
           <div className="space-y-16 mt-12">
             <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <Logo className="justify-start"  textColor="white"/>
-                <LogoutButton className="text-white/50 hover:text-white" />
-              </div>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -356,25 +378,44 @@ export default function OnboardingForm() {
                   )}
 
                   {question.type === 'select' && (
-                    <div className="relative">
-                      <select
-                        id={question.id}
-                        name={question.id}
-                        required={question.required}
-                        className="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none focus:border-white transition-all duration-300 text-white appearance-none"
+                    <div ref={customSelectRef} className="relative">
+                      {/* Hidden native input for form submission */}
+                      <input type="hidden" name={question.id} value={selectValues[question.id] ?? ''} />
+                      <button
+                        type="button"
+                        data-select-id={question.id}
+                        onClick={() => setOpenSelectId(prev => prev === question.id ? null : question.id)}
+                        className="w-full flex items-center justify-between border-b border-gray-700 py-2 text-left hover:border-white transition-all duration-300"
                       >
-                        <option value="" className="bg-gray-800">Select an option</option>
-                        {question.options?.map((option) => (
-                          <option key={option} value={option} className="bg-gray-800">
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <span className={selectValues[question.id] ? 'text-white' : 'text-gray-400'}>
+                          {selectValues[question.id] ?? 'Select an option'}
+                        </span>
+                        <svg
+                          width="12" height="12" viewBox="0 0 12 12" fill="none"
+                          className={`text-gray-400 transition-transform duration-200 ${openSelectId === question.id ? 'rotate-180' : ''}`}
+                        >
                           <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                      </div>
+                      </button>
+                      {openSelectId === question.id && (
+                        <div className="absolute z-20 mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+                          {question.options?.map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              onClick={() => {
+                                setSelectValues(prev => ({ ...prev, [question.id]: option }))
+                                setOpenSelectId(null)
+                              }}
+                              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-800 transition-colors ${
+                                selectValues[question.id] === option ? 'text-white bg-white/10' : 'text-gray-300'
+                              }`}
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -545,7 +586,7 @@ function SubmitButton({ hasFileErrors }: { hasFileErrors: boolean }) {
       className={`w-full py-4 transition-all duration-300 font-medium tracking-widest text-sm uppercase mt-8 flex items-center justify-center gap-2
         ${pending || hasFileErrors
           ? 'bg-[#333333] text-gray-500 cursor-not-allowed'
-          : 'bg-white text-black hover:bg-gray-100 active:scale-[0.98]'
+          : 'bg-white text-black hover:bg-black hover:text-white active:scale-[0.98]'
         }`}
     >
       {pending ? (

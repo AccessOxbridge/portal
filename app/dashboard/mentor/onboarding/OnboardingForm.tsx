@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useRef, useEffect, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { COUNTRIES } from '@/config/countries'
 import { submitOnboarding } from './actions'
 import { Logo } from "@/components/logo";
 import { LogoutButton } from "@/components/logout-button";
@@ -23,13 +24,34 @@ export default function OnboardingForm() {
   const [searchQuery, setSearchQuery] = useState('');
   const [customExpertise, setCustomExpertise] = useState('');
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Phone input state
+  const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'GB')!
+  const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY)
+  const [phoneDigits, setPhoneDigits] = useState('')
+  const [countrySearch, setCountrySearch] = useState('')
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false)
+  const countryDropdownRef = useRef<HTMLDivElement>(null)
+  const countrySearchInputRef = useRef<HTMLInputElement>(null)
+
+  const filteredCountries = countrySearch.trim()
+    ? COUNTRIES.filter(c =>
+        c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+        c.dialCode.includes(countrySearch)
+      )
+    : COUNTRIES
+
+  // Close subject dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setIsCountryDropdownOpen(false);
+        setCountrySearch('');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -84,7 +106,31 @@ export default function OnboardingForm() {
       return;
     }
 
-    // 2. Check for required multiselects (like subjects)
+    // 2. Validate phone number digits
+    if (phoneDigits.length < 6 || phoneDigits.length > 10) {
+      e.preventDefault();
+      setFieldErrors(prev => ({ ...prev, phone_number: 'Please enter between 6 and 10 digits (excluding the country code).' }));
+      document.getElementById('phone_number_digits')?.focus();
+      return;
+    }
+    setFieldErrors(prev => ({ ...prev, phone_number: '' }));
+
+    // 3. Validate LinkedIn URL format (if provided)
+    const form = e.currentTarget;
+    const linkedinInput = form.elements.namedItem('linkedin_url') as HTMLInputElement | null;
+    const linkedinValue = linkedinInput?.value.trim() ?? '';
+    if (linkedinValue) {
+      const isValidLinkedIn = /^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9\-_%]+\/?$/.test(linkedinValue);
+      if (!isValidLinkedIn) {
+        e.preventDefault();
+        setFieldErrors(prev => ({ ...prev, linkedin_url: 'Please enter a valid LinkedIn profile URL (e.g. https://www.linkedin.com/in/yourname)' }));
+        linkedinInput?.focus();
+        return;
+      }
+    }
+    setFieldErrors(prev => ({ ...prev, linkedin_url: '' }));
+
+    // 3. Check for required multiselects (like subjects)
     // Since these are custom components, native HTML validation might not catch them
     const requiredQuestions = MENTOR_ONBOARDING_QUESTIONS.filter(q => q.required);
     for (const q of requiredQuestions) {
@@ -146,15 +192,132 @@ export default function OnboardingForm() {
                     {question.label} {question.required && <span className="text-red-500">*</span>}
                   </label>
 
+                  {question.type === 'phone' && (
+                    <div className="space-y-1">
+                      {/* Hidden input carries the full number to Supabase */}
+                      <input type="hidden" name="phone_number" value={`${selectedCountry.dialCode}${phoneDigits}`} />
+                      <div className="flex items-stretch gap-0 border-b border-gray-700 focus-within:border-white transition-all duration-300">
+                        {/* Country code button */}
+                        <div ref={countryDropdownRef} className="relative shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCountryDropdownOpen(prev => !prev)
+                              if (!isCountryDropdownOpen) {
+                                setTimeout(() => countrySearchInputRef.current?.focus(), 50)
+                              }
+                            }}
+                            className="flex items-center gap-1.5 pr-2 py-2 text-sm text-white hover:text-white/80 transition-colors"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={`https://flagcdn.com/w20/${selectedCountry.code.toLowerCase()}.png`} alt={selectedCountry.name} width={20} height={14} className="rounded-[2px] object-cover" />
+                            <span className="font-mono text-sm">{selectedCountry.dialCode}</span>
+                            <svg className={`w-3 h-3 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+
+                          {/* Country dropdown */}
+                          {isCountryDropdownOpen && (
+                            <div className="absolute z-30 top-full left-0 mt-1 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl overflow-hidden">
+                              <div className="p-2 border-b border-gray-700 sticky top-0 bg-gray-900">
+                                <input
+                                  ref={countrySearchInputRef}
+                                  type="text"
+                                  value={countrySearch}
+                                  onChange={e => setCountrySearch(e.target.value)}
+                                  onKeyDown={e => {
+                                    if (e.key === 'Escape') {
+                                      setIsCountryDropdownOpen(false)
+                                      setCountrySearch('')
+                                    }
+                                    if (e.key === 'Enter' && filteredCountries.length > 0) {
+                                      e.preventDefault()
+                                      setSelectedCountry(filteredCountries[0])
+                                      setIsCountryDropdownOpen(false)
+                                      setCountrySearch('')
+                                    }
+                                  }}
+                                  placeholder="Search country or code…"
+                                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-white text-white placeholder:text-gray-500"
+                                />
+                              </div>
+                              <div className="overflow-y-auto max-h-52">
+                                {filteredCountries.map(country => (
+                                  <button
+                                    key={country.code}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedCountry(country)
+                                      setIsCountryDropdownOpen(false)
+                                      setCountrySearch('')
+                                      document.getElementById('phone_number_digits')?.focus()
+                                    }}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left hover:bg-gray-800 transition-colors ${
+                                      country.code === selectedCountry.code ? 'bg-white/10 text-white' : 'text-gray-300'
+                                    }`}
+                                  >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={`https://flagcdn.com/w20/${country.code.toLowerCase()}.png`} alt={country.name} width={20} height={14} className="rounded-[2px] object-cover shrink-0" />
+                                    <span className="flex-1 truncate">{country.name}</span>
+                                    <span className="font-mono text-gray-400 text-xs shrink-0">{country.dialCode}</span>
+                                  </button>
+                                ))}
+                                {filteredCountries.length === 0 && (
+                                  <div className="px-3 py-6 text-center text-gray-500 text-sm">No country found</div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Divider */}
+                        <span className="self-center text-gray-600 pr-2">|</span>
+
+                        {/* Digits input */}
+                        <input
+                          type="text"
+                          id="phone_number_digits"
+                          inputMode="numeric"
+                          value={phoneDigits}
+                          onChange={e => {
+                            const digits = e.target.value.replace(/\D/g, '').slice(0, 10)
+                            setPhoneDigits(digits)
+                            if (fieldErrors.phone_number) setFieldErrors(prev => ({ ...prev, phone_number: '' }))
+                          }}
+                          placeholder={question.placeholder}
+                          required={question.required}
+                          className="flex-1 bg-transparent py-2 focus:outline-none text-white placeholder:text-gray-600 text-sm"
+                        />
+                      </div>
+                      {fieldErrors.phone_number && (
+                        <p className="text-xs text-red-400">{fieldErrors.phone_number}</p>
+                      )}
+                    </div>
+                  )}
+
                   {question.type === 'text' && (
-                    <input
-                      type="text"
-                      id={question.id}
-                      name={question.id}
-                      required={question.required}
-                      placeholder={question.placeholder}
-                      className="w-full bg-transparent border-b border-gray-700 py-2 focus:outline-none focus:border-white transition-all duration-300"
-                    />
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        id={question.id}
+                        name={question.id}
+                        required={question.required}
+                        placeholder={question.placeholder}
+                        onChange={() => {
+                          if (fieldErrors[question.id]) {
+                            setFieldErrors(prev => ({ ...prev, [question.id]: '' }))
+                          }
+                        }}
+                        aria-invalid={Boolean(fieldErrors[question.id])}
+                        className={`w-full bg-transparent border-b py-2 focus:outline-none transition-all duration-300 ${
+                          fieldErrors[question.id] ? 'border-red-500 focus:border-red-400' : 'border-gray-700 focus:border-white'
+                        }`}
+                      />
+                      {fieldErrors[question.id] && (
+                        <p className="text-xs text-red-400">{fieldErrors[question.id]}</p>
+                      )}
+                    </div>
                   )}
 
                   {question.type === 'textarea' && (

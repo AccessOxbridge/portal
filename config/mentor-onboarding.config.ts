@@ -1,4 +1,4 @@
-export type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'file';
+export type QuestionType = 'text' | 'textarea' | 'select' | 'multiselect' | 'file' | 'phone';
 
 export interface OnboardingQuestion {
     id: string;
@@ -187,9 +187,9 @@ export const MENTOR_ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     {
         id: 'phone_number',
         label: 'Phone Number',
-        type: 'text',
+        type: 'phone',
         required: true,
-        placeholder: '+44 7000 000000',
+        placeholder: '7000 000000',
     },
     {
         id: 'expertise',

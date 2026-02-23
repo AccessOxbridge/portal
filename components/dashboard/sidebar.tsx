@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -121,6 +121,23 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
     const [searchQuery, setSearchQuery] = useState('')
+    const searchInputRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault()
+                searchInputRef.current?.focus()
+                searchInputRef.current?.select()
+            }
+            if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+                searchInputRef.current?.blur()
+                setSearchQuery('')
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [])
 
     // Determine effective role for admin-dev to show relevant sidebar on different dashboard pages
     let effectiveRole = role
@@ -172,6 +189,7 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        ref={searchInputRef}
                         className="w-full bg-white/10 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all placeholder:text-white/40"
                     />
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/5 border border-white/10 rounded-md px-1.5 py-0.5 text-[10px] text-white/40 font-mono">

@@ -12,9 +12,6 @@ const supabaseAdmin = createClient(
 export async function POST(req: Request) {
     const body = await req.text()
     const signature = req.headers.get('stripe-signature')
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/0e9b57db-5534-496a-aad7-d2fdd61b30e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'c623e4'},body:JSON.stringify({sessionId:'c623e4',runId:'pre-fix',hypothesisId:'H3',location:'app/api/webhooks/stripe/route.ts:15',message:'stripe webhook hit',data:{hasSignature:!!signature,bodyLength:body.length,hasWebhookSecret:!!process.env.STRIPE_WEBHOOK_SECRET},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
 
     if (!signature) {
         return NextResponse.json({ error: 'No signature' }, { status: 400 })
@@ -28,9 +25,6 @@ export async function POST(req: Request) {
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
         )
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/0e9b57db-5534-496a-aad7-d2fdd61b30e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'c623e4'},body:JSON.stringify({sessionId:'c623e4',runId:'pre-fix',hypothesisId:'H4',location:'app/api/webhooks/stripe/route.ts:30',message:'stripe signature verified',data:{eventType:event.type,eventId:event.id},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
     } catch (err: any) {
         console.error('Webhook signature verification failed:', err.message)
         return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })

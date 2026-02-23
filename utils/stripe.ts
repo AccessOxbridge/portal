@@ -70,27 +70,40 @@ export async function createConnectedAccount(
     email: string,
     name?: string
 ): Promise<string> {
-    const account = await getStripe().accounts.create({
-        type: 'express',
-        country: 'GB', // UK-based platform
-        email,
-        business_type: 'individual',
-        capabilities: {
-            transfers: { requested: true }
-        },
-        metadata: {
-            mentor_id: mentorId
-        },
-        settings: {
-            payouts: {
-                schedule: {
-                    interval: 'manual' // We control when payouts happen
+    try {
+        const account = await getStripe().accounts.create({
+            type: 'express',
+            country: 'GB', // UK-based platform
+            email,
+            business_type: 'individual',
+            capabilities: {
+                transfers: { requested: true }
+            },
+            metadata: {
+                mentor_id: mentorId
+            },
+            settings: {
+                payouts: {
+                    schedule: {
+                        interval: 'manual' // We control when payouts happen
+                    }
                 }
             }
-        }
-    })
+        })
 
-    return account.id
+        return account.id
+    } catch (err: any) {
+        // Provide a clearer error when the platform account isn't enabled for Connect
+        if (err?.rawType === 'invalid_request_error' && /signed up for Connect/i.test(err?.message || '')) {
+            const e = new Error('Stripe Connect is not enabled for this platform. Sign up for Connect in your Stripe dashboard or use a secret key with Connect permissions.')
+            // attach code for callers to detect
+            ;(e as any).code = 'STRIPE_CONNECT_NOT_ENABLED'
+            throw e
+        }
+
+        // Re-throw other errors
+        throw err
+    }
 }
 
 /**

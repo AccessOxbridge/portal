@@ -189,12 +189,22 @@ export default function TrainingContent({
         formData.set('background_check_confirm', backgroundCheckConfirmed ? '1' : '')
 
         startTransition(async () => {
-            const result = await submitBackgroundCheck(formData)
-            if (result.error) {
-                setError(result.error)
-            } else {
-                setLocalStatus(prev => ({ ...prev, dbs: true }))
-                setCurrentStep(5) // Move to payment
+            try {
+                const res = await fetch('/api/mentor/background-check', {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                })
+                const result = await res.json()
+
+                if (!res.ok || result?.error) {
+                    setError(result?.error || 'Upload failed')
+                } else {
+                    setLocalStatus(prev => ({ ...prev, dbs: true }))
+                    setCurrentStep(5) // Move to payment
+                }
+            } catch (err) {
+                setError('Upload failed')
             }
         })
     }
@@ -589,7 +599,7 @@ export default function TrainingContent({
                                                     type="file"
                                                     name="dbs_certificate"
                                                     accept=".pdf,.jpg,.jpeg,.png"
-                                                    className="hidden"
+                                                    className="sr-only"
                                                 />
                                             </label>
                                         </div>

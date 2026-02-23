@@ -38,17 +38,29 @@ export async function POST(req: Request) {
 
         // 4. Create new account if doesn't exist
         if (!accountId) {
-            accountId = await createConnectedAccount(
-                user.id,
-                profile.email || user.email!,
-                profile.full_name || undefined
-            )
+            try {
+                accountId = await createConnectedAccount(
+                    user.id,
+                    profile.email || user.email!,
+                    profile.full_name || undefined
+                )
 
-            // Save account ID to database
-            await supabase
-                .from('mentors')
-                .update({ stripe_account_id: accountId })
-                .eq('id', user.id)
+                // Save account ID to database
+                await supabase
+                    .from('mentors')
+                    .update({ stripe_account_id: accountId })
+                    .eq('id', user.id)
+            } catch (err: any) {
+                // If Stripe Connect isn't enabled, return a helpful error to the client
+                if (err?.code === 'STRIPE_CONNECT_NOT_ENABLED' || /signed up for Connect/i.test(err?.message || '')) {
+                    console.error('Stripe Connect onboarding blocked - platform Connect not enabled:', err.message)
+                    return NextResponse.json({
+                        error: 'Stripe Connect is not enabled for this platform. Please enable Connect in your Stripe dashboard or use a secret key with Connect permissions.'
+                    }, { status: 400 })
+                }
+
+                throw err
+            }
         } else if (!mentor?.payouts_enabled) {
             // Check if account is actually enabled (missed webhook)
             const { isAccountPayoutsEnabled } = await import('@/utils/stripe')

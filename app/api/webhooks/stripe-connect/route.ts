@@ -82,13 +82,17 @@ export async function POST(req: Request) {
                 }
                 break
             }
-
-            case 'transfer.paid': {
-                // Transfer was successfully paid
+            case 'transfer.updated': {
+                // Transfer status changed (use this instead of transfer.paid/transfer.failed)
                 const transfer = event.data.object as any
                 const payoutId = transfer.metadata?.payout_id
 
-                if (payoutId) {
+                if (!payoutId) break
+
+                // Normalize handling based on transfer.status
+                const status = transfer.status as string | undefined
+
+                if (status === 'paid') {
                     await supabase
                         .from('mentor_payouts')
                         .update({
@@ -98,25 +102,28 @@ export async function POST(req: Request) {
                         .eq('id', payoutId)
 
                     console.log(`Payout ${payoutId} marked as paid`)
-                }
-                break
-            }
-
-            case 'transfer.failed': {
-                // Transfer failed
-                const transfer = event.data.object as any
-                const payoutId = transfer.metadata?.payout_id
-
-                if (payoutId) {
+                } else if (status === 'failed' || status === 'returned') {
                     await supabase
                         .from('mentor_payouts')
                         .update({
                             status: 'failed',
-                            failure_message: 'Transfer failed'
+                            failure_message: transfer.failure_message || 'Transfer failed'
                         })
                         .eq('id', payoutId)
 
                     console.log(`Payout ${payoutId} marked as failed`)
+                } else {
+                    // Other statuses (e.g., 'processing') — update basic info
+                    await supabase
+                        .from('mentor_payouts')
+                        .update({
+                            status: 'processing',
+                            processed_at: new Date().toISOString(),
+                            stripe_transfer_id: transfer.id
+                        })
+                        .eq('id', payoutId)
+
+                    console.log(`Payout ${payoutId} processing / updated (status=${status})`)
                 }
                 break
             }

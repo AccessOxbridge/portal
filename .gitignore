@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 testzoom.ts
+ 
+# Supabase temporary files (dev-only)
+/supabase/.temp/
+supabase\.temp

@@ -111,6 +111,13 @@ export default function TrainingContent({
     // Local status for optimistic updates
     const [localStatus, setLocalStatus] = useState(onboardingStatus)
 
+    // Upload UI state for background checks
+    const [isUploading, setIsUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
+    const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null)
+    const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+    const [lastSelectedFile, setLastSelectedFile] = useState<File | null>(null)
+
     const isAllCompleted = Object.values(localStatus).every(Boolean)
 
     const handleCompleteTraining = () => {
@@ -182,31 +189,53 @@ export default function TrainingContent({
         })
     }
 
-    const handleBackgroundCheckSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+    const handleBackgroundCheckSubmit = async (formFile: File | null, confirmed: boolean) => {
         setError(null)
-        const formData = new FormData(e.currentTarget)
-        formData.set('background_check_confirm', backgroundCheckConfirmed ? '1' : '')
+        setUploadError(null)
+        setIsUploading(true)
+        setUploadedFileUrl(null)
+
+        // Keep the last file so we can retry if needed
+        if (formFile) setLastSelectedFile(formFile)
 
         startTransition(async () => {
             try {
-                const res = await fetch('/api/mentor/background-check', {
-                    method: 'POST',
-                    credentials: 'include',
-                    body: formData
-                })
-                const result = await res.json()
+                const formData = new FormData()
+                if (formFile) formData.set('dbs_certificate', formFile)
+                if (confirmed) formData.set('background_check_confirm', '1')
+                // Call server action that returns uploaded URL when successful
+                const result = await submitBackgroundCheck(formData)
 
-                if (!res.ok || result?.error) {
-                    setError(result?.error || 'Upload failed')
+                if (result?.error) {
+                    setUploadError(result.error)
+                    setIsUploading(false)
                 } else {
+                    if (result?.url) {
+                        setUploadedFileUrl(result.url as string)
+                        setUploadedFileName(formFile?.name ?? null)
+                    }
                     setLocalStatus(prev => ({ ...prev, dbs: true }))
-                    setCurrentStep(5) // Move to payment
+                    setIsUploading(false)
                 }
             } catch (err) {
-                setError('Upload failed')
+                setUploadError('Upload failed')
+                setIsUploading(false)
             }
         })
+    }
+
+    const handleRetryUpload = async () => {
+        if (!lastSelectedFile) return
+        await handleBackgroundCheckSubmit(lastSelectedFile, backgroundCheckConfirmed)
+    }
+
+    const handleCancelUpload = () => {
+        // Can't abort server action once sent, but clear UI state
+        setIsUploading(false)
+        setUploadError(null)
+        setUploadedFileUrl(null)
+        setUploadedFileName(null)
+        setLastSelectedFile(null)
     }
 
     const handleCompleteProfile = (e: React.FormEvent<HTMLFormElement>) => {
@@ -238,10 +267,11 @@ export default function TrainingContent({
 
             {/* Progress Steps */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                <div className="flex items-center justify-between overflow-x-auto pb-2">
-                    {STEPS.map((step, index) => {
+                <div className="flex items-center justify-between overflow-x-auto overflow-y-visible pt-2 pb-2 px-4 no-scrollbar">
+                {STEPS.map((step, index) => {
                         const stepKey = step.id
-                        const isCompleted = stepKey === 'welcome' ? true : localStatus[stepKey as keyof OnboardingStatus]
+                        // Consider "welcome" completed only after the user advances past it.
+                        const isCompleted = stepKey === 'welcome' ? currentStep > 0 : localStatus[stepKey as keyof OnboardingStatus]
                         const isCurrent = index === currentStep
                         const Icon = step.icon
 
@@ -253,9 +283,9 @@ export default function TrainingContent({
                                     }`}
                             >
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isCompleted
-                                    ? 'bg-green-500 text-white'
+                                    ? 'bg-green-500 text-white z-10'
                                     : isCurrent
-                                        ? 'bg-accent text-white'
+                                        ? 'bg-accent text-white blink-slow ring-2 ring-accent/40 z-10'
                                         : 'bg-gray-100 text-gray-400'
                                     }`}>
                                     {isCompleted ? (
@@ -273,6 +303,27 @@ export default function TrainingContent({
                     })}
                 </div>
             </div>
+
+            {/* Scoped styles for current step blinking */}
+            <style jsx>{`
+                /* Hide horizontal scrollbar while keeping scroll functionality */
+                .no-scrollbar {
+                    -ms-overflow-style: none; /* IE and Edge */
+                    scrollbar-width: none; /* Firefox */
+                }
+                .no-scrollbar::-webkit-scrollbar {
+                    height: 0;
+                    display: none;
+                }
+                .blink-slow {
+                    animation: blink 1.6s ease-in-out infinite;
+                }
+                @keyframes blink {
+                    0% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.6; transform: scale(1.06); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
+            `}</style>
 
             {/* Error Message */}
             {error && (
@@ -568,6 +619,14 @@ export default function TrainingContent({
                             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                                 <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
                                 <p className="text-green-700 font-semibold">Background Checks Complete!</p>
+                                {uploadedFileUrl && (
+                                    <p className="text-green-600 text-sm mt-2">
+                                        Uploaded file:{' '}
+                                        <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="underline">
+                                            {uploadedFileName ?? uploadedFileUrl}
+                                        </a>
+                                    </p>
+                                )}
                                 <button
                                     onClick={() => setCurrentStep(5)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
@@ -582,63 +641,19 @@ export default function TrainingContent({
                                     If you have been explicitly required to provide us with a DBS, please attach DBS below.
                                 </p>
 
-                                <form onSubmit={handleBackgroundCheckSubmit} className="space-y-6">
-                                    <label className="block">
-                                        <span className="text-sm font-medium text-gray-700">
-                                            Upload DBS Certificate (PDF, JPG, or PNG - Max 10MB) — optional if not required
-                                        </span>
-                                        <div className="mt-2 flex items-center justify-center w-full">
-                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                    <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                                                    <p className="text-sm text-gray-500">
-                                                        <span className="font-semibold">Click to upload</span> or drag and drop
-                                                    </p>
-                                                </div>
-                                                <input
-                                                    type="file"
-                                                    name="dbs_certificate"
-                                                    accept=".pdf,.jpg,.jpeg,.png"
-                                                    className="sr-only"
-                                                />
-                                            </label>
-                                        </div>
-                                    </label>
-
-                                    <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-accent/30 transition-colors cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            name="background_check_confirm"
-                                            checked={backgroundCheckConfirmed}
-                                            onChange={(e) => setBackgroundCheckConfirmed(e.target.checked)}
-                                            className="mt-1 w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
-                                            required
-                                        />
-                                        <span className="text-gray-700">
-                                            I confirm that I have no criminal convictions or cautions that would make me unsuitable to work with students.
-                                        </span>
-                                    </label>
-
-                                    <div className="flex justify-end">
-                                        <button
-                                            type="submit"
-                                            disabled={isPending || !backgroundCheckConfirmed}
-                                            className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
-                                        >
-                                            {isPending ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    Saving...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Confirm & Continue
-                                                    <ChevronRight className="w-5 h-5" />
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </form>
+                                {/* Upload states and controls */}
+                                <BackgroundUploadForm
+                                    onSubmitHandler={handleBackgroundCheckSubmit}
+                                    backgroundCheckConfirmed={backgroundCheckConfirmed}
+                                    setBackgroundCheckConfirmed={setBackgroundCheckConfirmed}
+                                    isUploading={isUploading}
+                                    uploadError={uploadError}
+                                    uploadedFileUrl={uploadedFileUrl}
+                                    uploadedFileName={uploadedFileName}
+                                    lastSelectedFile={lastSelectedFile}
+                                    onRetry={handleRetryUpload}
+                                    onCancel={handleCancelUpload}
+                                />
                             </>
                         )}
                     </div>
@@ -840,6 +855,151 @@ export default function TrainingContent({
                         <ChevronRight className="w-5 h-5" />
                     </a>
                 </div>
+            )}
+        </div>
+    )
+}
+
+/** BackgroundUploadForm - client-side upload UI with simple progress, retry & cancel */
+function BackgroundUploadForm({
+    onSubmitHandler,
+    backgroundCheckConfirmed,
+    setBackgroundCheckConfirmed,
+    isUploading,
+    uploadError,
+    uploadedFileUrl,
+    uploadedFileName,
+    lastSelectedFile,
+    onRetry,
+    onCancel
+}: {
+    onSubmitHandler: (file: File | null, confirmed: boolean) => Promise<void>
+    backgroundCheckConfirmed: boolean
+    setBackgroundCheckConfirmed: (v: boolean) => void
+    isUploading: boolean
+    uploadError: string | null
+    uploadedFileUrl: string | null
+    uploadedFileName: string | null
+    lastSelectedFile: File | null
+    onRetry: () => void
+    onCancel: () => void
+}) {
+    const [file, setFile] = useState<File | null>(lastSelectedFile ?? null)
+    const [localError, setLocalError] = useState<string | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalError(null)
+        const f = e.target.files?.[0] ?? null
+        if (f && f.size > 10 * 1024 * 1024) {
+            setLocalError('File must be less than 10MB')
+            e.target.value = ''
+            setFile(null)
+            return
+        }
+        setFile(f)
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Uploading */}
+            {isUploading ? (
+                <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 animate-spin text-accent" />
+                        <div>
+                            <p className="font-semibold text-gray-900">Uploading…</p>
+                            <p className="text-sm text-gray-500">{file?.name ?? 'Preparing upload'}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={onCancel}
+                            className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ) : uploadedFileUrl ? (
+                // Success UI (file uploaded). The main step will show the completion panel (localStatus.dbs).
+                <div className="p-4 bg-green-50 rounded-xl border border-green-200 flex items-center justify-between">
+                    <div>
+                        <p className="font-semibold text-green-700">File uploaded</p>
+                        <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="text-sm text-green-600 underline break-all">
+                            {uploadedFileName ?? uploadedFileUrl}
+                        </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={onRetry} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Retry</button>
+                        <button onClick={() => setFile(null)} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Remove</button>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <form
+                        onSubmit={async (e) => {
+                            e.preventDefault()
+                            setLocalError(null)
+                            if (!backgroundCheckConfirmed) {
+                                setLocalError('Please confirm the background check statement.')
+                                return
+                            }
+                            await onSubmitHandler(file, backgroundCheckConfirmed)
+                        }}
+                        className="space-y-4"
+                    >
+                        <label className="block">
+                            <span className="text-sm font-medium text-gray-700">
+                                Upload DBS Certificate (PDF, JPG, or PNG - Max 10MB) — optional if not required
+                            </span>
+                            <div className="mt-2 flex items-center justify-center w-full">
+                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                                        <p className="text-sm text-gray-500">
+                                            <span className="font-semibold">Click to upload</span> or drag and drop
+                                        </p>
+                                        {file && <p className="text-xs text-gray-500 mt-2 truncate">{file.name}</p>}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        name="dbs_certificate"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        className="sr-only"
+                                        onChange={handleFileChange}
+                                    />
+                                </label>
+                                {localError && <p className="text-xs text-red-500 ml-4">{localError}</p>}
+                            </div>
+                        </label>
+
+                        {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
+
+                        <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-accent/30 transition-colors cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="background_check_confirm"
+                                checked={backgroundCheckConfirmed}
+                                onChange={(e) => setBackgroundCheckConfirmed(e.target.checked)}
+                                className="mt-1 w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                required
+                            />
+                            <span className="text-gray-700">
+                                I confirm that I have no criminal convictions or cautions that would make me unsuitable to work with students.
+                            </span>
+                        </label>
+
+                        <div className="flex justify-end items-center gap-3">
+                            <button
+                                type="submit"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                            >
+                                Confirm & Continue
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </form>
+                </>
             )}
         </div>
     )

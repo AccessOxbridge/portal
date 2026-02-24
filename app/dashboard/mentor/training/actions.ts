@@ -184,7 +184,28 @@ export async function submitBackgroundCheck(formData: FormData) {
     }
 
     revalidatePath('/dashboard/mentor/training')
-    return { success: true }
+    // Return success and uploaded file info when available so client can confirm and show it.
+    // Note: if a file was uploaded above, `publicUrl` will be in scope; otherwise undefined.
+    try {
+        // Try to get the stored public URL again in case the earlier upload branch executed.
+        const dbRow = await supabase
+            .from('mentors')
+            .select('dbs_certificate_url')
+            .eq('id', user.id)
+            .single()
+
+        const uploadedUrl = (dbRow.data as any)?.dbs_certificate_url || null
+        if (uploadedUrl) {
+            console.log(`Background check uploaded for user=${user.id}: ${uploadedUrl}`)
+            return { success: true, url: uploadedUrl }
+        } else {
+            console.log(`Background check confirmed (no file) for user=${user.id}`)
+            return { success: true }
+        }
+    } catch (err) {
+        console.log('submitBackgroundCheck: unable to fetch mentor row after update', err)
+        return { success: true }
+    }
 }
 
 export async function completeProfile(formData: FormData) {

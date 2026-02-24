@@ -79,7 +79,13 @@ export default async function MentorTrainingPage() {
         contract: !!mentorData.contract_signed_at,
         dbs: !!mentorData.dbs_certificate_url || !!mentorData.background_check_confirmed_at,
         payment: !!mentorData.payouts_enabled,
-        profile: !!mentorData.profile_completed_at || (!!mentorData.bio && !!mentorData.photo_url)
+        // Only consider the profile step complete when an explicit timestamp exists.
+        // Previously we treated presence of bio + photo as "completed", which
+        // caused newly-onboarded users (who provide these during application)
+        // to appear as having finished the profile onboarding step. Require the
+        // dedicated `profile_completed_at` flag so completion only happens when
+        // the user explicitly finishes the profile step in the training flow.
+        profile: !!mentorData.profile_completed_at
     }
 
     return (

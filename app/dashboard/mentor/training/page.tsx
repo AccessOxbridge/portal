@@ -2,8 +2,25 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import TrainingContent from './training-content'
+import { isAccountPayoutsEnabled } from '@/utils/stripe'
 
-export default async function MentorTrainingPage() {
+type MentorTrainingPageProps = {
+    searchParams?: {
+        step?: string
+    }
+}
+
+const STEP_INDEX: Record<string, number> = {
+    welcome: 0,
+    training: 1,
+    quiz: 2,
+    contract: 3,
+    dbs: 4,
+    payment: 5,
+    profile: 6
+}
+
+export default async function MentorTrainingPage({ searchParams }: MentorTrainingPageProps) {
     const supabase = await createClient()
 
     const {
@@ -69,7 +86,28 @@ export default async function MentorTrainingPage() {
 
     // For now, we'll use placeholder values for new tracking columns
     // These will work once the database migration is applied
-    const mentorData = mentor as any
+    let mentorData = mentor as any
+
+    // Stripe webhooks can arrive slightly after the user returns from onboarding.
+    // We sync from Stripe here so payment status updates immediately in the UI.
+    if (mentorData.stripe_account_id && !mentorData.payouts_enabled) {
+        try {
+            const payoutsEnabled = await isAccountPayoutsEnabled(mentorData.stripe_account_id)
+            if (payoutsEnabled) {
+                await supabase
+                    .from('mentors')
+                    .update({ payouts_enabled: true })
+                    .eq('id', user.id)
+
+                mentorData = {
+                    ...mentorData,
+                    payouts_enabled: true
+                }
+            }
+        } catch (error) {
+            console.error('Failed to sync Stripe payouts status for mentor training page:', error)
+        }
+    }
 
     // Calculate onboarding completion status for each step
     // Using existing fields where possible, placeholder for new ones
@@ -87,6 +125,7 @@ export default async function MentorTrainingPage() {
         // the user explicitly finishes the profile step in the training flow.
         profile: !!mentorData.profile_completed_at
     }
+    const initialStep = STEP_INDEX[searchParams?.step ?? ''] ?? 0
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -94,6 +133,7 @@ export default async function MentorTrainingPage() {
                 mentorId={user.id}
                 mentorName={profile.full_name || 'Mentor'}
                 onboardingStatus={onboardingStatus}
+                initialStep={initialStep}
                 existingData={{
                     photo_url: mentorData.photo_url,
                     bio: mentorData.bio,

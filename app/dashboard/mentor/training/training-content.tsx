@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useRef } from 'react'
+import { useState, useTransition, useRef, useEffect } from 'react'
 import {
     GraduationCap,
     FileText,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { completeTraining, completeQuiz, signContract, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
+import { COUNTRIES } from '@/config/countries'
 
 interface OnboardingStatus {
     training: boolean
@@ -42,6 +43,7 @@ interface TrainingContentProps {
     mentorId: string
     mentorName: string
     onboardingStatus: OnboardingStatus
+    initialStep?: number
     existingData: ExistingData
 }
 
@@ -96,9 +98,10 @@ export default function TrainingContent({
     mentorId,
     mentorName,
     onboardingStatus,
+    initialStep = 0,
     existingData
 }: TrainingContentProps) {
-    const [currentStep, setCurrentStep] = useState(0)
+    const [currentStep, setCurrentStep] = useState(Math.max(0, Math.min(initialStep, 6)))
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
 
@@ -107,6 +110,10 @@ export default function TrainingContent({
     const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
     const [quizSubmitted, setQuizSubmitted] = useState(onboardingStatus.quiz)
     const [backgroundCheckConfirmed, setBackgroundCheckConfirmed] = useState(false)
+    // Phone display state (read-only here; populated from existingData.phone)
+    const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'GB')!
+    const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY)
+    const [phoneDigits, setPhoneDigits] = useState('')
 
     // Local status for optimistic updates
     const [localStatus, setLocalStatus] = useState(onboardingStatus)
@@ -121,6 +128,57 @@ export default function TrainingContent({
     const xhrRef = useRef<XMLHttpRequest | null>(null)
 
     const isAllCompleted = Object.values(localStatus).every(Boolean)
+
+    // Parse existing phone (from onboarding) into country + digits on mount / when existingData changes
+    useEffect(() => {
+        const raw = existingData.phone ?? ''
+        if (!raw || raw.trim() === '') {
+            // No phone saved yet: default to UK and empty digits
+            setSelectedCountry(DEFAULT_COUNTRY)
+            setPhoneDigits('')
+            return
+        }
+
+        // Remove spaces and non-digit/+ characters for parsing
+        const normalized = raw.replace(/\s+/g, '')
+        // If it starts with +, try to match a country dial code
+        if (normalized.startsWith('+')) {
+            const digitsOnly = normalized.replace(/\D/g, '')
+            // Find longest matching dial code (some have prefixes like 1-242, so remove non-digits)
+            let matched: typeof DEFAULT_COUNTRY | undefined
+            for (const c of COUNTRIES) {
+                const dial = c.dialCode.replace(/\D/g, '')
+                if (dial && digitsOnly.startsWith(dial)) {
+                    // prefer longest match
+                    if (!matched || dial.length > matched.dialCode.replace(/\D/g, '').length) {
+                        matched = c
+                    }
+                }
+            }
+
+            if (matched) {
+                const dialLen = matched.dialCode.replace(/\D/g, '').length
+                const remaining = digitsOnly.slice(dialLen)
+                setSelectedCountry(matched)
+                setPhoneDigits(remaining.slice(0, 10))
+                return
+            }
+        }
+
+        // Fallback: treat as local UK number (digits only)
+        const fallbackDigits = raw.replace(/\D/g, '').slice(0, 10)
+        setSelectedCountry(DEFAULT_COUNTRY)
+        setPhoneDigits(fallbackDigits)
+    }, [existingData.phone])
+
+    // Helper to format local digits for display e.g. 7123456789 -> "712 345 6789"
+    function formatLocalNumber(digits: string) {
+        if (!digits) return ''
+        if (digits.length <= 3) return digits
+        if (digits.length <= 6) return digits.replace(/(\d{3})(\d+)/, '$1 $2')
+        // 7-10 digits => 3-3-remaining (usually 4)
+        return digits.replace(/(\d{3})(\d{3})(\d+)/, '$1 $2 $3')
+    }
 
     const handleCompleteTraining = () => {
         setError(null)
@@ -830,16 +888,30 @@ export default function TrainingContent({
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Phone Number
-                                        </label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Phone Number
+                                    </label>
+                                    <div className="flex items-stretch gap-0 border border-gray-200 rounded-xl overflow-hidden">
+                                        {/* Hidden input carries the full number to the server */}
+                                        <input type="hidden" name="phone" value={phoneDigits ? `${selectedCountry.dialCode}${phoneDigits}` : (existingData.phone || '')} />
+
+                                        <div className="flex items-center gap-2 px-3">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={`https://flagcdn.com/w20/${selectedCountry.code.toLowerCase()}.png`} alt={selectedCountry.name} width={20} height={14} className="rounded-[2px] object-cover" />
+                                            <span className="font-mono text-base text-gray-700">{selectedCountry.dialCode}</span>
+                                        </div>
+
                                         <input
-                                            type="tel"
-                                            name="phone"
-                                            defaultValue={existingData.phone || ''}
-                                            placeholder="+44 7XXX XXXXXX"
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+                                            type="text"
+                                            name="phone_display"
+                                            value={formatLocalNumber(phoneDigits)}
+                                            readOnly
+                                            aria-readonly
+                                            placeholder="7XXX XXXXXX"
+                                            className="flex-1 px-4 py-3 bg-transparent text-gray-700 focus:outline-none"
                                         />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">Phone number set during onboarding and cannot be changed here.</p>
                                     </div>
                                 </div>
 

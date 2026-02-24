@@ -31,7 +31,7 @@ export async function POST(req: Request) {
             .single()
 
         const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        const returnUrl = `${origin}/dashboard/mentor?stripe_onboarding=complete`
+        const returnUrl = `${origin}/dashboard/mentor/training?step=payment&stripe_onboarding=complete`
         const refreshUrl = `${origin}/api/stripe/connect/refresh`
 
         let accountId = mentor?.stripe_account_id

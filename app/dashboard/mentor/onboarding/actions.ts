@@ -85,6 +85,9 @@ export async function submitOnboarding(prevState: any, formData: FormData) {
             expertise: Array.isArray(responses.expertise) ? responses.expertise : (responses.expertise ? [responses.expertise] : []),
             cv_url: cvUrl,
             photo_url: photoUrl,
+            // If the onboarding form included a phone number (named phone_number or phone),
+            // copy it into the mentors.phone column so other pages can read it directly.
+            phone: responses.phone_number || responses.phone || null,
         })
         .eq('id', user.id)
         .select('id')

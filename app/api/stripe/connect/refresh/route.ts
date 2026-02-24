@@ -24,13 +24,13 @@ export async function GET(req: Request) {
             .single()
 
         if (!mentor?.stripe_account_id) {
-            // No account - redirect to mentor dashboard
-            return NextResponse.redirect(new URL('/dashboard/mentor', req.url))
+            // No account yet - redirect to training payment step
+            return NextResponse.redirect(new URL('/dashboard/mentor/training?step=payment', req.url))
         }
 
         // 3. Generate new onboarding link
         const origin = new URL(req.url).origin
-        const returnUrl = `${origin}/dashboard/mentor?stripe_onboarding=complete`
+        const returnUrl = `${origin}/dashboard/mentor/training?step=payment&stripe_onboarding=complete`
         const refreshUrl = `${origin}/api/stripe/connect/refresh`
 
         const onboardingUrl = await getAccountOnboardingLink(

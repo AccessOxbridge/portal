@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import {
     GraduationCap,
     FileText,
@@ -14,7 +14,7 @@ import {
     BookOpen,
     AlertCircle
 } from 'lucide-react'
-import { completeTraining, completeQuiz, signContract, uploadDBS, submitBackgroundCheck, completeProfile } from './actions'
+import { completeTraining, completeQuiz, signContract, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 
 interface OnboardingStatus {
@@ -113,10 +113,12 @@ export default function TrainingContent({
 
     // Upload UI state for background checks
     const [isUploading, setIsUploading] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState<number>(0)
     const [uploadError, setUploadError] = useState<string | null>(null)
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null)
     const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
     const [lastSelectedFile, setLastSelectedFile] = useState<File | null>(null)
+    const xhrRef = useRef<XMLHttpRequest | null>(null)
 
     const isAllCompleted = Object.values(localStatus).every(Boolean)
 
@@ -172,56 +174,72 @@ export default function TrainingContent({
         })
     }
 
-    const handleUploadDBS = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setError(null)
-        const formData = new FormData(e.currentTarget)
-        formData.set('background_check_confirm', backgroundCheckConfirmed ? '1' : '')
-
-        startTransition(async () => {
-            const result = await submitBackgroundCheck(formData)
-            if (result.error) {
-                setError(result.error)
-            } else {
-                setLocalStatus(prev => ({ ...prev, dbs: true }))
-                setCurrentStep(5) // Move to payment
-            }
-        })
-    }
-
     const handleBackgroundCheckSubmit = async (formFile: File | null, confirmed: boolean) => {
         setError(null)
         setUploadError(null)
         setIsUploading(true)
+        setUploadProgress(0)
+        // Keep the last file so we can retry if needed
         setUploadedFileUrl(null)
 
-        // Keep the last file so we can retry if needed
         if (formFile) setLastSelectedFile(formFile)
 
-        startTransition(async () => {
+        // Use XHR so we can show byte-level progress
+        await new Promise<void>((resolve, reject) => {
             try {
-                const formData = new FormData()
-                if (formFile) formData.set('dbs_certificate', formFile)
-                if (confirmed) formData.set('background_check_confirm', '1')
-                // Call server action that returns uploaded URL when successful
-                const result = await submitBackgroundCheck(formData)
+                const xhr = new XMLHttpRequest()
+                xhrRef.current = xhr
+                xhr.open('POST', '/api/mentor/background-check')
 
-                if (result?.error) {
-                    setUploadError(result.error)
-                    setIsUploading(false)
-                } else {
-                    if (result?.url) {
-                        setUploadedFileUrl(result.url as string)
-                        setUploadedFileName(formFile?.name ?? null)
+                xhr.upload.onprogress = (ev: ProgressEvent) => {
+                    if (ev.lengthComputable) {
+                        setUploadProgress(Math.round((ev.loaded / ev.total) * 100))
                     }
-                    setLocalStatus(prev => ({ ...prev, dbs: true }))
-                    setIsUploading(false)
                 }
+
+                xhr.onload = () => {
+                    try {
+                        const res = JSON.parse(xhr.responseText)
+                        if (xhr.status >= 400 || res?.error) {
+                            setUploadError(res?.error || 'Upload failed')
+                            setIsUploading(false)
+                            reject(new Error(res?.error || 'Upload failed'))
+                        } else {
+                            if (res?.url) {
+                                setUploadedFileUrl(res.url as string)
+                                setUploadedFileName(formFile?.name ?? null)
+                            }
+                            setUploadProgress(100)
+                            setLocalStatus(prev => ({ ...prev, dbs: true }))
+                            setIsUploading(false)
+                            resolve()
+                        }
+                    } catch (err) {
+                        setUploadError('Upload failed')
+                        setIsUploading(false)
+                        reject(err)
+                    }
+                }
+
+                xhr.onerror = () => {
+                    setUploadError('Network error during upload')
+                    setIsUploading(false)
+                    reject(new Error('Network error'))
+                }
+
+                const fd = new FormData()
+                if (formFile) fd.set('dbs_certificate', formFile)
+                if (confirmed) fd.set('background_check_confirm', '1')
+
+                xhr.send(fd)
             } catch (err) {
                 setUploadError('Upload failed')
                 setIsUploading(false)
+                reject(err)
             }
         })
+
+        xhrRef.current = null
     }
 
     const handleRetryUpload = async () => {
@@ -230,12 +248,16 @@ export default function TrainingContent({
     }
 
     const handleCancelUpload = () => {
-        // Can't abort server action once sent, but clear UI state
+        if (xhrRef.current) {
+            xhrRef.current.abort()
+            xhrRef.current = null
+        }
         setIsUploading(false)
         setUploadError(null)
         setUploadedFileUrl(null)
         setUploadedFileName(null)
         setLastSelectedFile(null)
+        setUploadProgress(0)
     }
 
     const handleCompleteProfile = (e: React.FormEvent<HTMLFormElement>) => {
@@ -618,13 +640,18 @@ export default function TrainingContent({
                         {localStatus.dbs ? (
                             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                                 <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Background Checks Complete!</p>
+                                <p className="text-green-700 font-semibold">Background checks complete</p>
                                 {uploadedFileUrl && (
                                     <p className="text-green-600 text-sm mt-2">
-                                        Uploaded file:{' '}
+                                        File:{' '}
                                         <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="underline">
                                             {uploadedFileName ?? uploadedFileUrl}
                                         </a>
+                                    </p>
+                                )}
+                                {!uploadedFileUrl && (
+                                    <p className="text-green-600 text-sm mt-2">
+                                        Confirmation submitted (no DBS file uploaded).
                                     </p>
                                 )}
                                 <button
@@ -651,6 +678,7 @@ export default function TrainingContent({
                                     uploadedFileUrl={uploadedFileUrl}
                                     uploadedFileName={uploadedFileName}
                                     lastSelectedFile={lastSelectedFile}
+                                    uploadProgress={uploadProgress}
                                     onRetry={handleRetryUpload}
                                     onCancel={handleCancelUpload}
                                 />
@@ -870,6 +898,7 @@ function BackgroundUploadForm({
     uploadedFileUrl,
     uploadedFileName,
     lastSelectedFile,
+    uploadProgress,
     onRetry,
     onCancel
 }: {
@@ -881,6 +910,7 @@ function BackgroundUploadForm({
     uploadedFileUrl: string | null
     uploadedFileName: string | null
     lastSelectedFile: File | null
+    uploadProgress: number
     onRetry: () => void
     onCancel: () => void
 }) {
@@ -907,8 +937,20 @@ function BackgroundUploadForm({
                     <div className="flex items-center gap-3">
                         <Loader2 className="w-5 h-5 animate-spin text-accent" />
                         <div>
-                            <p className="font-semibold text-gray-900">Uploading…</p>
-                            <p className="text-sm text-gray-500">{file?.name ?? 'Preparing upload'}</p>
+                            {/* If there is a file, show uploading progress. If user only submitted confirmation (no file),
+                                show an indeterminate submitting state without the progress bar. */}
+                            <p className="font-semibold text-gray-900">
+                                {(file || lastSelectedFile) ? 'Uploading…' : 'Submitting confirmation…'}
+                            </p>
+                            <p className="text-sm text-gray-500">{file?.name ?? lastSelectedFile?.name ?? ''}</p>
+                            {(file || lastSelectedFile) && (
+                                <>
+                                    <div className="w-48 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                                        <div className="h-2 bg-accent transition-all" style={{ width: `${uploadProgress}%` }} />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">{uploadProgress}%</p>
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -924,14 +966,17 @@ function BackgroundUploadForm({
                 // Success UI (file uploaded). The main step will show the completion panel (localStatus.dbs).
                 <div className="p-4 bg-green-50 rounded-xl border border-green-200 flex items-center justify-between">
                     <div>
-                        <p className="font-semibold text-green-700">File uploaded</p>
-                        <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="text-sm text-green-600 underline break-all">
-                            {uploadedFileName ?? uploadedFileUrl}
-                        </a>
+                        <p className="font-semibold text-green-700">Upload complete</p>
+                        <p className="text-sm text-green-600 mt-1 break-all">
+                            File:{' '}
+                            <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="underline">
+                                {uploadedFileName ?? uploadedFileUrl}
+                            </a>
+                        </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={onRetry} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Retry</button>
-                        <button onClick={() => setFile(null)} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Remove</button>
+                        <button onClick={onRetry} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Retry upload</button>
+                        <button onClick={() => setFile(null)} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Remove file</button>
                     </div>
                 </div>
             ) : (
@@ -944,20 +989,24 @@ function BackgroundUploadForm({
                                 setLocalError('Please confirm the background check statement.')
                                 return
                             }
-                            await onSubmitHandler(file, backgroundCheckConfirmed)
+                            try {
+                                await onSubmitHandler(file, backgroundCheckConfirmed)
+                            } catch {
+                                // Parent handler already sets the UI error state.
+                            }
                         }}
                         className="space-y-4"
                     >
                         <label className="block">
                             <span className="text-sm font-medium text-gray-700">
-                                Upload DBS Certificate (PDF, JPG, or PNG - Max 10MB) — optional if not required
+                                Upload DBS certificate (PDF, JPG, PNG, max 10MB) - optional unless requested
                             </span>
                             <div className="mt-2 flex items-center justify-center w-full">
                                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                         <Upload className="w-8 h-8 mb-2 text-gray-400" />
                                         <p className="text-sm text-gray-500">
-                                            <span className="font-semibold">Click to upload</span> or drag and drop
+                                            <span className="font-semibold">Click to upload</span> or drag and drop.
                                         </p>
                                         {file && <p className="text-xs text-gray-500 mt-2 truncate">{file.name}</p>}
                                     </div>
@@ -973,7 +1022,7 @@ function BackgroundUploadForm({
                             </div>
                         </label>
 
-                        {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
+                        {uploadError && <p className="text-sm text-red-500">Upload failed — {uploadError}. Try again or cancel.</p>}
 
                         <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-accent/30 transition-colors cursor-pointer">
                             <input
@@ -985,14 +1034,15 @@ function BackgroundUploadForm({
                                 required
                             />
                             <span className="text-gray-700">
-                                I confirm that I have no criminal convictions or cautions that would make me unsuitable to work with students.
+                                I confirm I have no criminal convictions or cautions that would make me unsuitable to work with students.
                             </span>
                         </label>
 
                         <div className="flex justify-end items-center gap-3">
                             <button
                                 type="submit"
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                disabled={isUploading || !backgroundCheckConfirmed}
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Confirm & Continue
                                 <ChevronRight className="w-5 h-5" />

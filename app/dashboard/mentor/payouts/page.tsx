@@ -36,7 +36,39 @@ export default async function MentorPayoutsPage() {
     const pendingPayouts = payouts?.filter(p => p.status === 'pending' || p.status === 'processing') || []
 
     const totalPaid = paidPayouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
-    const totalPending = pendingPayouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
+    const batchedPending = pendingPayouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
+
+    // Real-time "to be paid": sessions that have ended/completed but are not yet included in any payout batch.
+    // This makes the mentor view update immediately after Zoom webhook updates session status.
+    const payoutIds = payouts?.map(p => p.id) || []
+    const { data: payoutItems } = payoutIds.length > 0
+        ? await supabase
+            .from('mentor_payout_items')
+            .select('session_id, payout_id')
+            .in('payout_id', payoutIds)
+        : { data: [] }
+
+    const paidOrBatchedSessionIds = new Set(
+        (payoutItems || [])
+            .map((item: any) => item.session_id)
+            .filter(Boolean)
+    )
+
+    const { data: eligibleSessions } = await supabase
+        .from('sessions')
+        .select('id, duration_minutes, status, zoom_meeting_status')
+        .eq('mentor_id', user.id)
+        .or('status.eq.completed,zoom_meeting_status.eq.ended')
+
+    const hourlyRate = mentor?.hourly_rate_cents || 2500
+    const unbatchedPending = (eligibleSessions || [])
+        .filter((s: any) => !paidOrBatchedSessionIds.has(s.id))
+        .reduce((sum: number, s: any) => {
+            const duration = s.duration_minutes || 60
+            return sum + Math.round((duration / 60) * hourlyRate)
+        }, 0)
+
+    const totalPending = batchedPending + unbatchedPending
 
     // Get completed session count this month
     const startOfMonth = new Date()
@@ -49,8 +81,6 @@ export default async function MentorPayoutsPage() {
         .eq('mentor_id', user.id)
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
         .gte('scheduled_at', startOfMonth.toISOString())
-
-    const hourlyRate = mentor?.hourly_rate_cents || 2500
 
     return (
         <div className="space-y-12">

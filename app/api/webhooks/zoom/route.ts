@@ -71,6 +71,59 @@ export async function POST(req: Request) {
                     message: 'Your session has ended! We\'d love to hear about your experience (optional).',
                     data: { session_id: session.id, action: 'student_feedback' }
                 })
+                
+                // Deduct student credits based on scheduled duration (1 credit = 60 minutes).
+                // Business rule: round up partial hours to the nearest whole credit.
+                try {
+                    const { data: sess } = await supabase
+                        .from('sessions')
+                        .select('id, duration_minutes, student_id')
+                        .eq('id', session.id)
+                        .single()
+
+                    if (sess && sess.student_id) {
+                        const durationMinutes = sess.duration_minutes || 60
+                        const creditsToDeduct = Math.ceil((durationMinutes || 60) / 60)
+
+                        // Get current credits
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('credits')
+                            .eq('id', sess.student_id)
+                            .single()
+
+                        const currentCredits = (profile?.credits as number) || 0
+                        const newBalance = Math.max(0, currentCredits - creditsToDeduct)
+
+                        // Update student credits (service role allowed)
+                        await supabase
+                            .from('profiles')
+                            .update({ credits: newBalance })
+                            .eq('id', sess.student_id)
+
+                        // Insert credit transaction record
+                        await supabase.from('credit_transactions').insert({
+                            user_id: sess.student_id,
+                            amount: -creditsToDeduct,
+                            balance_after: newBalance,
+                            type: 'booking',
+                            description: `Auto-deduct credits for session ${sess.id}`,
+                            reference_id: sess.id
+                        })
+
+                        // Notify student about deduction
+                        await supabase.from('notifications').insert({
+                            recipient_id: sess.student_id,
+                            recipient_email: '',
+                            type: 'session_confirmed',
+                            title: `Credits deducted for session`,
+                            message: `We deducted ${creditsToDeduct} credit${creditsToDeduct !== 1 ? 's' : ''} for your recent session.`,
+                            data: { session_id: sess.id, credits_deducted: creditsToDeduct, balance_after: newBalance }
+                        })
+                    }
+                } catch (err) {
+                    console.error('[CREDITS] Failed to deduct credits for session:', err)
+                }
             }
         }
 

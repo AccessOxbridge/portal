@@ -44,11 +44,20 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
         // Create UTC ISO strings
         const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
         const endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
+        const startISO = startDateTime.toISOString()
+        const endISO = endDateTime.toISOString()
+
+        // Prevent adding the exact same time slot twice
+        const duplicate = timeSlots.some(s => s.startTime === startISO && s.endTime === endISO)
+        if (duplicate) {
+            alert('This time slot has already been added')
+            return
+        }
 
         setTimeSlots(prev => [...prev, {
             date: newSlot.date,
-            startTime: startDateTime.toISOString(),
-            endTime: endDateTime.toISOString()
+            startTime: startISO,
+            endTime: endISO
         }])
         setNewSlot({ date: '', startTime: '', endTime: '' })
     }

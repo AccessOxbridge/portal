@@ -40,6 +40,7 @@ interface SidebarProps {
     userId?: string;
     pendingReportsCount?: number;
     onboardingIncomplete?: boolean;
+    trainingComplete?: boolean;
     studentHelpCount?: number;
 }
 
@@ -116,7 +117,7 @@ const navigation = {
     ]
 }
 
-export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false, studentHelpCount = 0 }: SidebarProps) {
+export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false, trainingComplete = false, studentHelpCount = 0 }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
@@ -203,7 +204,8 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
-                    const showTrainingBadge = item.name === 'Training' && effectiveRole === 'mentor' && onboardingIncomplete
+                    const showTrainingIncompleteBadge = item.name === 'Training' && effectiveRole === 'mentor' && onboardingIncomplete && !trainingComplete
+                    const showTrainingCompleteBadge = item.name === 'Training' && effectiveRole === 'mentor' && !!trainingComplete
                     const showStudentHelpBadge = item.name === 'Student Help' && (effectiveRole === 'admin' || effectiveRole === 'admin-dev') && studentHelpCount > 0
 
                     return (
@@ -224,9 +226,14 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                                     {pendingReportsCount}
                                 </span>
                             )}
-                            {showTrainingBadge && (
+                            {showTrainingIncompleteBadge && (
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     <AlertCircle className="w-3 h-3" />
+                                </span>
+                            )}
+                            {showTrainingCompleteBadge && (
+                                <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                    <CheckCircle className="w-3 h-3" />
                                 </span>
                             )}
                             {showStudentHelpBadge && (

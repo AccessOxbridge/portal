@@ -134,6 +134,8 @@ export default async function DashboardLayout({
             const profileComplete = !!mentor.profile_completed_at || (!!mentor.bio && !!mentor.photo_url)
 
             onboardingIncomplete = !trainingComplete || !quizComplete || !contractSigned || !dbsComplete || !paymentSetup || !profileComplete
+            // expose trainingComplete to sidebar via local variable (passed below)
+            ;(profile as any).mentors.trainingCompleteFlag = trainingComplete
         }
     }
 
@@ -198,6 +200,7 @@ export default async function DashboardLayout({
                     userId={user.id}
                     pendingReportsCount={pendingReportsCount}
                     onboardingIncomplete={onboardingIncomplete}
+                    trainingComplete={((profile as any).mentors?.trainingCompleteFlag) || false}
                     studentHelpCount={studentHelpCount}
                 />
             )}

@@ -37,7 +37,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'start and end dates are required' }, { status: 400 })
         }
 
-        // 3. Get completed sessions with mentor info
+        // 3. Get sessions with mentor info (completed or Zoom-ended)
         const { data: sessions, error: sessionsError } = await supabase
             .from('sessions')
             .select(`
@@ -58,7 +58,6 @@ export async function GET(req: Request) {
                     )
                 )
             `)
-            .eq('status', 'completed')
             .gte('scheduled_at', periodStart)
             .lte('scheduled_at', periodEnd)
 
@@ -82,6 +81,9 @@ export async function GET(req: Request) {
         }> = {}
 
         for (const session of sessions || []) {
+            const isFinished = session.status === 'completed' || session.zoom_meeting_status === 'ended'
+            if (!isFinished) continue
+
             const mentorId = session.mentor_id
             const profile = session.profiles as any
             const mentor = profile?.mentors
@@ -204,20 +206,23 @@ export async function POST(req: Request) {
                     continue
                 }
 
-                // Get completed sessions for this mentor in the period
+                // Get completed/ended sessions for this mentor in the period
                 const { data: sessions } = await supabase
                     .from('sessions')
-                    .select('id, duration_minutes')
+                    .select('id, duration_minutes, status, zoom_meeting_status')
                     .eq('mentor_id', mentorId)
-                    .eq('status', 'completed')
                     .gte('scheduled_at', period_start)
                     .lte('scheduled_at', period_end)
 
-                if (!sessions?.length) {
+                const eligibleSessions = (sessions || []).filter(
+                    s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
+                )
+
+                if (!eligibleSessions.length) {
                     results.push({
                         mentor_id: mentorId,
                         success: false,
-                        error: 'No completed sessions in this period'
+                        error: 'No completed/ended sessions in this period'
                     })
                     continue
                 }
@@ -227,7 +232,7 @@ export async function POST(req: Request) {
                 let totalMinutes = 0
                 let totalCents = 0
 
-                for (const session of sessions) {
+                for (const session of eligibleSessions) {
                     const duration = session.duration_minutes || 60
                     totalMinutes += duration
                     totalCents += Math.round((duration / 60) * hourlyRateCents)
@@ -259,7 +264,7 @@ export async function POST(req: Request) {
                         mentor_id: mentorId,
                         period_start,
                         period_end,
-                        sessions_count: sessions.length,
+                        sessions_count: eligibleSessions.length,
                         total_minutes: totalMinutes,
                         amount_cents: totalCents,
                         currency: 'gbp',
@@ -271,7 +276,7 @@ export async function POST(req: Request) {
                 if (payoutError) throw payoutError
 
                 // Create payout items
-                for (const session of sessions) {
+                for (const session of eligibleSessions) {
                     const duration = session.duration_minutes || 60
                     await supabase
                         .from('mentor_payout_items')

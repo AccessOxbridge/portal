@@ -23,7 +23,6 @@ export default async function StudentReportsPage() {
         return redirect('/dashboard')
     }
 
-    // Fetch all sessions with reports for this student
     const { data: sessions } = await supabase
         .from('sessions')
         .select(`
@@ -32,31 +31,54 @@ export default async function StudentReportsPage() {
             mentor:profiles!sessions_mentor_id_fkey (
                 full_name,
                 photo_url:mentors(photo_url)
-            ),
-            session_reports (
+            )
+        `)
+        .eq('student_id', user.id)
+        .order('scheduled_at', { ascending: false })
+
+    const sessionIds = (sessions || []).map((s: any) => s.id)
+    const { data: reports } = sessionIds.length > 0
+        ? await supabase
+            .from('session_reports')
+            .select(`
                 id,
+                session_id,
                 summary,
                 key_points,
                 action_items,
                 personalized_report,
                 personalized_report_generated_at,
                 created_at
-            )
-        `)
-        .eq('student_id', user.id)
-        .not('session_reports', 'is', null)
-        .order('scheduled_at', { ascending: false })
+            `)
+            .in('session_id', sessionIds)
+            .order('created_at', { ascending: false })
+        : { data: [] as any[] }
 
-    // Process sessions with reports
-    const reportsData = (sessions || [])
-        .filter((session: any) => session.session_reports && session.session_reports.length > 0)
-        .map((session: any) => ({
-            session_id: session.id,
-            scheduled_at: session.scheduled_at,
-            mentor_full_name: session.mentor?.full_name || 'Mentor',
-            mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
-            report: session.session_reports[0]
-        }))
+    const sessionById = new Map(
+        (sessions || []).map((session: any) => [session.id, session])
+    )
+
+    const reportsData = (reports || [])
+        .map((item: any) => {
+            const session = sessionById.get(item.session_id)
+            if (!session) return null
+            return {
+                session_id: session.id,
+                scheduled_at: session.scheduled_at,
+                mentor_full_name: session.mentor?.full_name || 'Mentor',
+                mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
+                report: {
+                    id: item.id,
+                    summary: item.summary,
+                    key_points: item.key_points,
+                    action_items: item.action_items,
+                    personalized_report: item.personalized_report,
+                    personalized_report_generated_at: item.personalized_report_generated_at,
+                    created_at: item.created_at
+                }
+            }
+        })
+        .filter(Boolean) as any[]
 
     return (
         <div className="max-w-4xl mx-auto">

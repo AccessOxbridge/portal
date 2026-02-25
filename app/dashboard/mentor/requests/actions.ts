@@ -98,6 +98,7 @@ export async function handleMentorshipRequest(
                 request_id: request.id,
                 status: 'active',
                 scheduled_at: scheduledAt.toISOString(),
+                duration_minutes: durationMinutes > 0 ? durationMinutes : 60,
                 selected_slot: JSON.parse(JSON.stringify(selectedSlot)),
                 zoom_meeting_id: zoomMeeting?.id || null,
                 zoom_join_url: zoomMeeting?.joinUrl || null,
@@ -196,5 +197,8 @@ export async function handleMentorshipRequest(
     }
 
     revalidatePath('/dashboard/mentor/requests')
+    revalidatePath('/dashboard/mentor')
+    revalidatePath('/dashboard/mentor/sessions')
     revalidatePath('/dashboard/student')
+    revalidatePath('/dashboard/student/sessions')
 }

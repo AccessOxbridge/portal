@@ -64,7 +64,8 @@ export default async function MentorDashboard() {
         .eq('mentor_id', user.id)
         .eq('status', 'pending')
 
-    // Fetch active sessions for this mentor
+    // Fetch active sessions for this mentor (upcoming/ongoing only)
+    const now = new Date().toISOString()
     const { data: activeSessions } = await supabase
         .from('sessions')
         .select(`
@@ -75,6 +76,9 @@ export default async function MentorDashboard() {
         `)
         .eq('mentor_id', user.id)
         .eq('status', 'active')
+        .or(`scheduled_at.gte.${now},scheduled_at.is.null`)
+        .order('scheduled_at', { ascending: true })
+        .limit(10)
 
     return (
         <div className="space-y-12">

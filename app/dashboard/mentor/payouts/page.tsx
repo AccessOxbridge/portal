@@ -47,7 +47,7 @@ export default async function MentorPayoutsPage() {
         .from('sessions')
         .select('*', { count: 'exact', head: true })
         .eq('mentor_id', user.id)
-        .eq('status', 'completed')
+        .or('status.eq.completed,zoom_meeting_status.eq.ended')
         .gte('scheduled_at', startOfMonth.toISOString())
 
     const hourlyRate = mentor?.hourly_rate_cents || 2500

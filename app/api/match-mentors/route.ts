@@ -112,11 +112,11 @@ Mentor requirements: ${requirements || ''}
             return NextResponse.json({ error: 'Failed to process your profile for matching. Please try again later.' }, { status: 503 })
         }
 
-        // 4. Search for top 5 mentors via RPC
+        // 4. Search for top mentors via RPC (hard-capped to 5)
         const { data: matches, error: matchError } = await supabase.rpc('match_mentors', {
             query_embedding: `[${embedding.join(',')}]`,
             match_threshold: 0.1, // Lowered threshold slightly to ensure matches
-            match_count: 100,
+            match_count: 5,
         })
 
         console.log('\n\nMatches:\n', JSON.stringify(matches, null, 2), '\n\n')
@@ -131,8 +131,11 @@ Mentor requirements: ${requirements || ''}
             return NextResponse.json({ error: 'No suitable mentors found at this time.' }, { status: 404 })
         }
 
+        // Defensive cap in case RPC returns more than requested.
+        const topMatches = matches.slice(0, 5)
+
         // 5. Create mentorship requests
-        const requests = matches.map((mentor: any) => ({
+        const requests = topMatches.map((mentor: any) => ({
             student_id: user.id,
             mentor_id: mentor.id,
             responses: {
@@ -163,7 +166,7 @@ Mentor requirements: ${requirements || ''}
 
         // 6. Create notifications for mentors
         // We fetch emails from profiles (previously synced)
-        const mentorIds = matches.map((m: any) => m.id)
+        const mentorIds = topMatches.map((m: any) => m.id)
         const { data: mentorProfiles } = await supabase
             .from('profiles')
             .select('id, email, full_name')
@@ -209,7 +212,7 @@ Mentor requirements: ${requirements || ''}
 
         return NextResponse.json({
             success: true,
-            count: matches.length
+            count: topMatches.length
         })
 
     } catch (error: any) {

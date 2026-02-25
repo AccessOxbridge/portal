@@ -30,8 +30,8 @@ export default async function StudentDashboard() {
         .eq('student_id', user.id)
         .eq('status', 'pending')
 
-    // Fetch active sessions
-    const { data: activeSession } = await supabase
+    // Fetch active sessions (newest first); pick only upcoming/unscheduled
+    const { data: activeSessions } = await supabase
         .from('sessions')
         .select(`
             *,
@@ -41,7 +41,8 @@ export default async function StudentDashboard() {
         `)
         .eq('student_id', user.id)
         .eq('status', 'active')
-        .maybeSingle()
+        .order('scheduled_at', { ascending: true })
+        .limit(20)
 
     // Fetch upcoming sessions (active sessions with future scheduled_at)
     const now = new Date().toISOString()
@@ -61,10 +62,16 @@ export default async function StudentDashboard() {
         .order('scheduled_at', { ascending: true })
         .limit(15)
 
+    const nowDate = new Date()
+    const sessionToShow = (activeSessions || []).find((session: any) => {
+        if (!session.scheduled_at) return true
+        return new Date(session.scheduled_at) >= nowDate
+    }) || null
+
     // Flatten mentor name if exists
-    const sessionWithMentor = activeSession ? {
-        ...activeSession,
-        mentor_full_name: (activeSession.mentor as any)?.full_name
+    const sessionWithMentor = sessionToShow ? {
+        ...sessionToShow,
+        mentor_full_name: (sessionToShow.mentor as any)?.full_name
     } : null
 
     // Process upcoming sessions

@@ -27,22 +27,28 @@ export async function POST(req: Request) {
 
         if (event === 'meeting.started') {
             const meetingId = payload.object.id
+            const meetingIdStr = String(meetingId)
             await supabase
                 .from('sessions')
                 .update({ zoom_meeting_status: 'started' })
-                .eq('zoom_meeting_id', meetingId.toString())
+                .eq('zoom_meeting_id', meetingIdStr)
         }
 
         else if (event === 'meeting.ended') {
             const meetingId = payload.object.id
+            const meetingIdStr = String(meetingId)
 
             // Update session status
-            const { data: session } = await supabase
+            const { data: session, error: updateError } = await supabase
                 .from('sessions')
                 .update({ zoom_meeting_status: 'ended', status: 'completed' })
-                .eq('zoom_meeting_id', meetingId.toString())
+                .eq('zoom_meeting_id', meetingIdStr)
                 .select('id, mentor_id, student_id')
-                .single()
+                .maybeSingle()
+
+            if (updateError) {
+                console.error(`[ZOOM WEBHOOK] Failed to mark meeting ended for ${meetingIdStr}:`, updateError)
+            }
 
             // Send notifications for form filling
             if (session) {
@@ -71,6 +77,7 @@ export async function POST(req: Request) {
         // 3. Handle Transcription Completed
         else if (event === 'recording.transcript_completed') {
             const meetingId = payload.object.id
+            const meetingIdStr = String(meetingId)
             const downloadToken = body.download_token // Extract from webhook body
             const transcriptFile = payload.object.recording_files.find(
                 (file: any) => file.file_type === 'TRANSCRIPT'
@@ -83,11 +90,11 @@ export async function POST(req: Request) {
                 await supabase
                     .from('sessions')
                     .update({ transcript_url: transcriptFile.download_url })
-                    .eq('zoom_meeting_id', meetingId.toString())
+                    .eq('zoom_meeting_id', meetingIdStr)
 
                 // Trigger AI processing (background)
                 // We don't await this to respond to Zoom quickly (within 3s)
-                processTranscript(meetingId.toString(), transcriptFile.download_url, downloadToken)
+                processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
                     .catch((err: any) => console.error('[ZOOM WEBHOOK] Transcript processing failed:', err))
             }
         }

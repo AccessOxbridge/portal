@@ -26,28 +26,45 @@ export async function POST(req: Request) {
         const supabase = createAdminClient()
 
         if (event === 'meeting.started') {
-            const meetingId = payload.object.id
-            const meetingIdStr = String(meetingId)
-            await supabase
-                .from('sessions')
-                .update({ zoom_meeting_status: 'started' })
-                .eq('zoom_meeting_id', meetingIdStr)
+            const meetingId = payload?.object?.id ?? payload?.payload?.object?.id
+            const meetingIdStr = meetingId != null ? String(meetingId) : ''
+            console.log(`[ZOOM WEBHOOK] meeting.started — zoom_meeting_id: ${meetingIdStr}`)
+            if (!meetingIdStr) {
+                console.error('[ZOOM WEBHOOK] meeting.started missing payload.object.id. Payload:', JSON.stringify(payload).slice(0, 500))
+            } else {
+                const { error: updateError } = await supabase
+                    .from('sessions')
+                    .update({ zoom_meeting_status: 'started' })
+                    .eq('zoom_meeting_id', meetingIdStr)
+                if (updateError) {
+                    console.error(`[ZOOM WEBHOOK] Failed to set started for ${meetingIdStr}:`, updateError)
+                }
+            }
         }
 
         else if (event === 'meeting.ended') {
-            const meetingId = payload.object.id
-            const meetingIdStr = String(meetingId)
+            const meetingId = payload?.object?.id ?? payload?.payload?.object?.id
+            const meetingIdStr = meetingId != null ? String(meetingId) : ''
+            console.log(`[ZOOM WEBHOOK] meeting.ended — zoom_meeting_id: ${meetingIdStr}`)
+            let session: { id: string; mentor_id: string; student_id: string } | null = null
+            if (!meetingIdStr) {
+                console.error('[ZOOM WEBHOOK] meeting.ended missing payload.object.id. Payload:', JSON.stringify(payload).slice(0, 500))
+            } else {
+                // Update session status
+                const result = await supabase
+                    .from('sessions')
+                    .update({ zoom_meeting_status: 'ended', status: 'completed' })
+                    .eq('zoom_meeting_id', meetingIdStr)
+                    .select('id, mentor_id, student_id')
+                    .maybeSingle()
+                session = result.data
+                const updateError = result.error
 
-            // Update session status
-            const { data: session, error: updateError } = await supabase
-                .from('sessions')
-                .update({ zoom_meeting_status: 'ended', status: 'completed' })
-                .eq('zoom_meeting_id', meetingIdStr)
-                .select('id, mentor_id, student_id')
-                .maybeSingle()
-
-            if (updateError) {
-                console.error(`[ZOOM WEBHOOK] Failed to mark meeting ended for ${meetingIdStr}:`, updateError)
+                if (updateError) {
+                    console.error(`[ZOOM WEBHOOK] Failed to mark meeting ended for ${meetingIdStr}:`, updateError)
+                } else if (!session) {
+                    console.warn(`[ZOOM WEBHOOK] meeting.ended: no session found with zoom_meeting_id=${meetingIdStr}. Check that the webhook meeting id matches sessions.zoom_meeting_id.`)
+                }
             }
 
             // Send notifications for form filling
@@ -150,6 +167,8 @@ export async function POST(req: Request) {
                 processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
                     .catch((err: any) => console.error('[ZOOM WEBHOOK] Transcript processing failed:', err))
             }
+        } else {
+            console.log(`[ZOOM WEBHOOK] Unhandled event: ${event}. Payload keys: ${payload ? Object.keys(payload).join(', ') : 'none'}`)
         }
 
         return NextResponse.json({ message: 'Received' }, { status: 200 })

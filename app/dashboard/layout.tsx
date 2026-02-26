@@ -144,8 +144,6 @@ export default async function DashboardLayout({
 
     // Calculate pending reports count for mentors
     let pendingReportsCount = 0
-    let mentorNextSession: { scheduled_at: string; zoom_join_url: string | null } | null = null
-    let mentorNextSessionIsSoon = false
 
     if (isMentor && showSidebar) {
         const nowIso = new Date().toISOString()
@@ -178,32 +176,6 @@ export default async function DashboardLayout({
                 return (isPast || isEnded) && !submittedSessionIds.has(session.id)
             }).length
         }
-
-        // Find next upcoming active session for this mentor (for sidebar CTA)
-        const { data: upcoming } = await supabase
-            .from('sessions')
-            .select('scheduled_at, zoom_join_url, status')
-            .eq('mentor_id', user.id)
-            .eq('status', 'active')
-            .gt('scheduled_at', nowIso)
-            .order('scheduled_at', { ascending: true })
-            .limit(1)
-
-        const next = upcoming && upcoming.length > 0 ? upcoming[0] : null
-
-        if (next && next.scheduled_at && next.zoom_join_url) {
-            const start = new Date(next.scheduled_at)
-            const diffMs = start.getTime() - now.getTime()
-            const oneHourMs = 60 * 60 * 1000
-
-            if (diffMs > 0 && diffMs <= oneHourMs) {
-                mentorNextSession = {
-                    scheduled_at: next.scheduled_at,
-                    zoom_join_url: next.zoom_join_url,
-                }
-                mentorNextSessionIsSoon = true
-            }
-        }
     }
 
     // Calculate student help count for admins
@@ -232,8 +204,6 @@ export default async function DashboardLayout({
                     onboardingIncomplete={onboardingIncomplete}
                     trainingComplete={((profile as any).mentors?.trainingCompleteFlag) || false}
                     studentHelpCount={studentHelpCount}
-                    mentorNextSession={mentorNextSession || undefined}
-                    mentorNextSessionIsSoon={mentorNextSessionIsSoon}
                 />
             )}
 

@@ -87,18 +87,6 @@ export default async function MentorSessionsPage() {
         return new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
     })
 
-    // Current: active, started (scheduled_at <= now) but booked duration not yet over; if they end Zoom early, status becomes 'completed' so it moves to Completed
-    const currentSessions = processedSessions.filter(session => {
-        if (session.status !== 'active' || !session.scheduled_at) return false
-        const start = new Date(session.scheduled_at)
-        if (start > now) return false
-        const endTime = getSessionEndTime(session)
-        if (!endTime || now >= endTime) return false
-        return true
-    }).sort((a, b) => {
-        return new Date(a.scheduled_at!).getTime() - new Date(b.scheduled_at!).getTime()
-    })
-
     // Past/Completed: completed, cancelled, or active but past the booked end time
     const pastSessions = processedSessions.filter(session => {
         if (session.status === 'completed' || session.status === 'cancelled') return true
@@ -126,7 +114,6 @@ export default async function MentorSessionsPage() {
 
             <MentorSessionsContent
                 upcomingSessions={upcomingSessions}
-                currentSessions={currentSessions}
                 pastSessions={pastSessions}
             />
         </div>

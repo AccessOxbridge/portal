@@ -24,11 +24,13 @@ import {
     Video,
     MapPin,
     ChevronDown,
+    ChevronUp,
     Home,
     Briefcase,
     GraduationCap,
     AlertCircle,
-    HelpCircle
+    HelpCircle,
+    User
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -137,7 +139,17 @@ export default function Sidebar({
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
     const [searchQuery, setSearchQuery] = useState('')
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false)
     const searchInputRef = useRef<HTMLInputElement>(null)
+    const profileMenuRef = useRef<HTMLDivElement>(null)
+
+    // Determine effective role for admin-dev to show relevant sidebar on different dashboard pages
+    let effectiveRole = role
+    if (role === 'admin-dev') {
+        if (pathname.startsWith('/dashboard/student')) effectiveRole = 'student'
+        else if (pathname.startsWith('/dashboard/mentor')) effectiveRole = 'mentor'
+        else if (pathname.startsWith('/dashboard/admin')) effectiveRole = 'admin-dev'
+    }
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -150,18 +162,23 @@ export default function Sidebar({
                 searchInputRef.current?.blur()
                 setSearchQuery('')
             }
+            if (e.key === 'Escape') setProfileMenuOpen((open) => (open ? false : open))
         }
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [])
 
-    // Determine effective role for admin-dev to show relevant sidebar on different dashboard pages
-    let effectiveRole = role
-    if (role === 'admin-dev') {
-        if (pathname.startsWith('/dashboard/student')) effectiveRole = 'student'
-        else if (pathname.startsWith('/dashboard/mentor')) effectiveRole = 'mentor'
-        else if (pathname.startsWith('/dashboard/admin')) effectiveRole = 'admin-dev'
-    }
+    // Close profile drop-up when clicking outside (student only)
+    useEffect(() => {
+        if (effectiveRole !== 'student' || !profileMenuOpen) return
+        const handleClickOutside = (e: MouseEvent) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+                setProfileMenuOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [effectiveRole, profileMenuOpen])
 
     // Filter menu items based on search query
     const filteredMenuItems = useMemo(() => {
@@ -358,25 +375,80 @@ export default function Sidebar({
 
             {/* Footer Section */}
             <div className="p-3 border-t border-white/10 bg-black/10">
-                <div className="flex items-center justify-between py-3 px-3 bg-white/5 border border-white/5 rounded-2xl group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
-                            {userName?.[0] || 'U'}
+                {effectiveRole === 'student' ? (
+                    <div className="relative" ref={profileMenuRef}>
+                        {/* Drop-up menu (above profile button) – connected */}
+                        <div
+                            className={`absolute bottom-full left-0 right-0 overflow-hidden rounded-t-2xl border border-white/10 border-b-0 bg-accent shadow-lg transition-all duration-200 ease-out ${
+                                profileMenuOpen
+                                    ? 'opacity-100 translate-y-0 visible'
+                                    : 'opacity-0 translate-y-2 pointer-events-none invisible'
+                            }`}
+                        >
+                            <Link
+                                href="/dashboard/student/profile"
+                                onClick={() => setProfileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm border-b border-white/10"
+                            >
+                                <User className="w-5 h-5 text-white/60" />
+                                <span>My Profile</span>
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setProfileMenuOpen(false)
+                                    handleSignOut()
+                                }}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
+                            >
+                                <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                                <span>Sign Out</span>
+                            </button>
                         </div>
-                        <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
-                            <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
-                        </div>
-                    </div>
-                </div>
 
-                <button
-                    onClick={handleSignOut}
-                    className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
-                >
-                    <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                    <span>Sign Out</span>
-                </button>
+                        {/* Profile button – opens drop-up, connects visually when menu open */}
+                        <button
+                            type="button"
+                            onClick={() => setProfileMenuOpen((open) => !open)}
+                            className={`w-full flex items-center justify-between py-3 px-3 bg-white/5 border border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all rounded-b-2xl ${profileMenuOpen ? 'rounded-t-none' : 'rounded-2xl'}`}
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
+                                    {userName?.[0] || 'U'}
+                                </div>
+                                <div className="flex flex-col min-w-0 text-left">
+                                    <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
+                                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
+                                </div>
+                            </div>
+                            <ChevronUp
+                                className={`w-4 h-4 text-white/40 shrink-0 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`}
+                            />
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className="flex items-center justify-between py-3 px-3 bg-white/5 border border-white/5 rounded-2xl group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
+                                    {userName?.[0] || 'U'}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
+                                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleSignOut}
+                            className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
+                        >
+                            <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                            <span>Sign Out</span>
+                        </button>
+                    </>
+                )}
             </div>
         </aside>
     )

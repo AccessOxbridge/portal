@@ -144,15 +144,19 @@ export default async function DashboardLayout({
 
     // Calculate pending reports count for mentors
     let pendingReportsCount = 0
-    if (isMentor && showSidebar) {
-        const now = new Date().toISOString()
+    let mentorNextSession: { scheduled_at: string; zoom_join_url: string | null } | null = null
+    let mentorNextSessionIsSoon = false
 
-        // Get all past/ended sessions for this mentor
+    if (isMentor && showSidebar) {
+        const nowIso = new Date().toISOString()
+        const now = new Date()
+
+        // Get all past/ended sessions for this mentor (for reports)
         const { data: sessions } = await supabase
             .from('sessions')
             .select('id, scheduled_at, status, zoom_meeting_status')
             .eq('mentor_id', user.id)
-            .or(`scheduled_at.lt.${now},zoom_meeting_status.eq.ended,status.eq.completed`)
+            .or(`scheduled_at.lt.${nowIso},zoom_meeting_status.eq.ended,status.eq.completed`)
 
         if (sessions && sessions.length > 0) {
             const sessionIds = sessions.map(s => s.id)
@@ -169,10 +173,36 @@ export default async function DashboardLayout({
 
             // Count sessions that need reports
             pendingReportsCount = sessions.filter(session => {
-                const isPast = session.scheduled_at && new Date(session.scheduled_at) < new Date()
+                const isPast = session.scheduled_at && new Date(session.scheduled_at) < now
                 const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
                 return (isPast || isEnded) && !submittedSessionIds.has(session.id)
             }).length
+        }
+
+        // Find next upcoming active session for this mentor (for sidebar CTA)
+        const { data: upcoming } = await supabase
+            .from('sessions')
+            .select('scheduled_at, zoom_join_url, status')
+            .eq('mentor_id', user.id)
+            .eq('status', 'active')
+            .gt('scheduled_at', nowIso)
+            .order('scheduled_at', { ascending: true })
+            .limit(1)
+
+        const next = upcoming && upcoming.length > 0 ? upcoming[0] : null
+
+        if (next && next.scheduled_at && next.zoom_join_url) {
+            const start = new Date(next.scheduled_at)
+            const diffMs = start.getTime() - now.getTime()
+            const oneHourMs = 60 * 60 * 1000
+
+            if (diffMs > 0 && diffMs <= oneHourMs) {
+                mentorNextSession = {
+                    scheduled_at: next.scheduled_at,
+                    zoom_join_url: next.zoom_join_url,
+                }
+                mentorNextSessionIsSoon = true
+            }
         }
     }
 
@@ -202,6 +232,8 @@ export default async function DashboardLayout({
                     onboardingIncomplete={onboardingIncomplete}
                     trainingComplete={((profile as any).mentors?.trainingCompleteFlag) || false}
                     studentHelpCount={studentHelpCount}
+                    mentorNextSession={mentorNextSession || undefined}
+                    mentorNextSessionIsSoon={mentorNextSessionIsSoon}
                 />
             )}
 

@@ -42,6 +42,11 @@ interface SidebarProps {
     onboardingIncomplete?: boolean;
     trainingComplete?: boolean;
     studentHelpCount?: number;
+    mentorNextSession?: {
+        scheduled_at: string;
+        zoom_join_url: string | null;
+    };
+    mentorNextSessionIsSoon?: boolean;
 }
 
 // Define section type for expandable sections
@@ -117,7 +122,17 @@ const navigation = {
     ]
 }
 
-export default function Sidebar({ role, userName, userId, pendingReportsCount = 0, onboardingIncomplete = false, trainingComplete = false, studentHelpCount = 0 }: SidebarProps) {
+export default function Sidebar({
+    role,
+    userName,
+    userId,
+    pendingReportsCount = 0,
+    onboardingIncomplete = false,
+    trainingComplete = false,
+    studentHelpCount = 0,
+    mentorNextSession,
+    mentorNextSessionIsSoon = false
+}: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
@@ -211,6 +226,27 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                     >
                         <Calendar className="w-4 h-4" />
                         <span>Book a session</span>
+                    </button>
+                )}
+
+                {/* Upcoming mentor session CTA (mentor only, within 1 hour) */}
+                {effectiveRole === 'mentor' && mentorNextSession && mentorNextSessionIsSoon && mentorNextSession.zoom_join_url && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (!mentorNextSession.zoom_join_url) return
+                            window.open(mentorNextSession.zoom_join_url, '_blank', 'noopener,noreferrer')
+                        }}
+                        className="w-full mb-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-rich-amber-accent text-accent font-semibold text-sm py-2.5 shadow-md shadow-black/20 hover:bg-amber-200 hover:text-accent transition-colors"
+                    >
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                            Session at{' '}
+                            {new Date(mentorNextSession.scheduled_at).toLocaleTimeString('en-GB', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </span>
                     </button>
                 )}
             </div>

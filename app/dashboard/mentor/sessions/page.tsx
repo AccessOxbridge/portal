@@ -29,6 +29,7 @@ export default async function MentorSessionsPage() {
         .select(`
             id,
             scheduled_at,
+            duration_minutes,
             status,
             zoom_start_url,
             zoom_join_url,
@@ -59,6 +60,7 @@ export default async function MentorSessionsPage() {
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
+        duration_minutes: session.duration_minutes ?? 60,
         status: session.status,
         zoom_start_url: session.zoom_start_url,
         zoom_join_url: session.zoom_join_url,
@@ -67,10 +69,17 @@ export default async function MentorSessionsPage() {
         has_report: reportSet.has(session.id)
     }))
 
-    // Split into upcoming and past
+    // Session end time = start + booked duration (what student picked)
+    const getSessionEndTime = (s: { scheduled_at: string | null; duration_minutes: number }) => {
+        if (!s.scheduled_at) return null
+        const start = new Date(s.scheduled_at).getTime()
+        return new Date(start + s.duration_minutes * 60 * 1000)
+    }
+
+    // Upcoming: active, scheduled in the future
     const upcomingSessions = processedSessions.filter(session => {
         if (session.status !== 'active') return false
-        if (!session.scheduled_at) return true // Active but no date yet counts as upcoming
+        if (!session.scheduled_at) return true
         return new Date(session.scheduled_at) > now
     }).sort((a, b) => {
         if (!a.scheduled_at) return 1
@@ -78,9 +87,25 @@ export default async function MentorSessionsPage() {
         return new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
     })
 
+    // Current: active, started (scheduled_at <= now) but booked duration not yet over; if they end Zoom early, status becomes 'completed' so it moves to Completed
+    const currentSessions = processedSessions.filter(session => {
+        if (session.status !== 'active' || !session.scheduled_at) return false
+        const start = new Date(session.scheduled_at)
+        if (start > now) return false
+        const endTime = getSessionEndTime(session)
+        if (!endTime || now >= endTime) return false
+        return true
+    }).sort((a, b) => {
+        return new Date(a.scheduled_at!).getTime() - new Date(b.scheduled_at!).getTime()
+    })
+
+    // Past/Completed: completed, cancelled, or active but past the booked end time
     const pastSessions = processedSessions.filter(session => {
         if (session.status === 'completed' || session.status === 'cancelled') return true
-        if (session.status === 'active' && session.scheduled_at && new Date(session.scheduled_at) <= now) return true
+        if (session.status === 'active' && session.scheduled_at) {
+            const endTime = getSessionEndTime(session)
+            if (endTime && now >= endTime) return true
+        }
         return false
     }).sort((a, b) => {
         if (!a.scheduled_at) return 1
@@ -101,6 +126,7 @@ export default async function MentorSessionsPage() {
 
             <MentorSessionsContent
                 upcomingSessions={upcomingSessions}
+                currentSessions={currentSessions}
                 pastSessions={pastSessions}
             />
         </div>

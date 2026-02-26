@@ -7,6 +7,7 @@ import { Calendar, Video, FileText, Clock, ArrowRight, Users } from 'lucide-reac
 interface Session {
     id: string
     scheduled_at: string | null
+    duration_minutes: number
     status: string
     zoom_start_url: string | null
     zoom_join_url: string | null
@@ -17,14 +18,16 @@ interface Session {
 
 interface MentorSessionsContentProps {
     upcomingSessions: Session[]
+    currentSessions: Session[]
     pastSessions: Session[]
 }
 
 export default function MentorSessionsContent({
     upcomingSessions,
+    currentSessions,
     pastSessions
 }: MentorSessionsContentProps) {
-    const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming')
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'current' | 'past'>('upcoming')
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
@@ -54,7 +57,7 @@ export default function MentorSessionsContent({
         return sessionTime - now <= oneHour && sessionTime > now
     }
 
-    const sessions = activeTab === 'upcoming' ? upcomingSessions : pastSessions
+    const sessions = activeTab === 'upcoming' ? upcomingSessions : activeTab === 'current' ? currentSessions : pastSessions
 
     return (
         <div className="space-y-8">
@@ -71,6 +74,20 @@ export default function MentorSessionsContent({
                     {upcomingSessions.length > 0 && (
                         <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
                             {upcomingSessions.length}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveTab('current')}
+                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
+                        ? 'bg-white text-accent shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                >
+                    Current
+                    {currentSessions.length > 0 && (
+                        <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                            {currentSessions.length}
                         </span>
                     )}
                 </button>
@@ -97,12 +114,14 @@ export default function MentorSessionsContent({
                         <Calendar className="w-10 h-10 text-gray-400" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {activeTab === 'upcoming' ? 'No upcoming sessions' : 'No completed sessions'}
+                        {activeTab === 'upcoming' && 'No upcoming sessions'}
+                        {activeTab === 'current' && 'No current sessions'}
+                        {activeTab === 'past' && 'No completed sessions'}
                     </h3>
                     <p className="text-gray-500 max-w-sm">
-                        {activeTab === 'upcoming'
-                            ? 'Once students book sessions with you, they will appear here.'
-                            : 'Your completed sessions will appear here.'}
+                        {activeTab === 'upcoming' && 'Once students book sessions with you, they will appear here.'}
+                        {activeTab === 'current' && 'Sessions in progress will appear here for the duration you agreed with the student.'}
+                        {activeTab === 'past' && 'Your completed sessions will appear here.'}
                     </p>
                     {activeTab === 'upcoming' && (
                         <Link
@@ -153,37 +172,43 @@ export default function MentorSessionsContent({
                                                 Starting soon
                                             </span>
                                         )}
+                                        {activeTab === 'current' && (
+                                            <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                                In progress
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2">
-                                    {activeTab === 'upcoming' ? (
+                                    {(activeTab === 'upcoming' || activeTab === 'current') ? (
                                         session.zoom_start_url ? (
                                             <a
                                                 href={session.zoom_start_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
+                                                className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${activeTab === 'current' || isSessionSoon(session.scheduled_at)
                                                     ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
                                                     : 'bg-accent text-white hover:scale-[1.02]'
                                                     }`}
                                             >
                                                 <Video className="w-4 h-4" />
-                                                Start Session
+                                                {activeTab === 'current' ? 'Rejoin Session' : 'Start Session'}
                                             </a>
                                         ) : session.zoom_join_url ? (
                                             <a
                                                 href={session.zoom_join_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
+                                                className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${activeTab === 'current' || isSessionSoon(session.scheduled_at)
                                                     ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
                                                     : 'bg-accent text-white hover:scale-[1.02]'
                                                     }`}
                                             >
                                                 <Video className="w-4 h-4" />
-                                                Join Session
+                                                {activeTab === 'current' ? 'Rejoin Session' : 'Join Session'}
                                             </a>
                                         ) : (
                                             <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">

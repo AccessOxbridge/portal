@@ -93,8 +93,8 @@ export default function StudentDashboardContent({
                         </h1>
                         <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
 
-                        {/* Academic Profile + Targets on left, Booking card on right */}
-                        <div className="my-4 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_360px] gap-5 md:gap-6 items-start">
+                        {/* Academic Profile + Targets on left */}
+                        <div className="my-4">
                             <div className="space-y-4">
                                 <AcademicProfileCard userId={userId} userName={userName} />
 
@@ -126,126 +126,112 @@ export default function StudentDashboardContent({
                                     </div>
                                 )}
                             </div>
+                        </div>
 
-                            <div className="w-full md:w-[360px]">
-                                {activeSession ? (
-                                    <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex items-start gap-4 min-w-0">
-                                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
-                                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <h3 className="text-base font-bold text-gray-900 truncate">Active Mentorship</h3>
-                                                    <p className="text-sm text-gray-500 mt-0.5 truncate">Mentor: <strong>{activeSession.mentor_full_name}</strong></p>
-                                                </div>
-                                            </div>
-                                            <Link href="/dashboard/student/sessions" className="p-2 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100">
-                                                <ArrowRight className="w-5 h-5" />
-                                            </Link>
-                                        </div>
-                                        {activeSession.scheduled_at && (
-                                            <p className="text-accent font-bold text-sm mt-4">
-                                                {new Date(activeSession.scheduled_at).toLocaleDateString('en-GB', {
-                                                    weekday: 'short',
-                                                    day: 'numeric',
-                                                    month: 'short'
-                                                })} · {new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
-                                            </p>
-                                        )}
+                        {/* Booking / Requests Card as header sibling (right) */}
+                    </div>
+                    <div className="mt-4 md:mt-0 md:ml-6 w-full md:w-[360px]">
+                        {activeSession ? (
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
                                     </div>
-                                ) : pendingRequests.length > 0 ? (
-                                    <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex items-start gap-4 min-w-0">
-                                                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                                                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <h3 className="text-base font-bold text-gray-900 truncate">Requests Pending</h3>
-                                                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to the top 5 matching mentors. We'll notify you once one of them accepts!</p>
-                                                </div>
-                                            </div>
-                                            <Link href="/dashboard/student/sessions" className="p-2 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100">
-                                                <ArrowRight className="w-5 h-5" />
-                                            </Link>
-                                        </div>
-
-                                        <div className="mt-5">
-                                            <Link
-                                                href="/dashboard/student/sessions"
-                                                className="block w-full py-3 bg-accent text-white font-bold text-[18px] rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
-                                            >
-                                                View Pending Requests
-                                            </Link>
-                                            {canBook ? (
-                                                <button
-                                                    onClick={() => setShowBookingModal(true)}
-                                                    className="block w-full py-3 text-accent font-semibold text-[16px] text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
-                                                >
-                                                    + Book Another Session
-                                                </button>
-                                            ) : (
-                                                <Link
-                                                    href="/dashboard/student/profile"
-                                                    className="block w-full py-3 text-amber-600 font-semibold text-[16px] text-center border-2 border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors"
-                                                >
-                                                    Complete Profile to Book
-                                                </Link>
-                                            )}
-                                        </div>
+                                    <div className="min-w-0">
+                                        <h3 className="text-base font-bold text-gray-900 truncate">Active Mentorship</h3>
+                                        <p className="text-sm text-gray-500 mt-0.5 truncate">Mentor: <strong>{activeSession.mentor_full_name}</strong></p>
                                     </div>
-                                ) : (
-                                    <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex items-start gap-4 min-w-0">
-                                                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                    </svg>
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-base font-bold text-white italic truncate">Unlock Personalized Mentorship</h3>
-                                                    <p className="text-sm text-white/75 mt-2 leading-relaxed">{
-                                                        canBook
-                                                            ? "Select your available time slots and we'll match you with the perfect mentor."
-                                                            : "Complete your academic profile first, then book a session with a curated mentor."
-                                                    }</p>
-                                                </div>
-                                            </div>
-                                            <Link href="/dashboard/student/sessions" className="p-2 rounded-full bg-white/10 text-white/70 hover:bg-white/20">
-                                                <ArrowRight className="w-5 h-5" />
-                                            </Link>
-                                        </div>
-
-                                        <div className="mt-5">
-                                            {canBook ? (
-                                                <button
-                                                    onClick={() => setShowBookingModal(true)}
-                                                    className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
-                                                >
-                                                    Book a Session
-                                                </button>
-                                            ) : (
-                                                <Link
-                                                    href="/dashboard/student/profile"
-                                                    className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
-                                                >
-                                                    Complete Profile
-                                                </Link>
-                                            )}
-                                        </div>
-                                    </div>
+                                </div>
+                                {activeSession.scheduled_at && (
+                                    <p className="text-accent font-bold text-sm mt-4">
+                                        {new Date(activeSession.scheduled_at).toLocaleDateString('en-GB', {
+                                            weekday: 'short',
+                                            day: 'numeric',
+                                            month: 'short'
+                                        })} · {new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </p>
                                 )}
                             </div>
-                        </div>
+                        ) : pendingRequests.length > 0 ? (
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                                        <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h3 className="text-base font-bold text-gray-900 truncate">Requests Pending</h3>
+                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to the top 5 matching mentors. We'll notify you once one of them accepts!</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-5">
+                                    <Link
+                                        href="/dashboard/student/sessions"
+                                        className="block w-full py-3 bg-accent text-white font-bold text-[18px] rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
+                                    >
+                                        View Pending Requests
+                                    </Link>
+                                    {canBook ? (
+                                        <button
+                                            onClick={() => setShowBookingModal(true)}
+                                            className="block w-full py-3 text-accent font-semibold text-[16px] text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
+                                        >
+                                            + Book Another Session
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href="/dashboard/student/profile"
+                                            className="block w-full py-3 text-amber-600 font-semibold text-[16px] text-center border-2 border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors"
+                                        >
+                                            Complete Profile to Book
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-white italic truncate">Unlock Personalized Mentorship</h3>
+                                        <p className="text-sm text-white/75 mt-2 leading-relaxed">{
+                                            canBook
+                                                ? "Select your available time slots and we'll match you with the perfect mentor."
+                                                : 'Complete your academic profile first, then book a session with a curated mentor.'
+                                        }</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-5">
+                                    {canBook ? (
+                                        <button
+                                            onClick={() => setShowBookingModal(true)}
+                                            className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
+                                        >
+                                            Book a Session
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href="/dashboard/student/profile"
+                                            className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
+                                        >
+                                            Complete Profile
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </header>
 

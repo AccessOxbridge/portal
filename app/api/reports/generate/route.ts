@@ -53,6 +53,15 @@ export async function POST(req: Request) {
 
         const mentorData = mentorResponse.responses as Record<string, any>
 
+        // Look up mentor's name for the closing signature
+        const { data: mentorProfile } = await adminSupabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single()
+
+        const mentorName = mentorProfile?.full_name || 'Your mentor'
+
         // 3. Build a strict, source-of-truth prompt using only mentor-provided fields.
         //    IMPORTANT: instruct the model NOT to invent information. If a field is missing,
         //    the model should explicitly say "Not provided" or omit that section.
@@ -79,9 +88,10 @@ export async function POST(req: Request) {
             "2) Summarizes what was accomplished based ONLY on the mentor's responses and the AI summary above.",
             "3) Lists clear areas to work on (from mentor input). If none provided, write 'Not provided'.",
             "4) Gives 3 concise, actionable next steps drawn from the mentor's recommendations (or say 'Not provided').",
-            "5) Ends with a short motivational closing.",
+            `5) Ends with a short motivational closing, signed with this exact mentor name: ${mentorName}.`,
             "",
             "Tone: warm, supportive, professional. Keep it factual and avoid generic filler. Do not add any new claims or extrapolations beyond the inputs.",
+            "Do NOT sign off as 'Education Consultant' or with any placeholder such as [Your Name]. Use only the mentor name provided above.",
             "Output: plain text, max 400 words."
         ].join("\n\n")
 

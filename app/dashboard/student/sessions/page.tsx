@@ -3,7 +3,11 @@ import { redirect } from 'next/navigation'
 import StudentSessionsContent from './student-sessions-content'
 import JourneyTimeline from './journey-timeline'
 
-export default async function StudentSessionsPage() {
+interface StudentSessionsPageProps {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+export default async function StudentSessionsPage({ searchParams }: StudentSessionsPageProps) {
     const supabase = await createClient()
 
     const {
@@ -24,14 +28,20 @@ export default async function StudentSessionsPage() {
         return redirect('/dashboard')
     }
 
-    // Fetch academic profile to check if complete
+    // Fetch full academic profile (for booking modal and journey)
     const { data: academicProfile } = await supabase
         .from('student_profiles')
-        .select('target_university, target_course')
+        .select('*')
         .eq('id', user.id)
         .single()
 
     const hasProfile = !!(academicProfile?.target_university || academicProfile?.target_course)
+    const canBook = !!(academicProfile?.is_complete &&
+        academicProfile?.school_name &&
+        academicProfile?.timezone &&
+        academicProfile?.subjects &&
+        Array.isArray(academicProfile.subjects) &&
+        academicProfile.subjects.length > 0)
 
     // Fetch pending mentorship requests
     const { data: pendingRequests } = await supabase
@@ -134,6 +144,9 @@ export default async function StudentSessionsPage() {
     const hasActiveMentorship = upcomingSessions.length > 0
     const hasScheduledSession = upcomingSessions.some(s => s.scheduled_at)
     const hasCompletedSession = pastSessions.some(s => s.status === 'completed')
+    const completedSessionsCount = pastSessions.filter(s => s.status === 'completed').length
+
+    const autoOpenBooking = searchParams?.book === '1'
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -152,6 +165,7 @@ export default async function StudentSessionsPage() {
                 hasActiveMentorship={hasActiveMentorship}
                 hasScheduledSession={hasScheduledSession}
                 hasCompletedSession={hasCompletedSession}
+                completedSessionsCount={completedSessionsCount}
             />
 
             <StudentSessionsContent
@@ -159,6 +173,9 @@ export default async function StudentSessionsPage() {
                 pastSessions={pastSessions}
                 pendingRequests={processedPendingRequests}
                 credits={profile?.credits || 0}
+                academicProfile={academicProfile as any}
+                canBook={canBook}
+                autoOpenBooking={autoOpenBooking}
             />
         </div>
     )

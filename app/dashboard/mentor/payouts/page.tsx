@@ -82,6 +82,20 @@ export default async function MentorPayoutsPage() {
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
         .gte('scheduled_at', startOfMonth.toISOString())
 
+    // Fortnightly payouts: next payout day is the next 1st or 15th of the month
+    const now = new Date()
+    const day = now.getDate()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const nextPayoutDate = day < 15
+        ? new Date(year, month, 15)
+        : new Date(year, month + 1, 1)
+    const nextPayoutLabel = nextPayoutDate.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+
     return (
         <div className="space-y-12">
             <header>
@@ -111,6 +125,18 @@ export default async function MentorPayoutsPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Next payout date — highlighted pill, only when there is money to be paid */}
+            {totalPending > 0 && (
+                <div className="flex justify-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold shadow-sm border border-blue-100">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Next payout on {nextPayoutLabel}</span>
                     </div>
                 </div>
             )}

@@ -35,7 +35,17 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
     const todayDate = new Date().toISOString().split('T')[0]
     const [newSlot, setNewSlot] = useState({ date: todayDate, startTime: '', endTime: '' })
 
-    // When startTime changes, default endTime to +60 minutes (1 hr) if not set
+    // Reset card state when user closes the modal (e.g. after adding 1–2 slots but not submitting)
+    useEffect(() => {
+        if (!isOpen) {
+            setTimeSlots([])
+            setNewSlot({ date: new Date().toISOString().split('T')[0], startTime: '', endTime: '' })
+            setError(null)
+            setLoading(false)
+        }
+    }, [isOpen])
+
+    // When startTime changes, always default endTime to +60 minutes (1 hr)
     useEffect(() => {
         if (!newSlot.startTime) return
         // compute default endTime (1 hour after start)
@@ -47,7 +57,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
         const defaultEnd = `${hh}:${mm}`
         setNewSlot(prev => ({
             ...prev,
-            endTime: prev.endTime || defaultEnd
+            endTime: defaultEnd
         }))
     }, [newSlot.startTime, newSlot.date])
 
@@ -194,7 +204,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
             }
 
             router.refresh()
-            router.push('/dashboard/student')
+            router.push('/dashboard/student/sessions')
             onClose()
         } catch (err: any) {
             console.error('Booking failed:', err)
@@ -329,7 +339,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                         >
                                             <option value="">Select end time / duration</option>
                                             {(() => {
-                                                const durations = [30, 45, 60, 90, 120, 150, 180]
+                                                const durations = [60, 120] // 1 hr and 2 hrs only
                                                 const start = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
                                                 const nodes: any[] = []
                                                 for (const d of durations) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
@@ -82,6 +82,19 @@ export default function StudentDashboardContent({
         academicProfile?.timezone &&
         academicProfile?.subjects &&
         academicProfile.subjects.length > 0
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const handler = () => {
+            if (canBook) {
+                setShowBookingModal(true)
+            }
+        }
+        window.addEventListener('open-book-session', handler as EventListener)
+        return () => {
+            window.removeEventListener('open-book-session', handler as EventListener)
+        }
+    }, [canBook])
 
     return (
         <>

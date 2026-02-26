@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins } from 'lucide-react'
+import BookSessionModal from '@/components/dashboard/book-session-modal'
 
 interface Session {
     id: string
@@ -22,22 +23,55 @@ interface PendingRequest {
     mentor_full_name: string
 }
 
+interface AcademicProfileForBooking {
+    school_name: string | null
+    school_country: string | null
+    curriculum: string | null
+    curriculum_other?: string | null
+    subjects: { name: string; predicted_grade: string }[] | null
+    target_university: string | null
+    timezone: string | null
+    interests: string | null
+    extracurriculars: string | null
+    additional_notes?: string | null
+}
+
 interface StudentSessionsContentProps {
     upcomingSessions: Session[]
     pastSessions: Session[]
     pendingRequests: PendingRequest[]
     credits: number
+    academicProfile?: AcademicProfileForBooking | null
+    canBook?: boolean
+    autoOpenBooking?: boolean
 }
 
 export default function StudentSessionsContent({
     upcomingSessions,
     pastSessions,
     pendingRequests,
-    credits
+    credits,
+    academicProfile,
+    canBook = false,
+    autoOpenBooking = false
 }: StudentSessionsContentProps) {
     const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'past'>(
         pendingRequests.length > 0 ? 'pending' : 'upcoming'
     )
+    const [showBookingModal, setShowBookingModal] = useState(autoOpenBooking && canBook)
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const handler = () => {
+            if (canBook) {
+                setShowBookingModal(true)
+            }
+        }
+        window.addEventListener('open-book-session', handler as EventListener)
+        return () => {
+            window.removeEventListener('open-book-session', handler as EventListener)
+        }
+    }, [canBook])
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
@@ -154,13 +188,23 @@ export default function StudentSessionsContent({
                         <p className="text-gray-500 max-w-sm">
                             When you request mentorship, your requests will appear here until a mentor accepts.
                         </p>
-                        <Link
-                            href="/dashboard/student/onboarding"
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
-                        >
-                            Book a Session
-                            <ArrowRight className="w-4 h-4" />
-                        </Link>
+                        {canBook ? (
+                            <button
+                                onClick={() => setShowBookingModal(true)}
+                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            >
+                                Book a Session
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+                        ) : (
+                            <Link
+                                href="/dashboard/student/profile"
+                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            >
+                                Complete profile to book
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="grid gap-4">
@@ -212,13 +256,23 @@ export default function StudentSessionsContent({
                                 : 'Your completed sessions will appear here with access to reports and feedback.'}
                         </p>
                         {activeTab === 'upcoming' && (
-                            <Link
-                                href="/dashboard/student/onboarding"
-                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
-                            >
-                                Find a Mentor
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
+                            canBook ? (
+                                <button
+                                    onClick={() => setShowBookingModal(true)}
+                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                >
+                                    Find a Mentor
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            ) : (
+                                <Link
+                                    href="/dashboard/student/profile"
+                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                >
+                                    Complete profile to book
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            )
                         )}
                     </div>
                 ) : (
@@ -316,6 +370,25 @@ export default function StudentSessionsContent({
                         ))}
                     </div>
                 )
+            )}
+
+            {academicProfile && canBook && (
+                <BookSessionModal
+                    isOpen={showBookingModal}
+                    onClose={() => setShowBookingModal(false)}
+                    studentProfile={{
+                        school_name: academicProfile.school_name || '',
+                        school_country: academicProfile.school_country || '',
+                        curriculum: academicProfile.curriculum || '',
+                        curriculum_other: academicProfile.curriculum_other || undefined,
+                        subjects: academicProfile.subjects || [],
+                        target_university: academicProfile.target_university || '',
+                        timezone: academicProfile.timezone || '',
+                        interests: academicProfile.interests || '',
+                        extracurriculars: academicProfile.extracurriculars || '',
+                        additional_notes: academicProfile.additional_notes || undefined
+                    }}
+                />
             )}
         </div>
     )

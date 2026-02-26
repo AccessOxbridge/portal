@@ -197,6 +197,22 @@ export default function Sidebar({ role, userName, userId, pendingReportsCount = 
                         ⌘K
                     </div>
                 </div>
+
+                {/* Book a session CTA (student only) */}
+                {effectiveRole === 'student' && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (typeof window !== 'undefined') {
+                                window.dispatchEvent(new CustomEvent('open-book-session'))
+                            }
+                        }}
+                        className="w-full mb-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-white text-accent font-semibold text-sm py-2.5 shadow-md shadow-black/20 hover:bg-amber-100 hover:text-accent transition-colors"
+                    >
+                        <Calendar className="w-4 h-4" />
+                        <span>Book a session</span>
+                    </button>
+                )}
             </div>
 
             {/* Navigation Section */}

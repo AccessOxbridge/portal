@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Calendar, User, ChevronDown, ChevronUp, CheckCircle2, Lightbulb } from 'lucide-react'
+import { FileText, Calendar, User, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react'
 
 interface Report {
     id: string
@@ -123,10 +123,6 @@ export default function ReportsContent({ reports }: ReportsContentProps) {
                                 {/* Personalized Report */}
                                 {item.report.personalized_report && (
                                     <div className="mt-4 p-4 bg-gradient-to-br from-accent/5 to-blue-50 rounded-xl">
-                                        <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                            <Lightbulb className="w-5 h-5 text-amber-500" />
-                                            Your Personalized Report
-                                        </h4>
                                         <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
                                             {item.report.personalized_report}
                                         </div>

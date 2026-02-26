@@ -8,6 +8,7 @@ interface JourneyTimelineProps {
     hasActiveMentorship: boolean
     hasScheduledSession: boolean
     hasCompletedSession: boolean
+    completedSessionsCount: number
 }
 
 const stages = [
@@ -23,38 +24,82 @@ export default function JourneyTimeline({
     hasPendingRequests,
     hasActiveMentorship,
     hasScheduledSession,
-    hasCompletedSession
+    hasCompletedSession,
+    completedSessionsCount
 }: JourneyTimelineProps) {
+    const isIdle = !hasPendingRequests && !hasActiveMentorship && !hasScheduledSession
+
+    // Reflect current status: one "current" step at a time.
+    // When idle (no pending/active/scheduled session), treat this as the start of a new cycle:
+    // show profile/request only, and keep later steps gray even if they've completed sessions before.
     const getStageStatus = (stageId: string): 'completed' | 'current' | 'pending' => {
+        if (isIdle) {
+            switch (stageId) {
+                case 'profile':
+                    return hasProfile ? 'completed' : 'current'
+                case 'request':
+                    return hasProfile ? 'current' : 'pending'
+                default:
+                    return 'pending'
+            }
+        }
+
         switch (stageId) {
             case 'profile':
                 return hasProfile ? 'completed' : 'current'
             case 'request':
                 if (!hasProfile) return 'pending'
-                if (hasPendingRequests || hasActiveMentorship || hasCompletedSession) return 'completed'
-                return 'current'
+                // Completed only if they have a request/session *right now* (pending or matched)
+                if (hasPendingRequests || hasActiveMentorship) return 'completed'
+                return 'current' // next step: book a session
             case 'matched':
                 if (!hasProfile) return 'pending'
-                if (hasActiveMentorship || hasCompletedSession) return 'completed'
-                if (hasPendingRequests) return 'current'
+                if (hasActiveMentorship) return 'completed'
+                if (hasPendingRequests) return 'current' // waiting for a mentor to accept
                 return 'pending'
             case 'scheduled':
-                if (hasCompletedSession) return 'completed'
                 if (hasScheduledSession) return 'completed'
-                if (hasActiveMentorship) return 'current'
+                if (hasActiveMentorship) return 'current' // matched, waiting for a time to be set
                 return 'pending'
             case 'completed':
                 if (hasCompletedSession) return 'completed'
-                if (hasScheduledSession) return 'current'
+                if (hasScheduledSession) return 'current' // session booked, waiting for it to happen
                 return 'pending'
             default:
                 return 'pending'
         }
     }
 
+    const currentStage = stages.find((_, i) => getStageStatus(stages[i].id) === 'current')
+
+    let subtitle: string | null = null
+    if (!hasProfile) {
+        subtitle = 'Complete your profile to start booking sessions.'
+    } else if (isIdle) {
+        subtitle = 'Next: book a session below to get matched with a mentor.'
+    } else if (hasPendingRequests) {
+        subtitle = 'We’re finding the right mentor for you.'
+    } else if (hasScheduledSession) {
+        subtitle = 'Your first session is scheduled.'
+    } else if (hasActiveMentorship) {
+        subtitle = 'You have an active mentorship in progress.'
+    }
+
     return (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 p-6 mb-8">
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-6">Your Application Journey</h3>
+            <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                <div>
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Your Application Journey</h3>
+                    {subtitle && (
+                        <p className="text-sm text-gray-500 mt-1 sm:mt-1.5">{subtitle}</p>
+                    )}
+                </div>
+                {completedSessionsCount > 0 && (
+                    <p className="text-sm font-semibold text-emerald-600 sm:text-right">
+                        You’ve completed {completedSessionsCount} {completedSessionsCount === 1 ? 'session' : 'sessions'} so far
+                    </p>
+                )}
+            </div>
 
             <div className="flex items-center justify-between relative">
                 {/* Progress Line */}

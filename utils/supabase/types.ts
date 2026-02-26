@@ -939,47 +939,62 @@ export type Database = {
       }
       student_profiles: {
         Row: {
+          additional_notes: string | null
           application_year: number | null
           created_at: string | null
+          curriculum: string | null
+          curriculum_other: string | null
           extracurriculars: string | null
           gcse_results: Json | null
           id: string
           interests: string | null
           is_complete: boolean | null
+          school_country: string | null
           school_name: string | null
           subjects: Json | null
           target_course: string | null
           target_university: string | null
+          timezone: string | null
           updated_at: string | null
           year_group: string | null
         }
         Insert: {
+          additional_notes?: string | null
           application_year?: number | null
           created_at?: string | null
+          curriculum?: string | null
+          curriculum_other?: string | null
           extracurriculars?: string | null
           gcse_results?: Json | null
           id: string
           interests?: string | null
           is_complete?: boolean | null
+          school_country?: string | null
           school_name?: string | null
           subjects?: Json | null
           target_course?: string | null
           target_university?: string | null
+          timezone?: string | null
           updated_at?: string | null
           year_group?: string | null
         }
         Update: {
+          additional_notes?: string | null
           application_year?: number | null
           created_at?: string | null
+          curriculum?: string | null
+          curriculum_other?: string | null
           extracurriculars?: string | null
           gcse_results?: Json | null
           id?: string
           interests?: string | null
           is_complete?: boolean | null
+          school_country?: string | null
           school_name?: string | null
           subjects?: Json | null
           target_course?: string | null
           target_university?: string | null
+          timezone?: string | null
           updated_at?: string | null
           year_group?: string | null
         }

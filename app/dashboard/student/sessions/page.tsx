@@ -38,6 +38,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
     const hasProfile = !!(academicProfile?.target_university || academicProfile?.target_course)
     const canBook = !!(academicProfile?.is_complete &&
         academicProfile?.school_name &&
+        academicProfile?.timezone &&
         academicProfile?.subjects &&
         Array.isArray(academicProfile.subjects) &&
         academicProfile.subjects.length > 0)

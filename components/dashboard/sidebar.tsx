@@ -251,8 +251,8 @@ export default function Sidebar({
                 )}
             </div>
 
-            {/* Navigation Section */}
-            <nav className="grow px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+            {/* Navigation Section - separate scroll, no chaining to main */}
+            <nav className="grow min-h-0 px-3 py-2 space-y-1 overflow-y-auto overscroll-contain custom-scrollbar">
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0

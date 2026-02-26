@@ -5,9 +5,9 @@ import TrainingContent from './training-content'
 import { isAccountPayoutsEnabled } from '@/utils/stripe'
 
 type MentorTrainingPageProps = {
-    searchParams?: {
+    searchParams: Promise<{
         step?: string
-    }
+    }>
 }
 
 const STEP_INDEX: Record<string, number> = {
@@ -125,7 +125,8 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
         // the user explicitly finishes the profile step in the training flow.
         profile: !!mentorData.profile_completed_at
     }
-    const initialStep = STEP_INDEX[searchParams?.step ?? ''] ?? 0
+    const resolvedSearchParams = await searchParams
+    const initialStep = STEP_INDEX[resolvedSearchParams?.step ?? ''] ?? 0
 
     return (
         <div className="max-w-4xl mx-auto">

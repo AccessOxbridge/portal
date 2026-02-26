@@ -4,7 +4,7 @@ import StudentSessionsContent from './student-sessions-content'
 import JourneyTimeline from './journey-timeline'
 
 interface StudentSessionsPageProps {
-    searchParams?: { [key: string]: string | string[] | undefined }
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export default async function StudentSessionsPage({ searchParams }: StudentSessionsPageProps) {
@@ -146,7 +146,8 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
     const hasCompletedSession = pastSessions.some(s => s.status === 'completed')
     const completedSessionsCount = pastSessions.filter(s => s.status === 'completed').length
 
-    const autoOpenBooking = searchParams?.book === '1'
+    const resolvedSearchParams = await searchParams
+    const autoOpenBooking = resolvedSearchParams?.book === '1'
 
     return (
         <div className="max-w-4xl mx-auto">

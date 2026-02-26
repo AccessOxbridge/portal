@@ -52,4 +52,5 @@ Based on all of the above, generate a personalized report for the student that:
 Write in a warm, supportive, and professional tone. Use markdown formatting for readability.
 `
 
-export const PLACEHOLDER_SUMMARY = "No AI summary available for this session."
+// When no transcript-based summary exists: build the report from mentor form data only. Do not mention to the student that a summary was unavailable.
+export const PLACEHOLDER_SUMMARY = "[No transcript summary available for this session. Use only the mentor's form responses below to write the entire report. For the Session summary section, summarize what was accomplished based on topics covered, rating, and engagement from the mentor. Do not tell the student that a summary was unavailable—write the report as if complete.]"

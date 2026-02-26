@@ -83,16 +83,20 @@ export async function POST(req: Request) {
             `Mentor notes: ${String(mentorData.additional_notes || 'Not provided')}`,
             "",
             "TASK:",
-            "Create a single personalized session report for the student that:",
-            "1) Begins with brief positive encouragement.",
-            "2) Summarizes what was accomplished based ONLY on the mentor's responses and the AI summary above.",
-            "3) Lists clear areas to work on (from mentor input). If none provided, write 'Not provided'.",
-            "4) Gives 3 concise, actionable next steps drawn from the mentor's recommendations (or say 'Not provided').",
-            `5) Ends with a short motivational closing, signed with this exact mentor name: ${mentorName}.`,
+            "Create a personalized session report for the student. Use ONLY the information from the inputs above. Structure the report with markdown as follows:",
             "",
-            "Tone: warm, supportive, professional. Keep it factual and avoid generic filler. Do not add any new claims or extrapolations beyond the inputs.",
-            "Do NOT sign off as 'Education Consultant' or with any placeholder such as [Your Name]. Use only the mentor name provided above.",
-            "Output: plain text, max 400 words."
+            "1) Opening: One short paragraph (2–3 sentences) with positive encouragement. Then a blank line.",
+            "2) Section heading '## Session summary' then one brief paragraph on what was accomplished. Use the session summary and key points from the input above when present; when the input says '[No transcript summary available...]', use only the mentor's topics covered, rating, and engagement to write this section. Never tell the student that a summary was unavailable.",
+            "3) Section heading '## Areas for improvement' then a bullet list (each item on its own line with a dash). If none provided, write 'Not provided'.",
+            "4) Section heading '## Next steps' then a numbered list (1. 2. 3.) with exactly 3 concise, actionable steps. If none, write 'Not provided'.",
+            `5) Closing: One short motivational sentence, then a blank line, then 'Best regards,' and on the next line this exact name: ${mentorName}.`,
+            "",
+            "RULES:",
+            "- Use ## for the three section headings (Session summary, Areas for improvement, Next steps).",
+            "- Put a blank line between each section and between the intro and the first heading.",
+            "- Keep paragraphs short. Use lists, not long paragraphs, for areas and next steps.",
+            "- Tone: warm, supportive, professional. No invented facts. Do not sign as 'Education Consultant' or [Your Name]—only the mentor name above.",
+            "Output: Valid markdown only. Max 350 words."
         ].join("\n\n")
 
         // 4. Generate personalized report (use deterministic temperature to avoid hallucination)

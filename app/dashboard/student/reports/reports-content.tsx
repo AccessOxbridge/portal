@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { FileText, Calendar, User, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react'
 
 interface Report {
@@ -123,8 +124,8 @@ export default function ReportsContent({ reports }: ReportsContentProps) {
                                 {/* Personalized Report */}
                                 {item.report.personalized_report && (
                                     <div className="mt-4 p-4 bg-gradient-to-br from-accent/5 to-blue-50 rounded-xl">
-                                        <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-                                            {item.report.personalized_report}
+                                        <div className="prose prose-sm max-w-none text-gray-700 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-h2:mt-4 prose-h2:mb-2 prose-h2:font-semibold prose-h2:text-gray-800">
+                                            <ReactMarkdown>{item.report.personalized_report}</ReactMarkdown>
                                         </div>
                                     </div>
                                 )}

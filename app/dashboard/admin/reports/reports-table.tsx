@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import {
     FileText,
     Calendar,
@@ -241,8 +242,8 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                                 <Lightbulb className="w-5 h-5 text-amber-500" />
                                                 Personalized Report
                                             </h4>
-                                            <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap max-h-64 overflow-y-auto">
-                                                {report.personalized_report}
+                                            <div className="prose prose-sm max-w-none text-gray-700 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-h2:mt-4 prose-h2:mb-2 prose-h2:font-semibold prose-h2:text-gray-800 max-h-64 overflow-y-auto">
+                                                <ReactMarkdown>{report.personalized_report}</ReactMarkdown>
                                             </div>
                                             {report.personalized_report_generated_at && (
                                                 <p className="mt-3 text-xs text-gray-400">

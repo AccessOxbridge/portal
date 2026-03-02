@@ -35,19 +35,15 @@ export default function AdminPayoutsPage() {
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
 
-    // Default to current fortnight
+    // Default to current calendar year to make sure all pending sessions are included
     const today = new Date()
-    const daysSinceStart = today.getDate() <= 15 ? today.getDate() - 1 : today.getDate() - 16
-    const periodStart = new Date(today)
-    periodStart.setDate(today.getDate() - daysSinceStart)
-    periodStart.setHours(0, 0, 0, 0)
+    const yearStart = new Date(today.getFullYear(), 0, 1)
+    yearStart.setHours(0, 0, 0, 0)
+    const yearEnd = new Date(today)
+    yearEnd.setHours(23, 59, 59, 999)
 
-    const periodEnd = new Date(periodStart)
-    periodEnd.setDate(periodStart.getDate() + 13)
-    periodEnd.setHours(23, 59, 59, 999)
-
-    const [startDate, setStartDate] = useState(periodStart.toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(periodEnd.toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(yearStart.toISOString().split('T')[0])
+    const [endDate, setEndDate] = useState(yearEnd.toISOString().split('T')[0])
 
     const calculatePayouts = async () => {
         setLoading(true)

@@ -25,6 +25,7 @@ export async function POST(req: Request) {
             academicInterests,
             extracurriculars,
             anythingElse,
+            parentEmail,
 
             // Backwards-compatible fields (if older clients still send them)
             strengths,
@@ -163,6 +164,26 @@ Mentor requirements: ${requirements || ''}
             .insert(requests)
 
         if (insertError) throw insertError
+
+        // 5b. Upsert student_profiles so we have school info and parent_email for fortnightly reports
+        const targetUniversity = Array.isArray(targetUniversities) && targetUniversities.length > 0 ? targetUniversities[0] : null
+        await supabase
+            .from('student_profiles')
+            .upsert({
+                id: user.id,
+                school_name: schoolName || null,
+                school_country: schoolCountry || null,
+                curriculum: curriculum || null,
+                curriculum_other: curriculumOther || null,
+                target_university: targetUniversity,
+                subjects: Array.isArray(subjects) ? subjects : [],
+                interests: academicInterests || null,
+                extracurriculars: extracurriculars || null,
+                additional_notes: anythingElse || null,
+                timezone: timezone || null,
+                parent_email: parentEmail && String(parentEmail).trim() ? String(parentEmail).trim() : null,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'id' })
 
         // 6. Create notifications for mentors
         // We fetch emails from profiles (previously synced)

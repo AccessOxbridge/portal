@@ -27,6 +27,7 @@ export default async function StudentReportsPage() {
         .from('sessions')
         .select(`
             id,
+            mentor_id,
             scheduled_at,
             mentor:profiles!sessions_mentor_id_fkey (
                 full_name,
@@ -65,6 +66,7 @@ export default async function StudentReportsPage() {
             return {
                 session_id: session.id,
                 scheduled_at: session.scheduled_at,
+                mentor_id: session.mentor_id,
                 mentor_full_name: session.mentor?.full_name || 'Mentor',
                 mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
                 report: {

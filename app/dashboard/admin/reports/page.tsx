@@ -1,9 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
 import AdminReportsTable from './reports-table'
 
 export default async function AdminReportsPage() {
     const supabase = await createClient()
+    const adminSupabase = createAdminClient()
 
     // Check if user is admin
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -22,7 +24,7 @@ export default async function AdminReportsPage() {
     }
 
     // Fetch all session reports with session info
-    const { data: reports } = await supabase
+    const { data: reports } = await adminSupabase
         .from('session_reports')
         .select(`
             id,
@@ -52,7 +54,7 @@ export default async function AdminReportsPage() {
     // Fetch all profiles at once
     let profileMap = new Map<string, { full_name: string | null; email: string | null }>()
     if (allUserIds.length > 0) {
-        const { data: profiles } = await supabase
+        const { data: profiles } = await adminSupabase
             .from('profiles')
             .select('id, full_name, email')
             .in('id', allUserIds)
@@ -65,7 +67,7 @@ export default async function AdminReportsPage() {
     let mentorReportMap = new Map<string, { submitted_at: string | null; responses: any }>()
 
     if (sessionIds.length > 0) {
-        const { data: mentorReports } = await supabase
+        const { data: mentorReports } = await adminSupabase
             .from('form_responses')
             .select('session_id, created_at, responses')
             .eq('form_type', 'mentor_report')

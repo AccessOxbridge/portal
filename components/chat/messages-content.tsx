@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import ConversationList from '@/components/chat/conversation-list'
 import ChatWindow from '@/components/chat/chat-window'
@@ -41,18 +42,33 @@ interface MessagesContentProps {
     currentUserId: string
     connectedUsers: ConnectedUser[]
     userRole: 'student' | 'mentor'
+    /** When set, open the conversation with this mentor (student view). */
+    initialMentorId?: string
 }
 
 export default function MessagesContent({
     conversations,
     currentUserId,
     connectedUsers,
-    userRole
+    userRole,
+    initialMentorId
 }: MessagesContentProps) {
+    const router = useRouter()
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(
         conversations.length > 0 ? conversations[0] : null
     )
     const [isNewConversationOpen, setIsNewConversationOpen] = useState(false)
+
+    // Open specific mentor chat when navigating with ?mentor=
+    useEffect(() => {
+        if (!initialMentorId || conversations.length === 0) return
+        const withMentor = conversations.find((c) => c.mentor_id === initialMentorId)
+        if (withMentor) {
+            setSelectedConversation(withMentor)
+            // Clear URL so refreshing doesn't re-apply
+            router.replace('/dashboard/student/messages', { scroll: false })
+        }
+    }, [initialMentorId, conversations, router])
 
     // Dynamic placeholder text based on user role
     const placeholderText = userRole === 'student'

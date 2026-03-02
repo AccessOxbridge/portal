@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { verifyZoomWebhook } from '@/utils/zoom-webhooks'
-import { processTranscript } from '@/utils/reports'
+import { processTranscript, pollAndProcessTranscript } from '@/utils/reports'
 
 export async function POST(req: Request) {
     try {
@@ -50,7 +50,6 @@ export async function POST(req: Request) {
             if (!meetingIdStr) {
                 console.error('[ZOOM WEBHOOK] meeting.ended missing payload.object.id. Payload:', JSON.stringify(payload).slice(0, 500))
             } else {
-                // Update session status
                 const result = await supabase
                     .from('sessions')
                     .update({ zoom_meeting_status: 'ended', status: 'completed' })
@@ -67,19 +66,16 @@ export async function POST(req: Request) {
                 }
             }
 
-            // Send notifications for form filling
             if (session) {
-                // Notify mentor (mandatory report)
                 await supabase.from('notifications').insert({
                     recipient_id: session.mentor_id,
-                    recipient_email: '', // Will be fetched by notification system
-                    type: 'session_confirmed', // Reusing existing type
+                    recipient_email: '',
+                    type: 'session_confirmed',
                     title: '📝 Session Report Required',
                     message: 'Please complete your session report to generate the student\'s personalized feedback.',
                     data: { session_id: session.id, action: 'mentor_report' }
                 })
 
-                // Notify student (optional feedback)
                 await supabase.from('notifications').insert({
                     recipient_id: session.student_id,
                     recipient_email: '',
@@ -89,8 +85,6 @@ export async function POST(req: Request) {
                     data: { session_id: session.id, action: 'student_feedback' }
                 })
                 
-                // Deduct student credits based on scheduled duration (1 credit = 60 minutes).
-                // Business rule: round up partial hours to the nearest whole credit.
                 try {
                     const { data: sess } = await supabase
                         .from('sessions')
@@ -102,7 +96,6 @@ export async function POST(req: Request) {
                         const durationMinutes = sess.duration_minutes || 60
                         const creditsToDeduct = Math.ceil((durationMinutes || 60) / 60)
 
-                        // Get current credits
                         const { data: profile } = await supabase
                             .from('profiles')
                             .select('credits')
@@ -112,13 +105,11 @@ export async function POST(req: Request) {
                         const currentCredits = (profile?.credits as number) || 0
                         const newBalance = Math.max(0, currentCredits - creditsToDeduct)
 
-                        // Update student credits (service role allowed)
                         await supabase
                             .from('profiles')
                             .update({ credits: newBalance })
                             .eq('id', sess.student_id)
 
-                        // Insert credit transaction record
                         await supabase.from('credit_transactions').insert({
                             user_id: sess.student_id,
                             amount: -creditsToDeduct,
@@ -128,7 +119,6 @@ export async function POST(req: Request) {
                             reference_id: sess.id
                         })
 
-                        // Notify student about deduction
                         await supabase.from('notifications').insert({
                             recipient_id: sess.student_id,
                             recipient_email: '',
@@ -142,28 +132,60 @@ export async function POST(req: Request) {
                     console.error('[CREDITS] Failed to deduct credits for session:', err)
                 }
             }
+
+            // Start background polling as a safety net for transcript retrieval.
+            // If the recording.completed or recording.transcript_completed webhook
+            // fires first (common), the poller will detect the existing report and exit early.
+            if (meetingIdStr) {
+                pollAndProcessTranscript(meetingIdStr)
+                    .catch((err: any) => console.error('[ZOOM WEBHOOK] Background transcript polling failed:', err))
+            }
         }
 
-        // 3. Handle Transcription Completed
+        // 3. Handle Recording Completed (includes transcript files when available)
+        else if (event === 'recording.completed') {
+            const meetingId = payload?.object?.id
+            const meetingIdStr = meetingId != null ? String(meetingId) : ''
+            const downloadToken = body.download_token
+
+            if (meetingIdStr && payload?.object?.recording_files) {
+                const transcriptFile = payload.object.recording_files.find(
+                    (file: any) => file.file_type === 'TRANSCRIPT' || file.recording_type === 'audio_transcript'
+                )
+
+                if (transcriptFile && downloadToken) {
+                    console.log(`[ZOOM WEBHOOK] recording.completed has transcript for meeting: ${meetingIdStr}`)
+
+                    await supabase
+                        .from('sessions')
+                        .update({ transcript_url: transcriptFile.download_url })
+                        .eq('zoom_meeting_id', meetingIdStr)
+
+                    processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
+                        .catch((err: any) => console.error('[ZOOM WEBHOOK] recording.completed transcript processing failed:', err))
+                } else {
+                    console.log(`[ZOOM WEBHOOK] recording.completed for ${meetingIdStr} — no transcript file yet`)
+                }
+            }
+        }
+
+        // 4. Handle Transcription Completed (dedicated event, can be unreliable)
         else if (event === 'recording.transcript_completed') {
             const meetingId = payload.object.id
             const meetingIdStr = String(meetingId)
-            const downloadToken = body.download_token // Extract from webhook body
-            const transcriptFile = payload.object.recording_files.find(
+            const downloadToken = body.download_token
+            const transcriptFile = payload.object.recording_files?.find(
                 (file: any) => file.file_type === 'TRANSCRIPT'
             )
 
             if (transcriptFile) {
                 console.log(`[ZOOM WEBHOOK] Transcript ready for meeting: ${meetingId}`)
 
-                // Update session with transcript URL
                 await supabase
                     .from('sessions')
                     .update({ transcript_url: transcriptFile.download_url })
                     .eq('zoom_meeting_id', meetingIdStr)
 
-                // Trigger AI processing (background)
-                // We don't await this to respond to Zoom quickly (within 3s)
                 processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
                     .catch((err: any) => console.error('[ZOOM WEBHOOK] Transcript processing failed:', err))
             }

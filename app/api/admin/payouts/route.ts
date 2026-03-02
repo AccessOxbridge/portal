@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { NextResponse } from 'next/server'
 import { createTransfer } from '@/utils/stripe'
 
@@ -11,6 +12,7 @@ import { createTransfer } from '@/utils/stripe'
 export async function GET(req: Request) {
     try {
         const supabase = await createClient()
+        const adminSupabase = createAdminClient()
 
         // 1. Verify admin access
         const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -37,31 +39,63 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'start and end dates are required' }, { status: 400 })
         }
 
-        // 3. Get sessions with mentor info (completed or Zoom-ended)
-        const { data: sessions, error: sessionsError } = await supabase
+        // Interpret dates as full days: [start 00:00, end 24:00)
+        const startDate = new Date(`${periodStart}T00:00:00.000Z`)
+        const endDate = new Date(`${periodEnd}T00:00:00.000Z`)
+        const endExclusive = new Date(endDate)
+        endExclusive.setDate(endExclusive.getDate() + 1)
+
+        // 3. Get all sessions in the date range (no inner join – we look up mentor data separately)
+        const { data: sessions, error: sessionsError } = await adminSupabase
             .from('sessions')
-            .select(`
-                id,
-                mentor_id,
-                scheduled_at,
-                duration_minutes,
-                status,
-                zoom_meeting_status,
-                profiles!sessions_mentor_id_fkey!inner (
-                    full_name,
-                    email,
-                    mentors!inner (
-                        id,
-                        hourly_rate_cents,
-                        stripe_account_id,
-                        payouts_enabled
-                    )
-                )
-            `)
-            .gte('scheduled_at', periodStart)
-            .lte('scheduled_at', periodEnd)
+            .select('id, mentor_id, scheduled_at, duration_minutes, status, zoom_meeting_status')
+            .gte('scheduled_at', startDate.toISOString())
+            .lt('scheduled_at', endExclusive.toISOString())
 
         if (sessionsError) throw sessionsError
+
+        // Filter to finished sessions
+        const finishedSessions = (sessions || []).filter(
+            s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
+        )
+
+        // Collect unique mentor IDs
+        const mentorIds = [...new Set(finishedSessions.map(s => s.mentor_id))]
+
+        // Batch-fetch mentor + profile data for those IDs
+        const mentorMap: Record<string, {
+            full_name: string
+            email: string
+            stripe_account_id: string | null
+            payouts_enabled: boolean
+            hourly_rate_cents: number
+        }> = {}
+
+        if (mentorIds.length > 0) {
+            const { data: mentorRows } = await supabase
+                .from('mentors')
+                .select('id, hourly_rate_cents, stripe_account_id, payouts_enabled')
+                .in('id', mentorIds)
+
+            const { data: profileRows } = await supabase
+                .from('profiles')
+                .select('id, full_name, email')
+                .in('id', mentorIds)
+
+            const profileLookup: Record<string, any> = {}
+            for (const p of profileRows || []) profileLookup[p.id] = p
+
+            for (const m of mentorRows || []) {
+                const p = profileLookup[m.id] || {}
+                mentorMap[m.id] = {
+                    full_name: p.full_name || 'Unknown',
+                    email: p.email || '',
+                    stripe_account_id: m.stripe_account_id || null,
+                    payouts_enabled: !!m.payouts_enabled,
+                    hourly_rate_cents: m.hourly_rate_cents || 2500,
+                }
+            }
+        }
 
         // 4. Group sessions by mentor and calculate earnings
         const mentorEarnings: Record<string, {
@@ -80,22 +114,18 @@ export async function GET(req: Request) {
             total_cents: number
         }> = {}
 
-        for (const session of sessions || []) {
-            const isFinished = session.status === 'completed' || session.zoom_meeting_status === 'ended'
-            if (!isFinished) continue
-
+        for (const session of finishedSessions) {
             const mentorId = session.mentor_id
-            const profile = session.profiles as any
-            const mentor = profile?.mentors
+            const info = mentorMap[mentorId]
 
             if (!mentorEarnings[mentorId]) {
                 mentorEarnings[mentorId] = {
                     mentor_id: mentorId,
-                    mentor_name: profile?.full_name || 'Unknown',
-                    mentor_email: profile?.email || '',
-                    stripe_account_id: mentor?.stripe_account_id || null,
-                    payouts_enabled: mentor?.payouts_enabled || false,
-                    hourly_rate_cents: mentor?.hourly_rate_cents || 2500,
+                    mentor_name: info?.full_name || 'Unknown',
+                    mentor_email: info?.email || '',
+                    stripe_account_id: info?.stripe_account_id || null,
+                    payouts_enabled: info?.payouts_enabled || false,
+                    hourly_rate_cents: info?.hourly_rate_cents || 2500,
                     sessions: [],
                     total_minutes: 0,
                     total_cents: 0
@@ -114,12 +144,12 @@ export async function GET(req: Request) {
             mentorEarnings[mentorId].total_cents += amountCents
         }
 
-        // 5. Check for existing payouts in this period
-        const { data: existingPayouts } = await supabase
+        // 5. Check for existing payouts that overlap with the queried period
+        const { data: existingPayouts } = await adminSupabase
             .from('mentor_payouts')
             .select('mentor_id, status')
-            .eq('period_start', periodStart)
-            .eq('period_end', periodEnd)
+            .lte('period_start', periodEnd)
+            .gte('period_end', periodStart)
 
         const paidMentors = new Set(
             existingPayouts
@@ -152,6 +182,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     try {
         const supabase = await createClient()
+        const adminSupabase = createAdminClient()
 
         // 1. Verify admin access
         const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -179,6 +210,12 @@ export async function POST(req: Request) {
             )
         }
 
+        // Interpret dates as full days: [start 00:00, end 24:00)
+        const startDatePost = new Date(`${period_start}T00:00:00.000Z`)
+        const endDatePost = new Date(`${period_end}T00:00:00.000Z`)
+        const endExclusivePost = new Date(endDatePost)
+        endExclusivePost.setDate(endExclusivePost.getDate() + 1)
+
         const results: Array<{
             mentor_id: string
             success: boolean
@@ -191,7 +228,7 @@ export async function POST(req: Request) {
         for (const mentorId of mentor_ids) {
             try {
                 // Get mentor's Stripe account and sessions
-                const { data: mentor } = await supabase
+                const { data: mentor } = await adminSupabase
                     .from('mentors')
                     .select('stripe_account_id, payouts_enabled, hourly_rate_cents')
                     .eq('id', mentorId)
@@ -207,12 +244,12 @@ export async function POST(req: Request) {
                 }
 
                 // Get completed/ended sessions for this mentor in the period
-                const { data: sessions } = await supabase
+                const { data: sessions } = await adminSupabase
                     .from('sessions')
                     .select('id, duration_minutes, status, zoom_meeting_status')
                     .eq('mentor_id', mentorId)
-                    .gte('scheduled_at', period_start)
-                    .lte('scheduled_at', period_end)
+                    .gte('scheduled_at', startDatePost.toISOString())
+                    .lt('scheduled_at', endExclusivePost.toISOString())
 
                 const eligibleSessions = (sessions || []).filter(
                     s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
@@ -239,7 +276,7 @@ export async function POST(req: Request) {
                 }
 
                 // Check for existing payout
-                const { data: existingPayout } = await supabase
+                const { data: existingPayout } = await adminSupabase
                     .from('mentor_payouts')
                     .select('id, status')
                     .eq('mentor_id', mentorId)
@@ -257,7 +294,7 @@ export async function POST(req: Request) {
                 }
 
                 // Create payout record
-                const { data: payout, error: payoutError } = await supabase
+                const { data: payout, error: payoutError } = await adminSupabase
                     .from('mentor_payouts')
                     .upsert({
                         id: existingPayout?.id,
@@ -278,7 +315,7 @@ export async function POST(req: Request) {
                 // Create payout items
                 for (const session of eligibleSessions) {
                     const duration = session.duration_minutes || 60
-                    await supabase
+                    await adminSupabase
                         .from('mentor_payout_items')
                         .insert({
                             payout_id: payout.id,
@@ -303,7 +340,7 @@ export async function POST(req: Request) {
                 )
 
                 // Update payout with transfer ID
-                await supabase
+                await adminSupabase
                     .from('mentor_payouts')
                     .update({
                         stripe_transfer_id: transferId,

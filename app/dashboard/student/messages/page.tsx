@@ -2,8 +2,13 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MessagesContent from '@/components/chat/messages-content'
 
-export default async function StudentMessagesPage() {
+export default async function StudentMessagesPage({
+    searchParams
+}: {
+    searchParams: Promise<{ mentor?: string }>
+}) {
     const supabase = await createClient()
+    const { mentor: mentorId } = await searchParams
 
     const {
         data: { user },
@@ -138,6 +143,7 @@ export default async function StudentMessagesPage() {
                 currentUserId={user.id}
                 connectedUsers={connectedUsers}
                 userRole="student"
+                initialMentorId={mentorId}
             />
         </div>
     )

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle } from 'lucide-react'
 import BookSessionModal from '@/components/dashboard/book-session-modal'
 
 interface Session {
@@ -55,10 +56,12 @@ export default function StudentSessionsContent({
     canBook = false,
     autoOpenBooking = false
 }: StudentSessionsContentProps) {
+    const router = useRouter()
     const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'past'>(
         pendingRequests.length > 0 ? 'pending' : 'upcoming'
     )
     const [showBookingModal, setShowBookingModal] = useState(autoOpenBooking && canBook)
+    const [cancelling, setCancelling] = useState(false)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -101,6 +104,21 @@ export default function StudentSessionsContent({
         return sessionTime - now <= oneHour && sessionTime > now
     }
 
+    const handleCancelAllPending = async () => {
+        if (cancelling || pendingRequests.length === 0) return
+        setCancelling(true)
+        try {
+            const res = await fetch('/api/student/pending-requests/cancel', { method: 'POST' })
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(data.error || 'Failed to cancel')
+            router.refresh()
+        } catch (e) {
+            alert(e instanceof Error ? e.message : 'Failed to cancel pending requests')
+        } finally {
+            setCancelling(false)
+        }
+    }
+
     const sessions = activeTab === 'upcoming' ? upcomingSessions : pastSessions
 
     return (
@@ -129,50 +147,63 @@ export default function StudentSessionsContent({
                     </Link>
                 </div>
             )}
-            {/* Tab Switcher */}
-            <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
-                <button
-                    onClick={() => setActiveTab('pending')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
-                        ? 'bg-white text-amber-600 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Pending
-                    {pendingRequests.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full text-xs">
-                            {pendingRequests.length}
-                        </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => setActiveTab('upcoming')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Upcoming
-                    {upcomingSessions.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
-                            {upcomingSessions.length}
-                        </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => setActiveTab('past')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Past
-                    {pastSessions.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
-                            {pastSessions.length}
-                        </span>
-                    )}
-                </button>
+            {/* Tab Switcher + Cancel all (pending only) */}
+            <div className="flex flex-wrap items-center gap-2">
+                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+                    <button
+                        onClick={() => setActiveTab('pending')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
+                            ? 'bg-white text-amber-600 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Pending
+                        {pendingRequests.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full text-xs">
+                                {pendingRequests.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('upcoming')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Upcoming
+                        {upcomingSessions.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
+                                {upcomingSessions.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('past')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Past
+                        {pastSessions.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                                {pastSessions.length}
+                            </span>
+                        )}
+                    </button>
+                </div>
+                {activeTab === 'pending' && pendingRequests.length > 0 && (
+                    <button
+                        type="button"
+                        onClick={handleCancelAllPending}
+                        disabled={cancelling}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                        <XCircle className="w-4 h-4 shrink-0" />
+                        {cancelling ? 'Cancelling…' : 'Cancel all pending requests'}
+                    </button>
+                )}
             </div>
 
             {/* Pending Requests Tab */}

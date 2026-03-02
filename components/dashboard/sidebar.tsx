@@ -30,7 +30,8 @@ import {
     GraduationCap,
     AlertCircle,
     HelpCircle,
-    User
+    User,
+    CalendarRange
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { Logo } from '../logo'
@@ -95,6 +96,7 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
+        { name: 'Fortnightly Report', href: '/dashboard/admin/fortnightly-report', icon: CalendarRange },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
         { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
         { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },
@@ -112,6 +114,7 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
         { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
+        { name: 'Fortnightly Report', href: '/dashboard/admin/fortnightly-report', icon: CalendarRange },
         { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
         { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
         { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },

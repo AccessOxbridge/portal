@@ -31,6 +31,8 @@ interface StudentOnboardingData {
     academicInterests: string
     extracurriculars: string
     anythingElse: string
+    /** Optional: parent/guardian email for fortnightly progress reports */
+    parentEmail: string
 }
 
 const STORAGE_KEY = 'oxbridge.studentOnboardingDraft.v1'
@@ -50,7 +52,8 @@ const EMPTY_DATA: StudentOnboardingData = {
     timeSlots: [],
     academicInterests: '',
     extracurriculars: '',
-    anythingElse: ''
+    anythingElse: '',
+    parentEmail: ''
 }
 
 export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
@@ -652,6 +655,17 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
                                     className="w-full h-28 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
                                     placeholder="Any constraints, preferred mentor style, deadlines, context we should know..."
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Parent/guardian email (optional)</label>
+                                <input
+                                    type="email"
+                                    value={formData.parentEmail}
+                                    onChange={(e) => setFormData({ ...formData, parentEmail: e.target.value.trim() })}
+                                    className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
+                                    placeholder="e.g., parent@example.com"
+                                />
+                                <p className="mt-1 text-xs text-gray-500">We’ll send fortnightly progress reports to this address if provided.</p>
                             </div>
                         </div>
                     </div>

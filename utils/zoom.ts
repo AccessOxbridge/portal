@@ -1,6 +1,7 @@
 /**
  * Zoom API Integration
- * Server-to-Server OAuth for creating scheduled meetings
+ * Server-to-Server OAuth for creating scheduled meetings,
+ * ensuring audio transcription is enabled, and polling for recordings.
  */
 
 interface ZoomTokenResponse {
@@ -24,13 +25,23 @@ interface CreateMeetingParams {
     timezone?: string
 }
 
+export interface ZoomRecordingFile {
+    id: string
+    recording_type: string
+    file_type: string
+    download_url: string
+    status: string
+}
+
+export interface ZoomRecordingResponse {
+    id: number
+    uuid: string
+    recording_files: ZoomRecordingFile[]
+}
+
 let cachedToken: { token: string; expiresAt: number } | null = null
 
-/**
- * Get Zoom access token using Server-to-Server OAuth
- */
 export async function getZoomAccessToken(): Promise<string> {
-    // Check if we have a valid cached token
     if (cachedToken && Date.now() < cachedToken.expiresAt - 60000) {
         return cachedToken.token
     }
@@ -63,7 +74,6 @@ export async function getZoomAccessToken(): Promise<string> {
 
     const data: ZoomTokenResponse = await response.json()
 
-    // Cache the token
     cachedToken = {
         token: data.access_token,
         expiresAt: Date.now() + data.expires_in * 1000,
@@ -73,14 +83,48 @@ export async function getZoomAccessToken(): Promise<string> {
 }
 
 /**
- * Create a scheduled Zoom meeting
+ * Ensure audio transcription is enabled for the Zoom user's cloud recordings.
+ * This is a prerequisite for Zoom to generate transcript (VTT) files automatically.
+ * Called once during meeting creation; safe to call repeatedly (idempotent PATCH).
  */
+export async function ensureAudioTranscriptionEnabled(): Promise<void> {
+    try {
+        const accessToken = await getZoomAccessToken()
+
+        const response = await fetch('https://api.zoom.us/v2/users/me/settings', {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                recording: {
+                    cloud_recording: true,
+                    recording_audio_transcript: true,
+                },
+            }),
+        })
+
+        if (!response.ok) {
+            const error = await response.text()
+            console.warn(`[ZOOM] Could not enable audio transcription (non-fatal): ${error}`)
+        } else {
+            console.log('[ZOOM] Audio transcription setting confirmed enabled')
+        }
+    } catch (err) {
+        console.warn('[ZOOM] Failed to ensure audio transcription (non-fatal):', err)
+    }
+}
+
 export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
     id: string
     joinUrl: string
     startUrl: string
 }> {
     const { topic, startTime, duration = 60, timezone = 'UTC' } = params
+
+    // Best-effort: ensure the user has audio transcription enabled
+    await ensureAudioTranscriptionEnabled()
 
     const accessToken = await getZoomAccessToken()
 
@@ -92,7 +136,7 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
         },
         body: JSON.stringify({
             topic,
-            type: 2, // Scheduled meeting
+            type: 2,
             start_time: startTime.toISOString(),
             duration,
             timezone,
@@ -102,7 +146,7 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
                 join_before_host: true,
                 waiting_room: false,
                 audio: 'both',
-                auto_recording: 'cloud', // Record to cloud for session reports
+                auto_recording: 'cloud',
             },
         }),
     })
@@ -118,5 +162,34 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
         id: String(data.id),
         joinUrl: data.join_url,
         startUrl: data.start_url,
+    }
+}
+
+/**
+ * Fetch recordings for a past meeting from Zoom's API.
+ * Used as a polling fallback when webhooks don't fire.
+ */
+export async function getZoomRecordings(meetingId: string): Promise<ZoomRecordingResponse | null> {
+    try {
+        const accessToken = await getZoomAccessToken()
+
+        const response = await fetch(
+            `https://api.zoom.us/v2/meetings/${meetingId}/recordings`,
+            {
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+            }
+        )
+
+        if (!response.ok) {
+            if (response.status === 404) return null
+            const error = await response.text()
+            console.warn(`[ZOOM] Failed to fetch recordings for ${meetingId}: ${error}`)
+            return null
+        }
+
+        return await response.json()
+    } catch (err) {
+        console.error(`[ZOOM] Error fetching recordings for ${meetingId}:`, err)
+        return null
     }
 }

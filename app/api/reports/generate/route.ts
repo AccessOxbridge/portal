@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import OpenAI from 'openai'
-import { PERSONALIZED_REPORT_PROMPT, PLACEHOLDER_SUMMARY } from '@/config/prompts.config'
+import { PLACEHOLDER_SUMMARY } from '@/config/prompts.config'
+import { sanitizeReportContent } from '@/lib/report-utils'
 
 export async function POST(req: Request) {
     try {
@@ -86,16 +87,17 @@ export async function POST(req: Request) {
             "Create a personalized session report for the student. Use ONLY the information from the inputs above. Structure the report with markdown as follows:",
             "",
             "1) Opening: One short paragraph (2–3 sentences) with positive encouragement. Then a blank line.",
-            "2) Section heading '## Session summary' then one brief paragraph on what was accomplished. Use the session summary and key points from the input above when present; when the input says '[No transcript summary available...]', use only the mentor's topics covered, rating, and engagement to write this section. Never tell the student that a summary was unavailable.",
+            "2) Section heading '## Session summary' then one brief paragraph on what was accomplished. Use the session summary and key points from the input above when present; when the input says '[No transcript summary available...]', use only the mentor's topics covered, rating, and engagement to write this section. Do not mention summaries, transcripts, or availability—write only about the session and the student.",
             "3) Section heading '## Areas for improvement' then a bullet list (each item on its own line with a dash). If none provided, write 'Not provided'.",
             "4) Section heading '## Next steps' then a numbered list (1. 2. 3.) with exactly 3 concise, actionable steps. If none, write 'Not provided'.",
-            `5) Closing: One short motivational sentence, then a blank line, then 'Best regards,' and on the next line this exact name: ${mentorName}.`,
+            `5) Closing: One short motivational sentence, then a blank line, then 'Best regards,' then a blank line, then on the next line this exact name: ${mentorName}.`,
             "",
             "RULES:",
             "- Use ## for the three section headings (Session summary, Areas for improvement, Next steps).",
             "- Put a blank line between each section and between the intro and the first heading.",
             "- Keep paragraphs short. Use lists, not long paragraphs, for areas and next steps.",
             "- Tone: warm, supportive, professional. No invented facts. Do not sign as 'Education Consultant' or [Your Name]—only the mentor name above.",
+            "- CRITICAL: Do not use the words 'AI', 'summary', 'available', 'unavailable', or 'transcript' in a way that refers to how the report was produced. Write only about the session and the student.",
             "Output: Valid markdown only. Max 350 words."
         ].join("\n\n")
 
@@ -109,7 +111,10 @@ export async function POST(req: Request) {
             temperature: 0.0
         })
 
-        const personalizedReport = completion.choices[0].message.content
+        let personalizedReport = completion.choices[0].message.content ?? ''
+
+        // Strip any mention of AI summary / unavailability so the student never sees it
+        personalizedReport = sanitizeReportContent(personalizedReport)
 
         // 5. Save to session_reports
         if (report) {

@@ -16,6 +16,7 @@ interface Student {
     year_group: string | null
     target_university: string | null
     target_course: string | null
+    parent_email: string | null
     is_complete: boolean
     created_at: string
     profile: {
@@ -107,7 +108,7 @@ export default function AdminStudentsPage() {
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
+            <div className="bg-white border border-gray-100 rounded-[32px] shadow-sm">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-24">
                         <Loader2 className="w-8 h-8 text-accent animate-spin" />
@@ -165,7 +166,7 @@ export default function AdminStudentsPage() {
                                                 {format(new Date(student.created_at), 'MMM dd, yyyy')}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <StudentActions email={student.profile?.email || ''} />
+                                                <StudentActions student={student} onSaved={() => fetchStudents()} />
                                             </td>
                                         </tr>
                                     ))}

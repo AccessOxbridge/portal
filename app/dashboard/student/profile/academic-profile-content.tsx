@@ -27,6 +27,7 @@ interface AcademicProfile {
     extracurriculars: string | null
     timezone: string | null
     additional_notes: string | null
+    parent_email: string | null
     is_complete: boolean
 }
 
@@ -73,7 +74,8 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
         interests: existingProfile?.interests || '',
         extracurriculars: existingProfile?.extracurriculars || '',
         timezone: existingProfile?.timezone || '',
-        additional_notes: existingProfile?.additional_notes || ''
+        additional_notes: existingProfile?.additional_notes || '',
+        parent_email: existingProfile?.parent_email || ''
     })
 
     // Initialize timezone on mount
@@ -123,6 +125,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
             const profileData = {
                 id: userId,
                 ...formData,
+                parent_email: formData.parent_email?.trim() || null,
                 is_complete: isProfileComplete(),
                 updated_at: new Date().toISOString()
             }
@@ -456,6 +459,17 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             placeholder="Any constraints, preferred mentor style, deadlines, or context we should know..."
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Parent/guardian email (optional)</label>
+                        <input
+                            type="email"
+                            value={formData.parent_email}
+                            onChange={(e) => setFormData({ ...formData, parent_email: e.target.value.trim() })}
+                            placeholder="e.g., parent@example.com"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">Fortnightly progress reports can be sent to this address.</p>
                     </div>
                 </div>
             </section>

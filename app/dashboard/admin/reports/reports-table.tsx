@@ -295,16 +295,57 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                     {report.mentor_form_responses && (
                                         <div className="bg-gray-50 rounded-xl p-4">
                                             <h4 className="font-semibold text-gray-800 mb-2">
-                                                Mentor's Session Notes
+                                                Mentor&apos;s Session Notes
                                             </h4>
                                             {report.mentor_form_submitted_at && (
                                                 <p className="text-xs text-gray-400 mb-2">
                                                     Submitted on {new Date(report.mentor_form_submitted_at).toLocaleString()}
                                                 </p>
                                             )}
-                                            <pre className="text-xs text-gray-600 whitespace-pre-wrap overflow-x-auto bg-white p-3 rounded-lg border border-gray-100 max-h-48 overflow-y-auto">
-                                                {JSON.stringify(report.mentor_form_responses, null, 2)}
-                                            </pre>
+                                            {typeof report.mentor_form_responses === 'object' ? (
+                                                <div className="space-y-2 text-sm text-gray-700">
+                                                    {'topics_covered' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Topics covered: </span>
+                                                            {report.mentor_form_responses.topics_covered}
+                                                        </p>
+                                                    )}
+                                                    {'overall_rating' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Overall rating: </span>
+                                                            {report.mentor_form_responses.overall_rating}
+                                                        </p>
+                                                    )}
+                                                    {'student_engagement' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Student engagement: </span>
+                                                            {report.mentor_form_responses.student_engagement}
+                                                        </p>
+                                                    )}
+                                                    {'areas_of_improvement' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Areas of improvement: </span>
+                                                            {report.mentor_form_responses.areas_of_improvement}
+                                                        </p>
+                                                    )}
+                                                    {'next_steps' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Next steps: </span>
+                                                            {report.mentor_form_responses.next_steps}
+                                                        </p>
+                                                    )}
+                                                    {'additional_notes' in report.mentor_form_responses && (
+                                                        <p>
+                                                            <span className="font-semibold">Additional notes: </span>
+                                                            {report.mentor_form_responses.additional_notes}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                                    {String(report.mentor_form_responses)}
+                                                </p>
+                                            )}
                                         </div>
                                     )}
 

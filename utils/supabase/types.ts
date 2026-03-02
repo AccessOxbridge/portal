@@ -949,6 +949,7 @@ export type Database = {
           id: string
           interests: string | null
           is_complete: boolean | null
+          parent_email: string | null
           school_country: string | null
           school_name: string | null
           subjects: Json | null
@@ -969,6 +970,7 @@ export type Database = {
           id: string
           interests?: string | null
           is_complete?: boolean | null
+          parent_email?: string | null
           school_country?: string | null
           school_name?: string | null
           subjects?: Json | null
@@ -989,6 +991,7 @@ export type Database = {
           id?: string
           interests?: string | null
           is_complete?: boolean | null
+          parent_email?: string | null
           school_country?: string | null
           school_name?: string | null
           subjects?: Json | null

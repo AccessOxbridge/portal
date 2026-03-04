@@ -25,6 +25,7 @@ import {
     MapPin,
     ChevronDown,
     ChevronUp,
+    ClipboardList,
     Home,
     Briefcase,
     GraduationCap,
@@ -79,6 +80,7 @@ const navigation = {
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
         { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
         { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
+        { name: 'Requests', href: '/dashboard/mentor/requests', icon: ClipboardList },
         { name: 'Reports', href: '/dashboard/mentor/reports', icon: FileText },
         { name: 'Payouts', href: '/dashboard/mentor/payouts', icon: Banknote },
         { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
@@ -175,14 +177,17 @@ export default function Sidebar({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [effectiveRole, profileMenuOpen])
 
-    // Filter menu items based on search query
+    // Filter menu items based on search query; hide Training from mentor when complete
     const filteredMenuItems = useMemo(() => {
-        const items = navigation[effectiveRole as keyof typeof navigation] || navigation.student
+        let items = navigation[effectiveRole as keyof typeof navigation] || navigation.student
+        if (effectiveRole === 'mentor' && trainingComplete) {
+            items = items.filter((item) => item.name !== 'Training')
+        }
         if (!searchQuery) return items
         return items.filter(item =>
             item.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
-    }, [effectiveRole, searchQuery])
+    }, [effectiveRole, searchQuery, trainingComplete])
 
     // Filter student sections based on search query
     const filteredStudentSections = useMemo(() => {

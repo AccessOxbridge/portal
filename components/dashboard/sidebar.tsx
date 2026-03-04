@@ -68,7 +68,6 @@ const studentSections: NavSection[] = [
 const navigation = {
     student: [
         { name: 'Home', href: '/dashboard/student', icon: Home },
-        { name: 'Services', href: '/dashboard/student/services', icon: CreditCard },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },

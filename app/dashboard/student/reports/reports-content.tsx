@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { FileText, Calendar, User, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
-import { sanitizeReportContent } from '@/lib/report-utils'
+import { sanitizeReportContent, normalizeReportMarkdown } from '@/lib/report-utils'
 
 /** Plain-text preview from markdown (strip headers, bold, etc.) for collapsed preview. */
 function reportPreviewText(md: string | null, maxLen: number = 120): string {
@@ -41,9 +42,10 @@ interface ReportData {
 
 interface ReportsContentProps {
     reports: ReportData[]
+    studentFirstName?: string
 }
 
-export default function ReportsContent({ reports }: ReportsContentProps) {
+export default function ReportsContent({ reports, studentFirstName }: ReportsContentProps) {
     const router = useRouter()
     const [expandedReports, setExpandedReports] = useState<Set<string>>(new Set())
     const [chatLoadingMentorId, setChatLoadingMentorId] = useState<string | null>(null)
@@ -109,6 +111,7 @@ export default function ReportsContent({ reports }: ReportsContentProps) {
             {reports.map((item) => {
                 const isExpanded = expandedReports.has(item.report.id)
                 const sessionDate = new Date(item.scheduled_at)
+                let isFirstParagraph = true
 
                 return (
                     <div
@@ -182,15 +185,76 @@ export default function ReportsContent({ reports }: ReportsContentProps) {
 
                         {/* Expanded Report Content — only the personalized report (what was written) */}
                         {isExpanded && (
-                            <div className="px-5 pb-5 border-t border-gray-50">
+                            <div className="px-5 pb-6 border-t border-gray-100">
                                 {item.report.personalized_report ? (
                                     <>
-                                        <div className="mt-4 p-4 bg-gradient-to-br from-accent/5 to-blue-50 rounded-xl">
-                                            <div className="prose prose-sm max-w-none text-gray-700 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-h2:mt-4 prose-h2:mb-2 prose-h2:font-semibold prose-h2:text-gray-800">
-                                                <ReactMarkdown>{sanitizeReportContent(item.report.personalized_report)}</ReactMarkdown>
+                                        <div className="mt-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                                            <div className="text-gray-700 leading-relaxed space-y-6">
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        h2: ({ children }) => (
+                                                            <h2 className="text-base font-semibold text-gray-900 mt-6 mb-3 first:mt-0 pb-2 border-b border-gray-200">
+                                                                {children}
+                                                            </h2>
+                                                        ),
+                                                        p: ({ children }) => {
+                                                            const raw = String(children ?? '').trim()
+                                                            const isBestRegards = raw.toLowerCase().startsWith('best regards')
+                                                            const isNameLine = !isBestRegards && raw.length > 0 && !raw.endsWith('.')
+                                                            const base = 'text-[15px]'
+                                                            // First paragraph greeting: prepend "Hi {FirstName}," if not present
+                                                            if (isFirstParagraph) {
+                                                                isFirstParagraph = false
+                                                                if (studentFirstName && raw.length > 0 && !/^hi\\b|^hello\\b/i.test(raw)) {
+                                                                    const firstChar = raw.charAt(0)
+                                                                    const rest = raw.slice(1)
+                                                                    const normalized =
+                                                                        firstChar ? firstChar.toLowerCase() + rest : raw
+                                                                    const withGreeting = `Hi ${studentFirstName}, ${normalized}`
+                                                                    return (
+                                                                        <p className={`my-3 ${base}`}>
+                                                                            {withGreeting}
+                                                                        </p>
+                                                                    )
+                                                                }
+                                                            }
+                                                            if (isBestRegards) {
+                                                                return (
+                                                                    <p className={`mt-7 mb-1 ${base}`}>
+                                                                        {children}
+                                                                    </p>
+                                                                )
+                                                            }
+                                                            if (isNameLine) {
+                                                                return (
+                                                                    <p className={`mt-1 ${base}`}>
+                                                                        {children}
+                                                                    </p>
+                                                                )
+                                                            }
+                                                            return (
+                                                                <p className={`my-3 ${base}`}>
+                                                                    {children}
+                                                                </p>
+                                                            )
+                                                        },
+                                                        ul: ({ children }) => (
+                                                            <ul className="my-4 list-disc pl-6 space-y-2">{children}</ul>
+                                                        ),
+                                                        ol: ({ children }) => (
+                                                            <ol className="my-4 list-decimal pl-6 space-y-2">{children}</ol>
+                                                        ),
+                                                        li: ({ children }) => (
+                                                            <li className="text-[15px] pl-1">{children}</li>
+                                                        ),
+                                                    }}
+                                                >
+                                                    {normalizeReportMarkdown(sanitizeReportContent(item.report.personalized_report))}
+                                                </ReactMarkdown>
                                             </div>
                                         </div>
-                                        <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
                                             {item.report.personalized_report_generated_at && (
                                                 <span className="text-xs text-gray-400">
                                                     Report generated on {new Date(item.report.personalized_report_generated_at).toLocaleDateString('en-US', {
@@ -206,7 +270,7 @@ export default function ReportsContent({ reports }: ReportsContentProps) {
                                                 type="button"
                                                 onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                                 disabled={chatLoadingMentorId === item.mentor_id}
-                                                className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
+                                                className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 shadow-sm"
                                             >
                                                 <MessageCircle className="w-4 h-4" />
                                                 {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}

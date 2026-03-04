@@ -15,7 +15,7 @@ export default async function StudentReportsPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, full_name')
         .eq('id', user.id)
         .single()
 
@@ -82,6 +82,11 @@ export default async function StudentReportsPage() {
         })
         .filter(Boolean) as any[]
 
+    const studentFirstName =
+        typeof profile?.full_name === 'string'
+            ? profile.full_name.trim().split(' ')[0] || null
+            : null
+
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
@@ -93,7 +98,7 @@ export default async function StudentReportsPage() {
                 </p>
             </header>
 
-            <ReportsContent reports={reportsData} />
+            <ReportsContent reports={reportsData} studentFirstName={studentFirstName || undefined} />
         </div>
     )
 }

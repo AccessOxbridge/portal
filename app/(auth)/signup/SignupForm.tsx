@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { signup } from '../../auth/actions'
 import { motion } from 'framer-motion'
 
@@ -13,65 +13,6 @@ interface PasswordValidation {
     hasNumber: boolean
 }
 
-const DYNAMIC_WORDS = [
-    "Securing Futures",
-    "Join the Community",
-    "Learn from Admissions Officers",
-    "Exclusive Workshops",
-    "Speak to Graduates"
-]
-
-function TypewriterEffect() {
-    const [index, setIndex] = useState(0)
-    const [subIndex, setSubIndex] = useState(0)
-    const [reverse, setReverse] = useState(false)
-    const [blink, setBlink] = useState(true)
-
-    // Main typewriter loop - simplified for stability
-    useEffect(() => {
-        const typingSpeed = reverse ? 40 : 100
-        const pauseTime = 2000
-
-        const timeout = setTimeout(() => {
-            if (!reverse && subIndex === DYNAMIC_WORDS[index].length) {
-                // Pause at the end of the word
-                setTimeout(() => setReverse(true), pauseTime)
-                return
-            }
-
-            if (reverse && subIndex === 0) {
-                setReverse(false)
-                setIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length)
-                return
-            }
-
-            setSubIndex((prev) => prev + (reverse ? -1 : 1))
-        }, typingSpeed)
-
-        return () => clearTimeout(timeout)
-    }, [subIndex, index, reverse])
-
-    // Cursor blink logic
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setBlink((prev) => !prev)
-        }, 500)
-        return () => clearInterval(interval)
-    }, [])
-
-    return (
-        <div className="flex items-center min-h-[1.5em] mt-4">
-            <p className="text-xl md:text-2xl text-white/80 font-light tracking-wide">
-                {DYNAMIC_WORDS[index].substring(0, subIndex)}
-            </p>
-            <motion.span
-                animate={{ opacity: blink ? 1 : 0 }}
-                transition={{ duration: 0 }}
-                className="inline-block w-[2px] h-[1.2em] bg-white/80 ml-1"
-            />
-        </div>
-    )
-}
 
 export function SignupForm() {
     const [password, setPassword] = useState('')
@@ -80,6 +21,29 @@ export function SignupForm() {
     const [isEmailTouched, setIsEmailTouched] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [memberCode, setMemberCode] = useState('')
+    const rightPanelRef = useRef<HTMLDivElement | null>(null)
+    const leftPanelRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        if (!leftPanelRef.current || !rightPanelRef.current) return
+
+        const leftEl = leftPanelRef.current
+        const rightEl = rightPanelRef.current
+
+        const onWheel = (e: WheelEvent) => {
+            if (window.innerWidth < 1024) return
+
+            e.preventDefault()
+            rightEl.scrollTop += e.deltaY
+        }
+
+        leftEl.addEventListener('wheel', onWheel, { passive: false })
+
+        return () => {
+            leftEl.removeEventListener('wheel', onWheel)
+        }
+    }, [])
 
     const isEmailValid = useMemo(() => {
         if (!email) return false
@@ -101,9 +65,12 @@ export function SignupForm() {
     const showValidation = isTouched && password.length > 0 && !isPasswordValid
 
     return (
-        <div className="flex min-h-screen bg-white selection:bg-accent/30 selection:text-accent">
+        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-accent/30 selection:text-accent">
             {/* Left Section - Decorative Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden">
+            <div
+                ref={leftPanelRef}
+                className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen"
+            >
                 {/* Background Pattern/Effect */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
@@ -140,22 +107,23 @@ export function SignupForm() {
                         </motion.span>
                     </div>
 
-                    <div className="mt-20">
+                    <div className="mt-28 xl:mt-32">
                         <h2 className="text-5xl font-bold text-white mb-2 leading-tight">
-                            Start Your Journey <br />
-                            To Excellence.
+                            Start Your Journey
                         </h2>
-                        <TypewriterEffect />
                     </div>
                 </motion.div>
 
                 <div className="z-10 text-white/60 text-sm font-medium">
-                    © {new Date().getFullYear()} Access Oxbridge. All rights reserved.
+                    © 2026 Access Oxbridge. All rights reserved.
                 </div>
             </div>
 
             {/* Right Section - Sign Up Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-16">
+            <div
+                ref={rightPanelRef}
+                className="w-full lg:w-1/2 flex items-center lg:items-start justify-center p-6 md:p-12 lg:p-16 lg:pt-16 lg:h-screen lg:overflow-y-auto"
+            >
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}

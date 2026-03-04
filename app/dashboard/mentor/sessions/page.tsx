@@ -54,8 +54,6 @@ export default async function MentorSessionsPage() {
 
     const reportSet = new Set(sessionReports?.map(r => r.session_id) || [])
 
-    const now = new Date()
-
     // Process sessions
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
@@ -69,38 +67,6 @@ export default async function MentorSessionsPage() {
         has_report: reportSet.has(session.id)
     }))
 
-    // Session end time = start + booked duration (what student picked)
-    const getSessionEndTime = (s: { scheduled_at: string | null; duration_minutes: number }) => {
-        if (!s.scheduled_at) return null
-        const start = new Date(s.scheduled_at).getTime()
-        return new Date(start + s.duration_minutes * 60 * 1000)
-    }
-
-    // Upcoming: active, scheduled in the future
-    const upcomingSessions = processedSessions.filter(session => {
-        if (session.status !== 'active') return false
-        if (!session.scheduled_at) return true
-        return new Date(session.scheduled_at) > now
-    }).sort((a, b) => {
-        if (!a.scheduled_at) return 1
-        if (!b.scheduled_at) return -1
-        return new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
-    })
-
-    // Past/Completed: completed, cancelled, or active but past the booked end time
-    const pastSessions = processedSessions.filter(session => {
-        if (session.status === 'completed' || session.status === 'cancelled') return true
-        if (session.status === 'active' && session.scheduled_at) {
-            const endTime = getSessionEndTime(session)
-            if (endTime && now >= endTime) return true
-        }
-        return false
-    }).sort((a, b) => {
-        if (!a.scheduled_at) return 1
-        if (!b.scheduled_at) return -1
-        return new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()
-    })
-
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
@@ -113,8 +79,8 @@ export default async function MentorSessionsPage() {
             </header>
 
             <MentorSessionsContent
-                upcomingSessions={upcomingSessions}
-                pastSessions={pastSessions}
+                sessions={processedSessions}
+                mentorId={user.id}
             />
         </div>
     )

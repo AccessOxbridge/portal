@@ -97,14 +97,22 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
 
     const addTimeSlot = () => {
         if (!newSlot.date || !newSlot.startTime || !newSlot.endTime) return
-        if (newSlot.endTime <= newSlot.startTime) {
+
+        // Create UTC ISO strings
+        const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
+        let endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
+
+        // If the selected end time appears before or equal to the start time
+        // (e.g. 23:00 → 00:00), treat it as crossing midnight into the next day.
+        if (endDateTime <= startDateTime) {
+            endDateTime.setDate(endDateTime.getDate() + 1)
+        }
+
+        if (endDateTime <= startDateTime) {
             alert('End time must be after start time')
             return
         }
 
-        // Create UTC ISO strings
-        const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
-        const endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
         const startISO = startDateTime.toISOString()
         const endISO = endDateTime.toISOString()
 

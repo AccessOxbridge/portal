@@ -64,6 +64,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
         .select(`
             id,
             scheduled_at,
+            duration_minutes,
             status,
             zoom_join_url,
             zoom_meeting_status,
@@ -102,6 +103,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
+        duration_minutes: session.duration_minutes ?? 60,
         status: session.status,
         zoom_join_url: session.zoom_join_url,
         zoom_meeting_status: session.zoom_meeting_status,
@@ -170,13 +172,13 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             />
 
             <StudentSessionsContent
-                upcomingSessions={upcomingSessions}
-                pastSessions={pastSessions}
+                sessions={processedSessions}
                 pendingRequests={processedPendingRequests}
                 credits={profile?.credits || 0}
                 academicProfile={academicProfile as any}
                 canBook={canBook}
                 autoOpenBooking={autoOpenBooking}
+                studentId={user.id}
             />
         </div>
     )

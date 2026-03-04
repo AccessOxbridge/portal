@@ -62,11 +62,10 @@ export default function JourneyTimeline({
                 if (hasActiveMentorship) return 'current' // matched, waiting for a time to be set
                 return 'pending'
             case 'completed':
-                // Only show as completed when they have a completed session in the current flow
-                // (active mentorship or scheduled session). When only pending requests exist,
-                // don't show Session Complete as done even if they had past sessions.
-                if (hasCompletedSession && (hasActiveMentorship || hasScheduledSession)) return 'completed'
+                // Only show as completed when there are no upcoming sessions. If there's an upcoming
+                // session, show as current (waiting for that session to complete).
                 if (hasScheduledSession) return 'current' // session booked, waiting for it to happen
+                if (hasCompletedSession) return 'completed' // at least one session done, no upcoming
                 return 'pending'
             default:
                 return 'pending'
@@ -109,6 +108,7 @@ export default function JourneyTimeline({
                 <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10" />
 
                 {stages.map((stage, index) => {
+                    if (stage.id === 'completed') return null
                     const status = getStageStatus(stage.id)
 
                     return (

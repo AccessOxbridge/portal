@@ -21,7 +21,7 @@ export function buildFortnightlyReportEmailHtml(bodyHtml: string, subjectLine?: 
     .report-body table td { color: #374151; }
   </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+<body style="margin: 0; padding: 0; font-family: 'Times New Roman', Times, serif; background-color: #f5f5f5;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5; padding: 16px 12px;">
     <tr>
       <td align="center">

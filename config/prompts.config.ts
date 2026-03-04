@@ -90,8 +90,8 @@ Then include these six sections:
    Two short paragraphs: (a) What progress they have made over the past two weeks—strengths and what is improving. (b) Their biggest current constraint or area that needs work. Then on a new line below these paragraphs, output: "Overall trajectory: [Improving steadily ↑ / Stable → / Needs focus ↓]" (or similar)—as its own separate line, not part of the main paragraphs.
 
 2. Performance Indicators (Tracked) (h2)
-   Output an HTML table with exactly these columns: Category | Score | Change | Trend | Comment.
-   Create 4–6 rows of categories relevant to the student (e.g. Critical Thinking, Argument Structure, Subject Mastery, Supercurricular Depth, Interview Readiness, or similar). Derive scores (X/10), change (+0.5, -0.5, or —), trend (↑, →, or ↓), and a short comment from the session data. Use <table>, <thead>, <tbody>, <tr>, <th>, <td>.
+   Output an HTML table with exactly these columns: Category | Score (0–100) | Change | Trend | Comment.
+   Create 4–6 rows of categories relevant to the student (e.g. Critical Thinking, Argument Structure, Subject Mastery, Supercurricular Depth, Interview Readiness, or similar). Derive scores as 0–100 values (e.g. 72/100, 83/100), change as a numerical shift on the same 0–100 scale (e.g. +5, -3, or 0/—), trend (↑, →, or ↓), and a short comment from the session data. Use <table>, <thead>, <tbody>, <tr>, <th>, <td>.
 
 3. What Specifically Improved (h2)
    3–5 bullet points listing concrete improvements evidenced in the sessions (e.g. "Reduced descriptive paragraphs in essays; more explicit argument signposting.", "Completed and summarised two academic articles independently.").

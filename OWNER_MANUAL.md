@@ -121,9 +121,13 @@ graph LR
 
 **Cron scheduler**
 
-- External scheduler is required to call `/api/cron/reminders` every 10-15 minutes.
-- Configuration:
-- `CRON_SECRET` (optional)
+- External scheduler is required to call `/api/cron/reminders` every 10–15 minutes.
+- Implemented in GitHub Actions: `.github/workflows/reminders.yml` (runs every 15 minutes and supports manual `workflow_dispatch`).
+- **Configuration (app env):** `CRON_SECRET` (optional; if set, the cron request must send `Authorization: Bearer <CRON_SECRET>`).
+- **GitHub Actions secrets (required for the workflow):**
+  - `SITE_URL`: Base URL of the app to hit (e.g. `https://your-app.vercel.app`). This controls which environment the cron hits: set to the dev URL to hit dev, or the prod URL to hit prod. No code change needed to switch.
+  - `CRON_SECRET`: Must match the `CRON_SECRET` in the app’s environment variables for that deployment.
+- **Scheduled runs use the default branch:** The workflow that runs on the schedule is the one on the repository’s **default branch** (e.g. `main`). If you change the repo’s default branch to `dev`, then scheduled runs will use the workflow and code on `dev` (and still use the same secrets). Changing the default branch is repo-wide and affects PR targets and default clone branch, not just the cron.
 
 **Other config keys observed in code**
 

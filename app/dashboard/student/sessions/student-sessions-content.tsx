@@ -101,6 +101,8 @@ export default function StudentSessionsContent({
     const [hadCurrent, setHadCurrent] = useState(false)
     const [reportSessionId, setReportSessionId] = useState<string | null>(null)
     const [showReportSuccess, setShowReportSuccess] = useState(false)
+    const [reportSubmitting, setReportSubmitting] = useState(false)
+    const [reportError, setReportError] = useState<string | null>(null)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -608,7 +610,7 @@ export default function StudentSessionsContent({
                 <div className="fixed inset-0 z-40 flex items-center justify-center">
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                        onClick={() => setReportSessionId(null)}
+                        onClick={() => { setReportSessionId(null); setReportError(null) }}
                     />
                     <div className="relative z-50 w-full max-w-md mx-4 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
@@ -618,7 +620,7 @@ export default function StudentSessionsContent({
                             </div>
                             <button
                                 type="button"
-                                onClick={() => setReportSessionId(null)}
+                                onClick={() => { setReportSessionId(null); setReportError(null) }}
                                 className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-gray-500 text-sm font-semibold"
                             >
                                 ×
@@ -633,18 +635,39 @@ export default function StudentSessionsContent({
                                     Only use this if your mentor hasn&apos;t joined the Zoom room after the scheduled start time.
                                 </p>
                             </div>
+                            {reportError && (
+                                <p className="text-sm text-red-600">{reportError}</p>
+                            )}
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setReportSessionId(null)
-                                    setShowReportSuccess(true)
-                                    setTimeout(() => {
-                                        setShowReportSuccess(false)
-                                    }, 4000)
+                                disabled={reportSubmitting}
+                                onClick={async () => {
+                                    if (!reportSessionId) return
+                                    setReportSubmitting(true)
+                                    setReportError(null)
+                                    try {
+                                        const res = await fetch('/api/student/report-mentor-absent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ session_id: reportSessionId })
+                                        })
+                                        const data = await res.json().catch(() => ({}))
+                                        if (!res.ok) {
+                                            setReportError(data.error || 'Failed to submit report')
+                                            return
+                                        }
+                                        setReportSessionId(null)
+                                        setShowReportSuccess(true)
+                                        setTimeout(() => setShowReportSuccess(false), 4000)
+                                    } catch {
+                                        setReportError('Something went wrong. Please try again.')
+                                    } finally {
+                                        setReportSubmitting(false)
+                                    }
                                 }}
-                                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold text-sm shadow-lg shadow-red-200 hover:bg-red-700 transition-colors"
+                                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold text-sm shadow-lg shadow-red-200 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Yes, mentor is absent
+                                {reportSubmitting ? 'Submitting…' : 'Yes, mentor is absent'}
                             </button>
                         </div>
                     </div>

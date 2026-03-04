@@ -124,6 +124,7 @@ export async function GET(req: Request) {
     }
 
     const sentFifteenMinuteReminders: any[] = [];
+    const insertErrors: string[] = [];
 
     if (shortSessions && shortSessions.length > 0) {
         for (const session of shortSessions) {
@@ -142,7 +143,7 @@ export async function GET(req: Request) {
             // does not send an email (it will receive an empty address).
 
             // 1. Notify Student (in-app)
-            await supabase.from('notifications').insert({
+            const { error: errStudent } = await supabase.from('notifications').insert({
                 recipient_id: session.student_id,
                 recipient_email: '',
                 type: 'session_reminder' as any,
@@ -155,9 +156,10 @@ export async function GET(req: Request) {
                     reminder_window: '15m'
                 }
             });
+            if (errStudent) insertErrors.push(`student ${session.id}: ${errStudent.message}`);
 
             // 2. Notify Mentor (in-app)
-            await supabase.from('notifications').insert({
+            const { error: errMentor } = await supabase.from('notifications').insert({
                 recipient_id: session.mentor_id,
                 recipient_email: '',
                 type: 'session_reminder' as any,
@@ -170,11 +172,14 @@ export async function GET(req: Request) {
                     reminder_window: '15m'
                 }
             });
+            if (errMentor) insertErrors.push(`mentor ${session.id}: ${errMentor.message}`);
 
-            // 3. Mark short reminder as sent
-            await supabase.from('sessions')
-                .update({ short_reminder_sent: true } as any)
-                .eq('id', session.id);
+            // 3. Mark short reminder as sent only if both inserts succeeded
+            if (!errStudent && !errMentor) {
+                await supabase.from('sessions')
+                    .update({ short_reminder_sent: true } as any)
+                    .eq('id', session.id);
+            }
 
             sentFifteenMinuteReminders.push({
                 session_id: session.id,
@@ -189,6 +194,7 @@ export async function GET(req: Request) {
         oneHourCount: sentOneHourReminders.length,
         fifteenMinuteCount: sentFifteenMinuteReminders.length,
         oneHourDetails: sentOneHourReminders,
-        fifteenMinuteDetails: sentFifteenMinuteReminders
+        fifteenMinuteDetails: sentFifteenMinuteReminders,
+        ...(insertErrors.length > 0 && { insertErrors })
     });
 }

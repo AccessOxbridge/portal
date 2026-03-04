@@ -1,3 +1,8 @@
+# Session Reminders Cron
+# - Runs every 15 minutes on the default branch (e.g. main). Scheduled runs use the workflow file from the default branch.
+# - Required GitHub Actions secrets: SITE_URL (e.g. https://your-app.vercel.app), CRON_SECRET (must match the app env).
+# - SITE_URL controls which app is hit: set to dev URL for dev, prod URL for prod. No code change needed to switch.
+
 name: Session Reminders Cron
 
 on:

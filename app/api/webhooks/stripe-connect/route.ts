@@ -96,29 +96,6 @@ export async function POST(req: Request) {
                 // Normalize handling based on transfer.status
                 const status = (transfer.status as string | undefined) || undefined
 
-                // #region agent log
-                fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Debug-Session-Id': '103fb4'
-                    },
-                    body: JSON.stringify({
-                        sessionId: '103fb4',
-                        runId: 'post-fix-2',
-                        hypothesisId: 'W1',
-                        location: 'app/api/webhooks/stripe-connect/route.ts:90',
-                        message: 'Stripe transfer.updated received',
-                        data: {
-                            payoutId,
-                            transferId: transfer.id,
-                            status: status || null
-                        },
-                        timestamp: Date.now()
-                    })
-                }).catch(() => { })
-                // #endregion agent log
-
                 if (status === 'paid') {
                     await supabase
                         .from('mentor_payouts')

@@ -45,3 +45,5 @@ testzoom.ts
 # Supabase temporary files (dev-only)
 /supabase/.temp/
 supabase\.temp
+
+/.cursor

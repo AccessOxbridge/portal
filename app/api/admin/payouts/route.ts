@@ -54,30 +54,6 @@ export async function GET(req: Request) {
 
         if (sessionsError) throw sessionsError
 
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Debug-Session-Id': '103fb4'
-            },
-            body: JSON.stringify({
-                sessionId: '103fb4',
-                runId: 'pre-fix-1',
-                hypothesisId: 'H1',
-                location: 'app/api/admin/payouts/route.ts:52',
-                message: 'Payouts GET – raw sessions fetched',
-                data: {
-                    periodStart,
-                    periodEnd,
-                    sessionsCount: (sessions || []).length,
-                    mentorIds: Array.from(new Set((sessions || []).map(s => s.mentor_id)))
-                },
-                timestamp: Date.now()
-            })
-        }).catch(() => { })
-        // #endregion agent log
-
         // Filter to finished sessions
         const finishedSessions = (sessions || []).filter(
             s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
@@ -95,30 +71,6 @@ export async function GET(req: Request) {
 
             const batchedSessionIds = new Set((existingItems || []).map(i => i.session_id))
             unbatchedSessions = finishedSessions.filter(s => !batchedSessionIds.has(s.id))
-
-            // #region agent log
-            fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Debug-Session-Id': '103fb4'
-                },
-                body: JSON.stringify({
-                    sessionId: '103fb4',
-                    runId: 'post-fix-1',
-                    hypothesisId: 'H4',
-                    location: 'app/api/admin/payouts/route.ts:90',
-                    message: 'Payouts GET – filter out already batched sessions',
-                    data: {
-                        periodStart,
-                        periodEnd,
-                        finishedCount: finishedSessions.length,
-                        unbatchedCount: unbatchedSessions.length
-                    },
-                    timestamp: Date.now()
-                })
-            }).catch(() => { })
-            // #endregion agent log
         }
 
         // Collect unique mentor IDs
@@ -216,32 +168,6 @@ export async function GET(req: Request) {
             .eq('period_start', periodStart)
             .eq('period_end', periodEnd)
 
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Debug-Session-Id': '103fb4'
-            },
-            body: JSON.stringify({
-                sessionId: '103fb4',
-                runId: 'pre-fix-1',
-                hypothesisId: 'H2',
-                location: 'app/api/admin/payouts/route.ts:148',
-                message: 'Payouts GET – existing payouts for period',
-                data: {
-                    periodStart,
-                    periodEnd,
-                    existing: (existingPayouts || []).map(p => ({
-                        mentor_id: p.mentor_id,
-                        status: p.status
-                    }))
-                },
-                timestamp: Date.now()
-            })
-        }).catch(() => { })
-        // #endregion agent log
-
         const paidMentors = new Set(
             existingPayouts
                 ?.filter(p => ['processing', 'paid'].includes(p.status))
@@ -253,33 +179,6 @@ export async function GET(req: Request) {
             ...e,
             already_paid: paidMentors.has(e.mentor_id)
         }))
-
-        // #region agent log
-        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Debug-Session-Id': '103fb4'
-            },
-            body: JSON.stringify({
-                sessionId: '103fb4',
-                runId: 'pre-fix-1',
-                hypothesisId: 'H3',
-                location: 'app/api/admin/payouts/route.ts:161',
-                message: 'Payouts GET – mentor earnings with already_paid flag',
-                data: {
-                    mentors: result.map(m => ({
-                        mentor_id: m.mentor_id,
-                        total_minutes: m.total_minutes,
-                        total_cents: m.total_cents,
-                        sessions_count: m.sessions.length,
-                        already_paid: m.already_paid
-                    }))
-                },
-                timestamp: Date.now()
-            })
-        }).catch(() => { })
-        // #endregion agent log
 
         return NextResponse.json({
             period_start: periodStart,
@@ -385,29 +284,6 @@ export async function POST(req: Request) {
 
                     const batchedSessionIds = new Set((existingItems || []).map(i => i.session_id))
                     eligibleSessions = finishedSessionsForMentor.filter(s => !batchedSessionIds.has(s.id))
-
-                    // #region agent log
-                    fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Debug-Session-Id': '103fb4'
-                        },
-                        body: JSON.stringify({
-                            sessionId: '103fb4',
-                            runId: 'post-fix-1',
-                            hypothesisId: 'H5',
-                            location: 'app/api/admin/payouts/route.ts:334',
-                            message: 'Payouts POST – eligible sessions after excluding batched ones',
-                            data: {
-                                mentorId,
-                                finishedCount: finishedSessionsForMentor.length,
-                                eligibleCount: eligibleSessions.length
-                            },
-                            timestamp: Date.now()
-                        })
-                    }).catch(() => { })
-                    // #endregion agent log
                 }
 
                 if (!eligibleSessions.length) {

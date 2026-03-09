@@ -142,8 +142,9 @@ export default async function DashboardLayout({
     const isStudent = profile.role === 'student' || (profile.role === 'admin-dev' && headerList.get('referer')?.includes('student'))
     const isMentor = profile.role === 'mentor' || (profile.role === 'admin-dev' && headerList.get('referer')?.includes('mentor'))
 
-    // Calculate pending reports count for mentors
+    // Calculate pending reports count and pending requests count for mentors
     let pendingReportsCount = 0
+    let pendingRequestsCount = 0
 
     if (isMentor && showSidebar) {
         const nowIso = new Date().toISOString()
@@ -176,6 +177,14 @@ export default async function DashboardLayout({
                 return (isPast || isEnded) && !submittedSessionIds.has(session.id)
             }).length
         }
+
+        // Pending student requests (mentorship_requests awaiting mentor response)
+        const { count: requestsCount } = await supabase
+            .from('mentorship_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('mentor_id', user.id)
+            .eq('status', 'pending')
+        pendingRequestsCount = requestsCount ?? 0
     }
 
     // Calculate student help count for admins
@@ -201,6 +210,7 @@ export default async function DashboardLayout({
                     userName={profile.full_name || user.email?.split('@')[0] || 'User'}
                     userId={user.id}
                     pendingReportsCount={pendingReportsCount}
+                    pendingRequestsCount={pendingRequestsCount}
                     onboardingIncomplete={onboardingIncomplete}
                     trainingComplete={((profile as any).mentors?.trainingCompleteFlag) || false}
                     studentHelpCount={studentHelpCount}

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, Construction } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { formatPrice } from '@/utils/stripe'
 
 interface Purchase {
     id: string
@@ -16,21 +17,28 @@ interface Purchase {
     credit_packages: { name: string; credits: number } | null
 }
 
-interface Props {
-    purchases: Purchase[]
+interface Payout {
+    id: string
+    mentor_id: string
+    amount_cents: number
+    currency: string
+    status: string
+    period_start: string
+    period_end: string
+    paid_at: string | null
+    created_at: string | null
+    profiles: { full_name: string | null; email: string | null } | null
 }
 
-export default function TransactionsTabs({ purchases }: Props) {
+interface Props {
+    purchases: Purchase[]
+    payouts: Payout[]
+}
+
+export default function TransactionsTabs({ purchases, payouts }: Props) {
     const [activeTab, setActiveTab] = useState<'inbound' | 'outbound'>('inbound')
 
-    const formatPrice = (cents: number, currency: string = 'gbp') => {
-        return new Intl.NumberFormat('en-GB', {
-            style: 'currency',
-            currency: currency.toUpperCase(),
-        }).format(cents / 100)
-    }
-
-    const formatDate = (dateStr: string) => {
+    const formatDateTime = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'short',
@@ -40,9 +48,29 @@ export default function TransactionsTabs({ purchases }: Props) {
         })
     }
 
-    // Calculate totals
+    const formatDateRange = (start: string, end: string) => {
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+
+        const startLabel = startDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short'
+        })
+        const endLabel = endDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        })
+
+        return `${startLabel} – ${endLabel}`
+    }
+
+    // Inbound totals
     const totalRevenue = purchases.reduce((sum, p) => sum + p.amount_paid_cents, 0)
     const totalCredits = purchases.reduce((sum, p) => sum + p.credits_purchased, 0)
+
+    // Outbound totals
+    const totalPayoutAmount = payouts.reduce((sum, p) => sum + (p.amount_cents || 0), 0)
 
     return (
         <div className="space-y-6">
@@ -53,12 +81,22 @@ export default function TransactionsTabs({ purchases }: Props) {
                     <p className="text-3xl font-black text-green-600">{formatPrice(totalRevenue)}</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Credits Sold</p>
-                    <p className="text-3xl font-black text-accent">{totalCredits}</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">
+                        {activeTab === 'inbound' ? 'Credits Sold' : 'Total Payouts'}
+                    </p>
+                    <p className="text-3xl font-black text-accent">
+                        {activeTab === 'inbound'
+                            ? totalCredits
+                            : formatPrice(totalPayoutAmount)}
+                    </p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Total Purchases</p>
-                    <p className="text-3xl font-black text-gray-900">{purchases.length}</p>
+                    <p className="text-sm font-medium text-gray-500 mb-1">
+                        {activeTab === 'inbound' ? 'Total Purchases' : 'Total Payouts'}
+                    </p>
+                    <p className="text-3xl font-black text-gray-900">
+                        {activeTab === 'inbound' ? purchases.length : payouts.length}
+                    </p>
                 </div>
             </div>
 
@@ -124,7 +162,7 @@ export default function TransactionsTabs({ purchases }: Props) {
                                         {formatPrice(purchase.amount_paid_cents, purchase.currency)}
                                     </td>
                                     <td className="px-6 py-4 text-gray-500 text-sm">
-                                        {purchase.completed_at ? formatDate(purchase.completed_at) : '-'}
+                                        {purchase.completed_at ? formatDateTime(purchase.completed_at) : '-'}
                                     </td>
                                 </tr>
                             ))}
@@ -139,16 +177,69 @@ export default function TransactionsTabs({ purchases }: Props) {
                     </table>
                 </div>
             ) : (
-                <div className="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 p-12 text-center">
-                    <Construction className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">Coming Soon</h3>
-                    <p className="text-gray-500 max-w-md mx-auto">
-                        Outbound transactions (mentor payouts, refunds) will be displayed here once the payout system is implemented.
-                    </p>
-                    <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-xl text-sm font-medium">
-                        <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                        TODO: Implement mentor payout tracking
-                    </div>
+                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Mentor</th>
+                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Period</th>
+                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Amount</th>
+                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Status</th>
+                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Paid At</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {payouts.map((payout) => (
+                                <tr key={payout.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div>
+                                            <p className="font-medium text-gray-900">
+                                                {payout.profiles?.full_name || 'Unknown'}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                {payout.profiles?.email || ''}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-700">
+                                        {formatDateRange(payout.period_start, payout.period_end)}
+                                    </td>
+                                    <td className="px-6 py-4 font-bold text-red-600">
+                                        {formatPrice(payout.amount_cents, payout.currency)}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span
+                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                                payout.status === 'paid'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : payout.status === 'processing'
+                                                    ? 'bg-blue-100 text-blue-700'
+                                                    : payout.status === 'failed'
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-gray-100 text-gray-700'
+                                            }`}
+                                        >
+                                            {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-500 text-sm">
+                                        {payout.paid_at
+                                            ? formatDateTime(payout.paid_at)
+                                            : payout.created_at
+                                                ? formatDateTime(payout.created_at)
+                                                : '-'}
+                                    </td>
+                                </tr>
+                            ))}
+                            {payouts.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                        No payouts yet
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>

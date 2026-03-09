@@ -94,7 +94,7 @@ export default async function StudentReportsPage() {
                     Session Reports
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    View personalized reports and insights from your mentorship sessions
+                    View personalised reports and insights from your mentorship sessions
                 </p>
             </header>
 

@@ -79,7 +79,7 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
                                             You have {toComplete.length} report{toComplete.length > 1 ? 's' : ''} to complete
                                         </p>
                                         <p className="text-sm text-amber-600 mt-0.5">
-                                            Please submit reports promptly so students can receive their personalized feedback.
+                                            Please submit reports promptly so students can receive their personalised feedback.
                                         </p>
                                     </div>
                                 </div>

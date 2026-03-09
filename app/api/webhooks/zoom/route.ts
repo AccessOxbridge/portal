@@ -67,12 +67,12 @@ export async function POST(req: Request) {
             }
 
             if (session) {
-                await supabase.from('notifications').insert({
+                    await supabase.from('notifications').insert({
                     recipient_id: session.mentor_id,
                     recipient_email: '',
                     type: 'session_confirmed',
                     title: '📝 Session Report Required',
-                    message: 'Please complete your session report to generate the student\'s personalized feedback.',
+                    message: 'Please complete your session report to generate the student\'s personalised feedback.',
                     data: { session_id: session.id, action: 'mentor_report' }
                 })
 

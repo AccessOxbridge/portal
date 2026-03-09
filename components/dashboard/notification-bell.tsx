@@ -41,7 +41,10 @@ export default function NotificationBell() {
 
     const visibleNotifications = useMemo(() => {
         const cutoff = Date.now() - NOTIFICATION_VISIBLE_MS
-        return notifications.filter(n => new Date(n.created_at).getTime() >= cutoff)
+        return notifications
+            .filter(n => new Date(n.created_at).getTime() >= cutoff)
+            // Temporarily hide credit deduction notifications from the bell
+            .filter(n => !(n.title === 'Credits deducted for session'))
     }, [notifications, tick])
 
     const unreadCount = useMemo(

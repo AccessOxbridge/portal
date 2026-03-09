@@ -15,7 +15,7 @@
  */
 
 export const PERSONALIZED_REPORT_PROMPT = `
-You are an expert education consultant creating a personalized session report for a student.
+You are an expert education consultant creating a personalised session report for a student.
 Your goal is to create an encouraging, actionable, and helpful report that motivates the student.
 
 ## Session Summary (AI-Generated from Transcript):
@@ -42,7 +42,7 @@ Your goal is to create an encouraging, actionable, and helpful report that motiv
 
 ---
 
-Based on all of the above, generate a personalized report for the student that:
+Based on all of the above, generate a personalised report for the student that:
 1. Starts with positive encouragement
 2. Summarizes what was accomplished in the session
 3. Clearly outlines areas to work on
@@ -56,7 +56,7 @@ Write in a warm, supportive, and professional tone. Use markdown formatting for 
 export const PLACEHOLDER_SUMMARY = "[No transcript summary available for this session. Use only the mentor's form responses below to write the entire report. For the Session summary section, summarize what was accomplished based on topics covered, rating, and engagement from the mentor. Do not tell the student that a summary was unavailable—write the report as if complete.]"
 
 // --- Fortnightly consolidated report (student version) ---
-// Input: aggregated session data + personalized reports for the last 14 days.
+// Input: aggregated session data + personalised reports for the last 14 days.
 // Tone: direct to the student, encouraging, warm. Mix mentor inputs with coherent narrative. Never mention AI.
 export const FORTNIGHTLY_REPORT_STUDENT_SYSTEM = `You are an expert education consultant writing a fortnightly progress report for a student. The report will be sent by email from Access Oxbridge. Write in a warm, encouraging tone directly to the student. Use "you" and "your". Keep paragraphs short and use clear headings. The writing must feel like a thoughtful human mentor typed it after thinking about this specific student: vary sentence length, occasionally use natural spoken phrases, and prioritise clear, direct language over formal or generic wording. Avoid stock phrases such as "commendable dedication", "on the right path", "will serve you well", "in summary", or "overall" at the start of sentences; instead, use concrete observations tied to the data (e.g. what they did, how it looked in a session, what changed). Do not invent any facts—use only the session data and report excerpts provided. End the body with a single short closing sentence of encouragement before the sign-off; the sign-off "Thank You, Access Oxbridge" will be added automatically, so do not include it.
 
@@ -76,7 +76,7 @@ Subject focus (for report header): ${subjectFocus}
 Fortnight ending date (for report header): ${fortnightEnding}
 Count of sessions in this fortnight: ${sessionCount}
 
-Below is consolidated data from all sessions and personalized reports in this period. Use it to write one coherent fortnightly report. The report should merge all sessions in the fortnight into a single narrative—whether the student had 1 session or several, the format is the same.
+Below is consolidated data from all sessions and personalised reports in this period. Use it to write one coherent fortnightly report. The report should merge all sessions in the fortnight into a single narrative—whether the student had 1 session or several, the format is the same.
 
 ${consolidatedContext}
 
@@ -129,7 +129,7 @@ Target (e.g. Oxford PPE, Cambridge Economics): ${target}
 Fortnight ending date: ${fortnightEnding}
 Count of sessions in this fortnight: ${sessionCount}
 
-Below is consolidated data from all sessions and personalized reports in this period. Use it to write one coherent fortnightly report for the parent/guardian. Merge all sessions in the fortnight into a single narrative—whether 1 session or several, the format is the same.
+Below is consolidated data from all sessions and personalised reports in this period. Use it to write one coherent fortnightly report for the parent/guardian. Merge all sessions in the fortnight into a single narrative—whether 1 session or several, the format is the same.
 
 ${consolidatedContext}
 

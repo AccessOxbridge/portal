@@ -81,12 +81,12 @@ const QUIZ_QUESTIONS = [
         ],
         correct: 'B'
     },
-    {
+        {
         id: 'q3',
         question: 'What should you do after each session?',
         options: [
             'A) Nothing, just wait for the next session',
-            'B) Submit a session report to help generate personalized feedback',
+            'B) Submit a session report to help generate personalised feedback',
             'C) Send the student homework',
             'D) Contact the parents'
         ],

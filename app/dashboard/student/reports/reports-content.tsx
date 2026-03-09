@@ -172,7 +172,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                 </button>
                                 {item.report.personalized_report && (
                                     <span className="px-2.5 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full">
-                                        Personalized
+                                        Personalised
                                     </span>
                                 )}
                                 {isExpanded ? (
@@ -278,7 +278,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                         </div>
                                     </>
                                 ) : (
-                                    <p className="mt-4 text-sm text-gray-500">No personalized report for this session yet.</p>
+                                    <p className="mt-4 text-sm text-gray-500">No personalised report for this session yet.</p>
                                 )}
                             </div>
                         )}

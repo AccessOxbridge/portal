@@ -113,11 +113,11 @@ Mentor requirements: ${requirements || ''}
             return NextResponse.json({ error: 'Failed to process your profile for matching. Please try again later.' }, { status: 503 })
         }
 
-        // 4. Search for top mentors via RPC (hard-capped to 5)
+        // 4. Search for top mentors via RPC (hard-capped to 12)
         const { data: matches, error: matchError } = await supabase.rpc('match_mentors', {
             query_embedding: `[${embedding.join(',')}]`,
             match_threshold: 0.1, // Lowered threshold slightly to ensure matches
-            match_count: 5,
+            match_count: 12,
         })
 
         console.log('\n\nMatches:\n', JSON.stringify(matches, null, 2), '\n\n')
@@ -133,7 +133,7 @@ Mentor requirements: ${requirements || ''}
         }
 
         // Defensive cap in case RPC returns more than requested.
-        const topMatches = matches.slice(0, 5)
+        const topMatches = matches.slice(0, 12)
 
         // 5. Create mentorship requests
         const requests = topMatches.map((mentor: any) => ({

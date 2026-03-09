@@ -4,6 +4,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import OpenAI from 'openai'
 import { PLACEHOLDER_SUMMARY } from '@/config/prompts.config'
 import { sanitizeReportContent } from '@/lib/report-utils'
+import { ensureTranscriptProcessedForSession } from '@/utils/reports'
 
 export async function POST(req: Request) {
     try {
@@ -31,6 +32,11 @@ export async function POST(req: Request) {
         if (!sessionOwner || sessionOwner.mentor_id !== user.id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
         }
+
+        // Ensure transcript-derived summary/key_points are in session_reports when available (so student report uses them)
+        await ensureTranscriptProcessedForSession(sessionId).catch((err) =>
+            console.warn('[REPORT GENERATION] ensureTranscriptProcessedForSession:', err)
+        )
 
         // 1. Fetch AI-generated summary from session_reports
         const { data: report } = await adminSupabase
@@ -84,7 +90,7 @@ export async function POST(req: Request) {
             `Mentor notes: ${String(mentorData.additional_notes || 'Not provided')}`,
             "",
             "TASK:",
-            "Create a personalized session report for the student. Use ONLY the information from the inputs above. Structure the report with markdown as follows:",
+            "Create a personalised session report for the student. Use ONLY the information from the inputs above. Structure the report with markdown as follows:",
             "",
             "1) Opening: One short paragraph (2–3 sentences) with positive encouragement. Then a blank line.",
             "2) Section heading '## Session summary' then one brief paragraph on what was accomplished. Use the session summary and key points from the input above when present; when the input says '[No transcript summary available...]', use only the mentor's topics covered, rating, and engagement to write this section. Do not mention summaries, transcripts, or availability—write only about the session and the student.",
@@ -101,7 +107,7 @@ export async function POST(req: Request) {
             "Output: Valid markdown only. Max 350 words."
         ].join("\n\n")
 
-        // 4. Generate personalized report (use deterministic temperature to avoid hallucination)
+        // 4. Generate personalised report (use deterministic temperature to avoid hallucination)
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o',
             messages: [

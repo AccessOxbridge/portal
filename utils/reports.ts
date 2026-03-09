@@ -102,6 +102,142 @@ async function generateAndSaveReport(meetingId: string, vttContent: string) {
 }
 
 /**
+ * Fetch transcript VTT for a session (by session row with transcript_url / token or zoom_meeting_id).
+ * Used when mentor triggers report generation and we don't have summary yet.
+ */
+async function fetchTranscriptForSession(session: {
+    zoom_meeting_id: string | null
+    transcript_url: string | null
+    transcript_download_token: string | null
+}): Promise<string | null> {
+    const { getZoomAccessToken } = await import('./zoom')
+    const accessToken = await getZoomAccessToken()
+    let vttContent: string | null = null
+
+    if (session.transcript_url && session.transcript_download_token) {
+        const res = await fetch(session.transcript_url, {
+            headers: { 'Authorization': `Bearer ${session.transcript_download_token}` },
+        })
+        if (res.ok) vttContent = await res.text()
+    }
+    if (!vttContent && session.zoom_meeting_id) {
+        const recordings = await getZoomRecordings(session.zoom_meeting_id)
+        const transcriptFile = recordings?.recording_files?.find(
+            (f) => f.recording_type === 'audio_transcript' || f.file_type === 'TRANSCRIPT'
+        )
+        if (transcriptFile?.download_url) {
+            const u = new URL(transcriptFile.download_url)
+            u.searchParams.set('access_token', accessToken)
+            const res = await fetch(u.toString())
+            if (res.ok) vttContent = await res.text()
+        }
+    }
+    if (!vttContent && session.transcript_url) {
+        try {
+            const u = new URL(session.transcript_url)
+            u.searchParams.set('access_token', accessToken)
+            const res = await fetch(u.toString())
+            if (res.ok) vttContent = await res.text()
+        } catch {
+            const res = await fetch(`${session.transcript_url}${session.transcript_url.includes('?') ? '&' : '?'}access_token=${accessToken}`)
+            if (res.ok) vttContent = await res.text()
+        }
+    }
+    return vttContent
+}
+
+/**
+ * Update or insert session_reports with transcript-derived summary/key_points/action_items.
+ * Used when report row already exists (e.g. mentor generated report first) but transcript wasn't processed.
+ */
+async function saveReportFromTranscript(sessionId: string, vttContent: string) {
+    const supabase = createAdminClient()
+    const openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY })
+    const cleanedTranscript = parseVTT(vttContent)
+    if (!cleanedTranscript || cleanedTranscript.length < 20) return
+
+    const completion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+            {
+                role: 'system',
+                content:
+                    'You are an expert education consultant for a mentorship platform. Your task is to generate a structured report about the session. Do not mention any transcripts, recordings, video platforms, or how the information was obtained. Return JSON with \'summary\', \'key_points\' (array of strings), and \'action_items\' (array of strings).',
+            },
+            {
+                role: 'user',
+                content: `Generate a mentorship session report based on the following session dialogue. Do not mention the source. \n\n ${cleanedTranscript}`,
+            },
+        ],
+        response_format: { type: 'json_object' },
+    })
+
+    const reportData = JSON.parse(completion.choices[0].message.content || '{}')
+    const safeSummary = sanitizeReportContent(String(reportData?.summary ?? '')).trim()
+    const safeKeyPoints = Array.isArray(reportData?.key_points)
+        ? reportData.key_points.map((x: any) => sanitizeReportContent(String(x ?? '')).trim()).filter(Boolean)
+        : []
+    const safeActionItems = Array.isArray(reportData?.action_items)
+        ? reportData.action_items.map((x: any) => sanitizeReportContent(String(x ?? '')).trim()).filter(Boolean)
+        : []
+
+    const { data: existing } = await supabase
+        .from('session_reports')
+        .select('id')
+        .eq('session_id', sessionId)
+        .maybeSingle()
+
+    if (existing) {
+        await supabase
+            .from('session_reports')
+            .update({
+                summary: safeSummary || null,
+                key_points: safeKeyPoints,
+                action_items: safeActionItems,
+                raw_transcript: cleanedTranscript,
+            })
+            .eq('session_id', sessionId)
+    } else {
+        await supabase.from('session_reports').insert({
+            session_id: sessionId,
+            summary: safeSummary || null,
+            key_points: safeKeyPoints,
+            action_items: safeActionItems,
+            raw_transcript: cleanedTranscript,
+        })
+    }
+    console.log(`[REPORTS] Filled transcript-derived content for session ${sessionId}`)
+}
+
+/**
+ * Ensure session_reports has transcript-derived summary/key_points for this session when the mentor
+ * triggers report generation. Fetches transcript from Zoom if we have URL/token but no content yet.
+ */
+export async function ensureTranscriptProcessedForSession(sessionId: string): Promise<void> {
+    const supabase = createAdminClient()
+    const { data: session } = await supabase
+        .from('sessions')
+        .select('zoom_meeting_id, transcript_url, transcript_download_token')
+        .eq('id', sessionId)
+        .single()
+    if (!session) return
+
+    const { data: report } = await supabase
+        .from('session_reports')
+        .select('summary, raw_transcript')
+        .eq('session_id', sessionId)
+        .maybeSingle()
+    if (report?.summary || report?.raw_transcript) return
+
+    if (!session.transcript_url && !session.zoom_meeting_id) return
+
+    const vttContent = await fetchTranscriptForSession(session)
+    if (!vttContent || vttContent.includes('<!DOCTYPE') || vttContent.includes('<html')) return
+
+    await saveReportFromTranscript(sessionId, vttContent)
+}
+
+/**
  * Process transcript from a webhook-provided download URL + token.
  * Used by recording.transcript_completed and recording.completed webhooks.
  */

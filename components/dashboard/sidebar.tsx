@@ -43,6 +43,7 @@ interface SidebarProps {
     userName: string;
     userId?: string;
     pendingReportsCount?: number;
+    pendingRequestsCount?: number;
     onboardingIncomplete?: boolean;
     trainingComplete?: boolean;
     studentHelpCount?: number;
@@ -94,6 +95,7 @@ const navigation = {
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Sessions', href: '/dashboard/admin/sessions', icon: Video },
+        { name: 'Manage Sessions', href: '/dashboard/admin/manage-sessions', icon: CalendarRange },
         { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
@@ -113,6 +115,7 @@ const navigation = {
         { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
         { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
         { name: 'Sessions', href: '/dashboard/admin/sessions', icon: Video },
+        { name: 'Manage Sessions', href: '/dashboard/admin/manage-sessions', icon: CalendarRange },
         { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
         { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
         { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
@@ -130,6 +133,7 @@ export default function Sidebar({
     userName,
     userId,
     pendingReportsCount = 0,
+    pendingRequestsCount = 0,
     onboardingIncomplete = false,
     trainingComplete = false,
     studentHelpCount = 0
@@ -139,6 +143,7 @@ export default function Sidebar({
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
     const [searchQuery, setSearchQuery] = useState('')
     const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0)
     const searchInputRef = useRef<HTMLInputElement>(null)
     const profileMenuRef = useRef<HTMLDivElement>(null)
 
@@ -208,6 +213,70 @@ export default function Sidebar({
         window.location.href = '/login'
     }
 
+    // Fetch unread messages count for student and mentor sidebars,
+    // and keep it updated via realtime + light polling.
+    useEffect(() => {
+        if (!userId) return
+        if (effectiveRole !== 'student' && effectiveRole !== 'mentor') return
+
+        let isMounted = true
+
+        const fetchUnreadCount = async () => {
+            if (!isMounted) return
+            try {
+                // 1) Get all conversations for this user (as student or mentor)
+                const { data: conversations } = await supabase
+                    .from('conversations')
+                    .select('id')
+                    .eq(effectiveRole === 'student' ? 'student_id' : 'mentor_id', userId)
+
+                const conversationIds = (conversations || []).map((c: any) => c.id)
+                if (conversationIds.length === 0) {
+                    if (isMounted) setUnreadMessagesCount(0)
+                    return
+                }
+
+                // 2) Count unread messages not sent by the current user
+                const { count } = await supabase
+                    .from('messages')
+                    .select('*', { count: 'exact', head: true })
+                    .in('conversation_id', conversationIds)
+                    .eq('is_read', false)
+                    .neq('sender_id', userId)
+
+                if (isMounted) {
+                    setUnreadMessagesCount(count || 0)
+                }
+            } catch (err) {
+                console.error('[Sidebar] Failed to fetch unread messages count:', err)
+            }
+        }
+
+        // Initial fetch
+        fetchUnreadCount()
+
+        // Re-fetch when new messages arrive via realtime
+        const channel = supabase
+            .channel('messages-sidebar')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'messages' },
+                () => {
+                    fetchUnreadCount()
+                }
+            )
+            .subscribe()
+
+        // Light polling as a safety net (every 60s)
+        const interval = setInterval(fetchUnreadCount, 60_000)
+
+        return () => {
+            isMounted = false
+            clearInterval(interval)
+            supabase.removeChannel(channel)
+        }
+    }, [effectiveRole, supabase, userId])
+
     return (
         <aside className="w-64 bg-accent border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 z-50">
             {/* Top Branding & Search */}
@@ -255,9 +324,14 @@ export default function Sidebar({
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
+                    const showRequestsBadge = item.name === 'Requests' && effectiveRole === 'mentor' && pendingRequestsCount > 0
                     const showTrainingIncompleteBadge = item.name === 'Training' && effectiveRole === 'mentor' && onboardingIncomplete && !trainingComplete
                     const showTrainingCompleteBadge = item.name === 'Training' && effectiveRole === 'mentor' && !!trainingComplete
                     const showStudentHelpBadge = item.name === 'Student Help' && (effectiveRole === 'admin' || effectiveRole === 'admin-dev') && studentHelpCount > 0
+                    const showMessagesUnreadBadge =
+                        item.name === 'Messages' &&
+                        (effectiveRole === 'student' || effectiveRole === 'mentor') &&
+                        unreadMessagesCount > 0
 
                     return (
                         <Link
@@ -277,6 +351,11 @@ export default function Sidebar({
                                     {pendingReportsCount}
                                 </span>
                             )}
+                            {showRequestsBadge && (
+                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                    {pendingRequestsCount > 9 ? '9+' : pendingRequestsCount}
+                                </span>
+                            )}
                             {showTrainingIncompleteBadge && (
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     <AlertCircle className="w-3 h-3" />
@@ -289,6 +368,11 @@ export default function Sidebar({
                             )}
                             {showStudentHelpBadge && (
                                 <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50" />
+                            )}
+                            {showMessagesUnreadBadge && (
+                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                                </span>
                             )}
                         </Link>
                     )

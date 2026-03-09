@@ -115,7 +115,7 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
-                        Personalized
+                        Personalised
                     </button>
                     <button
                         onClick={() => setFilterType('without_personalized')}
@@ -188,7 +188,7 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                             )}
                                             {report.personalized_report && (
                                                 <span className="px-2 py-0.5 bg-green-50 text-green-600 text-xs font-medium rounded-full">
-                                                    Personalized
+                                                    Personalised
                                                 </span>
                                             )}
                                         </div>
@@ -235,12 +235,12 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                         </div>
                                     </div>
 
-                                    {/* Personalized Report */}
+                                    {/* Personalised Report */}
                                     {report.personalized_report && (
                                         <div className="bg-gradient-to-br from-accent/5 to-blue-50 rounded-xl p-4">
                                             <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                                 <Lightbulb className="w-5 h-5 text-amber-500" />
-                                                Personalized Report
+                                                Personalised Report
                                             </h4>
                                             <div className="prose prose-sm max-w-none text-gray-700 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-h2:mt-4 prose-h2:mb-2 prose-h2:font-semibold prose-h2:text-gray-800 max-h-64 overflow-y-auto">
                                                 <ReactMarkdown>{report.personalized_report}</ReactMarkdown>

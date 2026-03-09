@@ -64,7 +64,8 @@ export async function POST(req: Request) {
             }
 
             case 'transfer.created': {
-                // Transfer to connected account was created
+                // Transfer to connected account was created.
+                // Transfers are synchronous, so we can treat this as "paid".
                 const transfer = event.data.object as any
                 const payoutId = transfer.metadata?.payout_id
 
@@ -73,24 +74,50 @@ export async function POST(req: Request) {
                         .from('mentor_payouts')
                         .update({
                             stripe_transfer_id: transfer.id,
-                            status: 'processing',
-                            processed_at: new Date().toISOString()
+                            status: 'paid',
+                            processed_at: new Date().toISOString(),
+                            paid_at: new Date().toISOString()
                         })
                         .eq('id', payoutId)
 
-                    console.log(`Transfer created for payout ${payoutId}`)
+                    console.log(`Transfer created and payout ${payoutId} marked as paid`)
                 }
                 break
             }
             case 'transfer.updated': {
-                // Transfer status changed (use this instead of transfer.paid/transfer.failed)
+                // Transfer object has limited status information; we mostly expect
+                // the initial "created" event above. Keep this handler defensive
+                // in case Stripe adds more states or the transfer is reversed.
                 const transfer = event.data.object as any
                 const payoutId = transfer.metadata?.payout_id
 
                 if (!payoutId) break
 
                 // Normalize handling based on transfer.status
-                const status = transfer.status as string | undefined
+                const status = (transfer.status as string | undefined) || undefined
+
+                // #region agent log
+                fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Debug-Session-Id': '103fb4'
+                    },
+                    body: JSON.stringify({
+                        sessionId: '103fb4',
+                        runId: 'post-fix-2',
+                        hypothesisId: 'W1',
+                        location: 'app/api/webhooks/stripe-connect/route.ts:90',
+                        message: 'Stripe transfer.updated received',
+                        data: {
+                            payoutId,
+                            transferId: transfer.id,
+                            status: status || null
+                        },
+                        timestamp: Date.now()
+                    })
+                }).catch(() => { })
+                // #endregion agent log
 
                 if (status === 'paid') {
                     await supabase
@@ -113,17 +140,10 @@ export async function POST(req: Request) {
 
                     console.log(`Payout ${payoutId} marked as failed`)
                 } else {
-                    // Other statuses (e.g., 'processing') — update basic info
-                    await supabase
-                        .from('mentor_payouts')
-                        .update({
-                            status: 'processing',
-                            processed_at: new Date().toISOString(),
-                            stripe_transfer_id: transfer.id
-                        })
-                        .eq('id', payoutId)
-
-                    console.log(`Payout ${payoutId} processing / updated (status=${status})`)
+                    // For any other status we *do not* downgrade or overwrite the
+                    // payout status — the admin API already set it to "paid" when
+                    // the transfer was created. Just log and leave the DB row as-is.
+                    console.log(`Payout ${payoutId} transfer.updated with non-terminal status=${status}`)
                 }
                 break
             }

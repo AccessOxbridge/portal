@@ -54,13 +54,75 @@ export async function GET(req: Request) {
 
         if (sessionsError) throw sessionsError
 
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': '103fb4'
+            },
+            body: JSON.stringify({
+                sessionId: '103fb4',
+                runId: 'pre-fix-1',
+                hypothesisId: 'H1',
+                location: 'app/api/admin/payouts/route.ts:52',
+                message: 'Payouts GET – raw sessions fetched',
+                data: {
+                    periodStart,
+                    periodEnd,
+                    sessionsCount: (sessions || []).length,
+                    mentorIds: Array.from(new Set((sessions || []).map(s => s.mentor_id)))
+                },
+                timestamp: Date.now()
+            })
+        }).catch(() => { })
+        // #endregion agent log
+
         // Filter to finished sessions
         const finishedSessions = (sessions || []).filter(
             s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
         )
 
+        // 3b. Exclude sessions that have already been included in any payout batch
+        const finishedSessionIds = finishedSessions.map(s => s.id)
+        let unbatchedSessions = finishedSessions
+
+        if (finishedSessionIds.length > 0) {
+            const { data: existingItems } = await adminSupabase
+                .from('mentor_payout_items')
+                .select('session_id')
+                .in('session_id', finishedSessionIds)
+
+            const batchedSessionIds = new Set((existingItems || []).map(i => i.session_id))
+            unbatchedSessions = finishedSessions.filter(s => !batchedSessionIds.has(s.id))
+
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Debug-Session-Id': '103fb4'
+                },
+                body: JSON.stringify({
+                    sessionId: '103fb4',
+                    runId: 'post-fix-1',
+                    hypothesisId: 'H4',
+                    location: 'app/api/admin/payouts/route.ts:90',
+                    message: 'Payouts GET – filter out already batched sessions',
+                    data: {
+                        periodStart,
+                        periodEnd,
+                        finishedCount: finishedSessions.length,
+                        unbatchedCount: unbatchedSessions.length
+                    },
+                    timestamp: Date.now()
+                })
+            }).catch(() => { })
+            // #endregion agent log
+        }
+
         // Collect unique mentor IDs
-        const mentorIds = [...new Set(finishedSessions.map(s => s.mentor_id))]
+        const mentorIds = [...new Set(unbatchedSessions.map(s => s.mentor_id))]
 
         // Batch-fetch mentor + profile data for those IDs
         const mentorMap: Record<string, {
@@ -114,7 +176,7 @@ export async function GET(req: Request) {
             total_cents: number
         }> = {}
 
-        for (const session of finishedSessions) {
+        for (const session of unbatchedSessions) {
             const mentorId = session.mentor_id
             const info = mentorMap[mentorId]
 
@@ -144,12 +206,41 @@ export async function GET(req: Request) {
             mentorEarnings[mentorId].total_cents += amountCents
         }
 
-        // 5. Check for existing payouts that overlap with the queried period
+        // 5. Check for existing payouts that match this exact period.
+        // We only treat mentors as "already paid" when there is a payout
+        // record for this *specific* period, to avoid incorrectly hiding
+        // new sessions that fall within a broader date range.
         const { data: existingPayouts } = await adminSupabase
             .from('mentor_payouts')
             .select('mentor_id, status')
-            .lte('period_start', periodEnd)
-            .gte('period_end', periodStart)
+            .eq('period_start', periodStart)
+            .eq('period_end', periodEnd)
+
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': '103fb4'
+            },
+            body: JSON.stringify({
+                sessionId: '103fb4',
+                runId: 'pre-fix-1',
+                hypothesisId: 'H2',
+                location: 'app/api/admin/payouts/route.ts:148',
+                message: 'Payouts GET – existing payouts for period',
+                data: {
+                    periodStart,
+                    periodEnd,
+                    existing: (existingPayouts || []).map(p => ({
+                        mentor_id: p.mentor_id,
+                        status: p.status
+                    }))
+                },
+                timestamp: Date.now()
+            })
+        }).catch(() => { })
+        // #endregion agent log
 
         const paidMentors = new Set(
             existingPayouts
@@ -162,6 +253,33 @@ export async function GET(req: Request) {
             ...e,
             already_paid: paidMentors.has(e.mentor_id)
         }))
+
+        // #region agent log
+        fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': '103fb4'
+            },
+            body: JSON.stringify({
+                sessionId: '103fb4',
+                runId: 'pre-fix-1',
+                hypothesisId: 'H3',
+                location: 'app/api/admin/payouts/route.ts:161',
+                message: 'Payouts GET – mentor earnings with already_paid flag',
+                data: {
+                    mentors: result.map(m => ({
+                        mentor_id: m.mentor_id,
+                        total_minutes: m.total_minutes,
+                        total_cents: m.total_cents,
+                        sessions_count: m.sessions.length,
+                        already_paid: m.already_paid
+                    }))
+                },
+                timestamp: Date.now()
+            })
+        }).catch(() => { })
+        // #endregion agent log
 
         return NextResponse.json({
             period_start: periodStart,
@@ -251,9 +369,46 @@ export async function POST(req: Request) {
                     .gte('scheduled_at', startDatePost.toISOString())
                     .lt('scheduled_at', endExclusivePost.toISOString())
 
-                const eligibleSessions = (sessions || []).filter(
+                const finishedSessionsForMentor = (sessions || []).filter(
                     s => s.status === 'completed' || s.zoom_meeting_status === 'ended'
                 )
+
+                // Exclude sessions that are already part of any payout batch
+                const mentorSessionIds = finishedSessionsForMentor.map(s => s.id)
+                let eligibleSessions = finishedSessionsForMentor
+
+                if (mentorSessionIds.length > 0) {
+                    const { data: existingItems } = await adminSupabase
+                        .from('mentor_payout_items')
+                        .select('session_id')
+                        .in('session_id', mentorSessionIds)
+
+                    const batchedSessionIds = new Set((existingItems || []).map(i => i.session_id))
+                    eligibleSessions = finishedSessionsForMentor.filter(s => !batchedSessionIds.has(s.id))
+
+                    // #region agent log
+                    fetch('http://127.0.0.1:7245/ingest/1c3fc266-62c3-4a4c-91ae-b0327a1d8af1', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Debug-Session-Id': '103fb4'
+                        },
+                        body: JSON.stringify({
+                            sessionId: '103fb4',
+                            runId: 'post-fix-1',
+                            hypothesisId: 'H5',
+                            location: 'app/api/admin/payouts/route.ts:334',
+                            message: 'Payouts POST – eligible sessions after excluding batched ones',
+                            data: {
+                                mentorId,
+                                finishedCount: finishedSessionsForMentor.length,
+                                eligibleCount: eligibleSessions.length
+                            },
+                            timestamp: Date.now()
+                        })
+                    }).catch(() => { })
+                    // #endregion agent log
+                }
 
                 if (!eligibleSessions.length) {
                     results.push({
@@ -326,7 +481,9 @@ export async function POST(req: Request) {
                         })
                 }
 
-                // Create Stripe Transfer
+                // Create Stripe Transfer. Transfers are synchronous – if this call
+                // succeeds, funds have been moved to the connected account, so we
+                // can safely mark the payout as paid.
                 const transferId = await createTransfer(
                     mentor.stripe_account_id,
                     totalCents,
@@ -339,13 +496,15 @@ export async function POST(req: Request) {
                     }
                 )
 
-                // Update payout with transfer ID
+                // Update payout with transfer ID and mark as paid
+                const nowIso = new Date().toISOString()
                 await adminSupabase
                     .from('mentor_payouts')
                     .update({
                         stripe_transfer_id: transferId,
-                        status: 'processing',
-                        processed_at: new Date().toISOString()
+                        status: 'paid',
+                        processed_at: nowIso,
+                        paid_at: nowIso
                     })
                     .eq('id', payout.id)
 

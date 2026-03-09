@@ -94,7 +94,7 @@ export default async function MentorReportsPage() {
                     Session Reports
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    Submit reports after each session to help generate personalized feedback for students
+                    Submit reports after each session to help generate personalised feedback for students
                 </p>
             </header>
 

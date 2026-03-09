@@ -43,7 +43,7 @@ function buildConsolidatedContext(
         if (s.action_items?.length) parts.push(`Action items: ${s.action_items.join('; ')}`)
         if (s.personalized_report) {
             const excerpt = s.personalized_report.replace(/\n/g, ' ').slice(0, 800)
-            parts.push(`Personalized report excerpt: ${excerpt}${s.personalized_report.length > 800 ? '...' : ''}`)
+            parts.push(`Personalised report excerpt: ${excerpt}${s.personalized_report.length > 800 ? '...' : ''}`)
         }
         if (s.mentor_responses && typeof s.mentor_responses === 'object') {
             const r = s.mentor_responses as Record<string, unknown>

@@ -99,51 +99,54 @@ export default function StudentDashboardContent({
     return (
         <>
             <div className="space-y-10">
-                <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                {/* Top row: heading + welcome aligned with hours remaining & bell (same vertical level) */}
+                <div className="flex flex-wrap items-center justify-between gap-4 -mt-1 md:-mt-5">
                     <div>
                         <h1 className="text-5xl font-extrabold text-accent tracking-tight">
                             Student Dashboard
                         </h1>
                         <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
-
-                        {/* Academic Profile + Targets on left */}
-                        <div className="my-4">
-                            <div className="space-y-4">
-                                <AcademicProfileCard userId={userId} userName={userName} />
-
-                                {/* Targets Section */}
-                                {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
-                                    <div className="flex flex-wrap items-center gap-3">
-                                        {academicProfile.target_university && (
-                                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                </svg>
-                                                {academicProfile.target_university}
-                                            </span>
-                                        )}
-                                        {academicProfile.target_course && (
-                                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                                </svg>
-                                                {academicProfile.target_course}
-                                            </span>
-                                        )}
-                                        {academicProfile.application_year && (
-                                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
-                                                <Calendar className="w-4 h-4" />
-                                                {academicProfile.application_year} Entry
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Booking / Requests Card as header sibling (right) */}
                     </div>
-                    <div className="mt-4 md:mt-0 md:ml-6 w-full md:w-[360px]">
+                    {/* Spacer so fixed hours/bell sit on the right without overlapping this row */}
+                    <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
+                </div>
+
+                <header className="mb-12 flex flex-col md:flex-row md:items-start justify-between gap-6 mt-6">
+                    <div className="flex-1 min-w-0">
+                        {/* Academic Profile + Targets on left */}
+                        <div className="space-y-4">
+                            <AcademicProfileCard userId={userId} userName={userName} />
+
+                            {/* Targets Section */}
+                            {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {academicProfile.target_university && (
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                            </svg>
+                                            {academicProfile.target_university}
+                                        </span>
+                                    )}
+                                    {academicProfile.target_course && (
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            </svg>
+                                            {academicProfile.target_course}
+                                        </span>
+                                    )}
+                                    {academicProfile.application_year && (
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                                            <Calendar className="w-4 h-4" />
+                                            {academicProfile.application_year} Entry
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="w-full md:w-[360px] shrink-0">
                         {activeSession ? (
                             <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
                                 <div className="flex items-start gap-4">
@@ -180,7 +183,7 @@ export default function StudentDashboardContent({
                                     </div>
                                     <div className="min-w-0">
                                         <h3 className="text-base font-bold text-gray-900 truncate">Requests Pending</h3>
-                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to the top 5 matching mentors. We'll notify you once one of them accepts!</p>
+                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to the top 12 matching mentors. We'll notify you once one of them accepts!</p>
                                     </div>
                                 </div>
 

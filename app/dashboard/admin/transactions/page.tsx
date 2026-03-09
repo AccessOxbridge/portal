@@ -33,6 +33,16 @@ export default async function AdminTransactionsPage() {
         .order('completed_at', { ascending: false })
         .limit(100)
 
+    // Fetch outbound transactions (mentor payouts)
+    const { data: payouts } = await supabase
+        .from('mentor_payouts')
+        .select(`
+            *,
+            profiles:mentor_id (full_name, email)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100)
+
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
@@ -44,7 +54,7 @@ export default async function AdminTransactionsPage() {
                 </p>
             </header>
 
-            <TransactionsTabs purchases={purchases || []} />
+            <TransactionsTabs purchases={purchases || []} payouts={payouts || []} />
         </div>
     )
 }

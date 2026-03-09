@@ -863,6 +863,7 @@ export type Database = {
           selected_slot: Json | null
           status: string
           student_id: string
+          transcript_download_token: string | null
           transcript_url: string | null
           updated_at: string | null
           zoom_join_url: string | null
@@ -881,6 +882,7 @@ export type Database = {
           selected_slot?: Json | null
           status?: string
           student_id: string
+          transcript_download_token?: string | null
           transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null
@@ -899,6 +901,7 @@ export type Database = {
           selected_slot?: Json | null
           status?: string
           student_id?: string
+          transcript_download_token?: string | null
           transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null

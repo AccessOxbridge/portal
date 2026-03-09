@@ -5,6 +5,7 @@ import { Star, Search, ChevronDown, ChevronUp, FileText } from 'lucide-react'
 
 interface Feedback {
     id: string
+    sessionId: string | null
     studentName: string
     mentorName: string
     mentorId: string
@@ -126,7 +127,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                             onClick={() => setExpandedId(expandedId === feedback.id ? null : feedback.id)}
                                             className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors inline-flex items-center gap-1"
                                         >
-                                            {(feedback.experience || feedback.transcript || feedback.summary) && (
+                                            {(feedback.experience || feedback.transcript || feedback.summary || feedback.transcriptUrl) && (
                                                 <FileText className="w-4 h-4" />
                                             )}
                                             {expandedId === feedback.id ? (
@@ -147,7 +148,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                         </td>
                                     </tr>
                                 )}
-                                {expandedId === feedback.id && (feedback.transcript || feedback.summary) && (
+                                {expandedId === feedback.id && (feedback.transcript || feedback.summary || feedback.transcriptUrl) && (
                                     <tr key={`${feedback.id}-transcript`} className="bg-gray-50">
                                         <td colSpan={7} className="px-6 py-4">
                                             <div className="p-4 bg-white rounded-xl border border-gray-100">
@@ -167,12 +168,12 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                                 )}
                                                 {feedback.transcriptUrl && !feedback.transcript && (
                                                     <a
-                                                        href={feedback.transcriptUrl}
+                                                        href={feedback.sessionId ? `/api/transcript/${feedback.sessionId}` : feedback.transcriptUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-accent hover:underline text-sm"
                                                     >
-                                                        View Transcript on Zoom →
+                                                        View Transcript →
                                                     </a>
                                                 )}
                                             </div>

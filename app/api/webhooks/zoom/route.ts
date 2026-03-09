@@ -144,9 +144,10 @@ export async function POST(req: Request) {
 
         // 3. Handle Recording Completed (includes transcript files when available)
         else if (event === 'recording.completed') {
-            const meetingId = payload?.object?.id
-            const meetingIdStr = meetingId != null ? String(meetingId) : ''
-            const downloadToken = body.download_token
+            const meetingIdA = payload?.object?.id
+            const meetingIdB = payload?.payload?.object?.id
+            const meetingIdStr = (meetingIdA ?? meetingIdB) != null ? String(meetingIdA ?? meetingIdB) : ''
+            const downloadToken = body?.download_token
 
             if (meetingIdStr && payload?.object?.recording_files) {
                 const transcriptFile = payload.object.recording_files.find(
@@ -155,10 +156,12 @@ export async function POST(req: Request) {
 
                 if (transcriptFile && downloadToken) {
                     console.log(`[ZOOM WEBHOOK] recording.completed has transcript for meeting: ${meetingIdStr}`)
-
                     await supabase
                         .from('sessions')
-                        .update({ transcript_url: transcriptFile.download_url })
+                        .update({
+                            transcript_url: transcriptFile.download_url,
+                            transcript_download_token: downloadToken,
+                        })
                         .eq('zoom_meeting_id', meetingIdStr)
 
                     processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
@@ -166,28 +169,36 @@ export async function POST(req: Request) {
                 } else {
                     console.log(`[ZOOM WEBHOOK] recording.completed for ${meetingIdStr} — no transcript file yet`)
                 }
+            } else {
             }
         }
 
         // 4. Handle Transcription Completed (dedicated event, can be unreliable)
         else if (event === 'recording.transcript_completed') {
-            const meetingId = payload.object.id
-            const meetingIdStr = String(meetingId)
-            const downloadToken = body.download_token
-            const transcriptFile = payload.object.recording_files?.find(
+            const meetingIdA = payload?.object?.id
+            const meetingIdB = payload?.payload?.object?.id
+            const meetingIdStr = (meetingIdA ?? meetingIdB) != null ? String(meetingIdA ?? meetingIdB) : ''
+            const downloadToken = body?.download_token
+            const recordingFiles = payload?.object?.recording_files ?? payload?.payload?.object?.recording_files
+            const transcriptFile = recordingFiles?.find(
                 (file: any) => file.file_type === 'TRANSCRIPT'
             )
 
-            if (transcriptFile) {
-                console.log(`[ZOOM WEBHOOK] Transcript ready for meeting: ${meetingId}`)
+            if (meetingIdStr && transcriptFile) {
+                console.log(`[ZOOM WEBHOOK] Transcript ready for meeting: ${meetingIdStr}`)
 
                 await supabase
                     .from('sessions')
-                    .update({ transcript_url: transcriptFile.download_url })
+                    .update({
+                        transcript_url: transcriptFile.download_url,
+                        ...(downloadToken && { transcript_download_token: downloadToken }),
+                    })
                     .eq('zoom_meeting_id', meetingIdStr)
 
-                processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
+                if (downloadToken) {
+                    processTranscript(meetingIdStr, transcriptFile.download_url, downloadToken)
                     .catch((err: any) => console.error('[ZOOM WEBHOOK] Transcript processing failed:', err))
+                }
             }
         } else {
             console.log(`[ZOOM WEBHOOK] Unhandled event: ${event}. Payload keys: ${payload ? Object.keys(payload).join(', ') : 'none'}`)

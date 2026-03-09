@@ -89,6 +89,7 @@ export default async function AdminFeedbacksPage() {
         const responses = f.responses as Record<string, any>
         return {
             id: f.id,
+            sessionId: f.session_id,
             studentName: session?.student_id ? studentMap.get(session.student_id) || 'Unknown' : 'Unknown',
             mentorName: session?.mentor_id ? mentorMap.get(session.mentor_id) || 'Unknown' : 'Unknown',
             mentorId: session?.mentor_id || '',

@@ -13,6 +13,12 @@ export function sanitizeReportContent(text: string): string {
         /\s*\(?(?:AI summary|AI-generated summary) (?:was )?not available\)?\.?\s*/gi,
         /\s*Note:?\s*(?:the )?AI summary (?:was )?not available\.?\s*/gi,
         /\s*Without (?:an? )?AI summary,?\s*/gi,
+        // Strip any mention of transcripts/recordings or video platform names.
+        /\s*(?:based on|from|using|according to|as per|per)\s+(?:the\s+)?(?:zoom\s+)?(?:recording|transcript)\b[:,]?\s*/gi,
+        /\s*(?:the\s+)?(?:zoom\s+)?(?:recording|transcript)\s+(?:shows|indicates|suggests|states|notes)\b[:,]?\s*/gi,
+        /\bzoom\b/gi,
+        /\btranscript\b/gi,
+        /\brecording\b/gi,
     ]
     let out = text
     for (const p of patterns) {

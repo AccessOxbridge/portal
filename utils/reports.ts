@@ -1,6 +1,7 @@
 import { createAdminClient } from './supabase/admin'
 import { getZoomAccessToken, getZoomRecordings } from './zoom'
 import OpenAI from 'openai'
+import { sanitizeReportContent } from '@/lib/report-utils'
 
 export function parseVTT(vttContent: string): string {
     let text = vttContent.replace(/^WEBVTT\n\n/i, '')
@@ -53,17 +54,25 @@ async function generateAndSaveReport(meetingId: string, vttContent: string) {
         messages: [
             {
                 role: 'system',
-                content: 'You are an expert AI assistant for a mentorship platform. Your task is to analyze a mentorship session transcript and generate a structured report. Return JSON with \'summary\', \'key_points\' (array of strings), and \'action_items\' (array of strings).',
+                content:
+                    'You are an expert education consultant for a mentorship platform. Your task is to generate a structured report about the session. Do not mention any transcripts, recordings, video platforms, or how the information was obtained. Return JSON with \'summary\', \'key_points\' (array of strings), and \'action_items\' (array of strings).',
             },
             {
                 role: 'user',
-                content: `Analyze the following transcript and generate a mentorship session report: \n\n ${cleanedTranscript}`,
+                content: `Generate a mentorship session report based on the following session dialogue. Do not mention the source. \n\n ${cleanedTranscript}`,
             },
         ],
         response_format: { type: 'json_object' },
     })
 
     const reportData = JSON.parse(completion.choices[0].message.content || '{}')
+    const safeSummary = sanitizeReportContent(String(reportData?.summary ?? '')).trim()
+    const safeKeyPoints = Array.isArray(reportData?.key_points)
+        ? reportData.key_points.map((x: any) => sanitizeReportContent(String(x ?? '')).trim()).filter(Boolean)
+        : []
+    const safeActionItems = Array.isArray(reportData?.action_items)
+        ? reportData.action_items.map((x: any) => sanitizeReportContent(String(x ?? '')).trim()).filter(Boolean)
+        : []
 
     console.log(`[REPORTS] Looking up session for zoom_meeting_id: ${meetingId}`)
     const { data: session, error: fetchError } = await supabase
@@ -81,9 +90,9 @@ async function generateAndSaveReport(meetingId: string, vttContent: string) {
         .from('session_reports')
         .insert({
             session_id: session.id,
-            summary: reportData.summary,
-            key_points: reportData.key_points,
-            action_items: reportData.action_items,
+            summary: safeSummary || null,
+            key_points: safeKeyPoints,
+            action_items: safeActionItems,
             raw_transcript: cleanedTranscript,
         })
 
@@ -99,7 +108,6 @@ async function generateAndSaveReport(meetingId: string, vttContent: string) {
 export async function processTranscript(meetingId: string, downloadUrl: string, downloadToken: string) {
     try {
         console.log(`[REPORTS] Starting webhook-triggered process for meeting: ${meetingId}`)
-
         if (await reportAlreadyExists(meetingId)) {
             console.log(`[REPORTS] Report already exists for meeting ${meetingId}, skipping`)
             return

@@ -1,1 +1,1 @@
-Portal to Top Universities.
+Portal to Top Universities

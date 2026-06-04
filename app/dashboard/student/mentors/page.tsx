@@ -23,82 +23,94 @@ export default async function MyMentorsPage() {
         return redirect('/dashboard')
     }
 
-    // Fetch unique mentors from sessions (both active and completed)
-    const { data: sessions } = await supabase
-        .from('sessions')
-        .select(`
-            id,
-            status,
-            scheduled_at,
-            created_at,
-            mentor_id,
-            mentor:profiles!sessions_mentor_id_fkey (
-                id,
-                full_name
-            )
-        `)
+    // The student's mentor history comes from admin assignments.
+    const { data: assignments } = await supabase
+        .from('student_mentor_assignments')
+        .select('mentor_id, is_current, created_at, ended_at')
         .eq('student_id', user.id)
-        .in('status', ['active', 'completed'])
         .order('created_at', { ascending: false })
 
-    // Get unique mentor IDs
-    const mentorIds = [...new Set((sessions || []).map((s: any) => s.mentor_id))]
+    const currentAssignment = (assignments || []).find((a: any) => a.is_current) || null
+    const currentMentorId = currentAssignment?.mentor_id || null
 
-    // Fetch mentor details
-    const { data: mentorDetails } = mentorIds.length > 0
+    // Past mentors = distinct previously-assigned mentors that are not the current one.
+    const pastMentorIds = [
+        ...new Set(
+            (assignments || [])
+                .filter((a: any) => !a.is_current && a.mentor_id && a.mentor_id !== currentMentorId)
+                .map((a: any) => a.mentor_id as string)
+        ),
+    ]
+
+    const allMentorIds = [...new Set([currentMentorId, ...pastMentorIds].filter(Boolean) as string[])]
+
+    // Mentor profile details
+    const { data: mentorDetails } = allMentorIds.length > 0
         ? await supabase
             .from('mentors')
             .select('id, bio, expertise, photo_url')
-            .in('id', mentorIds)
+            .in('id', allMentorIds)
         : { data: [] }
 
-    const mentorDetailsMap = new Map(
-        (mentorDetails || []).map((m: any) => [m.id, m])
-    )
+    const detailsMap = new Map((mentorDetails || []).map((m: any) => [m.id, m]))
 
-    // Process mentors with their session info
-    const mentorMap = new Map<string, any>()
+    const { data: mentorProfiles } = allMentorIds.length > 0
+        ? await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .in('id', allMentorIds)
+        : { data: [] }
 
-    for (const session of sessions || []) {
-        const mentorId = session.mentor_id
-        if (!mentorMap.has(mentorId)) {
-            const details = mentorDetailsMap.get(mentorId) || {}
-            mentorMap.set(mentorId, {
-                id: mentorId,
-                full_name: (session.mentor as any)?.full_name || 'Mentor',
-                bio: details.bio || null,
-                expertise: details.expertise || [],
-                photo_url: details.photo_url || null,
-                has_active_session: session.status === 'active',
-                total_sessions: 0,
-                last_session_at: null
-            })
+    const profileMap = new Map((mentorProfiles || []).map((p: any) => [p.id, p]))
+
+    // Session stats per mentor (for the card details / active badge)
+    const { data: sessions } = allMentorIds.length > 0
+        ? await supabase
+            .from('sessions')
+            .select('mentor_id, status, scheduled_at')
+            .eq('student_id', user.id)
+            .in('mentor_id', allMentorIds)
+        : { data: [] }
+
+    const statsMap = new Map<string, { total: number; active: boolean; last: string | null }>()
+    for (const s of sessions || []) {
+        const mid = (s as any).mentor_id as string
+        const entry = statsMap.get(mid) || { total: 0, active: false, last: null }
+        entry.total++
+        if ((s as any).status === 'active') entry.active = true
+        const scheduledAt = (s as any).scheduled_at
+        if (scheduledAt && (!entry.last || new Date(scheduledAt) > new Date(entry.last))) {
+            entry.last = scheduledAt
         }
+        statsMap.set(mid, entry)
+    }
 
-        const mentor = mentorMap.get(mentorId)!
-        mentor.total_sessions++
-        if (session.status === 'active') {
-            mentor.has_active_session = true
-        }
-        if (session.scheduled_at && (!mentor.last_session_at || new Date(session.scheduled_at) > new Date(mentor.last_session_at))) {
-            mentor.last_session_at = session.scheduled_at
+    const buildMentor = (mentorId: string) => {
+        const details = detailsMap.get(mentorId) || {}
+        const stats = statsMap.get(mentorId) || { total: 0, active: false, last: null }
+        return {
+            id: mentorId,
+            full_name: profileMap.get(mentorId)?.full_name || 'Mentor',
+            bio: details.bio || null,
+            expertise: details.expertise || [],
+            photo_url: details.photo_url || null,
+            has_active_session: stats.active,
+            total_sessions: stats.total,
+            last_session_at: stats.last,
         }
     }
 
-    const mentors = Array.from(mentorMap.values())
-
-    // Split into active (connected) and past mentors
-    const activeMentors = mentors.filter(m => m.has_active_session)
-    const pastMentors = mentors.filter(m => !m.has_active_session)
+    const activeMentors = currentMentorId ? [buildMentor(currentMentorId)] : []
+    const pastMentors = pastMentorIds.map(buildMentor)
 
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
                 <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    My Mentors
+                    My Mentor
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    Your allocated and connected mentors
+                    Your assigned mentor and your mentorship history
                 </p>
             </header>
 

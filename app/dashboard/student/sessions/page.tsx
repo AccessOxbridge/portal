@@ -43,6 +43,16 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
         Array.isArray(academicProfile.subjects) &&
         academicProfile.subjects.length > 0)
 
+    // A student can only book once an admin has assigned them a mentor.
+    const { data: currentAssignment } = await supabase
+        .from('student_mentor_assignments')
+        .select('mentor_id')
+        .eq('student_id', user.id)
+        .eq('is_current', true)
+        .maybeSingle()
+
+    const hasMentor = !!currentAssignment?.mentor_id
+
     // Fetch pending mentorship requests
     const { data: pendingRequests } = await supabase
         .from('mentorship_requests')
@@ -177,6 +187,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
                 credits={profile?.credits || 0}
                 academicProfile={academicProfile as any}
                 canBook={canBook}
+                hasMentor={hasMentor}
                 autoOpenBooking={autoOpenBooking}
                 studentId={user.id}
             />

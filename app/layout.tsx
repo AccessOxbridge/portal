@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "../assets/globals.css";
 import NotificationBell from "@/components/dashboard/notification-bell";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Access Oxbridge | Portal",
   description: "Your gateway to the world of Oxbridge admissions.",
   icons: {
-    icon: "/logo.webp",
+    icon: "/logo.png",
   },
   openGraph: {
     title: "Access Oxbridge | Portal",
@@ -30,9 +31,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body
-        className={`${geistSans.variable} antialiased`}
+        className="font-sans antialiased"
       >
         <NotificationBell />
         {children}

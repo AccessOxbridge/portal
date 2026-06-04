@@ -10,8 +10,9 @@ import NewConversationDialog from '@/components/chat/new-conversation-dialog'
 interface Conversation {
     id: string
     student_id: string
-    mentor_id: string
+    mentor_id: string | null
     admin_id?: string | null
+    type?: 'mentor' | 'support'
     last_message_at: string
     other_user: {
         id: string
@@ -44,6 +45,10 @@ interface MessagesContentProps {
     userRole: 'student' | 'mentor'
     /** When set, open the conversation with this mentor (student view). */
     initialMentorId?: string
+    /** When true, open the Help & Support conversation (student view). */
+    initialSupport?: boolean
+    /** Whether the "New conversation" affordance is shown. */
+    allowNewConversation?: boolean
 }
 
 export default function MessagesContent({
@@ -51,7 +56,9 @@ export default function MessagesContent({
     currentUserId,
     connectedUsers,
     userRole,
-    initialMentorId
+    initialMentorId,
+    initialSupport = false,
+    allowNewConversation = true
 }: MessagesContentProps) {
     const router = useRouter()
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(
@@ -70,6 +77,16 @@ export default function MessagesContent({
         }
     }, [initialMentorId, conversations, router])
 
+    // Open the Help & Support chat when navigating with ?support=1
+    useEffect(() => {
+        if (!initialSupport || conversations.length === 0) return
+        const support = conversations.find((c) => c.type === 'support')
+        if (support) {
+            setSelectedConversation(support)
+            router.replace('/dashboard/student/messages', { scroll: false })
+        }
+    }, [initialSupport, conversations, router])
+
     // Dynamic placeholder text based on user role
     const placeholderText = userRole === 'student'
         ? 'Choose a mentor to start chatting'
@@ -82,13 +99,15 @@ export default function MessagesContent({
                 <div className="w-80 border-r border-gray-100 overflow-y-auto bg-white flex flex-col">
                     <div className="sticky top-0 bg-white z-10 px-4 py-3 border-b border-gray-50 flex items-center justify-between">
                         <h2 className="font-semibold text-gray-700 text-sm">Conversations</h2>
-                        <button
-                            onClick={() => setIsNewConversationOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg hover:bg-accent/90 transition-colors"
-                        >
-                            <Plus className="w-3.5 h-3.5" />
-                            New
-                        </button>
+                        {allowNewConversation && (
+                            <button
+                                onClick={() => setIsNewConversationOpen(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                            >
+                                <Plus className="w-3.5 h-3.5" />
+                                New
+                            </button>
+                        )}
                     </div>
                     <div className="flex-1 overflow-y-auto">
                         <ConversationList
@@ -121,26 +140,30 @@ export default function MessagesContent({
                             </svg>
                             <p className="text-lg font-medium">Select a conversation</p>
                             <p className="text-sm text-gray-300 mt-1">{placeholderText}</p>
-                            <button
-                                onClick={() => setIsNewConversationOpen(true)}
-                                className="mt-4 flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-semibold rounded-xl hover:bg-accent/90 transition-colors"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Start a New Conversation
-                            </button>
+                            {allowNewConversation && (
+                                <button
+                                    onClick={() => setIsNewConversationOpen(true)}
+                                    className="mt-4 flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-semibold rounded-xl hover:bg-accent/90 transition-colors"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Start a New Conversation
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
 
             {/* New Conversation Dialog */}
-            <NewConversationDialog
-                isOpen={isNewConversationOpen}
-                onClose={() => setIsNewConversationOpen(false)}
-                currentUserId={currentUserId}
-                connectedUsers={connectedUsers}
-                userRole={userRole}
-            />
+            {allowNewConversation && (
+                <NewConversationDialog
+                    isOpen={isNewConversationOpen}
+                    onClose={() => setIsNewConversationOpen(false)}
+                    currentUserId={currentUserId}
+                    connectedUsers={connectedUsers}
+                    userRole={userRole}
+                />
+            )}
         </>
     )
 }

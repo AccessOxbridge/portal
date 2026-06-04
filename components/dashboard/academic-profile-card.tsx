@@ -75,14 +75,11 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
                         <p className={`text-base font-bold truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-900'}`}>
                             {isIncomplete ? 'Complete Your Profile' : 'Academic Profile'}
                         </p>
-                        <p className={`text-sm truncate mt-0.5 ${isIncomplete ? 'text-amber-600/80' : 'text-gray-500'}`}>
-                            {isIncomplete
-                                ? 'Required for matching'
-                                : profile?.target_university
-                                    ? `Target: ${profile.target_university}`
-                                    : userName
-                            }
-                        </p>
+                        {isIncomplete && (
+                            <p className="text-sm truncate mt-0.5 text-amber-600/80">
+                                Required for matching
+                            </p>
+                        )}
                     </div>
                 </div>
                 <ChevronRight className={`w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1 ${isIncomplete ? 'text-amber-500' : 'text-gray-400'

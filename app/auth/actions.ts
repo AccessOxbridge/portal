@@ -22,7 +22,7 @@ export async function login(formData: FormData) {
 
     if (error) {
         console.error('Login error:', error.message)
-        redirect(`/error?message=${encodeURIComponent(error.message)}`)
+        redirect(`/error?message=${encodeURIComponent(error.message)}&from=/login`)
     }
 
     revalidatePath('/', 'layout')
@@ -142,12 +142,27 @@ export async function resetPassword(formData: FormData) {
     const password = formData.get('password') as string
     const confirmPassword = formData.get('confirmPassword') as string
 
+    // Keep validation feedback on the reset-password page so the user can retry
+    // with the form (and their recovery session) still intact.
     if (!password || !confirmPassword) {
-        redirect('/error?message=Both password fields are required.')
+        redirect(`/reset-password?message=${encodeURIComponent('Both password fields are required.')}`)
+    }
+
+    if (password.length < 6) {
+        redirect(`/reset-password?message=${encodeURIComponent('Password must be at least 6 characters.')}`)
     }
 
     if (password !== confirmPassword) {
-        redirect('/error?message=Passwords do not match.')
+        redirect(`/reset-password?message=${encodeURIComponent('Passwords do not match.')}`)
+    }
+
+    // The user must have an active (recovery) session to update their password.
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect(`/reset-password?error=session_missing&error_description=${encodeURIComponent('Your reset link has expired. Please request a new one.')}`)
     }
 
     const { error } = await supabase.auth.updateUser({
@@ -156,7 +171,7 @@ export async function resetPassword(formData: FormData) {
 
     if (error) {
         console.error('Reset password error:', error.message)
-        redirect(`/error?message=${encodeURIComponent(error.message)}`)
+        redirect(`/reset-password?message=${encodeURIComponent(error.message)}`)
     }
 
     revalidatePath('/', 'layout')

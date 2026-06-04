@@ -28,7 +28,7 @@ interface ChatWindowProps {
     }
     allParticipants?: {
         student_id: string
-        mentor_id: string
+        mentor_id: string | null
         admin_id?: string
     }
 }

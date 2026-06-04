@@ -74,9 +74,10 @@ export type Database = {
           created_at: string | null
           id: string
           last_message_at: string | null
-          mentor_id: string
+          mentor_id: string | null
           session_id: string | null
           student_id: string
+          type: string
           updated_at: string | null
         }
         Insert: {
@@ -84,9 +85,10 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_message_at?: string | null
-          mentor_id: string
+          mentor_id?: string | null
           session_id?: string | null
           student_id: string
+          type?: string
           updated_at?: string | null
         }
         Update: {
@@ -94,9 +96,10 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_message_at?: string | null
-          mentor_id?: string
+          mentor_id?: string | null
           session_id?: string | null
           student_id?: string
+          type?: string
           updated_at?: string | null
         }
         Relationships: [
@@ -574,6 +577,7 @@ export type Database = {
           responses: Json | null
           status: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id: string | null
+          timezone: string | null
           training_completed_at: string | null
           university: string | null
           updated_at: string
@@ -600,6 +604,7 @@ export type Database = {
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id?: string | null
+          timezone?: string | null
           training_completed_at?: string | null
           university?: string | null
           updated_at?: string
@@ -626,6 +631,7 @@ export type Database = {
           responses?: Json | null
           status?: Database["public"]["Enums"]["mentor_status"] | null
           stripe_account_id?: string | null
+          timezone?: string | null
           training_completed_at?: string | null
           university?: string | null
           updated_at?: string
@@ -933,6 +939,58 @@ export type Database = {
           },
           {
             foreignKeyName: "sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_mentor_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          is_current: boolean
+          mentor_id: string
+          student_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_current?: boolean
+          mentor_id: string
+          student_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_current?: boolean
+          mentor_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_mentor_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_mentor_assignments_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_mentor_assignments_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"

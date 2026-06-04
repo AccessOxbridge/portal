@@ -166,6 +166,29 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
 }
 
 /**
+ * Delete a scheduled Zoom meeting. Best-effort: failures are logged, not thrown.
+ * Used when an admin reassigns a student's mentor and the old upcoming session
+ * needs to be cancelled.
+ */
+export async function deleteZoomMeeting(meetingId: string): Promise<void> {
+    try {
+        const accessToken = await getZoomAccessToken()
+
+        const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        })
+
+        if (!response.ok && response.status !== 404) {
+            const error = await response.text()
+            console.warn(`[ZOOM] Could not delete meeting ${meetingId} (non-fatal): ${error}`)
+        }
+    } catch (err) {
+        console.warn(`[ZOOM] Failed to delete meeting ${meetingId} (non-fatal):`, err)
+    }
+}
+
+/**
  * Fetch recordings for a past meeting from Zoom's API.
  * Used as a polling fallback when webhooks don't fire.
  */

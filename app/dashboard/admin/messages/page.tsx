@@ -23,13 +23,14 @@ export default async function AdminMessagesPage() {
         return redirect('/dashboard')
     }
 
-    // Fetch ALL conversations with student and mentor info
+    // Fetch ALL conversations with student and mentor info (incl. support threads)
     const { data: conversations } = await supabase
         .from('conversations')
         .select(`
             id,
             student_id,
             mentor_id,
+            type,
             last_message_at,
             created_at,
             student:profiles!conversations_student_id_fkey (
@@ -63,10 +64,13 @@ export default async function AdminMessagesPage() {
                 .limit(1)
                 .single()
 
+            const isSupport = conv.type === 'support'
+
             return {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
+                type: (conv.type || 'mentor') as 'mentor' | 'support',
                 last_message_at: conv.last_message_at || conv.created_at || new Date().toISOString(),
                 created_at: conv.created_at || new Date().toISOString(),
                 student: {
@@ -75,8 +79,8 @@ export default async function AdminMessagesPage() {
                     email: conv.student?.email || ''
                 },
                 mentor: {
-                    id: conv.mentor?.id || conv.mentor_id,
-                    full_name: conv.mentor?.full_name || 'Unknown Mentor',
+                    id: conv.mentor?.id || conv.mentor_id || 'support',
+                    full_name: isSupport ? 'Help & Support' : (conv.mentor?.full_name || 'Unknown Mentor'),
                     email: conv.mentor?.email || ''
                 },
                 message_count: messageCount || 0,

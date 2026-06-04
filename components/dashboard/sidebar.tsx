@@ -72,7 +72,7 @@ const navigation = {
         { name: 'Home', href: '/dashboard/student', icon: Home },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
-        { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
+        { name: 'My Mentor', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
         { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
     ],
@@ -459,6 +459,14 @@ export default function Sidebar({
                                 <User className="w-5 h-5 text-white/60" />
                                 <span>My Profile</span>
                             </Link>
+                            <Link
+                                href="/dashboard/settings"
+                                onClick={() => setProfileMenuOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm border-b border-white/10"
+                            >
+                                <Settings className="w-5 h-5 text-white/60" />
+                                <span>Settings</span>
+                            </Link>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -506,9 +514,17 @@ export default function Sidebar({
                             </div>
                         </div>
 
+                        <Link
+                            href="/dashboard/settings"
+                            className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-white/10 hover:text-white transition-all text-sm group"
+                        >
+                            <Settings className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors" />
+                            <span>Settings</span>
+                        </Link>
+
                         <button
                             onClick={handleSignOut}
-                            className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
+                            className="mt-1 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
                         >
                             <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                             <span>Sign Out</span>

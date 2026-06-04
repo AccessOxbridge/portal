@@ -42,7 +42,7 @@ serve(async (req) => {
             <p style="color: #555; font-size: 16px; line-height: 1.5;">${message}</p>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
             <p style="color: #888; font-size: 14px;">This is an automated notification from Oxbridge Portal. You can view your notifications by logging into your dashboard.</p>
-            <a href="https://accessoxbridge.vercel.app/dashboard" style="display: inline-block; padding: 10px 20px; background-color: #0070f3; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">Go to Dashboard</a>
+            <a href="https://app.accessoxbridge.io/dashboard" style="display: inline-block; padding: 10px 20px; background-color: #0070f3; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">Go to Dashboard</a>
           </div>
         `,
             }),

@@ -9,8 +9,8 @@ export function Logo({ className, textColor = "text-gray-900" }: { className?: s
       aria-label="Access Oxbridge"
       className={cn("col-span-1 flex items-center justify-center transition-opacity gap-2", className)}
     >
-      <Image src="/logo.webp" alt="Access Oxbridge" width={32} height={32} />
-      <h1 className={cn("text-lg hidden md:flex sm:text-2xl tracking-tighter text-center whitespace-nowrap", textColor)}>
+      <Image src="/logo.png" alt="Access Oxbridge" width={32} height={32} className="[mix-blend-mode:screen]" />
+      <h1 className={cn("text-lg hidden md:flex sm:text-2xl font-extrabold tracking-tight text-center whitespace-nowrap", textColor)}>
         Access Oxbridge
       </h1>
     </Link>

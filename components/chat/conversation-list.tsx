@@ -5,7 +5,8 @@ import { formatDistanceToNow } from 'date-fns'
 interface Conversation {
     id: string
     student_id: string
-    mentor_id: string
+    mentor_id: string | null
+    type?: 'mentor' | 'support'
     last_message_at: string
     other_user: {
         id: string

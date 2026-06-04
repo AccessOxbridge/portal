@@ -175,7 +175,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
 
     const handleSubmit = async () => {
         if (timeSlots.length < 3) {
-            setError('Please add at least 3 time slots for better mentor matching')
+            setError('Please add at least 3 time slots so your mentor can pick one that works')
             return
         }
 
@@ -183,7 +183,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
         setError(null)
 
         try {
-            const response = await fetch('/api/match-mentors', {
+            const response = await fetch('/api/student/book-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -261,7 +261,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-700 leading-relaxed">
-                                        Add at least <strong>3 time slots</strong> when you're available. This helps us match you with mentors more effectively.
+                                        Add at least <strong>3 time slots</strong> when you're available. Your assigned mentor will confirm one that works for them.
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">
                                         Timezone: <strong>{studentProfile.timezone || 'Not set'}</strong>

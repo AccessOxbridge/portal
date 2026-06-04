@@ -47,3 +47,7 @@ testzoom.ts
 supabase\.temp
 
 /.cursor
+
+/FOUNDERS_HANDBOOK.docx
+
+/temp

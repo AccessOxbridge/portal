@@ -7,6 +7,7 @@ import { Suspense } from 'react'
 function ErrorContent() {
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
+    const from = searchParams.get('from') || '/signup'
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">
@@ -16,7 +17,7 @@ function ErrorContent() {
                     {message || 'Sorry, an unexpected error occurred during authentication.'}
                 </p>
                 <Link
-                    href="/signup"
+                    href={from}
                     className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     Try Again

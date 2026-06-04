@@ -89,6 +89,32 @@ export default async function StudentDashboard() {
         .eq('id', user.id)
         .single()
 
+    // Current assigned mentor (booking requires one)
+    const { data: currentAssignment } = await supabase
+        .from('student_mentor_assignments')
+        .select('mentor_id')
+        .eq('student_id', user.id)
+        .eq('is_current', true)
+        .maybeSingle()
+
+    const hasMentor = !!currentAssignment?.mentor_id
+
+    // Count sessions booked this week (Mon–Sun)
+    const weekStart = new Date()
+    const dayOfWeek = weekStart.getDay()
+    weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1))
+    weekStart.setHours(0, 0, 0, 0)
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 7)
+
+    const { count: sessionsThisWeekCount } = await supabase
+        .from('sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', user.id)
+        .in('status', ['active', 'completed'])
+        .gte('scheduled_at', weekStart.toISOString())
+        .lt('scheduled_at', weekEnd.toISOString())
+
     return (
         <StudentDashboardContent
             profile={profile}
@@ -96,8 +122,10 @@ export default async function StudentDashboard() {
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
             academicProfile={academicProfile as any}
+            hasMentor={hasMentor}
             userId={user.id}
             userName={profile.full_name || 'Student'}
+            sessionsThisWeek={sessionsThisWeekCount ?? 0}
         />
     )
 }

@@ -9,6 +9,7 @@ import {
     Loader2
 } from 'lucide-react'
 import { StudentActions } from './components/StudentActions'
+import { MentorAssignCell } from './components/MentorAssignCell'
 
 interface Student {
     id: string
@@ -25,14 +26,49 @@ interface Student {
     } | null
 }
 
+interface MentorOption {
+    id: string
+    name: string
+}
+
 export default function AdminStudentsPage() {
     const supabase = createClient()
     const [students, setStudents] = useState<Student[]>([])
+    const [mentors, setMentors] = useState<MentorOption[]>([])
+    const [assignments, setAssignments] = useState<Record<string, string>>({})
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [page, setPage] = useState(1)
     const [totalCount, setTotalCount] = useState(0)
     const limit = 10
+
+    const fetchMentorsAndAssignments = async () => {
+        const { data: mentorRows } = await supabase
+            .from('mentors')
+            .select(`
+                id,
+                profile:profiles!mentors_id_fkey (
+                    full_name
+                )
+            `)
+
+        const mentorOptions: MentorOption[] = (mentorRows || [])
+            .filter((m: any) => m.profile?.full_name)
+            .map((m: any) => ({ id: m.id as string, name: m.profile.full_name as string }))
+            .sort((a: MentorOption, b: MentorOption) => a.name.localeCompare(b.name))
+        setMentors(mentorOptions)
+
+        const { data: assignmentRows } = await supabase
+            .from('student_mentor_assignments')
+            .select('student_id, mentor_id')
+            .eq('is_current', true)
+
+        const map: Record<string, string> = {}
+        ;(assignmentRows || []).forEach((row: any) => {
+            map[row.student_id] = row.mentor_id
+        })
+        setAssignments(map)
+    }
 
     const fetchStudents = async () => {
         setIsLoading(true)
@@ -71,6 +107,10 @@ export default function AdminStudentsPage() {
     useEffect(() => {
         fetchStudents()
     }, [searchTerm, page])
+
+    useEffect(() => {
+        fetchMentorsAndAssignments()
+    }, [])
 
     const [debouncedSearch, setDebouncedSearch] = useState('')
     useEffect(() => {
@@ -132,6 +172,7 @@ export default function AdminStudentsPage() {
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Student</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">School</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Target</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
                                     </tr>
@@ -161,6 +202,14 @@ export default function AdminStudentsPage() {
                                                     <span className="text-sm font-medium text-gray-900">{student.target_university || '-'}</span>
                                                     <span className="text-[10px] text-gray-400">{student.target_course || ''}</span>
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <MentorAssignCell
+                                                    studentId={student.id}
+                                                    currentMentorId={assignments[student.id] || null}
+                                                    mentors={mentors}
+                                                    onSaved={() => fetchMentorsAndAssignments()}
+                                                />
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 font-medium">
                                                 {format(new Date(student.created_at), 'MMM dd, yyyy')}

@@ -17,7 +17,8 @@ interface Message {
 interface Conversation {
     id: string
     student_id: string
-    mentor_id: string
+    mentor_id: string | null
+    type?: 'mentor' | 'support'
     last_message_at: string
     created_at: string
     student: {
@@ -128,12 +129,15 @@ export default function AdminMessagesContent({
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
 
-    // Admin can send a message (as system/admin intervention)
+    const isSupport = selectedConversation?.type === 'support'
+
+    // Admin can send a message. In support threads this is a normal reply from the
+    // help desk; in mentor threads it is a flagged "[ADMIN]" intervention.
     const handleSendAdminMessage = async () => {
         if (!selectedConversation || !adminMessage.trim() || isSending) return
 
         setIsSending(true)
-        const content = `[ADMIN] ${adminMessage.trim()}`
+        const content = isSupport ? adminMessage.trim() : `[ADMIN] ${adminMessage.trim()}`
 
         try {
             await supabase.from('messages').insert({
@@ -216,8 +220,8 @@ export default function AdminMessagesContent({
                                         <p className="font-semibold text-sm text-gray-900 truncate">
                                             {conv.student.full_name}
                                         </p>
-                                        <p className="text-xs text-gray-500">
-                                            ↔ {conv.mentor.full_name}
+                                        <p className={`text-xs ${conv.type === 'support' ? 'text-amber-600 font-medium' : 'text-gray-500'}`}>
+                                            ↔ {conv.type === 'support' ? 'Help & Support' : conv.mentor.full_name}
                                         </p>
                                     </div>
                                     <span className="shrink-0 text-[10px] text-gray-400">
@@ -248,10 +252,10 @@ export default function AdminMessagesContent({
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                             <div>
                                 <h3 className="font-semibold text-gray-900">
-                                    {selectedConversation.student.full_name} ↔ {selectedConversation.mentor.full_name}
+                                    {selectedConversation.student.full_name} ↔ {isSupport ? 'Help & Support' : selectedConversation.mentor.full_name}
                                 </h3>
                                 <p className="text-xs text-gray-400 mt-0.5">
-                                    Started {format(new Date(selectedConversation.created_at), 'MMM d, yyyy')}
+                                    {isSupport ? 'Help & Support request · ' : ''}Started {format(new Date(selectedConversation.created_at), 'MMM d, yyyy')}
                                 </p>
                             </div>
                             <button
@@ -275,6 +279,33 @@ export default function AdminMessagesContent({
                                 </div>
                             ) : (
                                 messages.map((message) => {
+                                    const isStudentSender = message.sender_id === selectedConversation.student_id
+
+                                    // Support thread: render as a normal 2-way chat between the
+                                    // student and the Help & Support team (no "intervention" styling).
+                                    if (isSupport) {
+                                        return (
+                                            <div key={message.id} className="flex flex-col">
+                                                <div className={`max-w-[70%] ${isStudentSender ? 'self-start' : 'self-end'}`}>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`text-xs font-medium ${isStudentSender ? 'text-blue-600' : 'text-accent'}`}>
+                                                            {isStudentSender ? (selectedConversation.student.full_name || 'Student') : 'Help & Support'}
+                                                        </span>
+                                                    </div>
+                                                    <div className={`px-4 py-2.5 rounded-2xl ${isStudentSender
+                                                        ? 'bg-blue-500 text-white rounded-bl-md'
+                                                        : 'bg-accent text-white rounded-br-md'
+                                                        }`}>
+                                                        <p className="text-sm">{message.content.replace('[ADMIN] ', '')}</p>
+                                                    </div>
+                                                    <p className={`text-[10px] text-gray-400 mt-1 ${isStudentSender ? 'text-left' : 'text-right'}`}>
+                                                        {format(new Date(message.created_at), 'MMM d, h:mm a')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+
                                     const role = getSenderRole(message.sender_id)
                                     const isAdmin = role === 'admin'
 
@@ -319,11 +350,20 @@ export default function AdminMessagesContent({
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Admin Intervention Input */}
-                        <div className="px-6 py-4 border-t border-gray-100 bg-amber-50">
+                        {/* Reply / Intervention Input */}
+                        <div className={`px-6 py-4 border-t border-gray-100 ${isSupport ? 'bg-white' : 'bg-amber-50'}`}>
                             <div className="flex items-center gap-2 mb-2">
-                                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                <span className="text-xs font-medium text-amber-700">Admin Intervention</span>
+                                {isSupport ? (
+                                    <>
+                                        <MessageCircle className="w-4 h-4 text-accent" />
+                                        <span className="text-xs font-medium text-accent">Reply as Help &amp; Support</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                        <span className="text-xs font-medium text-amber-700">Admin Intervention</span>
+                                    </>
+                                )}
                             </div>
                             <div className="flex gap-3">
                                 <input
@@ -331,13 +371,19 @@ export default function AdminMessagesContent({
                                     value={adminMessage}
                                     onChange={(e) => setAdminMessage(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendAdminMessage()}
-                                    placeholder="Send a message as admin..."
-                                    className="flex-1 px-4 py-2.5 bg-white border border-amber-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-100 focus:border-amber-300"
+                                    placeholder={isSupport ? 'Reply to the student...' : 'Send a message as admin...'}
+                                    className={`flex-1 px-4 py-2.5 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 ${
+                                        isSupport
+                                            ? 'border-gray-200 focus:ring-accent/20 focus:border-accent/40'
+                                            : 'border-amber-200 focus:ring-amber-100 focus:border-amber-300'
+                                    }`}
                                 />
                                 <button
                                     onClick={handleSendAdminMessage}
                                     disabled={!adminMessage.trim() || isSending}
-                                    className="px-4 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className={`px-4 py-2.5 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                                        isSupport ? 'bg-accent hover:bg-accent/90' : 'bg-amber-500 hover:bg-amber-600'
+                                    }`}
                                 >
                                     {isSending ? (
                                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

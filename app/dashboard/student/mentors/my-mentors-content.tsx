@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Users, Calendar, Briefcase, MessageCircle, ArrowRight } from 'lucide-react'
+import { Users, Calendar, Briefcase, MessageCircle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
 interface Mentor {
@@ -42,11 +42,12 @@ export default function MyMentorsContent({
                 .select('id')
                 .eq('student_id', currentUserId)
                 .eq('mentor_id', mentorId)
+                .eq('type', 'mentor')
                 .maybeSingle()  // Use maybeSingle instead of single to avoid error when no rows
 
             if (existingConv) {
                 // Navigate to messages with existing conversation
-                router.push('/dashboard/student/messages')
+                router.push(`/dashboard/student/messages?mentor=${mentorId}`)
                 return
             }
 
@@ -56,7 +57,8 @@ export default function MyMentorsContent({
                     .from('conversations')
                     .insert({
                         student_id: currentUserId,
-                        mentor_id: mentorId
+                        mentor_id: mentorId,
+                        type: 'mentor'
                     })
 
                 if (insertError) {
@@ -65,7 +67,7 @@ export default function MyMentorsContent({
             }
 
             // Always navigate to messages page
-            router.push('/dashboard/student/messages')
+            router.push(`/dashboard/student/messages?mentor=${mentorId}`)
         } catch (error) {
             console.error('Failed to start chat:', error)
             // Still navigate even on error
@@ -85,7 +87,11 @@ export default function MyMentorsContent({
         })
     }
 
-    const mentors = activeTab === 'active' ? activeMentors : pastMentors
+    // The "Past" tab is only relevant once the admin has changed the student's
+    // mentor at least once (i.e. there is a previous, non-current assignment).
+    const hasPastMentors = pastMentors.length > 0
+    const effectiveTab = activeTab === 'past' && !hasPastMentors ? 'active' : activeTab
+    const mentors = effectiveTab === 'active' ? activeMentors : pastMentors
 
     return (
         <div className="space-y-8">
@@ -93,32 +99,32 @@ export default function MyMentorsContent({
             <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
                 <button
                     onClick={() => setActiveTab('active')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'active'
+                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'active'
                         ? 'bg-white text-accent shadow-sm'
                         : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
-                    Connected
+                    Current
                     {activeMentors.length > 0 && (
                         <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
                             {activeMentors.length}
                         </span>
                     )}
                 </button>
-                <button
-                    onClick={() => setActiveTab('past')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Past
-                    {pastMentors.length > 0 && (
+                {hasPastMentors && (
+                    <button
+                        onClick={() => setActiveTab('past')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'past'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Past
                         <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
                             {pastMentors.length}
                         </span>
-                    )}
-                </button>
+                    </button>
+                )}
             </div>
 
             {/* Mentors List */}
@@ -128,22 +134,13 @@ export default function MyMentorsContent({
                         <Users className="w-10 h-10 text-gray-400" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {activeTab === 'active' ? 'No connected mentors' : 'No past mentors'}
+                        {effectiveTab === 'active' ? 'No mentor assigned yet' : 'No past mentors'}
                     </h3>
                     <p className="text-gray-500 max-w-sm">
-                        {activeTab === 'active'
-                            ? 'When you get matched with a mentor and have an active session, they will appear here.'
-                            : 'Your previously connected mentors will appear here after your sessions end.'}
+                        {effectiveTab === 'active'
+                            ? 'The Access Oxbridge team will assign your mentor shortly. Once assigned, they will appear here and you can book a session.'
+                            : 'If your mentor is ever changed, your previous mentors will appear here.'}
                     </p>
-                    {activeTab === 'active' && (
-                        <Link
-                            href="/dashboard/student"
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
-                        >
-                            Find a Mentor
-                            <ArrowRight className="w-4 h-4" />
-                        </Link>
-                    )}
                 </div>
             ) : (
                 <div className="grid gap-6">

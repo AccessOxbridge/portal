@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle } from 'lucide-react'
 import BookSessionModal from '@/components/dashboard/book-session-modal'
+import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 
 interface Session {
@@ -45,6 +46,7 @@ interface StudentSessionsContentProps {
     credits: number
     academicProfile?: AcademicProfileForBooking | null
     canBook?: boolean
+    hasMentor?: boolean
     autoOpenBooking?: boolean
     studentId: string
 }
@@ -55,10 +57,15 @@ export default function StudentSessionsContent({
     credits,
     academicProfile,
     canBook = false,
+    hasMentor = false,
     autoOpenBooking = false,
     studentId
 }: StudentSessionsContentProps) {
     const router = useRouter()
+    // Booking is only possible once the profile is complete AND an admin has
+    // assigned a mentor to this student.
+    const bookingReady = canBook && hasMentor
+    const { tryOpenBookSession, openCreditsRequest } = useStudentCredits()
     const [allSessions, setAllSessions] = useState<Session[]>(sessions)
     const [now, setNow] = useState<number>(() => Date.now())
     const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'current' | 'past'>(() => {
@@ -96,7 +103,9 @@ export default function StudentSessionsContent({
         if (pendingRequests.length > 0) return 'pending'
         return 'upcoming'
     })
-    const [showBookingModal, setShowBookingModal] = useState(autoOpenBooking && canBook)
+    const [showBookingModal, setShowBookingModal] = useState(
+        autoOpenBooking && canBook && hasMentor && credits > 0
+    )
     const [cancelling, setCancelling] = useState(false)
     const [hadCurrent, setHadCurrent] = useState(false)
     const [reportSessionId, setReportSessionId] = useState<string | null>(null)
@@ -107,15 +116,15 @@ export default function StudentSessionsContent({
     useEffect(() => {
         if (typeof window === 'undefined') return
         const handler = () => {
-            if (canBook) {
+            if (bookingReady) {
                 setShowBookingModal(true)
             }
         }
-        window.addEventListener('open-book-session', handler as EventListener)
+        window.addEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
         return () => {
-            window.removeEventListener('open-book-session', handler as EventListener)
+            window.removeEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
         }
-    }, [canBook])
+    }, [bookingReady])
 
     useEffect(() => {
         setAllSessions(sessions)
@@ -316,12 +325,13 @@ export default function StudentSessionsContent({
                             </p>
                         </div>
                     </div>
-                    <Link
-                        href="/dashboard/student/services"
+                    <button
+                        type="button"
+                        onClick={() => openCreditsRequest('topup')}
                         className="px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20 whitespace-nowrap"
                     >
-                        Top up Credits
-                    </Link>
+                        Request credits
+                    </button>
                 </div>
             )}
             {/* Tab Switcher + Cancel all (pending only) */}
@@ -408,17 +418,17 @@ export default function StudentSessionsContent({
                             No pending requests
                         </h3>
                         <p className="text-gray-500 max-w-sm">
-                            When you request mentorship, your requests will appear here until a mentor accepts.
+                            When you request a session with your mentor, it will appear here until they confirm a time.
                         </p>
-                        {canBook ? (
+                        {bookingReady ? (
                             <button
-                                onClick={() => setShowBookingModal(true)}
+                                onClick={tryOpenBookSession}
                                 className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                             >
                                 Book a Session
                                 <ArrowRight className="w-4 h-4" />
                             </button>
-                        ) : (
+                        ) : !canBook ? (
                             <Link
                                 href="/dashboard/student/profile"
                                 className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
@@ -426,6 +436,10 @@ export default function StudentSessionsContent({
                                 Complete profile to book
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
+                        ) : (
+                            <p className="mt-6 text-sm text-gray-400 max-w-sm">
+                                Your mentor will be assigned by the Access Oxbridge team. You can book a session as soon as they are assigned.
+                            </p>
                         )}
                     </div>
                 ) : (
@@ -478,15 +492,15 @@ export default function StudentSessionsContent({
                                 : 'Your completed sessions will appear here with access to reports and feedback.'}
                         </p>
                             {activeTab === 'upcoming' && (
-                            canBook ? (
+                            bookingReady ? (
                                 <button
-                                    onClick={() => setShowBookingModal(true)}
+                                    onClick={tryOpenBookSession}
                                     className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                                 >
-                                    Find a Mentor
+                                    Book a Session
                                     <ArrowRight className="w-4 h-4" />
                                 </button>
-                            ) : (
+                            ) : !canBook ? (
                                 <Link
                                     href="/dashboard/student/profile"
                                     className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
@@ -494,6 +508,10 @@ export default function StudentSessionsContent({
                                     Complete profile to book
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
+                            ) : (
+                                <p className="mt-6 text-sm text-gray-400 max-w-sm">
+                                    Your mentor will be assigned by the Access Oxbridge team. You can book a session as soon as they are assigned.
+                                </p>
                             )
                         )}
                     </div>
@@ -543,18 +561,29 @@ export default function StudentSessionsContent({
                                         {activeTab === 'upcoming' || activeTab === 'current' ? (
                                             <>
                                                 {session.zoom_join_url ? (
-                                                    <a
-                                                        href={credits > 0 ? session.zoom_join_url : '/dashboard/student/services'}
-                                                        target={credits > 0 ? "_blank" : undefined}
-                                                        rel={credits > 0 ? "noopener noreferrer" : undefined}
-                                                        className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
-                                                            ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                            : 'bg-accent text-white hover:scale-[1.02]'
-                                                            }`}
-                                                    >
-                                                        {credits > 0 ? <Video className="w-4 h-4" /> : <Coins className="w-4 h-4" />}
-                                                        {credits > 0 ? 'Join Session' : 'Top up Credits to Join'}
-                                                    </a>
+                                                    credits > 0 ? (
+                                                        <a
+                                                            href={session.zoom_join_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
+                                                                ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
+                                                                : 'bg-accent text-white hover:scale-[1.02]'
+                                                                }`}
+                                                        >
+                                                            <Video className="w-4 h-4" />
+                                                            Join Session
+                                                        </a>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openCreditsRequest('booking')}
+                                                            className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl bg-accent text-white hover:scale-[1.02] transition-all"
+                                                        >
+                                                            <Coins className="w-4 h-4" />
+                                                            Request credits to join
+                                                        </button>
+                                                    )
                                                 ) : (
                                                     <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
                                                         Zoom link coming soon
@@ -674,7 +703,7 @@ export default function StudentSessionsContent({
                 </div>
             )}
 
-            {academicProfile && canBook && (
+            {academicProfile && bookingReady && (
                 <BookSessionModal
                     isOpen={showBookingModal}
                     onClose={() => setShowBookingModal(false)}

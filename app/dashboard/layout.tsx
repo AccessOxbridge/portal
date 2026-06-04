@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Sidebar from '@/components/dashboard/sidebar'
-import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
+import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
+import HelpSupportButton from '@/components/dashboard/help-support-button'
 import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
@@ -200,7 +201,7 @@ export default async function DashboardLayout({
         studentHelpCount = count || 0
     }
 
-    return (
+    const dashboardShell = (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar with fixed width */}
             {showSidebar && (
@@ -224,10 +225,17 @@ export default async function DashboardLayout({
                 </div>
             </main>
 
-            {/* Floating Credits Button for Students */}
-            {isStudent && (
-                <CreditsFloatingButton initialCredits={(profile as any).credits || 0} />
-            )}
+            {isStudent && <HelpSupportButton />}
         </div>
     )
+
+    if (isStudent) {
+        return (
+            <StudentCreditsProvider initialCredits={(profile as any).credits ?? 0}>
+                {dashboardShell}
+            </StudentCreditsProvider>
+        )
+    }
+
+    return dashboardShell
 }

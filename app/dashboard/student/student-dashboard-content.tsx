@@ -7,6 +7,7 @@ import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 import ApplicationTimeline from '@/components/dashboard/application-timeline'
 import BookSessionModal from '@/components/dashboard/book-session-modal'
+import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
 
 interface UpcomingSession {
     id: string
@@ -37,8 +38,10 @@ interface StudentDashboardContentProps {
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
     academicProfile: AcademicProfile | null
+    hasMentor?: boolean
     userId: string
     userName: string
+    sessionsThisWeek?: number
 }
 
 export default function StudentDashboardContent({
@@ -47,8 +50,10 @@ export default function StudentDashboardContent({
     pendingRequests,
     upcomingSessions,
     academicProfile,
+    hasMentor = false,
     userId,
-    userName
+    userName,
+    sessionsThisWeek = 0
 }: StudentDashboardContentProps) {
     const formatDate = (dateString: string) => {
         const date = new Date(dateString)
@@ -75,13 +80,17 @@ export default function StudentDashboardContent({
     }
 
     const [showBookingModal, setShowBookingModal] = useState(false)
+    const { tryOpenBookSession } = useStudentCredits()
 
     // Check if profile is complete enough for booking
-    const canBook = academicProfile?.is_complete &&
+    const profileComplete = academicProfile?.is_complete &&
         academicProfile?.school_name &&
         academicProfile?.timezone &&
         academicProfile?.subjects &&
         academicProfile.subjects.length > 0
+
+    // Booking also requires an admin-assigned mentor.
+    const canBook = !!profileComplete && hasMentor
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -90,9 +99,9 @@ export default function StudentDashboardContent({
                 setShowBookingModal(true)
             }
         }
-        window.addEventListener('open-book-session', handler as EventListener)
+        window.addEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
         return () => {
-            window.removeEventListener('open-book-session', handler as EventListener)
+            window.removeEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
         }
     }, [canBook])
 
@@ -111,7 +120,7 @@ export default function StudentDashboardContent({
                     <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
                 </div>
 
-                <header className="mb-12 flex flex-col md:flex-row md:items-start justify-between gap-6 mt-6">
+                <header className="mb-12 flex flex-col md:flex-row md:items-stretch justify-between gap-6 mt-6">
                     <div className="flex-1 min-w-0">
                         {/* Academic Profile + Targets on left */}
                         <div className="space-y-4">
@@ -129,7 +138,7 @@ export default function StudentDashboardContent({
                                         </span>
                                     )}
                                     {academicProfile.target_course && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                             </svg>
@@ -137,7 +146,7 @@ export default function StudentDashboardContent({
                                         </span>
                                     )}
                                     {academicProfile.application_year && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
                                             <Calendar className="w-4 h-4" />
                                             {academicProfile.application_year} Entry
                                         </span>
@@ -146,9 +155,9 @@ export default function StudentDashboardContent({
                             )}
                         </div>
                     </div>
-                    <div className="w-full md:w-[360px] shrink-0">
+                    <div className="w-full md:w-[360px] shrink-0 flex flex-col">
                         {activeSession ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 flex-1">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
                                         <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +183,7 @@ export default function StudentDashboardContent({
                                 )}
                             </div>
                         ) : pendingRequests.length > 0 ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50">
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 flex-1 flex flex-col">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
                                         <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,8 +191,8 @@ export default function StudentDashboardContent({
                                         </svg>
                                     </div>
                                     <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-gray-900 truncate">Requests Pending</h3>
-                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to the top 12 matching mentors. We'll notify you once one of them accepts!</p>
+                                        <h3 className="text-base font-bold text-gray-900 truncate">Request Pending</h3>
+                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to your assigned mentor. We'll notify you once they confirm a time!</p>
                                     </div>
                                 </div>
 
@@ -196,54 +205,56 @@ export default function StudentDashboardContent({
                                     </Link>
                                     {canBook ? (
                                         <button
-                                            onClick={() => setShowBookingModal(true)}
+                                            onClick={tryOpenBookSession}
                                             className="block w-full py-3 text-accent font-semibold text-[16px] text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
                                         >
                                             + Book Another Session
                                         </button>
-                                    ) : (
+                                    ) : !profileComplete ? (
                                         <Link
                                             href="/dashboard/student/profile"
                                             className="block w-full py-3 text-amber-600 font-semibold text-[16px] text-center border-2 border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors"
                                         >
                                             Complete Profile to Book
                                         </Link>
+                                    ) : (
+                                        <p className="block w-full py-3 text-gray-400 text-[14px] text-center">
+                                            Your mentor will be assigned by the team soon.
+                                        </p>
                                     )}
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-base font-bold text-white italic truncate">Unlock Personalized Mentorship</h3>
-                                        <p className="text-sm text-white/75 mt-2 leading-relaxed">{
-                                            canBook
-                                                ? "Select your available time slots and we'll match you with the perfect mentor."
-                                                : 'Complete your academic profile first, then book a session with a curated mentor.'
-                                        }</p>
+                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group flex-1">
+                                <div>
+                                    <p className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-1">This Week</p>
+                                    <div className="flex items-end gap-2">
+                                        <span className="text-6xl font-extrabold text-white leading-none">{sessionsThisWeek}</span>
+                                        <span className="text-white/80 font-medium text-base mb-1">
+                                            {sessionsThisWeek === 1 ? 'session booked' : 'sessions booked'}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div className="mt-5">
                                     {canBook ? (
                                         <button
-                                            onClick={() => setShowBookingModal(true)}
+                                            onClick={tryOpenBookSession}
                                             className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
                                         >
                                             Book a Session
                                         </button>
-                                    ) : (
+                                    ) : !profileComplete ? (
                                         <Link
                                             href="/dashboard/student/profile"
                                             className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
                                         >
                                             Complete Profile
                                         </Link>
+                                    ) : (
+                                        <span className="block bg-white/10 text-white/80 font-semibold py-3 px-4 rounded-2xl text-center w-full text-sm">
+                                            Mentor assignment pending
+                                        </span>
                                     )}
                                 </div>
                             </div>

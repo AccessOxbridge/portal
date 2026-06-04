@@ -19,43 +19,46 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/error?message=${encodeURIComponent(errorDescription || error)}`)
     }
 
+    // Resolve the correct base URL (handles load balancer / forwarded host).
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const isLocalEnv = process.env.NODE_ENV === 'development'
+    const baseUrl = isLocalEnv || !forwardedHost ? origin : `https://${forwardedHost}`
+
+    const isResetFlow = next.includes('reset-password')
+
+    // Helper: route exchange failures to the most helpful place.
+    const failureRedirect = (message: string) => {
+        if (isResetFlow) {
+            return NextResponse.redirect(
+                `${baseUrl}/reset-password?error=exchange_failed&error_description=${encodeURIComponent(message)}`
+            )
+        }
+        return NextResponse.redirect(`${baseUrl}/error?message=${encodeURIComponent(message)}`)
+    }
+
     if (code) {
-        // Handle email verification
+        // Handle PKCE code exchange (email verification & password recovery)
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-            const isLocalEnv = process.env.NODE_ENV === 'development'
-            if (isLocalEnv) {
-                // we can be sure that origin is the right one
-                return NextResponse.redirect(`${origin}${next}`)
-            } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
-            } else {
-                return NextResponse.redirect(`${origin}${next}`)
-            }
+            return NextResponse.redirect(`${baseUrl}${next}`)
         }
+        console.error('Auth callback: exchangeCodeForSession failed:', error.message)
+        return failureRedirect('This link is invalid or has expired. Please request a new one.')
     } else if (accessToken && refreshToken && type === 'recovery') {
-        // Handle password reset recovery
+        // Handle password reset recovery via explicit tokens
         const supabase = await createClient()
         const { error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
         })
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-            const isLocalEnv = process.env.NODE_ENV === 'development'
-            if (isLocalEnv) {
-                // we can be sure that origin is the right one
-                return NextResponse.redirect(`${origin}${next}`)
-            } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
-            } else {
-                return NextResponse.redirect(`${origin}${next}`)
-            }
+            return NextResponse.redirect(`${baseUrl}${next}`)
         }
+        console.error('Auth callback: setSession failed:', error.message)
+        return failureRedirect('This link is invalid or has expired. Please request a new one.')
     }
 
-    // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/error?message=Email verification failed or link expired.`)
+    // No code/tokens present at all.
+    return failureRedirect('Email verification failed or the link has expired.')
 }

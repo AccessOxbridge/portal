@@ -5,10 +5,10 @@ import MessagesContent from '@/components/chat/messages-content'
 export default async function StudentMessagesPage({
     searchParams
 }: {
-    searchParams: Promise<{ mentor?: string }>
+    searchParams: Promise<{ mentor?: string; support?: string }>
 }) {
     const supabase = await createClient()
-    const { mentor: mentorId } = await searchParams
+    const { mentor: mentorId, support } = await searchParams
 
     const {
         data: { user },
@@ -28,7 +28,60 @@ export default async function StudentMessagesPage({
         return redirect('/dashboard')
     }
 
-    // Fetch conversations with mentor and admin (Senior Strategist) info and last message
+    // 1. Current assigned mentor (if any)
+    const { data: assignment } = await supabase
+        .from('student_mentor_assignments')
+        .select('mentor_id')
+        .eq('student_id', user.id)
+        .eq('is_current', true)
+        .maybeSingle()
+
+    const assignedMentorId = assignment?.mentor_id || null
+
+    // 2. Ensure the Help & Support conversation exists (student <-> admin).
+    const { data: existingSupport } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('student_id', user.id)
+        .eq('type', 'support')
+        .maybeSingle()
+
+    if (!existingSupport) {
+        const { data: adminProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .in('role', ['admin', 'admin-dev'])
+            .limit(1)
+            .maybeSingle()
+
+        await supabase.from('conversations').insert({
+            student_id: user.id,
+            mentor_id: null,
+            admin_id: adminProfile?.id || null,
+            type: 'support',
+        })
+    }
+
+    // 3. Ensure the assigned-mentor conversation exists.
+    if (assignedMentorId) {
+        const { data: existingMentorConv } = await supabase
+            .from('conversations')
+            .select('id')
+            .eq('student_id', user.id)
+            .eq('mentor_id', assignedMentorId)
+            .eq('type', 'mentor')
+            .maybeSingle()
+
+        if (!existingMentorConv) {
+            await supabase.from('conversations').insert({
+                student_id: user.id,
+                mentor_id: assignedMentorId,
+                type: 'mentor',
+            })
+        }
+    }
+
+    // 4. Load the (now-ensured) conversations.
     const { data: conversations } = await supabase
         .from('conversations')
         .select(`
@@ -36,6 +89,7 @@ export default async function StudentMessagesPage({
             student_id,
             mentor_id,
             admin_id,
+            type,
             last_message_at,
             mentor:profiles!conversations_mentor_id_fkey (
                 id,
@@ -43,62 +97,22 @@ export default async function StudentMessagesPage({
                 mentors (
                     photo_url
                 )
-            ),
-            admin:profiles!conversations_admin_id_fkey (
-                id,
-                full_name
             )
         `)
         .eq('student_id', user.id)
         .order('last_message_at', { ascending: false })
 
-    // Fetch all connected mentors (those with active/completed sessions)
-    const { data: connectedMentors } = await supabase
-        .from('sessions')
-        .select(`
-            mentor_id,
-            mentor:profiles!sessions_mentor_id_fkey (
-                id,
-                full_name,
-                mentors (
-                    photo_url
-                )
-            )
-        `)
-        .eq('student_id', user.id)
-        .in('status', ['active', 'completed'])
-
-    // Deduplicate mentors and check for existing conversations
-    const mentorMap = new Map()
-    const existingConvMentorIds = new Set((conversations || []).map((c: any) => c.mentor_id))
-
-        ; (connectedMentors || []).forEach((session: any) => {
-            if (session.mentor && !mentorMap.has(session.mentor_id)) {
-                mentorMap.set(session.mentor_id, {
-                    id: session.mentor.id,
-                    full_name: session.mentor.full_name,
-                    photo_url: session.mentor.mentors?.[0]?.photo_url || null,
-                    hasExistingConversation: existingConvMentorIds.has(session.mentor_id),
-                    conversationId: (conversations || []).find((c: any) => c.mentor_id === session.mentor_id)?.id
-                })
-            }
-        })
-
-    const connectedUsers = Array.from(mentorMap.values())
-
-    // Get last message for each conversation and unread count
+    // 5. Enrich each conversation with last message + unread count.
     const processedConversations = await Promise.all(
         (conversations || []).map(async (conv: any) => {
-            // Get last message
             const { data: lastMessage } = await supabase
                 .from('messages')
                 .select('content, sender_id')
                 .eq('conversation_id', conv.id)
                 .order('created_at', { ascending: false })
                 .limit(1)
-                .single()
+                .maybeSingle()
 
-            // Get unread count
             const { count } = await supabase
                 .from('messages')
                 .select('*', { count: 'exact', head: true })
@@ -106,26 +120,38 @@ export default async function StudentMessagesPage({
                 .eq('is_read', false)
                 .neq('sender_id', user.id)
 
+            const isSupport = conv.type === 'support'
+
             return {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
                 admin_id: conv.admin_id,
+                type: conv.type as 'mentor' | 'support',
                 last_message_at: conv.last_message_at,
-                other_user: {
-                    id: conv.mentor?.id || conv.mentor_id,
-                    full_name: conv.mentor?.full_name || 'Mentor',
-                    photo_url: conv.mentor?.mentors?.[0]?.photo_url || null
-                },
-                admin_user: conv.admin ? {
-                    id: conv.admin.id,
-                    full_name: 'Senior Strategist'
-                } : null,
+                other_user: isSupport
+                    ? {
+                        id: conv.admin_id || 'support',
+                        full_name: 'Help & Support',
+                        photo_url: null,
+                    }
+                    : {
+                        id: conv.mentor?.id || conv.mentor_id,
+                        full_name: conv.mentor?.full_name || 'Mentor',
+                        photo_url: conv.mentor?.mentors?.[0]?.photo_url || null,
+                    },
+                admin_user: null,
                 last_message: lastMessage || null,
-                unread_count: count || 0
+                unread_count: count || 0,
             }
         })
     )
+
+    // Support chats first, then mentor.
+    processedConversations.sort((a, b) => {
+        if (a.type === b.type) return 0
+        return a.type === 'support' ? -1 : 1
+    })
 
     return (
         <div className="max-w-6xl mx-auto h-[calc(100vh-120px)]">
@@ -134,16 +160,18 @@ export default async function StudentMessagesPage({
                     Messages
                 </h1>
                 <p className="mt-2 text-gray-500 text-lg">
-                    Chat with your mentors in real-time
+                    Chat with your mentor or reach the Access Oxbridge team for help.
                 </p>
             </header>
 
             <MessagesContent
                 conversations={processedConversations}
                 currentUserId={user.id}
-                connectedUsers={connectedUsers}
+                connectedUsers={[]}
                 userRole="student"
                 initialMentorId={mentorId}
+                initialSupport={support === '1'}
+                allowNewConversation={false}
             />
         </div>
     )

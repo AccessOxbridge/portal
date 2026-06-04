@@ -136,7 +136,7 @@ export function SignupForm() {
                             alt="Logo"
                             width={50}
                             height={50}
-                            className="mb-4 rounded-xl p-2 shadow-lg bg-accent"
+                            className="mb-4 rounded-xl shadow-lg"
                         />
                         <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
                     </div>

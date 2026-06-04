@@ -26,11 +26,11 @@ export function LoginForm() {
                 >
                     <div className="flex items-center gap-4 mb-12">
                         <Image
-                            src="/logo.webp"
+                            src="/logo.png"
                             alt="Logo"
                             width={60}
                             height={60}
-                            className="rounded-xl shadow-2xl"
+                            className="[mix-blend-mode:screen]"
                         />
                         <motion.span
                             animate={{
@@ -70,11 +70,11 @@ export function LoginForm() {
                 >
                     <div className="lg:hidden mb-8 flex flex-col items-center">
                         <Image
-                            src="/logo.webp"
+                            src="/logo.png"
                             alt="Logo"
                             width={50}
                             height={50}
-                            className="mb-4 rounded-xl shadow-lg bg-accent p-2"
+                            className="mb-4 rounded-xl shadow-lg"
                         />
                         <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
                     </div>
@@ -138,16 +138,14 @@ export function LoginForm() {
                                 "Sign In"
                             )}
                         </button>
-                    </form>
 
-                    <div className="mt-8 text-center border-t border-gray-100 pt-8">
-                        <p className="text-gray-600 font-medium">
-                            Don&apos;t have an account?{' '}
-                            <Link href="/signup" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
-                                Create one
-                            </Link>
+                        <p className="text-center text-xs text-gray-400 mt-4">
+                            By continuing, you agree to our{' '}
+                            <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms of Service</a>
+                            {' '}and{' '}
+                            <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Privacy Policy</a>.
                         </p>
-                    </div>
+                    </form>
                 </motion.div>
             </div>
         </div>

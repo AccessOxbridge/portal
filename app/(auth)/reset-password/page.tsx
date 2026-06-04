@@ -32,11 +32,11 @@ function ErrorMessage({ error, errorCode, errorDescription }: {
 }
 
 export default async function ResetPasswordPage({ searchParams }: {
-    searchParams: Promise<{ error?: string, error_code?: string, error_description?: string }>
+    searchParams: Promise<{ error?: string, error_code?: string, error_description?: string, message?: string }>
 }) {
     const params = await searchParams
     const supabase = await createClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
 
     // If there's an error from Supabase (e.g., link expired)
     if (params.error) {
@@ -67,8 +67,8 @@ export default async function ResetPasswordPage({ searchParams }: {
         )
     }
 
-    // If no session and no error, this is likely an unauthorized access attempt
-    if (!session) {
+    // If no recovery session and no error, this is likely an unauthorized access attempt
+    if (!user) {
         redirect('/login')
     }
 
@@ -79,6 +79,14 @@ export default async function ResetPasswordPage({ searchParams }: {
                 <p className="text-sm text-gray-600 mb-6 text-center">
                     Enter your new password below.
                 </p>
+                {params.message && (
+                    <div className="p-3 mb-4 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
+                        <svg className="h-5 w-5 text-red-400 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        <p className="text-sm text-red-700">{params.message}</p>
+                    </div>
+                )}
                 <form className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700" htmlFor="password">

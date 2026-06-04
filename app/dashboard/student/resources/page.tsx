@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { BookOpen, Clock, ArrowLeft, ChevronRight } from 'lucide-react'
+import { getBlogPostUrl } from '@/utils/blog'
 
 const CATEGORY_MAP: Record<string, string> = {
     'oxbridge-admissions': 'Oxbridge Admissions',
@@ -55,7 +56,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role, full_name')
+        .select('role')
         .eq('id', user.id)
         .single()
 
@@ -67,7 +68,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
 
     let query = supabase
         .from('articles')
-        .select('id, slug, title, description, author, published_at, reading_time, categories, featured, image')
+        .select('id, slug, title, description, published_at, reading_time, categories, featured, image')
         .order('published_at', { ascending: false })
 
     if (dbCategory) {
@@ -186,14 +187,11 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
 }
 
 function ArticleCard({ article }: { article: any }) {
-    const homeURL = process.env.NEXT_PUBLIC_HOME_PAGE_URL ?? ''
-    const articleURL = `${homeURL}/blog/${article.slug}`
+    const articleURL = getBlogPostUrl(article.slug)
 
     return (
-        <a
+        <Link
             href={articleURL}
-            target="_blank"
-            rel="noopener noreferrer"
             className="group flex flex-col sm:flex-row gap-5 p-6 bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/20 transition-all"
         >
             {article.image && (
@@ -224,12 +222,6 @@ function ArticleCard({ article }: { article: any }) {
                 </h3>
                 <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{article.description}</p>
                 <div className="flex items-center gap-4 text-xs text-gray-400 mt-auto pt-1">
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-bold text-gray-600 uppercase">
-                            {article.author?.[0] ?? 'A'}
-                        </div>
-                        <span className="font-medium text-gray-500">{article.author}</span>
-                    </div>
                     <div className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
                         <span>{article.reading_time} min read</span>
@@ -239,6 +231,6 @@ function ArticleCard({ article }: { article: any }) {
                     </span>
                 </div>
             </div>
-        </a>
+        </Link>
     )
 }

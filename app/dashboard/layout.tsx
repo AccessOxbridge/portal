@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { getGreetingName } from '@/utils/lib'
 import Sidebar from '@/components/dashboard/sidebar'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
@@ -208,7 +209,16 @@ export default async function DashboardLayout({
                 <Sidebar
                     // we should not default to student! error handling - TODO  
                     role={profile.role || 'student'}
-                    userName={profile.full_name || user.email?.split('@')[0] || 'User'}
+                    userName={
+                        profile.role === 'student' || profile.role === 'admin-dev'
+                            ? getGreetingName(
+                                  profile.full_name,
+                                  user.user_metadata?.full_name as string | undefined,
+                                  user.email,
+                                  'User'
+                              )
+                            : profile.full_name || user.email?.split('@')[0] || 'User'
+                    }
                     userId={user.id}
                     pendingReportsCount={pendingReportsCount}
                     pendingRequestsCount={pendingRequestsCount}

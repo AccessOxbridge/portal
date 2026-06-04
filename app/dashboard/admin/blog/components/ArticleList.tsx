@@ -1,18 +1,12 @@
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { Database } from '@/utils/supabase/types'
+import { getBlogPostUrl } from '@/utils/blog'
 
 type Article = Database['public']['Tables']['articles']['Row']
 
 interface ArticleListProps {
     articles: Article[]
-}
-
-function getHomePageURL() {
-    if (process.env.NODE_ENV === 'development') {
-        return 'http://localhost:3000'
-    }
-    return process.env.NEXT_PUBLIC_HOME_PAGE_URL
 }
 
 export function ArticleList({ articles }: ArticleListProps) {
@@ -70,7 +64,7 @@ export function ArticleList({ articles }: ArticleListProps) {
 
                         <div className="flex md:flex-col justify-end gap-2 shrink-0">
                             <Link
-                                href={`${getHomePageURL()}/blog/${article.slug}`}
+                                href={getBlogPostUrl(article.slug)}
                                 target="_blank"
                                 className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all shadow-sm"
                             >

@@ -41,6 +41,7 @@ interface StudentDashboardContentProps {
     hasMentor?: boolean
     userId: string
     userName: string
+    greetingName: string
     sessionsThisWeek?: number
 }
 
@@ -53,6 +54,7 @@ export default function StudentDashboardContent({
     hasMentor = false,
     userId,
     userName,
+    greetingName,
     sessionsThisWeek = 0
 }: StudentDashboardContentProps) {
     const formatDate = (dateString: string) => {
@@ -114,13 +116,13 @@ export default function StudentDashboardContent({
                         <h1 className="text-5xl font-extrabold text-accent tracking-tight">
                             Student Dashboard
                         </h1>
-                        <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
+                        <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {greetingName}!</p>
                     </div>
                     {/* Spacer so fixed hours/bell sit on the right without overlapping this row */}
                     <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
                 </div>
 
-                <header className="mb-12 flex flex-col md:flex-row md:items-stretch justify-between gap-6 mt-6">
+                <header className="mb-12 flex flex-col md:flex-row md:items-start justify-between gap-6 mt-6">
                     <div className="flex-1 min-w-0">
                         {/* Academic Profile + Targets on left */}
                         <div className="space-y-4">
@@ -155,9 +157,9 @@ export default function StudentDashboardContent({
                             )}
                         </div>
                     </div>
-                    <div className="w-full md:w-[360px] shrink-0 flex flex-col">
+                    <div className="w-full md:w-[360px] shrink-0">
                         {activeSession ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 flex-1">
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 w-full">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
                                         <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +185,7 @@ export default function StudentDashboardContent({
                                 )}
                             </div>
                         ) : pendingRequests.length > 0 ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 flex-1 flex flex-col">
+                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 w-full flex flex-col">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
                                         <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,38 +227,41 @@ export default function StudentDashboardContent({
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between group flex-1">
-                                <div>
-                                    <p className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-1">This Week</p>
-                                    <div className="flex items-end gap-2">
-                                        <span className="text-6xl font-extrabold text-white leading-none">{sessionsThisWeek}</span>
-                                        <span className="text-white/80 font-medium text-base mb-1">
+                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 w-full space-y-6">
+                                <div className="space-y-3">
+                                    <p className="text-xs font-semibold text-white/70 uppercase tracking-wider">
+                                        This Week
+                                    </p>
+                                    <div className="flex items-baseline gap-2.5 flex-wrap">
+                                        <span className="text-6xl font-extrabold text-white leading-none tabular-nums">
+                                            {sessionsThisWeek}
+                                        </span>
+                                        <span className="text-white/80 font-medium text-base">
                                             {sessionsThisWeek === 1 ? 'session booked' : 'sessions booked'}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="mt-5">
-                                    {canBook ? (
-                                        <button
-                                            onClick={tryOpenBookSession}
-                                            className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
-                                        >
-                                            Book a Session
-                                        </button>
-                                    ) : !profileComplete ? (
-                                        <Link
-                                            href="/dashboard/student/profile"
-                                            className="bg-rich-amber-accent text-accent font-bold py-3 px-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center w-full"
-                                        >
-                                            Complete Profile
-                                        </Link>
-                                    ) : (
-                                        <span className="block bg-white/10 text-white/80 font-semibold py-3 px-4 rounded-2xl text-center w-full text-sm">
-                                            Mentor assignment pending
-                                        </span>
-                                    )}
-                                </div>
+                                {canBook ? (
+                                    <button
+                                        type="button"
+                                        onClick={tryOpenBookSession}
+                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
+                                    >
+                                        Book a Session
+                                    </button>
+                                ) : !profileComplete ? (
+                                    <Link
+                                        href="/dashboard/student/profile"
+                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
+                                    >
+                                        Complete Profile
+                                    </Link>
+                                ) : (
+                                    <span className="flex w-full items-center justify-center bg-white/10 text-white/80 font-semibold py-3.5 px-6 rounded-2xl text-sm">
+                                        Mentor assignment pending
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>

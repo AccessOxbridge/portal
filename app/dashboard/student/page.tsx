@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { getGreetingName } from '@/utils/lib'
 import StudentDashboardContent from './student-dashboard-content'
 
 export default async function StudentDashboard() {
@@ -115,6 +116,12 @@ export default async function StudentDashboard() {
         .gte('scheduled_at', weekStart.toISOString())
         .lt('scheduled_at', weekEnd.toISOString())
 
+    const greetingName = getGreetingName(
+        profile.full_name,
+        user.user_metadata?.full_name as string | undefined,
+        user.email
+    )
+
     return (
         <StudentDashboardContent
             profile={profile}
@@ -124,7 +131,8 @@ export default async function StudentDashboard() {
             academicProfile={academicProfile as any}
             hasMentor={hasMentor}
             userId={user.id}
-            userName={profile.full_name || 'Student'}
+            userName={greetingName}
+            greetingName={greetingName}
             sessionsThisWeek={sessionsThisWeekCount ?? 0}
         />
     )

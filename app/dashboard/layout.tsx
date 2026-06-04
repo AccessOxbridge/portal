@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { getGreetingName } from '@/utils/lib'
-import Sidebar from '@/components/dashboard/sidebar'
+import DashboardShell from '@/components/dashboard/dashboard-shell'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
 import { headers } from 'next/headers'
@@ -202,41 +202,33 @@ export default async function DashboardLayout({
         studentHelpCount = count || 0
     }
 
+    const sidebarProps = {
+        role: profile.role || 'student',
+        userName:
+            profile.role === 'student' || profile.role === 'admin-dev'
+                ? getGreetingName(
+                      profile.full_name,
+                      user.user_metadata?.full_name as string | undefined,
+                      user.email,
+                      'User'
+                  )
+                : profile.full_name || user.email?.split('@')[0] || 'User',
+        userId: user.id,
+        pendingReportsCount,
+        pendingRequestsCount,
+        onboardingIncomplete,
+        trainingComplete: ((profile as any).mentors?.trainingCompleteFlag) || false,
+        studentHelpCount,
+    }
+
     const dashboardShell = (
-        <div className="flex h-screen overflow-hidden">
-            {/* Sidebar with fixed width */}
-            {showSidebar && (
-                <Sidebar
-                    // we should not default to student! error handling - TODO  
-                    role={profile.role || 'student'}
-                    userName={
-                        profile.role === 'student' || profile.role === 'admin-dev'
-                            ? getGreetingName(
-                                  profile.full_name,
-                                  user.user_metadata?.full_name as string | undefined,
-                                  user.email,
-                                  'User'
-                              )
-                            : profile.full_name || user.email?.split('@')[0] || 'User'
-                    }
-                    userId={user.id}
-                    pendingReportsCount={pendingReportsCount}
-                    pendingRequestsCount={pendingRequestsCount}
-                    onboardingIncomplete={onboardingIncomplete}
-                    trainingComplete={((profile as any).mentors?.trainingCompleteFlag) || false}
-                    studentHelpCount={studentHelpCount}
-                />
-            )}
-
-            {/* Main Content Area - separate scroll container */}
-            <main className={`flex-1 min-h-0 ${showSidebar ? 'ml-64' : ''} bg-[#F9FAFB] overflow-y-auto overflow-x-hidden overscroll-contain`}>
-                <div className="max-w-[1600px] mx-auto p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    {children}
-                </div>
-            </main>
-
-            {isStudent && <HelpSupportButton />}
-        </div>
+        <DashboardShell
+            showSidebar={showSidebar}
+            sidebarProps={sidebarProps}
+            footer={isStudent ? <HelpSupportButton /> : undefined}
+        >
+            {children}
+        </DashboardShell>
     )
 
     if (isStudent) {

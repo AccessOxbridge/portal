@@ -24,6 +24,7 @@ import {
     Video,
     MapPin,
     ChevronDown,
+    ChevronLeft,
     ChevronUp,
     ClipboardList,
     Home,
@@ -35,8 +36,8 @@ import {
     CalendarRange
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { cn } from '@/utils/lib'
 import { Logo } from '../logo'
-import NotificationBell from './notification-bell'
 
 interface SidebarProps {
     role: string;
@@ -47,6 +48,8 @@ interface SidebarProps {
     onboardingIncomplete?: boolean;
     trainingComplete?: boolean;
     studentHelpCount?: number;
+    collapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
 // Define section type for expandable sections
@@ -136,7 +139,9 @@ export default function Sidebar({
     pendingRequestsCount = 0,
     onboardingIncomplete = false,
     trainingComplete = false,
-    studentHelpCount = 0
+    studentHelpCount = 0,
+    collapsed = false,
+    onToggleCollapse,
 }: SidebarProps) {
     const pathname = usePathname()
     const supabase = createClient()
@@ -154,6 +159,10 @@ export default function Sidebar({
         else if (pathname.startsWith('/dashboard/mentor')) effectiveRole = 'mentor'
         else if (pathname.startsWith('/dashboard/admin')) effectiveRole = 'admin-dev'
     }
+
+    useEffect(() => {
+        if (collapsed) setProfileMenuOpen(false)
+    }, [collapsed])
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -278,49 +287,91 @@ export default function Sidebar({
     }, [effectiveRole, supabase, userId])
 
     return (
-        <aside className="w-64 bg-accent border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 z-50">
+        <aside
+            className={cn(
+                'bg-accent border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
+                collapsed ? 'w-[4.5rem]' : 'w-64'
+            )}
+        >
+            {onToggleCollapse && (
+                <button
+                    type="button"
+                    onClick={onToggleCollapse}
+                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    className={cn(
+                        'absolute z-[60] top-7 flex h-6 w-6 items-center justify-center rounded-full',
+                        'border border-white/20 bg-accent text-white/80 shadow-lg',
+                        'hover:bg-white/15 hover:text-white hover:border-white/30 transition-colors -right-3'
+                    )}
+                >
+                    <ChevronLeft
+                        className={cn('h-3.5 w-3.5 stroke-[2.5]', collapsed && 'rotate-180')}
+                    />
+                </button>
+            )}
+
             {/* Top Branding & Search */}
-            <div className="p-6 pb-2">
-                <div className="flex items-center justify-between mb-8">
-                    <Logo className="h-8" textColor="text-white" />
+            <div className={cn('pb-2', collapsed ? 'px-2 pt-4' : 'p-6 pr-8')}>
+                <div className={cn('mb-6', collapsed ? 'flex justify-center' : 'mb-8')}>
+                    <Logo
+                        size={collapsed ? 'default' : 'lg'}
+                        iconOnly={collapsed}
+                        textColor="text-white"
+                        className={collapsed ? 'justify-center' : 'justify-start'}
+                    />
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        ref={searchInputRef}
-                        className="w-full bg-white/10 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all placeholder:text-white/40"
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/5 border border-white/10 rounded-md px-1.5 py-0.5 text-[10px] text-white/40 font-mono">
-                        ⌘K
+                {!collapsed ? (
+                    <div className="relative mb-6">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            ref={searchInputRef}
+                            className="w-full bg-white/10 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all placeholder:text-white/40"
+                        />
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/5 border border-white/10 rounded-md px-1.5 py-0.5 text-[10px] text-white/40 font-mono">
+                            ⌘K
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <button
+                        type="button"
+                        title="Search"
+                        onClick={onToggleCollapse}
+                        className="w-full mb-4 flex items-center justify-center rounded-xl py-2.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+                    >
+                        <Search className="w-5 h-5" />
+                    </button>
+                )}
 
                 {/* Book a session CTA (student only) */}
                 {effectiveRole === 'student' && (
                     <button
                         type="button"
+                        title="Book a session"
                         onClick={() => {
                             if (typeof window !== 'undefined') {
                                 window.dispatchEvent(new CustomEvent('open-book-session'))
                             }
                         }}
-                        className="w-full mb-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-white text-accent font-semibold text-sm py-2.5 shadow-md shadow-black/20 hover:bg-amber-100 hover:text-accent transition-colors"
+                        className={cn(
+                            'mb-2 inline-flex items-center justify-center rounded-2xl bg-white text-accent font-semibold shadow-md shadow-black/20 hover:bg-amber-100 hover:text-accent transition-colors',
+                            collapsed ? 'w-full p-2.5' : 'w-full gap-2 text-sm py-2.5'
+                        )}
                     >
-                        <Calendar className="w-4 h-4" />
-                        <span>Book a session</span>
+                        <Calendar className="w-4 h-4 shrink-0" />
+                        {!collapsed && <span>Book a session</span>}
                     </button>
                 )}
 
             </div>
 
             {/* Navigation Section - separate scroll, no chaining to main */}
-            <nav className="grow min-h-0 px-3 py-2 space-y-1 overflow-y-auto overscroll-contain custom-scrollbar">
+            <nav className={cn('grow min-h-0 py-2 space-y-1 overflow-y-auto overscroll-contain custom-scrollbar', collapsed ? 'px-1.5' : 'px-3')}>
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
@@ -332,44 +383,58 @@ export default function Sidebar({
                         item.name === 'Messages' &&
                         (effectiveRole === 'student' || effectiveRole === 'mentor') &&
                         unreadMessagesCount > 0
+                    const hasBadge =
+                        showReportsBadge ||
+                        showRequestsBadge ||
+                        showTrainingIncompleteBadge ||
+                        showTrainingCompleteBadge ||
+                        showStudentHelpBadge ||
+                        showMessagesUnreadBadge
 
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group ${isActive
-                                ? 'bg-white/15 text-white shadow-sm'
-                                : 'text-white/70 hover:bg-white/10 hover:text-white'
-                                }`}
+                            title={collapsed ? item.name : undefined}
+                            className={cn(
+                                'flex items-center rounded-xl transition-all group relative',
+                                collapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5',
+                                isActive
+                                    ? 'bg-white/15 text-white shadow-sm'
+                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                            )}
                         >
-                            <div className="flex items-center gap-3">
+                            <div className={cn('flex items-center', !collapsed && 'gap-3')}>
                                 <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
-                                <span className="font-medium text-sm">{item.name}</span>
+                                {!collapsed && <span className="font-medium text-sm">{item.name}</span>}
                             </div>
-                            {showReportsBadge && (
+                            {collapsed && hasBadge && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+                            )}
+                            {!collapsed && showReportsBadge && (
                                 <span className="px-1.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
                                     {pendingReportsCount}
                                 </span>
                             )}
-                            {showRequestsBadge && (
+                            {!collapsed && showRequestsBadge && (
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
                                     {pendingRequestsCount > 9 ? '9+' : pendingRequestsCount}
                                 </span>
                             )}
-                            {showTrainingIncompleteBadge && (
+                            {!collapsed && showTrainingIncompleteBadge && (
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     <AlertCircle className="w-3 h-3" />
                                 </span>
                             )}
-                            {showTrainingCompleteBadge && (
+                            {!collapsed && showTrainingCompleteBadge && (
                                 <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     <CheckCircle className="w-3 h-3" />
                                 </span>
                             )}
-                            {showStudentHelpBadge && (
+                            {!collapsed && showStudentHelpBadge && (
                                 <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50" />
                             )}
-                            {showMessagesUnreadBadge && (
+                            {!collapsed && showMessagesUnreadBadge && (
                                 <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
                                     {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                                 </span>
@@ -382,6 +447,24 @@ export default function Sidebar({
                 {effectiveRole === 'student' && filteredStudentSections.map((section) => {
                     const isExpanded = expandedSections.includes(section.name) || searchQuery !== ''
                     const isAnySectionActive = section.subsections.some(sub => pathname === sub.href)
+
+                    if (collapsed) {
+                        return (
+                            <Link
+                                key={section.name}
+                                href={section.subsections[0].href}
+                                title={section.name}
+                                className={cn(
+                                    'flex items-center justify-center p-2.5 rounded-xl transition-all group',
+                                    isAnySectionActive
+                                        ? 'bg-white/15 text-white shadow-sm'
+                                        : 'text-white/70 hover:bg-white/10 hover:text-white'
+                                )}
+                            >
+                                <section.icon className={`w-5 h-5 transition-colors ${isAnySectionActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                            </Link>
+                        )
+                    }
 
                     return (
                         <div key={section.name} className="pt-2">
@@ -432,7 +515,7 @@ export default function Sidebar({
                     )
                 })}
 
-                {filteredMenuItems.length === 0 && filteredStudentSections.length === 0 && (
+                {filteredMenuItems.length === 0 && filteredStudentSections.length === 0 && !collapsed && (
                     <div className="px-4 py-8 text-center">
                         <p className="text-white/40 text-sm">No results found</p>
                     </div>
@@ -440,16 +523,22 @@ export default function Sidebar({
             </nav>
 
             {/* Footer Section */}
-            <div className="p-3 border-t border-white/10 bg-black/10">
+            <div className={cn('border-t border-white/10 bg-black/10', collapsed ? 'p-1.5' : 'p-3')}>
                 {effectiveRole === 'student' ? (
                     <div className="relative" ref={profileMenuRef}>
                         {/* Drop-up menu (above profile button) – connected */}
                         <div
-                            className={`absolute bottom-full left-0 right-0 overflow-hidden rounded-t-2xl border border-white/10 border-b-0 bg-accent shadow-lg transition-all duration-200 ease-out ${
+                            className={cn(
+                                'absolute overflow-hidden border border-white/10 bg-accent shadow-lg transition-all duration-200 ease-out z-50',
+                                collapsed
+                                    ? 'bottom-0 left-full ml-2 w-48 rounded-2xl'
+                                    : 'bottom-full left-0 right-0 rounded-t-2xl border-b-0',
                                 profileMenuOpen
                                     ? 'opacity-100 translate-y-0 visible'
-                                    : 'opacity-0 translate-y-2 pointer-events-none invisible'
-                            }`}
+                                    : collapsed
+                                      ? 'opacity-0 -translate-x-2 pointer-events-none invisible'
+                                      : 'opacity-0 translate-y-2 pointer-events-none invisible'
+                            )}
                         >
                             <Link
                                 href="/dashboard/student/profile"
@@ -483,51 +572,78 @@ export default function Sidebar({
                         {/* Profile button – opens drop-up, connects visually when menu open */}
                         <button
                             type="button"
+                            title={userName || 'Profile'}
                             onClick={() => setProfileMenuOpen((open) => !open)}
-                            className={`w-full flex items-center justify-between py-3 px-3 bg-white/5 border border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all rounded-b-2xl ${profileMenuOpen ? 'rounded-t-none' : 'rounded-2xl'}`}
+                            className={cn(
+                                'w-full flex items-center bg-white/5 border border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all',
+                                collapsed
+                                    ? 'justify-center p-2 rounded-xl'
+                                    : `justify-between py-3 px-3 rounded-b-2xl ${profileMenuOpen ? 'rounded-t-none' : 'rounded-2xl'}`
+                            )}
                         >
-                            <div className="flex items-center gap-3 min-w-0">
+                            <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
                                 <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
                                     {userName?.[0] || 'U'}
                                 </div>
-                                <div className="flex flex-col min-w-0 text-left">
-                                    <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
-                                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
-                                </div>
+                                {!collapsed && (
+                                    <div className="flex flex-col min-w-0 text-left">
+                                        <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
+                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
+                                    </div>
+                                )}
                             </div>
-                            <ChevronUp
-                                className={`w-4 h-4 text-white/40 shrink-0 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`}
-                            />
+                            {!collapsed && (
+                                <ChevronUp
+                                    className={`w-4 h-4 text-white/40 shrink-0 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`}
+                                />
+                            )}
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between py-3 px-3 bg-white/5 border border-white/5 rounded-2xl group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all">
-                            <div className="flex items-center gap-3 min-w-0">
+                        <div
+                            className={cn(
+                                'flex items-center bg-white/5 border border-white/5 rounded-2xl group hover:bg-white/10 hover:border-white/10 transition-all',
+                                collapsed ? 'justify-center p-2' : 'justify-between py-3 px-3'
+                            )}
+                            title={userName || 'Profile'}
+                        >
+                            <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
                                 <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
                                     {userName?.[0] || 'U'}
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
-                                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
-                                </div>
+                                {!collapsed && (
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
+                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <Link
                             href="/dashboard/settings"
-                            className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-white/10 hover:text-white transition-all text-sm group"
+                            title="Settings"
+                            className={cn(
+                                'mt-2 w-full flex items-center rounded-xl text-white/50 hover:bg-white/10 hover:text-white transition-all text-sm group',
+                                collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+                            )}
                         >
-                            <Settings className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors" />
-                            <span>Settings</span>
+                            <Settings className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors shrink-0" />
+                            {!collapsed && <span>Settings</span>}
                         </Link>
 
                         <button
+                            type="button"
+                            title="Sign Out"
                             onClick={handleSignOut}
-                            className="mt-1 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
+                            className={cn(
+                                'mt-1 w-full flex items-center rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group',
+                                collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
+                            )}
                         >
-                            <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                            <span>Sign Out</span>
+                            <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1 shrink-0" />
+                            {!collapsed && <span>Sign Out</span>}
                         </button>
                     </>
                 )}

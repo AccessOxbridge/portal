@@ -12,12 +12,11 @@ type MentorTrainingPageProps = {
 
 const STEP_INDEX: Record<string, number> = {
     welcome: 0,
-    training: 1,
-    quiz: 2,
-    contract: 3,
-    dbs: 4,
-    payment: 5,
-    profile: 6
+    questionnaire: 1,
+    contract: 2,
+    dbs: 3,
+    payment: 4,
+    profile: 5
 }
 
 export default async function MentorTrainingPage({ searchParams }: MentorTrainingPageProps) {
@@ -54,8 +53,11 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
             phone,
             stripe_account_id,
             payouts_enabled,
-            training_completed_at,
-            quiz_completed_at,
+            questionnaire_completed_at,
+            q_oxbridge_college,
+            q_specialisation,
+            q_alevels,
+            q_approach,
             contract_signed_at,
             contract_signature,
             dbs_certificate_url,
@@ -112,8 +114,7 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
     // Calculate onboarding completion status for each step
     // Using existing fields where possible, placeholder for new ones
     const onboardingStatus = {
-        training: !!mentorData.training_completed_at,
-        quiz: !!mentorData.quiz_completed_at,
+        questionnaire: !!mentorData.questionnaire_completed_at,
         contract: !!mentorData.contract_signed_at,
         dbs: !!mentorData.dbs_certificate_url || !!mentorData.background_check_confirmed_at,
         payment: !!mentorData.payouts_enabled,
@@ -141,9 +142,17 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
                     expertise: mentorData.expertise,
                     university: mentorData.university || null,
                     phone: mentorData.phone,
+                    email: user.email || null,
+                    questionnaire: {
+                        q_oxbridge_college: mentorData.q_oxbridge_college || '',
+                        q_specialisation: mentorData.q_specialisation || '',
+                        q_alevels: mentorData.q_alevels || '',
+                        q_approach: mentorData.q_approach || '',
+                    },
                     stripeConnected: !!mentorData.stripe_account_id,
                     payoutsEnabled: !!mentorData.payouts_enabled,
                     contractSignature: mentorData.contract_signature || null,
+                    contractSignedAt: mentorData.contract_signed_at || null,
                     dbsCertificateUrl: mentorData.dbs_certificate_url || null
                 }}
             />

@@ -6,10 +6,15 @@ interface StripeOnboardingButtonProps {
     variant: 'setup' | 'continue'
 }
 
+// Temporarily disabled: Stripe Connect onboarding is paused for mentors.
+// Flip this back to `false` to re-enable the button and its click handler.
+const STRIPE_CONNECT_DISABLED = true
+
 export function StripeOnboardingButton({ variant }: StripeOnboardingButtonProps) {
     const [loading, setLoading] = useState(false)
 
     const handleClick = async () => {
+        if (STRIPE_CONNECT_DISABLED) return
         setLoading(true)
         try {
             const res = await fetch('/api/stripe/connect/onboarding', {
@@ -30,16 +35,21 @@ export function StripeOnboardingButton({ variant }: StripeOnboardingButtonProps)
         }
     }
 
+    const isDisabled = STRIPE_CONNECT_DISABLED || loading
+
     return (
         <button
             onClick={handleClick}
-            disabled={loading}
+            disabled={isDisabled}
+            title={STRIPE_CONNECT_DISABLED ? 'Stripe setup is temporarily unavailable' : undefined}
             className={`
                 inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold transition-all
-                disabled:opacity-50 disabled:cursor-not-allowed
-                ${variant === 'setup'
-                    ? 'bg-[#635BFF] text-white hover:bg-[#5851E0] shadow-lg shadow-[#635BFF]/25'
-                    : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25'}
+                disabled:cursor-not-allowed
+                ${STRIPE_CONNECT_DISABLED
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                    : variant === 'setup'
+                        ? 'bg-[#635BFF] text-white hover:bg-[#5851E0] shadow-lg shadow-[#635BFF]/25 disabled:opacity-50'
+                        : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-500/25 disabled:opacity-50'}
             `}
         >
             {loading ? (

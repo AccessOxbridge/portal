@@ -11,20 +11,27 @@ import {
     ChevronRight,
     Loader2,
     Upload,
-    BookOpen,
+    Download,
+    ClipboardList,
     AlertCircle
 } from 'lucide-react'
-import { completeTraining, completeQuiz, signContract, submitBackgroundCheck, completeProfile } from './actions'
+import { completeQuestionnaire, signContract, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 import { COUNTRIES } from '@/config/countries'
 
 interface OnboardingStatus {
-    training: boolean
-    quiz: boolean
+    questionnaire: boolean
     contract: boolean
     dbs: boolean
     payment: boolean
     profile: boolean
+}
+
+interface QuestionnaireAnswers {
+    q_oxbridge_college: string
+    q_specialisation: string
+    q_alevels: string
+    q_approach: string
 }
 
 interface ExistingData {
@@ -33,10 +40,13 @@ interface ExistingData {
     expertise?: string[] | null
     university?: string | null
     phone?: string | null
+    email?: string | null
     stripeConnected: boolean
     payoutsEnabled: boolean
     contractSignature?: string | null
+    contractSignedAt?: string | null
     dbsCertificateUrl?: string | null
+    questionnaire?: QuestionnaireAnswers | null
 }
 
 interface TrainingContentProps {
@@ -49,50 +59,228 @@ interface TrainingContentProps {
 
 const STEPS = [
     { id: 'welcome', title: 'Welcome', icon: GraduationCap },
-    { id: 'training', title: 'Training', icon: BookOpen },
-    { id: 'quiz', title: 'Quiz', icon: FileText },
+    { id: 'questionnaire', title: 'Questionnaire', icon: ClipboardList },
     { id: 'contract', title: 'Contract', icon: FileText },
     { id: 'dbs', title: 'Background Checks', icon: Shield },
     { id: 'payment', title: 'Payment', icon: CreditCard },
     { id: 'profile', title: 'Profile', icon: User },
 ]
 
-// Placeholder quiz questions - to be replaced with actual content
-const QUIZ_QUESTIONS = [
+// Index of the last step (Profile). Used to clamp the initial step.
+const LAST_STEP_INDEX = STEPS.length - 1
+
+// Onboarding questionnaire — free-text questions that replaced the old Training + Quiz steps.
+const QUESTIONNAIRE: { id: keyof QuestionnaireAnswers; question: string; placeholder: string }[] = [
     {
-        id: 'q1',
-        question: 'What is the primary goal of Access Oxbridge mentorship?',
-        options: [
-            'A) To provide academic tutoring only',
-            'B) To help students achieve their academic goals and unlock their potential',
-            'C) To prepare students for exams',
-            'D) To teach specific subjects'
-        ],
-        correct: 'B'
+        id: 'q_oxbridge_college',
+        question: 'Did you attend Oxford or Cambridge, which college, and what did you study?',
+        placeholder: 'e.g. Cambridge, Trinity College, Natural Sciences',
     },
     {
-        id: 'q2',
-        question: 'How should you handle a student who is struggling with confidence?',
-        options: [
-            'A) Focus only on academic content',
-            'B) Provide encouragement and help build their self-belief',
-            'C) Tell them to work harder',
-            'D) Skip to the next topic'
-        ],
-        correct: 'B'
+        id: 'q_specialisation',
+        question: 'What area of your subject do you specialise in or feel most passionate about?',
+        placeholder: 'Tell us what you love most within your subject...',
     },
-        {
-        id: 'q3',
-        question: 'What should you do after each session?',
-        options: [
-            'A) Nothing, just wait for the next session',
-            'B) Submit a session report to help generate personalised feedback',
-            'C) Send the student homework',
-            'D) Contact the parents'
-        ],
-        correct: 'B'
-    }
+    {
+        id: 'q_alevels',
+        question: 'What A-levels (or equivalent) did you take, and what grades did you achieve?',
+        placeholder: 'e.g. Maths (A*), Physics (A*), Chemistry (A)',
+    },
+    {
+        id: 'q_approach',
+        question: 'How would you describe your approach to working with students?',
+        placeholder: 'Describe your mentoring style and what students can expect...',
+    },
 ]
+
+// Mentor Agreement, stored as structured data so the on-screen contract and the
+// downloadable copy are rendered from a single source of truth (no drift).
+const AGREEMENT_INTRO = 'This Agreement is between Access Oxbridge and the Mentor named below.'
+
+type AgreementSection = { title: string; body?: string; bullets?: string[] }
+
+const AGREEMENT_SECTIONS: AgreementSection[] = [
+    {
+        title: '1. Background',
+        body: 'Access Oxbridge is a specialist admissions organisation that prepares students worldwide to gain entry to the University of Oxford and the University of Cambridge, achieving a 67% offer rate — more than four times the global average. The Mentor has relevant academic expertise to provide high-quality, personalised guidance to students in pursuit of this goal. This Agreement sets out the terms of that engagement.',
+    },
+    {
+        title: '2. Mentor Services',
+        body: 'The Mentor agrees to provide the following services as directed by Access Oxbridge:',
+        bullets: [
+            'Conducting one-to-one mentoring sessions with assigned students, delivered remotely via video call or any format agreed with Access Oxbridge.',
+            'Providing guidance on personal statements, subject knowledge, interview technique, and the Oxford and Cambridge application process.',
+            "Delivering constructive, honest, and supportive feedback tailored to each student's individual needs and target subject.",
+            'Attending any required onboarding, training, or briefing sessions organised by Access Oxbridge.',
+            'Maintaining accurate session records and submitting notes or reports as reasonably requested.',
+            "Promptly communicating any concerns regarding a student's wellbeing or progress to Access Oxbridge.",
+        ],
+    },
+    {
+        title: '3. Nature of Engagement',
+        body: 'The Mentor is engaged as an independent contractor. Nothing in this Agreement creates or implies an employment relationship, partnership, or agency. The Mentor is solely responsible for their own tax, National Insurance contributions, and any other statutory obligations arising from fees received.',
+    },
+    {
+        title: '4. Fees & Payment',
+        bullets: [
+            'Session Rate: As agreed in writing prior to commencement. Rates may vary by session type.',
+            'Payment Schedule: Monthly, within 14 days of receipt of a valid invoice from the Mentor.',
+            'Expenses: Not payable unless agreed in advance and in writing by Access Oxbridge.',
+        ],
+    },
+    {
+        title: '5. Availability & Scheduling',
+        bullets: [
+            'The Mentor will provide Access Oxbridge with reasonable advance notice of their availability each programme cycle.',
+            'Cancellations must be notified as soon as practicable and, except in genuine emergencies, no less than 24 hours before a scheduled session.',
+            "Access Oxbridge will endeavour to match students to Mentors in a way that respects the Mentor's declared availability.",
+        ],
+    },
+    {
+        title: '6. Standards & Conduct',
+        body: 'The Mentor agrees to uphold the following standards at all times:',
+        bullets: [
+            'Deliver sessions to a consistently high professional standard, with accurate and current subject knowledge.',
+            'Treat all students with respect, fairness, and sensitivity regardless of background, culture, or academic level.',
+            'Maintain appropriate professional boundaries with students at all times.',
+            "Comply with Access Oxbridge's safeguarding standards and promptly report any concerns to the designated lead.",
+            'Not accept private paid tutoring arrangements with students introduced through Access Oxbridge for 12 months following the end of this Agreement.',
+        ],
+    },
+    {
+        title: '7. Safeguarding',
+        body: 'Access Oxbridge is committed to the safety and wellbeing of all students. The Mentor agrees to:',
+        bullets: [
+            'Complete an enhanced DBS check (or equivalent) if required by Access Oxbridge prior to working with students.',
+            'Complete any safeguarding training required by Access Oxbridge.',
+            "Adhere to Access Oxbridge's safeguarding standards and expectations for the duration of this Agreement.",
+            "Report any safeguarding concern immediately to Access Oxbridge's designated safeguarding lead.",
+        ],
+    },
+    {
+        title: '8. Confidentiality',
+        body: "The Mentor will keep confidential all information relating to Access Oxbridge's business, students, pricing, and materials. This obligation applies during and after the term of this Agreement and does not prevent disclosure required by law or of information already in the public domain through no fault of the Mentor.",
+    },
+    {
+        title: '9. Data Protection',
+        body: 'Both parties will comply with all applicable data protection legislation, including the UK GDPR and the Data Protection Act 2018. The Mentor will process student personal data only as necessary to deliver the agreed services, will not share or use that data outside this Agreement, and will notify Access Oxbridge immediately upon becoming aware of any actual or suspected personal data breach.',
+    },
+    {
+        title: '10. Intellectual Property',
+        body: 'Any materials or content created by the Mentor specifically for Access Oxbridge in the course of providing services under this Agreement shall be the sole property of Access Oxbridge. All intellectual property rights are assigned to Access Oxbridge upon creation. The Mentor retains ownership of any pre-existing materials they bring to the engagement.',
+    },
+    {
+        title: '11. Term & Termination',
+        body: 'This Agreement commences on the date of signing and continues until terminated as follows:',
+        bullets: [
+            "Either party may terminate by giving 14 days' written notice to the other.",
+            'Access Oxbridge may terminate with immediate effect in the event of serious breach, misconduct, or a safeguarding concern.',
+            'On termination, the Mentor will promptly return Access Oxbridge materials and cease using any Confidential Information.',
+            'Clauses 8, 9, 10, and 12 survive termination of this Agreement.',
+        ],
+    },
+    {
+        title: '12. Non-Solicitation',
+        body: 'For 12 months following termination, the Mentor agrees not to solicit, approach, or accept paid private tutoring from any student introduced through Access Oxbridge, nor encourage any student to reduce or end their engagement with Access Oxbridge.',
+    },
+    {
+        title: '13. Liability',
+        body: "Access Oxbridge's total liability under this Agreement shall not exceed the total fees paid to the Mentor in the three months preceding the event giving rise to the claim. Nothing in this Agreement excludes liability for fraud, death, or personal injury caused by negligence.",
+    },
+    {
+        title: '14. General',
+        bullets: [
+            'Entire Agreement: This Agreement supersedes all prior discussions and constitutes the entire agreement between the parties on its subject matter.',
+            'Amendments: Any amendment must be agreed in writing and signed by both parties.',
+            'Governing Law: This Agreement is governed by the laws of England and Wales. Disputes are subject to the exclusive jurisdiction of the courts of England and Wales.',
+            'Severability: If any provision is found unenforceable, the remaining provisions continue in full force.',
+        ],
+    },
+]
+
+function escapeHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+// Builds a self-contained, print-ready HTML document of the signed agreement.
+// Rendered from the same AGREEMENT_SECTIONS as the on-screen contract so the two never drift.
+function buildContractHtml(details: {
+    fullName: string
+    email: string
+    institution: string
+    signature: string
+    signedDate: string
+}): string {
+    const dateStr = details.signedDate
+        ? new Date(details.signedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+        : ''
+
+    const sectionsHtml = AGREEMENT_SECTIONS.map((s) => {
+        const body = s.body ? `<p>${escapeHtml(s.body)}</p>` : ''
+        const bullets = s.bullets ? `<ul>${s.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>` : ''
+        return `<section><h2>${escapeHtml(s.title)}</h2>${body}${bullets}</section>`
+    }).join('')
+
+    return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Access Oxbridge — Mentor Agreement</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: #1f2937; line-height: 1.55; max-width: 760px; margin: 32px auto; padding: 0 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: .04em; }
+  h2 { font-size: 14px; margin: 18px 0 4px; }
+  p, li { font-size: 12.5px; }
+  ul { margin: 4px 0 0; padding-left: 20px; }
+  li { margin-bottom: 3px; }
+  .intro { font-size: 12.5px; color: #4b5563; }
+  .parties { display: flex; gap: 20px; margin: 16px 0; }
+  .party { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; }
+  .party h3 { font-size: 12px; margin: 0 0 6px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; }
+  .party .label { color: #6b7280; }
+  .sigs { display: flex; gap: 40px; margin-top: 28px; }
+  .sig { flex: 1; }
+  .sig .name { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-size: 22px; border-bottom: 1px solid #9ca3af; padding-bottom: 2px; min-height: 30px; }
+  .sig .meta { font-size: 11.5px; color: #4b5563; margin-top: 6px; }
+  .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; text-align: center; }
+  @media print { body { margin: 0 auto; } }
+</style>
+</head>
+<body>
+  <h1>MENTOR AGREEMENT</h1>
+  <p class="intro">${escapeHtml(AGREEMENT_INTRO)}</p>
+  <div class="parties">
+    <div class="party">
+      <h3>The Company</h3>
+      <p>Access Oxbridge<br/>accessoxbridge.io</p>
+    </div>
+    <div class="party">
+      <h3>The Mentor</h3>
+      <p>
+        <span class="label">Full Name:</span> ${escapeHtml(details.fullName || '—')}<br/>
+        <span class="label">Email:</span> ${escapeHtml(details.email || '—')}<br/>
+        <span class="label">Institution:</span> ${escapeHtml(details.institution || '—')}
+      </p>
+    </div>
+  </div>
+  ${sectionsHtml}
+  <h2>Signatures</h2>
+  <p>By signing below, both parties confirm they have read and agree to be bound by the terms of this Mentor Agreement.</p>
+  <div class="sigs">
+    <div class="sig">
+      <div class="name">Access Oxbridge</div>
+      <div class="meta">For Access Oxbridge<br/>Date: ${escapeHtml(dateStr)}</div>
+    </div>
+    <div class="sig">
+      <div class="name">${escapeHtml(details.signature || details.fullName || '')}</div>
+      <div class="meta">Mentor — ${escapeHtml(details.fullName || '')}<br/>Date: ${escapeHtml(dateStr)}</div>
+    </div>
+  </div>
+  <div class="footer">Please retain a signed copy for your records.&nbsp;&nbsp;|&nbsp;&nbsp;accessoxbridge.io</div>
+</body>
+</html>`
+}
 
 export default function TrainingContent({
     mentorId,
@@ -101,14 +289,19 @@ export default function TrainingContent({
     initialStep = 0,
     existingData
 }: TrainingContentProps) {
-    const [currentStep, setCurrentStep] = useState(Math.max(0, Math.min(initialStep, 6)))
+    const [currentStep, setCurrentStep] = useState(Math.max(0, Math.min(initialStep, LAST_STEP_INDEX)))
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
 
     // Form states
     const [signature, setSignature] = useState(existingData.contractSignature || '')
-    const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
-    const [quizSubmitted, setQuizSubmitted] = useState(onboardingStatus.quiz)
+    const [questionnaireAnswers, setQuestionnaireAnswers] = useState<QuestionnaireAnswers>({
+        q_oxbridge_college: existingData.questionnaire?.q_oxbridge_college || '',
+        q_specialisation: existingData.questionnaire?.q_specialisation || '',
+        q_alevels: existingData.questionnaire?.q_alevels || '',
+        q_approach: existingData.questionnaire?.q_approach || '',
+    })
+    const [questionnaireSubmitted, setQuestionnaireSubmitted] = useState(onboardingStatus.questionnaire)
     const [backgroundCheckConfirmed, setBackgroundCheckConfirmed] = useState(false)
     // Phone display state (read-only here; populated from existingData.phone)
     const DEFAULT_COUNTRY = COUNTRIES.find(c => c.code === 'GB')!
@@ -180,36 +373,23 @@ export default function TrainingContent({
         return digits.replace(/(\d{3})(\d{3})(\d+)/, '$1 $2 $3')
     }
 
-    const handleCompleteTraining = () => {
-        setError(null)
-        startTransition(async () => {
-            const result = await completeTraining()
-            if (result.error) {
-                setError(result.error)
-            } else {
-                setLocalStatus(prev => ({ ...prev, training: true }))
-                setCurrentStep(2) // Move to quiz
-            }
-        })
-    }
-
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuestionnaire = () => {
         setError(null)
 
         // Check if all questions are answered
-        if (Object.keys(quizAnswers).length < QUIZ_QUESTIONS.length) {
+        if (QUESTIONNAIRE.some(q => !questionnaireAnswers[q.id]?.trim())) {
             setError('Please answer all questions before submitting')
             return
         }
 
         startTransition(async () => {
-            const result = await completeQuiz(quizAnswers)
+            const result = await completeQuestionnaire(questionnaireAnswers)
             if (result.error) {
                 setError(result.error)
             } else {
-                setQuizSubmitted(true)
-                setLocalStatus(prev => ({ ...prev, quiz: true }))
-                setCurrentStep(3) // Move to contract
+                setQuestionnaireSubmitted(true)
+                setLocalStatus(prev => ({ ...prev, questionnaire: true }))
+                setCurrentStep(2) // Move to contract
             }
         })
     }
@@ -227,9 +407,45 @@ export default function TrainingContent({
                 setError(result.error)
             } else {
                 setLocalStatus(prev => ({ ...prev, contract: true }))
-                setCurrentStep(4) // Move to DBS
+                setCurrentStep(3) // Move to Background Checks
             }
         })
+    }
+
+    const handleDownloadContract = () => {
+        const html = buildContractHtml({
+            fullName: mentorName || '',
+            email: existingData.email || '',
+            institution: existingData.university || '',
+            signature: existingData.contractSignature || signature || mentorName || '',
+            signedDate: existingData.contractSignedAt || new Date().toISOString(),
+        })
+
+        // Render into a hidden iframe and trigger the print dialog (Save as PDF),
+        // which avoids popup blockers that can break window.open.
+        const iframe = document.createElement('iframe')
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;'
+        document.body.appendChild(iframe)
+
+        const cleanup = () => setTimeout(() => { try { document.body.removeChild(iframe) } catch { /* already removed */ } }, 1000)
+
+        iframe.onload = () => {
+            try {
+                iframe.contentWindow?.focus()
+                iframe.contentWindow?.print()
+            } finally {
+                cleanup()
+            }
+        }
+
+        const doc = iframe.contentWindow?.document
+        if (!doc) {
+            document.body.removeChild(iframe)
+            return
+        }
+        doc.open()
+        doc.write(html)
+        doc.close()
     }
 
     const handleBackgroundCheckSubmit = async (formFile: File | null, confirmed: boolean) => {
@@ -430,10 +646,10 @@ export default function TrainingContent({
                         <div className="bg-rich-beige-accent/50 rounded-2xl p-6 text-left space-y-4">
                             <p className="text-gray-700 leading-relaxed">
                                 At accessoxbridge we will do everything we possibly can to ensure the success of our students.
-                                We require all of our team members to complete this onboarding and training.
+                                We require all of our team members to complete this short onboarding.
                             </p>
                             <p className="text-accent font-semibold">
-                                As soon as this 25 minute training is done, you can start receiving allocations immediately!
+                                As soon as these few steps are done, you can start receiving allocations immediately!
                             </p>
                         </div>
                         <button
@@ -446,82 +662,25 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 1: Training Content */}
+                {/* Step 1: Questionnaire */}
                 {currentStep === 1 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center">
-                                <BookOpen className="w-7 h-7 text-accent" />
+                                <ClipboardList className="w-7 h-7 text-accent" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Training Content</h2>
-                                <p className="text-gray-500">Estimated time: 25 minutes</p>
+                                <h2 className="text-2xl font-bold text-gray-900">Getting to Know You</h2>
+                                <p className="text-gray-500">A few questions to help us build your profile</p>
                             </div>
                         </div>
 
-                        {localStatus.training ? (
+                        {questionnaireSubmitted ? (
                             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                                 <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Training Completed!</p>
+                                <p className="text-green-700 font-semibold">Questionnaire Completed!</p>
                                 <button
                                     onClick={() => setCurrentStep(2)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
-                                >
-                                    Continue to Quiz
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="bg-gray-50 rounded-2xl p-8 border-2 border-dashed border-gray-200">
-                                    <p className="text-center text-gray-600 text-lg">
-                                        We will provide more details shortly
-                                    </p>
-                                </div>
-
-                                <div className="flex justify-end">
-                                    <button
-                                        onClick={handleCompleteTraining}
-                                        disabled={isPending}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
-                                    >
-                                        {isPending ? (
-                                            <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                Mark Training Complete
-                                                <ChevronRight className="w-5 h-5" />
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {/* Step 2: Quiz */}
-                {currentStep === 2 && (
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center">
-                                <FileText className="w-7 h-7 text-amber-600" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Training Quiz</h2>
-                                <p className="text-gray-500">Confirm your understanding</p>
-                            </div>
-                        </div>
-
-                        {quizSubmitted ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Quiz Completed!</p>
-                                <button
-                                    onClick={() => setCurrentStep(3)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Contract
@@ -531,42 +690,26 @@ export default function TrainingContent({
                         ) : (
                             <>
                                 <div className="space-y-6">
-                                    {QUIZ_QUESTIONS.map((q, index) => (
+                                    {QUESTIONNAIRE.map((q, index) => (
                                         <div key={q.id} className="bg-gray-50 rounded-2xl p-6">
-                                            <p className="font-semibold text-gray-900 mb-4">
+                                            <label htmlFor={q.id} className="block font-semibold text-gray-900 mb-3">
                                                 {index + 1}. {q.question}
-                                            </p>
-                                            <div className="space-y-2">
-                                                {q.options.map((option) => {
-                                                    const optionLetter = option.charAt(0)
-                                                    return (
-                                                        <label
-                                                            key={option}
-                                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${quizAnswers[q.id] === optionLetter
-                                                                ? 'bg-accent/10 border-2 border-accent'
-                                                                : 'bg-white border-2 border-gray-100 hover:border-gray-200'
-                                                                }`}
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                name={q.id}
-                                                                value={optionLetter}
-                                                                checked={quizAnswers[q.id] === optionLetter}
-                                                                onChange={() => setQuizAnswers(prev => ({ ...prev, [q.id]: optionLetter }))}
-                                                                className="w-4 h-4 text-accent"
-                                                            />
-                                                            <span className="text-gray-700">{option}</span>
-                                                        </label>
-                                                    )
-                                                })}
-                                            </div>
+                                            </label>
+                                            <textarea
+                                                id={q.id}
+                                                rows={3}
+                                                value={questionnaireAnswers[q.id]}
+                                                onChange={(e) => setQuestionnaireAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
+                                                placeholder={q.placeholder}
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none bg-white"
+                                            />
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className="flex justify-end">
                                     <button
-                                        onClick={handleSubmitQuiz}
+                                        onClick={handleSubmitQuestionnaire}
                                         disabled={isPending}
                                         className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
                                     >
@@ -577,7 +720,7 @@ export default function TrainingContent({
                                             </>
                                         ) : (
                                             <>
-                                                Submit Quiz
+                                                Submit Questionnaire
                                                 <ChevronRight className="w-5 h-5" />
                                             </>
                                         )}
@@ -588,8 +731,8 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 3: Contract */}
-                {currentStep === 3 && (
+                {/* Step 2: Contract */}
+                {currentStep === 2 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
@@ -608,35 +751,67 @@ export default function TrainingContent({
                                 <p className="text-green-600 text-sm mt-1">
                                     Signed by: {existingData.contractSignature || signature}
                                 </p>
-                                <button
-                                    onClick={() => setCurrentStep(4)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
-                                >
-                                    Continue to Background Checks
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
+                                <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                                    <button
+                                        onClick={handleDownloadContract}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-green-300 text-green-700 font-bold rounded-xl hover:bg-green-50 transition-all"
+                                    >
+                                        <Download className="w-5 h-5" />
+                                        Download signed contract
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrentStep(3)}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    >
+                                        Continue to Background Checks
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <>
-                                {/* Contract content placeholder */}
-                                <div className="bg-gray-50 rounded-2xl p-6 max-h-64 overflow-y-auto border border-gray-200">
-                                    <h3 className="font-bold text-gray-900 mb-4">MENTOR AGREEMENT</h3>
-                                    <div className="space-y-4 text-sm text-gray-600">
-                                        <p><strong>1. Role and Responsibilities</strong></p>
-                                        <p>As a mentor with Access Oxbridge, you agree to provide mentorship services to students assigned to you...</p>
+                                {/* Full mentor agreement */}
+                                <div className="bg-gray-50 rounded-2xl p-6 max-h-96 overflow-y-auto border border-gray-200">
+                                    <h3 className="font-bold text-gray-900 text-lg">MENTOR AGREEMENT</h3>
+                                    <p className="text-sm text-gray-600 mt-1">{AGREEMENT_INTRO}</p>
 
-                                        <p><strong>2. Confidentiality</strong></p>
-                                        <p>You agree to maintain the confidentiality of all student information and session details...</p>
+                                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                        <div className="rounded-xl border border-gray-200 bg-white p-4">
+                                            <p className="font-semibold text-gray-900 mb-1">The Company</p>
+                                            <p className="text-gray-700">Access Oxbridge</p>
+                                            <p className="text-gray-500">accessoxbridge.io</p>
+                                        </div>
+                                        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-1">
+                                            <p className="font-semibold text-gray-900 mb-1">The Mentor</p>
+                                            <p className="text-gray-700">
+                                                <span className="text-gray-500">Full Name: </span>
+                                                {mentorName || '—'}
+                                            </p>
+                                            <p className="text-gray-700">
+                                                <span className="text-gray-500">Email: </span>
+                                                {existingData.email || '—'}
+                                            </p>
+                                            <p className="text-gray-700">
+                                                <span className="text-gray-500">Institution: </span>
+                                                {existingData.university || '—'}
+                                            </p>
+                                        </div>
+                                    </div>
 
-                                        <p><strong>3. Professional Conduct</strong></p>
-                                        <p>You agree to conduct yourself professionally at all times and adhere to our code of conduct...</p>
-
-                                        <p><strong>4. Session Reports</strong></p>
-                                        <p>You agree to submit session reports within 24 hours of each mentoring session...</p>
-
-                                        <p className="text-gray-400 italic">
-                                            [Full contract terms to be provided]
-                                        </p>
+                                    <div className="mt-5 space-y-4 text-sm text-gray-600 leading-relaxed">
+                                        {AGREEMENT_SECTIONS.map((section) => (
+                                            <div key={section.title}>
+                                                <p className="font-semibold text-gray-900">{section.title}</p>
+                                                {section.body && <p>{section.body}</p>}
+                                                {section.bullets && (
+                                                    <ul className="list-disc pl-5 mt-1 space-y-1">
+                                                        {section.bullets.map((bullet, i) => (
+                                                            <li key={i}>{bullet}</li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -654,7 +829,7 @@ export default function TrainingContent({
                                         />
                                     </label>
                                     <p className="text-sm text-gray-500">
-                                        By typing your name above, you agree to the terms of this contract.
+                                        By typing your name above, you confirm you have read and agree to be bound by the terms of this Mentor Agreement. Your signature and the date will be recorded.
                                     </p>
                                 </div>
 
@@ -682,8 +857,8 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 4: Background Checks */}
-                {currentStep === 4 && (
+                {/* Step 3: Background Checks */}
+                {currentStep === 3 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
@@ -713,7 +888,7 @@ export default function TrainingContent({
                                     </p>
                                 )}
                                 <button
-                                    onClick={() => setCurrentStep(5)}
+                                    onClick={() => setCurrentStep(4)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Payment Setup
@@ -745,8 +920,8 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 5: Payment Setup */}
-                {currentStep === 5 && (
+                {/* Step 4: Payment Setup */}
+                {currentStep === 4 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-[#635BFF]/10 rounded-2xl flex items-center justify-center">
@@ -766,7 +941,7 @@ export default function TrainingContent({
                                     Your Stripe account is set up and ready to receive payouts.
                                 </p>
                                 <button
-                                    onClick={() => setCurrentStep(6)}
+                                    onClick={() => setCurrentStep(5)}
                                     className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Profile
@@ -795,7 +970,7 @@ export default function TrainingContent({
 
                                 <div className="text-center">
                                     <button
-                                        onClick={() => setCurrentStep(6)}
+                                        onClick={() => setCurrentStep(5)}
                                         className="text-gray-500 text-sm hover:text-gray-700 underline"
                                     >
                                         Skip for now (you can set this up later)
@@ -806,8 +981,8 @@ export default function TrainingContent({
                     </div>
                 )}
 
-                {/* Step 6: Profile Completion */}
-                {currentStep === 6 && (
+                {/* Step 5: Profile Completion */}
+                {currentStep === 5 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center">

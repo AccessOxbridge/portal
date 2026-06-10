@@ -51,6 +51,46 @@ export async function completeQuiz(answers: Record<string, string>) {
     return { success: true }
 }
 
+export async function completeQuestionnaire(answers: {
+    q_oxbridge_college: string
+    q_specialisation: string
+    q_alevels: string
+    q_approach: string
+}) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        return { error: 'Not authenticated' }
+    }
+
+    const trimmed = {
+        q_oxbridge_college: answers.q_oxbridge_college?.trim() ?? '',
+        q_specialisation: answers.q_specialisation?.trim() ?? '',
+        q_alevels: answers.q_alevels?.trim() ?? '',
+        q_approach: answers.q_approach?.trim() ?? '',
+    }
+
+    if (Object.values(trimmed).some(v => v.length === 0)) {
+        return { error: 'Please answer all questions before submitting' }
+    }
+
+    const { error } = await supabase
+        .from('mentors')
+        .update({
+            ...trimmed,
+            questionnaire_completed_at: new Date().toISOString(),
+        } as any)
+        .eq('id', user.id)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard/mentor/training')
+    return { success: true }
+}
+
 export async function signContract(signature: string) {
     const supabase = await createClient()
 

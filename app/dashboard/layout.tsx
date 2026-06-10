@@ -33,8 +33,7 @@ export default async function DashboardLayout({
                 bio,
                 photo_url,
                 payouts_enabled,
-                training_completed_at,
-                quiz_completed_at,
+                questionnaire_completed_at,
                 contract_signed_at,
                 dbs_certificate_url,
                 background_check_confirmed_at,
@@ -61,11 +60,11 @@ export default async function DashboardLayout({
                     .eq('id', user.id)
                     .single()
                 if (existingProfile) {
-                    let mentorsData: { status: string | null; bio: string | null; photo_url: string | null; payouts_enabled: boolean | null; training_completed_at: string | null; quiz_completed_at: string | null; contract_signed_at: string | null; dbs_certificate_url: string | null; background_check_confirmed_at: string | null; profile_completed_at: string | null } | null = null
+                    let mentorsData: { status: string | null; bio: string | null; photo_url: string | null; payouts_enabled: boolean | null; questionnaire_completed_at: string | null; contract_signed_at: string | null; dbs_certificate_url: string | null; background_check_confirmed_at: string | null; profile_completed_at: string | null } | null = null
                     if (existingProfile.role === 'mentor' || existingProfile.role === 'admin-dev') {
                         const { data: mentorRow } = await supabase
                             .from('mentors')
-                            .select('status, bio, photo_url, payouts_enabled, training_completed_at, quiz_completed_at, contract_signed_at, dbs_certificate_url, background_check_confirmed_at, profile_completed_at')
+                            .select('status, bio, photo_url, payouts_enabled, questionnaire_completed_at, contract_signed_at, dbs_certificate_url, background_check_confirmed_at, profile_completed_at')
                             .eq('id', user.id)
                             .single()
                         mentorsData = mentorRow
@@ -88,8 +87,7 @@ export default async function DashboardLayout({
                         bio,
                         photo_url,
                         payouts_enabled,
-                        training_completed_at,
-                        quiz_completed_at,
+                        questionnaire_completed_at,
                         contract_signed_at,
                         dbs_certificate_url,
                         background_check_confirmed_at,
@@ -125,19 +123,18 @@ export default async function DashboardLayout({
 
 
 
-        // Check if mentor training/onboarding is incomplete
+        // Check if mentor onboarding is incomplete
         if (mentor && showSidebar) {
-            // Check training completion - if any of these are missing, training is incomplete
-            const trainingComplete = !!mentor.training_completed_at
-            const quizComplete = !!mentor.quiz_completed_at
+            // Check onboarding completion - if any of these are missing, onboarding is incomplete
+            const questionnaireComplete = !!mentor.questionnaire_completed_at
             const contractSigned = !!mentor.contract_signed_at
             const dbsComplete = !!mentor.dbs_certificate_url || !!mentor.background_check_confirmed_at
             const paymentSetup = !!mentor.payouts_enabled
             const profileComplete = !!mentor.profile_completed_at || (!!mentor.bio && !!mentor.photo_url)
 
-            onboardingIncomplete = !trainingComplete || !quizComplete || !contractSigned || !dbsComplete || !paymentSetup || !profileComplete
-            // expose trainingComplete to sidebar via local variable (passed below)
-            ;(profile as any).mentors.trainingCompleteFlag = trainingComplete
+            onboardingIncomplete = !questionnaireComplete || !contractSigned || !dbsComplete || !paymentSetup || !profileComplete
+            // expose onboarding completion to sidebar via local variable (passed below)
+            ;(profile as any).mentors.trainingCompleteFlag = questionnaireComplete
         }
     }
 

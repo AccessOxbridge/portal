@@ -25,8 +25,7 @@ const ALL_SUBJECTS = Array.from(new Set(Object.values(SUBJECT_OPTIONS).flat())).
 // Helper to calculate onboarding completion
 function getOnboardingStatus(mentor: Mentor): { completed: number; total: number; label: string } {
     const steps = [
-        !!mentor.training_completed_at,
-        !!mentor.quiz_completed_at,
+        !!mentor.questionnaire_completed_at,
         !!mentor.contract_signed_at,
         !!mentor.dbs_certificate_url,
         !!mentor.payouts_enabled,

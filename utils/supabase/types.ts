@@ -572,6 +572,11 @@ export type Database = {
           phone: string | null
           photo_url: string | null
           profile_completed_at: string | null
+          q_alevels: string | null
+          q_approach: string | null
+          q_oxbridge_college: string | null
+          q_specialisation: string | null
+          questionnaire_completed_at: string | null
           quiz_answers: Json | null
           quiz_completed_at: string | null
           responses: Json | null
@@ -599,6 +604,11 @@ export type Database = {
           phone?: string | null
           photo_url?: string | null
           profile_completed_at?: string | null
+          q_alevels?: string | null
+          q_approach?: string | null
+          q_oxbridge_college?: string | null
+          q_specialisation?: string | null
+          questionnaire_completed_at?: string | null
           quiz_answers?: Json | null
           quiz_completed_at?: string | null
           responses?: Json | null
@@ -626,6 +636,11 @@ export type Database = {
           phone?: string | null
           photo_url?: string | null
           profile_completed_at?: string | null
+          q_alevels?: string | null
+          q_approach?: string | null
+          q_oxbridge_college?: string | null
+          q_specialisation?: string | null
+          questionnaire_completed_at?: string | null
           quiz_answers?: Json | null
           quiz_completed_at?: string | null
           responses?: Json | null

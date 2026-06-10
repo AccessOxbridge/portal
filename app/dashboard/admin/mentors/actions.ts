@@ -10,8 +10,7 @@ export interface Mentor {
     phone: string | null
     created_at: string
     photo_url: string | null
-    training_completed_at: string | null
-    quiz_completed_at: string | null
+    questionnaire_completed_at: string | null
     contract_signed_at: string | null
     dbs_certificate_url: string | null
     payouts_enabled: boolean | null

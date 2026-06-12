@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble from './message-bubble'
 import MessageInput from './message-input'
+import InterventionBubble from './intervention-bubble'
 
 interface Message {
     id: string
@@ -21,6 +22,7 @@ interface ChatWindowProps {
         id: string
         full_name: string | null
         photo_url?: string | null
+        role_label?: string | null
     }
     adminUser?: {
         id: string
@@ -49,6 +51,18 @@ export default function ChatWindow({
     // Scroll to bottom when messages change
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    // A message is a third-party "Access Oxbridge Support" intervention when it lands
+    // in a mentor↔student thread but was sent by neither of those two participants.
+    // (Support threads have no mentor, so admin replies there render normally.)
+    const isInterventionMessage = (message: Message) => {
+        if (message.content.startsWith('[ADMIN] ')) return true
+        if (!allParticipants?.mentor_id) return false
+        return (
+            message.sender_id !== allParticipants.student_id &&
+            message.sender_id !== allParticipants.mentor_id
+        )
     }
 
     // Presence tracking
@@ -252,6 +266,8 @@ export default function ChatWindow({
                     </div>
                     {adminUser ? (
                         <p className="text-xs text-gray-400">Group Chat</p>
+                    ) : otherUser.role_label ? (
+                        <p className="text-xs font-medium text-purple-600">{otherUser.role_label}</p>
                     ) : (
                         <p className={`text-xs ${isOtherUserOnline ? 'text-green-500' : 'text-gray-400'}`}>
                             {isOtherUserOnline ? 'Online' : 'Offline'}
@@ -278,6 +294,19 @@ export default function ChatWindow({
                     </div>
                 ) : (
                     messages.map((message, index) => {
+                        // A message from someone who is neither the student nor the mentor
+                        // (i.e. the Access Oxbridge team stepping into the conversation) is
+                        // rendered as a distinct, centered third-party intervention bubble.
+                        if (isInterventionMessage(message)) {
+                            return (
+                                <InterventionBubble
+                                    key={message.id}
+                                    content={message.content.replace(/^\[ADMIN\]\s*/, '')}
+                                    timestamp={message.created_at || new Date().toISOString()}
+                                />
+                            )
+                        }
+
                         const isSent = message.sender_id === currentUserId
                         const isFirstFromSender = index === 0 || messages[index - 1].sender_id !== message.sender_id
 

@@ -18,6 +18,7 @@ interface Conversation {
         id: string
         full_name: string | null
         photo_url?: string | null
+        role_label?: string | null
     }
     admin_user?: {
         id: string

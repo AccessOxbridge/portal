@@ -315,7 +315,7 @@ export default function AdminMessagesContent({
                                                 <div className="max-w-lg px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-center">
                                                     <div className="flex items-center justify-center gap-1 text-amber-600 text-xs font-medium mb-1">
                                                         <AlertTriangle className="w-3 h-3" />
-                                                        Admin Intervention
+                                                        Access Oxbridge Support (intervention)
                                                     </div>
                                                     <p className="text-sm text-amber-900">{message.content.replace('[ADMIN] ', '')}</p>
                                                     <p className="text-[10px] text-amber-400 mt-1">
@@ -361,7 +361,7 @@ export default function AdminMessagesContent({
                                 ) : (
                                     <>
                                         <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                        <span className="text-xs font-medium text-amber-700">Admin Intervention</span>
+                                        <span className="text-xs font-medium text-amber-700">Send as Access Oxbridge Support</span>
                                     </>
                                 )}
                             </div>

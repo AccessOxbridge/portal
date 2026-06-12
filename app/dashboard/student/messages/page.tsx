@@ -93,14 +93,29 @@ export default async function StudentMessagesPage({
             last_message_at,
             mentor:profiles!conversations_mentor_id_fkey (
                 id,
-                full_name,
-                mentors (
-                    photo_url
-                )
+                full_name
             )
         `)
         .eq('student_id', user.id)
         .order('last_message_at', { ascending: false })
+
+    // Mentor photos live on the `mentors` table (keyed by the profile id).
+    const mentorIds = [
+        ...new Set(
+            (conversations || [])
+                .map((c: any) => c.mentor_id)
+                .filter(Boolean) as string[]
+        ),
+    ]
+
+    const { data: mentorPhotos } = mentorIds.length > 0
+        ? await supabase
+            .from('mentors')
+            .select('id, photo_url')
+            .in('id', mentorIds)
+        : { data: [] }
+
+    const photoMap = new Map((mentorPhotos || []).map((m: any) => [m.id, m.photo_url]))
 
     // 5. Enrich each conversation with last message + unread count.
     const processedConversations = await Promise.all(
@@ -132,13 +147,15 @@ export default async function StudentMessagesPage({
                 other_user: isSupport
                     ? {
                         id: conv.admin_id || 'support',
-                        full_name: 'Help & Support',
-                        photo_url: null,
+                        full_name: 'Claire Marlowe',
+                        photo_url: '/logo.png',
+                        role_label: 'Senior Strategist',
                     }
                     : {
                         id: conv.mentor?.id || conv.mentor_id,
                         full_name: conv.mentor?.full_name || 'Mentor',
-                        photo_url: conv.mentor?.mentors?.[0]?.photo_url || null,
+                        photo_url: photoMap.get(conv.mentor_id) || null,
+                        role_label: null,
                     },
                 admin_user: null,
                 last_message: lastMessage || null,

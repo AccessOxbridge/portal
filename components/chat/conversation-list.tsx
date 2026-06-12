@@ -12,6 +12,7 @@ interface Conversation {
         id: string
         full_name: string | null
         photo_url?: string | null
+        role_label?: string | null
     }
     last_message?: {
         content: string
@@ -50,10 +51,11 @@ export default function ConversationList({
             {conversations.map((conversation) => {
                 const isSelected = selectedId === conversation.id
                 const hasUnread = (conversation.unread_count ?? 0) > 0
-                const lastMessagePreview = conversation.last_message?.content
-                    ? conversation.last_message.content.length > 40
-                        ? conversation.last_message.content.slice(0, 40) + '...'
-                        : conversation.last_message.content
+                const lastMessageContent = conversation.last_message?.content?.replace(/^\[ADMIN\]\s*/, '')
+                const lastMessagePreview = lastMessageContent
+                    ? lastMessageContent.length > 40
+                        ? lastMessageContent.slice(0, 40) + '...'
+                        : lastMessageContent
                     : 'No messages yet'
                 const isSender = conversation.last_message?.sender_id === currentUserId
 
@@ -96,6 +98,11 @@ export default function ConversationList({
                                     {formatDistanceToNow(new Date(conversation.last_message_at), { addSuffix: true })}
                                 </span>
                             </div>
+                            {conversation.other_user.role_label && (
+                                <span className="inline-block mb-1 px-2 py-0.5 rounded-full bg-purple-50 text-[10px] font-semibold text-purple-700">
+                                    {conversation.other_user.role_label}
+                                </span>
+                            )}
                             <p className={`text-xs truncate ${hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
                                 {isSender && <span className="text-gray-400">You: </span>}
                                 {lastMessagePreview}

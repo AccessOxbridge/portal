@@ -143,7 +143,10 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
             settings: {
                 host_video: true,
                 participant_video: true,
-                join_before_host: true,
+                // Students cannot enter until the mentor (host) starts the
+                // meeting. They'll see "waiting for the host to start" and are
+                // admitted automatically the moment the mentor starts it.
+                join_before_host: false,
                 waiting_room: false,
                 audio: 'both',
                 auto_recording: 'cloud',
@@ -162,6 +165,39 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
         id: String(data.id),
         joinUrl: data.join_url,
         startUrl: data.start_url,
+    }
+}
+
+/**
+ * Fetch a FRESH host start URL for an existing meeting.
+ *
+ * The `start_url` returned when a meeting is first created expires ~2 hours
+ * later (Zoom's documented behaviour for regular users). Since meetings are
+ * booked ahead of the session, the stored start_url is usually dead by the
+ * time the mentor wants to start it — which surfaces as "this meeting is
+ * hosted by someone else / you can't start it". Calling GET on the meeting
+ * returns a newly-minted start_url (with a fresh host token), so we generate
+ * it on demand at click time instead of reusing the stored one.
+ */
+export async function getZoomStartUrl(meetingId: string): Promise<string | null> {
+    try {
+        const accessToken = await getZoomAccessToken()
+
+        const response = await fetch(`https://api.zoom.us/v2/meetings/${meetingId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        })
+
+        if (!response.ok) {
+            const error = await response.text()
+            console.error(`[ZOOM] Could not fetch start_url for meeting ${meetingId}: ${error}`)
+            return null
+        }
+
+        const data: { start_url?: string } = await response.json()
+        return data.start_url || null
+    } catch (err) {
+        console.error(`[ZOOM] Error fetching start_url for meeting ${meetingId}:`, err)
+        return null
     }
 }
 

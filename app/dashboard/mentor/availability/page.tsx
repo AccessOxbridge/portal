@@ -45,7 +45,9 @@ export default async function MentorAvailabilityPage() {
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
-        zoom_url: session.zoom_start_url,
+        // Route through the on-demand start endpoint so the mentor always gets
+        // a fresh (non-expired) Zoom host link.
+        zoom_url: session.zoom_start_url ? `/api/sessions/${session.id}/start` : null,
         person_name: session.student?.full_name || 'Student'
     }))
 

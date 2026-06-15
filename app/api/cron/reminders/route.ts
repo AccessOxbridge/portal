@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 
+const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.accessoxbridge.io').replace(/\/$/, '');
+
 /**
  * CRON API Route: Sends reminders to students and mentors before a session starts.
  *  - 1 hour before (email + in-app, existing behaviour)
@@ -82,7 +84,12 @@ export async function GET(req: Request) {
                 message: `Your session with ${student.full_name} starts at ${timeStr}. Ready?`,
                 data: {
                     session_id: session.id,
-                    zoom_start_url: session.zoom_start_url || session.zoom_join_url,
+                    // On-demand start link: regenerates a fresh (non-expired)
+                    // Zoom host URL when the mentor clicks it. Falls back to the
+                    // stored links only if no meeting id is available.
+                    zoom_start_url: session.zoom_meeting_id
+                        ? `${APP_BASE_URL}/api/sessions/${session.id}/start`
+                        : (session.zoom_start_url || session.zoom_join_url),
                     scheduled_at: session.scheduled_at
                 }
             });

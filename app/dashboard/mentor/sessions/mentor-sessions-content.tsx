@@ -319,7 +319,7 @@ export default function MentorSessionsContent({
                                         <>
                                             {session.zoom_start_url ? (
                                                 <a
-                                                    href={session.zoom_start_url}
+                                                    href={`/api/sessions/${session.id}/start`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)

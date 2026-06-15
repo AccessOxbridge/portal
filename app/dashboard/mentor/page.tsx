@@ -136,9 +136,9 @@ export default async function MentorDashboard() {
                                             })}
                                         </p>
                                     )}
-                                    {session.zoom_start_url ? (
+                                    {session.zoom_meeting_id || session.zoom_start_url ? (
                                         <a
-                                            href={session.zoom_start_url}
+                                            href={`/api/sessions/${session.id}/start`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="w-full inline-flex justify-center items-center gap-2 px-4 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"

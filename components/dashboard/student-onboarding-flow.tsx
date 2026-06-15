@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
-import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
+import { DEFAULT_TIMEZONE, getDefaultTimezone, rememberTimezone, zonedTimeToUtcISO } from '@/lib/timezone'
 
 type StepId = 'basic' | 'targets' | 'additional'
 
@@ -151,9 +151,9 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
             return
         }
 
-        // Store UTC ISO strings (this matches the existing mentor-side scheduling flow)
-        const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
-        const endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
+        // Interpret the wall-clock times in the student's chosen timezone (not
+        // the browser's) before converting to UTC ISO strings.
+        const slotTz = formData.timezone || DEFAULT_TIMEZONE
 
         setFormData(prev => ({
             ...prev,
@@ -161,8 +161,8 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
                 ...prev.timeSlots,
                 {
                     date: newSlot.date,
-                    startTime: startDateTime.toISOString(),
-                    endTime: endDateTime.toISOString(),
+                    startTime: zonedTimeToUtcISO(newSlot.date, newSlot.startTime, slotTz),
+                    endTime: zonedTimeToUtcISO(newSlot.date, newSlot.endTime, slotTz),
                 }
             ]
         }))
@@ -178,21 +178,22 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
         const start = new Date(slot.startTime)
         const end = new Date(slot.endTime)
 
+        const slotTz = formData.timezone || DEFAULT_TIMEZONE
         const dateStr = start.toLocaleDateString('en-GB', {
             weekday: 'short',
             day: 'numeric',
             month: 'short',
-            timeZone: formData.timezone || undefined,
+            timeZone: slotTz,
         })
         const startTimeStr = start.toLocaleTimeString('en-GB', {
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: formData.timezone || undefined,
+            timeZone: slotTz,
         })
         const endTimeStr = end.toLocaleTimeString('en-GB', {
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: formData.timezone || undefined,
+            timeZone: slotTz,
         })
 
         return `${dateStr}, ${startTimeStr} - ${endTimeStr}`

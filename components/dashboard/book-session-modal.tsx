@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, Calendar, Clock, Plus } from 'lucide-react'
+import { DEFAULT_TIMEZONE, addMinutesToWallTime, getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
 
 interface TimeSlot {
     date: string
@@ -32,60 +33,49 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
-    const todayDate = new Date().toISOString().split('T')[0]
+    // All wall-clock times in this modal are interpreted in the student's
+    // timezone (not the browser's), so the label and the saved times agree.
+    const tz = studentProfile.timezone || DEFAULT_TIMEZONE
+    const todayDate = getZonedNow(tz).date
     const [newSlot, setNewSlot] = useState({ date: todayDate, startTime: '', endTime: '' })
 
     // Reset card state when user closes the modal (e.g. after adding 1–2 slots but not submitting)
     useEffect(() => {
         if (!isOpen) {
             setTimeSlots([])
-            setNewSlot({ date: new Date().toISOString().split('T')[0], startTime: '', endTime: '' })
+            setNewSlot({ date: getZonedNow(tz).date, startTime: '', endTime: '' })
             setError(null)
             setLoading(false)
         }
-    }, [isOpen])
+    }, [isOpen, tz])
 
     // When startTime changes, always default endTime to +60 minutes (1 hr)
     useEffect(() => {
         if (!newSlot.startTime) return
-        // compute default endTime (1 hour after start)
-        const [sh, sm] = newSlot.startTime.split(':').map(Number)
-        const dateObj = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
-        dateObj.setMinutes(dateObj.getMinutes() + 60)
-        const hh = String(dateObj.getHours()).padStart(2, '0')
-        const mm = String(dateObj.getMinutes()).padStart(2, '0')
-        const defaultEnd = `${hh}:${mm}`
         setNewSlot(prev => ({
             ...prev,
-            endTime: defaultEnd
+            endTime: addMinutesToWallTime(newSlot.startTime, 60)
         }))
     }, [newSlot.startTime, newSlot.date])
 
-    // Helper to format time (HH:MM) to label like "2:30pm"
-    const formatTimeLabel = (isoDate: string, time: string) => {
-        const dt = new Date(`${isoDate}T${time}:00`)
-        return dt.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' })
-    }
-
-    // When date is today and startTime is empty, default startTime to the next 15-minute slot
+    // When date is today (in the student's timezone) and startTime is empty,
+    // default startTime to the next 15-minute slot in that timezone.
     useEffect(() => {
-        const today = todayDate
-        if (newSlot.date !== today) return
+        if (newSlot.date !== todayDate) return
         if (newSlot.startTime) return
 
-        const now = new Date()
-        // compute minutes rounded up to next 15
-        let mins = Math.ceil(now.getMinutes() / 15) * 15
-        let hrs = now.getHours()
+        const [nowH, nowM] = getZonedNow(tz).time.split(':').map(Number)
+        let mins = Math.ceil(nowM / 15) * 15
+        let hrs = nowH
         if (mins === 60) {
             mins = 0
             hrs = (hrs + 1) % 24
         }
-        const hh = String(hrs).padStart(2, '0')
-        const mm = String(mins).padStart(2, '0')
-        const next15 = `${hh}:${mm}`
+        // Keep the default within the selectable 06:00–23:45 range.
+        if (hrs < 6) { hrs = 6; mins = 0 }
+        const next15 = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
         setNewSlot(prev => ({ ...prev, startTime: next15 }))
-    }, [newSlot.date, newSlot.startTime, todayDate])
+    }, [newSlot.date, newSlot.startTime, todayDate, tz])
 
     const durationLabel = (minutes: number) => {
         if (minutes < 60) return `${minutes} mins`
@@ -98,14 +88,17 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
     const addTimeSlot = () => {
         if (!newSlot.date || !newSlot.startTime || !newSlot.endTime) return
 
-        // Create UTC ISO strings
-        const startDateTime = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
-        let endDateTime = new Date(`${newSlot.date}T${newSlot.endTime}:00`)
+        // Convert the wall-clock times (read in the student's timezone) to UTC.
+        const startDateTime = new Date(zonedTimeToUtcISO(newSlot.date, newSlot.startTime, tz))
+        let endDateTime = new Date(zonedTimeToUtcISO(newSlot.date, newSlot.endTime, tz))
 
         // If the selected end time appears before or equal to the start time
         // (e.g. 23:00 → 00:00), treat it as crossing midnight into the next day.
         if (endDateTime <= startDateTime) {
-            endDateTime.setDate(endDateTime.getDate() + 1)
+            const nextDay = new Date(`${newSlot.date}T00:00:00Z`)
+            nextDay.setUTCDate(nextDay.getUTCDate() + 1)
+            const nextDayStr = nextDay.toISOString().split('T')[0]
+            endDateTime = new Date(zonedTimeToUtcISO(nextDayStr, newSlot.endTime, tz))
         }
 
         if (endDateTime <= startDateTime) {
@@ -157,17 +150,17 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
             weekday: 'short',
             day: 'numeric',
             month: 'short',
-            timeZone: studentProfile.timezone || undefined,
+            timeZone: tz,
         })
         const startTimeStr = start.toLocaleTimeString('en-GB', {
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: studentProfile.timezone || undefined,
+            timeZone: tz,
         })
         const endTimeStr = end.toLocaleTimeString('en-GB', {
             hour: '2-digit',
             minute: '2-digit',
-            timeZone: studentProfile.timezone || undefined,
+            timeZone: tz,
         })
 
         return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
@@ -264,7 +257,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                         Add at least <strong>3 time slots</strong> when you're available. Your assigned mentor will confirm one that works for them.
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">
-                                        Timezone: <strong>{studentProfile.timezone || 'Not set'}</strong>
+                                        Timezone: <strong>{tz}</strong>
                                     </p>
                                 </div>
                             </div>
@@ -307,7 +300,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                     <input
                                         type="date"
                                         value={newSlot.date}
-                                        min={new Date().toISOString().split('T')[0]}
+                                        min={todayDate}
                                         onChange={(e) => setNewSlot({ ...newSlot, date: e.target.value })}
                                         className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
                                     />
@@ -329,8 +322,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                                 const hh = String(h).padStart(2, '0')
                                                 const mm = String(m).padStart(2, '0')
                                                 const value = `${hh}:${mm}`
-                                                const label = new Date(`${newSlot.date}T${value}:00`).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' })
-                                                nodes.push(<option key={value} value={value}>{label}</option>)
+                                                nodes.push(<option key={value} value={value}>{value}</option>)
                                             }
                                         }
                                         return nodes
@@ -348,14 +340,10 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                             <option value="">Select end time / duration</option>
                                             {(() => {
                                                 const durations = [60, 120] // 1 hr and 2 hrs only
-                                                const start = new Date(`${newSlot.date}T${newSlot.startTime}:00`)
                                                 const nodes: any[] = []
                                                 for (const d of durations) {
-                                                    const dt = new Date(start.getTime() + d * 60000)
-                                                    const hh = String(dt.getHours()).padStart(2, '0')
-                                                    const mm = String(dt.getMinutes()).padStart(2, '0')
-                                                    const value = `${hh}:${mm}`
-                                                    const label = `${dt.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' })} (${durationLabel(d)})`
+                                                    const value = addMinutesToWallTime(newSlot.startTime, d)
+                                                    const label = `${value} (${durationLabel(d)})`
                                                     nodes.push(<option key={value} value={value}>{label}</option>)
                                                 }
                                                 return nodes

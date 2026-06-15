@@ -73,3 +73,75 @@ export function getDefaultTimezone(): string {
     const browserTz = getBrowserTimezone()
     return isValidTimezone(browserTz) ? browserTz : DEFAULT_TIMEZONE
 }
+
+const pad2 = (n: number) => String(n).padStart(2, '0')
+
+/** Offset in ms of `timeZone` from UTC at a given instant (tz = UTC + offset). */
+function tzOffsetMs(timeZone: string, instant: Date): number {
+    const dtf = new Intl.DateTimeFormat('en-GB', {
+        timeZone,
+        hourCycle: 'h23',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    })
+    const parts = dtf.formatToParts(instant)
+    const get = (t: string) => Number(parts.find((p) => p.type === t)?.value)
+    const asUTC = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+    return asUTC - instant.getTime()
+}
+
+/**
+ * Convert a wall-clock date + time *as read in `timeZone`* into a UTC ISO
+ * string. e.g. ('2026-06-15', '18:30', 'Europe/London') → the instant that
+ * shows as 18:30 in London (17:30Z in BST), regardless of the browser's own
+ * timezone. Falls back to local interpretation if `timeZone` is unusable.
+ */
+export function zonedTimeToUtcISO(dateStr: string, timeStr: string, timeZone: string): string {
+    if (!isValidTimezone(timeZone)) {
+        return new Date(`${dateStr}T${timeStr}:00`).toISOString()
+    }
+    // Treat the wall time as if it were UTC, then back out the zone's offset.
+    const naiveUTC = new Date(`${dateStr}T${timeStr}:00Z`)
+    if (Number.isNaN(naiveUTC.getTime())) {
+        return new Date(`${dateStr}T${timeStr}:00`).toISOString()
+    }
+    const offset = tzOffsetMs(timeZone, naiveUTC)
+    let utc = new Date(naiveUTC.getTime() - offset)
+    // Settle DST boundaries: re-evaluate the offset at the resolved instant.
+    const offset2 = tzOffsetMs(timeZone, utc)
+    if (offset2 !== offset) utc = new Date(naiveUTC.getTime() - offset2)
+    return utc.toISOString()
+}
+
+/**
+ * The current wall-clock date and time in `timeZone`, as
+ * { date: 'YYYY-MM-DD', time: 'HH:MM' } (24-hour).
+ */
+export function getZonedNow(timeZone: string): { date: string; time: string } {
+    const tz = isValidTimezone(timeZone) ? timeZone : DEFAULT_TIMEZONE
+    const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: tz,
+        hourCycle: 'h23',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).formatToParts(new Date())
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '00'
+    return { date: `${get('year')}-${get('month')}-${get('day')}`, time: `${get('hour')}:${get('minute')}` }
+}
+
+/**
+ * Add `minutes` to a 'HH:MM' wall-clock time, wrapping past midnight.
+ * Pure wall-clock arithmetic — timezone independent.
+ */
+export function addMinutesToWallTime(timeStr: string, minutes: number): string {
+    const [h, m] = timeStr.split(':').map(Number)
+    const total = (((h * 60 + m + minutes) % 1440) + 1440) % 1440
+    return `${pad2(Math.floor(total / 60))}:${pad2(total % 60)}`
+}

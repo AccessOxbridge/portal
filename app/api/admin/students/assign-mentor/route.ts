@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { deleteZoomMeeting } from '@/utils/zoom'
+import { sendEmail, EMAIL_SENDER_CLAIRE } from '@/lib/email/client'
+import { studentMatched, mentorMatched } from '@/lib/email/templates'
 
 export async function POST(req: Request) {
     try {
@@ -197,6 +199,32 @@ export async function POST(req: Request) {
 
         if (notifications.length > 0) {
             await adminSupabase.from('notifications').insert(notifications)
+        }
+
+        // 6. Branded "you've been matched" emails (from Claire). These fire on
+        //    every assignment, including later mentor changes. Email failures
+        //    must not fail the assignment itself.
+        try {
+            if (studentProfile?.email) {
+                const tpl = studentMatched(studentProfile.full_name || '', newMentorName)
+                await sendEmail({
+                    from: EMAIL_SENDER_CLAIRE,
+                    to: studentProfile.email,
+                    subject: tpl.subject,
+                    html: tpl.html,
+                })
+            }
+            if (newMentorProfile?.email) {
+                const tpl = mentorMatched(newMentorProfile.full_name || '', studentName)
+                await sendEmail({
+                    from: EMAIL_SENDER_CLAIRE,
+                    to: newMentorProfile.email,
+                    subject: tpl.subject,
+                    html: tpl.html,
+                })
+            }
+        } catch (emailError) {
+            console.error('Match email error:', emailError)
         }
 
         return NextResponse.json({ success: true })

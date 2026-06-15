@@ -1,0 +1,37 @@
+# Daily Email Crons
+# - Runs once a day on the default branch (e.g. main). Scheduled runs use the workflow file from the default branch.
+# - Required GitHub Actions secrets: SITE_URL (e.g. https://your-app.vercel.app), CRON_SECRET (must match the app env).
+#   These are the same secrets already used by the Session Reminders Cron.
+# - Drives:
+#     /api/cron/first-session-followup  → "How did your first session go?" (day-after first session)
+#     /api/cron/session-inactivity      → "Time to book your next session!" (no session for > 2 weeks)
+
+name: Daily Email Crons
+
+on:
+  schedule:
+    # 08:00 UTC every day. The first-session follow-up looks at "yesterday",
+    # so a morning run sends it the day after the session.
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  first-session-followup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping First-Session Follow-up Endpoint
+        run: |
+          curl -X GET "${{ secrets.SITE_URL }}/api/cron/first-session-followup" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -f
+        # The -f flag ensures the action fails if the response is 4xx or 5xx
+
+  session-inactivity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Session-Inactivity Endpoint
+        run: |
+          curl -X GET "${{ secrets.SITE_URL }}/api/cron/session-inactivity" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -f
+        # The -f flag ensures the action fails if the response is 4xx or 5xx

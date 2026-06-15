@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 
 interface SubjectWithGrade {
     name: string
@@ -38,13 +39,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
         anythingElse: ''
     })
 
-    const defaultTimeZone = useMemo(() => {
-        try {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone || ''
-        } catch {
-            return ''
-        }
-    }, [])
+    const defaultTimeZone = useMemo(() => getDefaultTimezone(), [])
 
     // Initialize timezone once (client-side)
     useEffect(() => {
@@ -76,6 +71,8 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
 
             const result = await response.json()
             if (result.error) throw new Error(result.error)
+
+            rememberTimezone(formData.timezone)
 
             router.refresh()
             onClose()

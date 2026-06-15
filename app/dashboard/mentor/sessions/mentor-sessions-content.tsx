@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
@@ -132,12 +132,16 @@ export default function MentorSessionsContent({
             })
     }, [allSessions, now])
 
+    // Default to the "Current" tab when a session is live, but only once —
+    // otherwise this would snap the user back to "Current" every time they
+    // tried to click another tab (e.g. "Upcoming"), making it unclickable.
+    const didAutoSwitchToCurrent = useRef(false)
     useEffect(() => {
-        const hasCurrent = currentSessions.length > 0
-        if (hasCurrent && activeTab === 'upcoming') {
+        if (!didAutoSwitchToCurrent.current && currentSessions.length > 0) {
+            didAutoSwitchToCurrent.current = true
             setActiveTab('current')
         }
-    }, [currentSessions.length, activeTab])
+    }, [currentSessions.length])
 
     useEffect(() => {
         const supabase = createClient()

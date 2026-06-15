@@ -75,8 +75,10 @@ export type Database = {
           id: string
           last_message_at: string | null
           mentor_id: string | null
+          mentor_notified_at: string | null
           session_id: string | null
           student_id: string
+          student_notified_at: string | null
           type: string
           updated_at: string | null
         }
@@ -86,8 +88,10 @@ export type Database = {
           id?: string
           last_message_at?: string | null
           mentor_id?: string | null
+          mentor_notified_at?: string | null
           session_id?: string | null
           student_id: string
+          student_notified_at?: string | null
           type?: string
           updated_at?: string | null
         }
@@ -97,8 +101,10 @@ export type Database = {
           id?: string
           last_message_at?: string | null
           mentor_id?: string | null
+          mentor_notified_at?: string | null
           session_id?: string | null
           student_id?: string
+          student_notified_at?: string | null
           type?: string
           updated_at?: string | null
         }
@@ -876,6 +882,7 @@ export type Database = {
         Row: {
           created_at: string | null
           duration_minutes: number | null
+          first_session_followup_sent: boolean | null
           id: string
           mentor_id: string
           reminder_sent: boolean | null
@@ -895,6 +902,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           duration_minutes?: number | null
+          first_session_followup_sent?: boolean | null
           id?: string
           mentor_id: string
           reminder_sent?: boolean | null
@@ -914,6 +922,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           duration_minutes?: number | null
+          first_session_followup_sent?: boolean | null
           id?: string
           mentor_id?: string
           reminder_sent?: boolean | null
@@ -968,6 +977,7 @@ export type Database = {
           ended_at: string | null
           id: string
           is_current: boolean
+          last_inactivity_nudge_at: string | null
           mentor_id: string
           student_id: string
         }
@@ -977,6 +987,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_current?: boolean
+          last_inactivity_nudge_at?: string | null
           mentor_id: string
           student_id: string
         }
@@ -986,6 +997,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_current?: boolean
+          last_inactivity_nudge_at?: string | null
           mentor_id?: string
           student_id?: string
         }

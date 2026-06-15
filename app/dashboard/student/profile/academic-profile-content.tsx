@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Save, School, Target, BookOpen, Trophy, Sparkles, Globe, Clock } from 'lucide-react'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 
 interface Subject {
     name: string
@@ -48,13 +49,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
 
-    const defaultTimezone = useMemo(() => {
-        try {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone || ''
-        } catch {
-            return ''
-        }
-    }, [])
+    const defaultTimezone = useMemo(() => getDefaultTimezone(), [])
 
     const ALL_SUBJECTS = useMemo(() => {
         const flat = Object.values(SUBJECT_OPTIONS).flat()
@@ -136,6 +131,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
 
             if (error) throw error
 
+            rememberTimezone(formData.timezone)
             setSaved(true)
             setTimeout(() => setSaved(false), 3000)
             router.refresh()

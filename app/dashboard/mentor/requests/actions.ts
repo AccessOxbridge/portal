@@ -3,7 +3,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { createZoomMeeting } from '@/utils/zoom'
-// import { sendSessionConfirmationEmail } from '@/utils/email'
+import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
+import { sessionConfirmedStudent, sessionConfirmedMentor } from '@/lib/email/templates'
 
 interface TimeSlot {
     date: string      // "2025-01-15"
@@ -170,30 +171,45 @@ export async function handleMentorshipRequest(
             })
         }
 
-        // Legacy direct emails (keeping for high-quality template redundancy)
-        // if (zoomMeeting) {
-        //     if (studentProfile?.email) {
-        //         await sendSessionConfirmationEmail({
-        //             recipientEmail: studentProfile.email,
-        //             recipientName: studentProfile.full_name || 'Student',
-        //             otherPartyName: mentorProfile?.full_name || 'Mentor',
-        //             otherPartyRole: 'mentor',
-        //             scheduledAt,
-        //             zoomJoinUrl: zoomMeeting.joinUrl,
-        //         })
-        //     }
+        // 10. Branded "session confirmed" emails to both parties. Email failures
+        //     must not roll back the confirmed session.
+        try {
+            const sessionDetails = {
+                date: formattedDate,
+                time: formattedTime,
+                zoomLink: zoomMeeting?.joinUrl || null,
+            }
 
-        //     if (mentorProfile?.email) {
-        //         await sendSessionConfirmationEmail({
-        //             recipientEmail: mentorProfile.email,
-        //             recipientName: mentorProfile.full_name || 'Mentor',
-        //             otherPartyName: studentProfile?.full_name || 'Student',
-        //             otherPartyRole: 'student',
-        //             scheduledAt,
-        //             zoomJoinUrl: zoomMeeting.joinUrl,
-        //         })
-        //     }
-        // }
+            if (studentProfile?.email) {
+                const tpl = sessionConfirmedStudent(
+                    studentProfile.full_name || '',
+                    mentorProfile?.full_name || '',
+                    sessionDetails
+                )
+                await sendEmail({
+                    from: EMAIL_SENDER_TEAM,
+                    to: studentProfile.email,
+                    subject: tpl.subject,
+                    html: tpl.html,
+                })
+            }
+
+            if (mentorProfile?.email) {
+                const tpl = sessionConfirmedMentor(
+                    mentorProfile.full_name || '',
+                    studentProfile?.full_name || '',
+                    sessionDetails
+                )
+                await sendEmail({
+                    from: EMAIL_SENDER_TEAM,
+                    to: mentorProfile.email,
+                    subject: tpl.subject,
+                    html: tpl.html,
+                })
+            }
+        } catch (emailError) {
+            console.error('Session confirmation email error:', emailError)
+        }
     }
 
     revalidatePath('/dashboard/mentor/requests')

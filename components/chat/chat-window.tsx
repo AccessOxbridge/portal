@@ -214,6 +214,14 @@ export default function ChatWindow({
             .update({ last_message_at: new Date().toISOString() })
             .eq('id', conversationId)
 
+        // Fire-and-forget: send a throttled "new message" email to the recipient.
+        // Failures here must never affect the chat experience.
+        fetch('/api/messages/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversationId }),
+        }).catch(() => { })
+
         // Replace optimistic message with real one
         if (data) {
             setMessages((prev) =>

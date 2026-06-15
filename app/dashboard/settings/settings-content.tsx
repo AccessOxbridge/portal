@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { User, Mail, Shield, CalendarDays, Globe, KeyRound, Check, AlertCircle, Loader2 } from 'lucide-react'
 import { updateTimezone, sendPasswordResetLink } from './actions'
+import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 
 interface SettingsContentProps {
     email: string
@@ -67,8 +68,7 @@ const roleLabel = (role: string) => {
 }
 
 export default function SettingsContent({ email, fullName, role, createdAt, timezone }: SettingsContentProps) {
-    const browserTz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
-    const [tz, setTz] = useState(timezone || browserTz || '')
+    const [tz, setTz] = useState(timezone || getDefaultTimezone())
     const [savedTz, setSavedTz] = useState(timezone || '')
     const [tzFeedback, setTzFeedback] = useState<{ ok: boolean; message: string } | null>(null)
     const [tzPending, startTzTransition] = useTransition()
@@ -83,7 +83,10 @@ export default function SettingsContent({ email, fullName, role, createdAt, time
         startTzTransition(async () => {
             const result = await updateTimezone(tz)
             setTzFeedback(result)
-            if (result.ok) setSavedTz(tz)
+            if (result.ok) {
+                setSavedTz(tz)
+                rememberTimezone(tz)
+            }
         })
     }
 

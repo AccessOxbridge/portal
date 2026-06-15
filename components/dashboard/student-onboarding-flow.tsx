@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 
 type StepId = 'basic' | 'targets' | 'additional'
 
@@ -70,13 +71,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
     const [newTargetUniversity, setNewTargetUniversity] = useState('')
     const [newSlot, setNewSlot] = useState<{ date: string; startTime: string; endTime: string }>({ date: '', startTime: '', endTime: '' })
 
-    const defaultTimeZone = useMemo(() => {
-        try {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone || ''
-        } catch {
-            return ''
-        }
-    }, [])
+    const defaultTimeZone = useMemo(() => getDefaultTimezone(), [])
 
     const ALL_SUBJECTS = useMemo(() => {
         const flat = Object.values(SUBJECT_OPTIONS).flat()
@@ -254,6 +249,8 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
                 }
                 throw new Error(result.error || 'Failed to submit onboarding data.')
             }
+
+            rememberTimezone(formData.timezone)
 
             try {
                 window.localStorage.removeItem(STORAGE_KEY)

@@ -7,6 +7,7 @@ import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass,
 import BookSessionModal from '@/components/dashboard/book-session-modal'
 import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface Session {
     id: string
@@ -49,6 +50,7 @@ interface StudentSessionsContentProps {
     hasMentor?: boolean
     autoOpenBooking?: boolean
     studentId: string
+    timezone?: string | null
 }
 
 export default function StudentSessionsContent({
@@ -59,7 +61,8 @@ export default function StudentSessionsContent({
     canBook = false,
     hasMentor = false,
     autoOpenBooking = false,
-    studentId
+    studentId,
+    timezone = null
 }: StudentSessionsContentProps) {
     const router = useRouter()
     // Booking is only possible once the profile is complete AND an admin has
@@ -140,22 +143,12 @@ export default function StudentSessionsContent({
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        })
+        return formatDateInTz(dateString, timezone)
     }
 
     const formatTime = (dateString: string | null) => {
         if (!dateString) return ''
-        const date = new Date(dateString)
-        return date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
+        return formatTimeInTz(dateString, timezone)
     }
 
     const isSessionSoon = (dateString: string | null) => {

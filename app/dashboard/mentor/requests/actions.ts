@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createZoomMeeting } from '@/utils/zoom'
 import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
 import { sessionConfirmedStudent, sessionConfirmedMentor } from '@/lib/email/templates'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface TimeSlot {
     date: string      // "2025-01-15"
@@ -77,6 +78,22 @@ export async function handleMentorshipRequest(
             .eq('id', request.mentor_id)
             .single()
 
+        // Timezones for per-recipient date/time formatting (student tz lives on
+        // student_profiles, mentor tz on mentors). Fall back handled downstream.
+        const { data: studentTzRow } = await supabase
+            .from('student_profiles')
+            .select('timezone')
+            .eq('id', request.student_id)
+            .maybeSingle()
+        const studentTz = studentTzRow?.timezone ?? null
+
+        const { data: mentorTzRow } = await supabase
+            .from('mentors')
+            .select('timezone')
+            .eq('id', request.mentor_id)
+            .maybeSingle()
+        const mentorTz = (mentorTzRow as { timezone?: string | null } | null)?.timezone ?? null
+
         // 5. Create Zoom meeting
         let zoomMeeting: { id: string; joinUrl: string; startUrl: string } | null = null
         try {
@@ -121,19 +138,16 @@ export async function handleMentorshipRequest(
             .eq('student_id', request.student_id)
             .eq('status', 'pending')
 
-        // 9. Send email/in-app notifications to both parties via notifications table
-        const formattedTime = scheduledAt.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        const formattedDate = scheduledAt.toLocaleDateString('en-GB', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long'
-        });
+        // 9. Send email/in-app notifications to both parties via notifications table.
+        //    Each recipient sees the time in their own timezone (with label).
+        const dateOpts: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' }
+        const studentDate = formatDateInTz(scheduledAt, studentTz, dateOpts)
+        const studentTime = formatTimeInTz(scheduledAt, studentTz, { withZone: true })
+        const studentTimeDisplay = `${studentDate} at ${studentTime}`
 
-        const timeDisplay = `${formattedDate} at ${formattedTime}`;
+        const mentorDate = formatDateInTz(scheduledAt, mentorTz, dateOpts)
+        const mentorTime = formatTimeInTz(scheduledAt, mentorTz, { withZone: true })
+        const mentorTimeDisplay = `${mentorDate} at ${mentorTime}`
 
         // Notification for student
         if (studentProfile?.email) {
@@ -142,7 +156,7 @@ export async function handleMentorshipRequest(
                 recipient_email: studentProfile.email,
                 type: 'match_accepted' as const,
                 title: 'Mentorship Request Accepted!',
-                message: `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your request. Your session is scheduled for ${timeDisplay}.`,
+                message: `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your request. Your session is scheduled for ${studentTimeDisplay}.`,
                 data: {
                     mentor_id: request.mentor_id,
                     mentor_name: mentorProfile?.full_name || 'Mentor',
@@ -160,7 +174,7 @@ export async function handleMentorshipRequest(
                 recipient_email: mentorProfile.email,
                 type: 'session_confirmed' as const,
                 title: 'Session Confirmed!',
-                message: `You have successfully scheduled a session with ${studentProfile?.full_name || 'your student'} for ${timeDisplay}.`,
+                message: `You have successfully scheduled a session with ${studentProfile?.full_name || 'your student'} for ${mentorTimeDisplay}.`,
                 data: {
                     student_id: request.student_id,
                     student_name: studentProfile?.full_name || 'Student',
@@ -174,17 +188,13 @@ export async function handleMentorshipRequest(
         // 10. Branded "session confirmed" emails to both parties. Email failures
         //     must not roll back the confirmed session.
         try {
-            const sessionDetails = {
-                date: formattedDate,
-                time: formattedTime,
-                zoomLink: zoomMeeting?.joinUrl || null,
-            }
+            const zoomLink = zoomMeeting?.joinUrl || null
 
             if (studentProfile?.email) {
                 const tpl = sessionConfirmedStudent(
                     studentProfile.full_name || '',
                     mentorProfile?.full_name || '',
-                    sessionDetails
+                    { date: studentDate, time: studentTime, zoomLink }
                 )
                 await sendEmail({
                     from: EMAIL_SENDER_TEAM,
@@ -198,7 +208,7 @@ export async function handleMentorshipRequest(
                 const tpl = sessionConfirmedMentor(
                     mentorProfile.full_name || '',
                     studentProfile?.full_name || '',
-                    sessionDetails
+                    { date: mentorDate, time: mentorTime, zoomLink }
                 )
                 await sendEmail({
                     from: EMAIL_SENDER_TEAM,

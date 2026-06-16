@@ -20,6 +20,8 @@ import {
     sessionConfirmedStudent,
     sessionInactivityMentor,
     sessionInactivityStudent,
+    sessionReminderMentor,
+    sessionReminderStudent,
     studentMatched,
 } from '../lib/email/templates'
 
@@ -43,6 +45,8 @@ const previews: { key: string; template: EmailTemplate }[] = [
     { key: 'sessionConfirmedMentor', template: sessionConfirmedMentor(MENTOR, STUDENT, SESSION) },
     { key: 'sessionInactivityStudent', template: sessionInactivityStudent(STUDENT, MENTOR) },
     { key: 'sessionInactivityMentor', template: sessionInactivityMentor(MENTOR, STUDENT) },
+    { key: 'sessionReminderStudent', template: sessionReminderStudent(STUDENT, MENTOR, '14:00 BST', 'https://zoom.us/j/1234567890') },
+    { key: 'sessionReminderMentor', template: sessionReminderMentor(MENTOR, STUDENT, '14:00 BST', 'https://app.accessoxbridge.io/api/sessions/demo/start') },
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))

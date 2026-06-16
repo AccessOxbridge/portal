@@ -134,6 +134,7 @@ export default async function StudentDashboard() {
             userName={greetingName}
             greetingName={greetingName}
             sessionsThisWeek={sessionsThisWeekCount ?? 0}
+            timezone={academicProfile?.timezone ?? null}
         />
     )
 }

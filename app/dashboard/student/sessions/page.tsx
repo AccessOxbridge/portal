@@ -190,6 +190,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
                 hasMentor={hasMentor}
                 autoOpenBooking={autoOpenBooking}
                 studentId={user.id}
+                timezone={academicProfile?.timezone ?? null}
             />
         </div>
     )

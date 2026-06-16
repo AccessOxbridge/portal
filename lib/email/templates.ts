@@ -416,3 +416,53 @@ export function sessionInactivityMentor(mentorName: string, studentName: string)
         }),
     }
 }
+
+/** 1-hour reminder → student. `timeLabel` already includes the zone, e.g. "14:00 BST". */
+export function sessionReminderStudent(
+    studentName: string,
+    mentorName: string,
+    timeLabel: string,
+    joinUrl: string
+): EmailTemplate {
+    const sName = escapeHtml(studentName || 'there')
+    const mName = escapeHtml(mentorName || 'your mentor')
+    const when = escapeHtml(timeLabel)
+    return {
+        subject: 'Reminder: your session starts soon | Access Oxbridge',
+        html: layout({
+            title: 'Your session starts soon',
+            preheader: `Your session with ${mentorName || 'your mentor'} starts at ${timeLabel} today.`,
+            paragraphs: [
+                `Dear ${sName},`,
+                `This is a friendly reminder that your session with ${mName} starts at <strong>${when}</strong> today.`,
+                `${link('Join your session', joinUrl)} when you’re ready — we’d recommend hopping on a couple of minutes early.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/** 1-hour reminder → mentor. `timeLabel` already includes the zone, e.g. "14:00 BST". */
+export function sessionReminderMentor(
+    mentorName: string,
+    studentName: string,
+    timeLabel: string,
+    startUrl: string
+): EmailTemplate {
+    const mName = escapeHtml(mentorName || 'there')
+    const sName = escapeHtml(studentName || 'your student')
+    const when = escapeHtml(timeLabel)
+    return {
+        subject: 'Reminder: your session starts soon | Access Oxbridge',
+        html: layout({
+            title: 'Your session starts soon',
+            preheader: `Your session with ${studentName || 'your student'} starts at ${timeLabel} today.`,
+            paragraphs: [
+                `Dear ${mName},`,
+                `This is a friendly reminder that your session with ${sName} starts at <strong>${when}</strong> today.`,
+                `${link('Start the session', startUrl)} when you’re ready — your Zoom host link opens straight from here.`,
+            ],
+            signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}

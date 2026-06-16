@@ -145,3 +145,54 @@ export function addMinutesToWallTime(timeStr: string, minutes: number): string {
     const total = (((h * 60 + m + minutes) % 1440) + 1440) % 1440
     return `${pad2(Math.floor(total / 60))}:${pad2(total % 60)}`
 }
+
+/** Resolve a usable IANA zone, falling back to {@link DEFAULT_TIMEZONE}. */
+function resolveTz(timeZone: string | null | undefined): string {
+    return isValidTimezone(timeZone) ? timeZone : DEFAULT_TIMEZONE
+}
+
+/**
+ * Format the date of an instant in `timeZone` (falls back to London).
+ * `iso` may be an ISO string or a Date.
+ */
+export function formatDateInTz(
+    iso: string | Date | null | undefined,
+    timeZone: string | null | undefined,
+    options: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
+): string {
+    if (!iso) return ''
+    const d = iso instanceof Date ? iso : new Date(iso)
+    if (Number.isNaN(d.getTime())) return ''
+    return d.toLocaleDateString('en-GB', { ...options, timeZone: resolveTz(timeZone) })
+}
+
+/**
+ * Format the time of an instant in `timeZone` (falls back to London). When
+ * `withZone` is true, appends the short zone label, e.g. "14:00 BST".
+ */
+export function formatTimeInTz(
+    iso: string | Date | null | undefined,
+    timeZone: string | null | undefined,
+    { withZone = true }: { withZone?: boolean } = {}
+): string {
+    if (!iso) return ''
+    const d = iso instanceof Date ? iso : new Date(iso)
+    if (Number.isNaN(d.getTime())) return ''
+    return d.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: resolveTz(timeZone),
+        ...(withZone ? { timeZoneName: 'short' } : {}),
+    })
+}
+
+/** Convenience: "Mon, 16 Jun 2026, 14:00 BST" in `timeZone`. */
+export function formatDateTimeInTz(
+    iso: string | Date | null | undefined,
+    timeZone: string | null | undefined
+): string {
+    if (!iso) return ''
+    const date = formatDateInTz(iso, timeZone)
+    const time = formatTimeInTz(iso, timeZone, { withZone: true })
+    return date && time ? `${date}, ${time}` : date || time
+}

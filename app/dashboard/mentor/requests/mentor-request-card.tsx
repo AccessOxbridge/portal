@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { handleMentorshipRequest } from './actions'
 import { Info, AlertTriangle } from 'lucide-react'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface TimeSlot {
     date: string
@@ -43,17 +44,12 @@ export function MentorRequestCard({ request }: { request: Request }) {
     const [loading, setLoading] = useState(false)
 
     const formatSlotDisplay = (slot: TimeSlot) => {
-        // Parse the UTC ISO strings
-        const start = new Date(slot.startTime)
-        const end = new Date(slot.endTime)
-
-        const dateStr = start.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short'
-        })
-        const startTimeStr = start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-        const endTimeStr = end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        // The student proposed these slots in their own timezone — show them in
+        // that timezone (with label) so the mentor reads them unambiguously.
+        const tz = request.responses.timezone || null
+        const dateStr = formatDateInTz(slot.startTime, tz, { weekday: 'short', day: 'numeric', month: 'short' })
+        const startTimeStr = formatTimeInTz(slot.startTime, tz, { withZone: false })
+        const endTimeStr = formatTimeInTz(slot.endTime, tz, { withZone: true })
 
         return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
     }

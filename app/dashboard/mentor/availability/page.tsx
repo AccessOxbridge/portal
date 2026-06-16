@@ -23,6 +23,13 @@ export default async function MentorAvailabilityPage() {
         return redirect('/dashboard')
     }
 
+    const { data: mentorRow } = await supabase
+        .from('mentors')
+        .select('timezone')
+        .eq('id', user.id)
+        .maybeSingle()
+    const timezone = (mentorRow as { timezone?: string | null } | null)?.timezone ?? null
+
     // Fetch all upcoming sessions for this mentor
     const now = new Date().toISOString()
     const { data: sessions } = await supabase
@@ -66,6 +73,7 @@ export default async function MentorAvailabilityPage() {
                 sessions={processedSessions}
                 personLabel="Student"
                 zoomButtonLabel="Start Zoom"
+                timezone={timezone}
             />
         </div>
     )

@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+// Use the verified domain sender. The old default (onboarding@resend.dev) is
+// Resend's sandbox sender and only delivers to the account owner, so real
+// recipients never received these emails. Override via RESEND_FROM_EMAIL.
+const RESEND_FROM_EMAIL =
+    Deno.env.get("RESEND_FROM_EMAIL") || "Access Oxbridge <office@accessoxbridge.io>";
 
 serve(async (req) => {
     try {
@@ -26,6 +31,16 @@ serve(async (req) => {
 
         const { recipient_email, title, message } = record;
 
+        // In-app-only notifications (e.g. 15-min reminders, and the 1-hour
+        // reminders which now email via the app's branded sender) intentionally
+        // carry an empty recipient_email — nothing to send here.
+        if (!recipient_email) {
+            return new Response(JSON.stringify({ message: "No recipient_email; in-app only" }), {
+                headers: { "Content-Type": "application/json" },
+                status: 200,
+            });
+        }
+
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
@@ -33,7 +48,7 @@ serve(async (req) => {
                 Authorization: `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-                from: "Oxbridge Portal <onboarding@resend.dev>",
+                from: RESEND_FROM_EMAIL,
                 to: recipient_email,
                 subject: title,
                 html: `

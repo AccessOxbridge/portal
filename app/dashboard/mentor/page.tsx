@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 import { LogoutButton } from '@/components/logout-button'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 export default async function MentorDashboard() {
     const supabase = await createClient()
@@ -127,13 +128,7 @@ export default async function MentorDashboard() {
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
-                                            {new Date(session.scheduled_at).toLocaleDateString('en-GB', {
-                                                day: 'numeric',
-                                                month: 'short'
-                                            })}, {new Date(session.scheduled_at).toLocaleTimeString('en-GB', {
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
+                                            {formatDateInTz(session.scheduled_at, mentor.timezone, { day: 'numeric', month: 'short' })}, {formatTimeInTz(session.scheduled_at, mentor.timezone)}
                                         </p>
                                     )}
                                     {session.zoom_meeting_id || session.zoom_start_url ? (
@@ -143,10 +138,7 @@ export default async function MentorDashboard() {
                                             rel="noopener noreferrer"
                                             className="w-full inline-flex justify-center items-center gap-2 px-4 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors shadow-md shadow-green-200"
                                         >
-                                            🎥 Start at {session.scheduled_at ? new Date(session.scheduled_at).toLocaleTimeString('en-GB', {
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            }) : 'Session'}
+                                            🎥 Start at {session.scheduled_at ? formatTimeInTz(session.scheduled_at, mentor.timezone) : 'Session'}
                                         </a>
                                     ) : (
                                         <span className="text-gray-500 text-sm">Zoom link unavailable</span>

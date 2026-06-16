@@ -1,7 +1,30 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { formatTimeInTz } from '@/lib/timezone';
+import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client';
+import { sessionReminderStudent, sessionReminderMentor } from '@/lib/email/templates';
 
 const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.accessoxbridge.io').replace(/\/$/, '');
+
+/**
+ * Format the session time once per recipient, each in their own timezone
+ * (student tz on student_profiles, mentor tz on mentors), with a zone label.
+ */
+async function recipientTimes(
+    supabase: ReturnType<typeof createAdminClient>,
+    session: any
+): Promise<{ studentTimeStr: string; mentorTimeStr: string }> {
+    const [{ data: sp }, { data: mr }] = await Promise.all([
+        supabase.from('student_profiles').select('timezone').eq('id', session.student_id).maybeSingle(),
+        supabase.from('mentors').select('timezone').eq('id', session.mentor_id).maybeSingle(),
+    ]);
+    const studentTz = (sp as { timezone?: string | null } | null)?.timezone ?? null;
+    const mentorTz = (mr as { timezone?: string | null } | null)?.timezone ?? null;
+    return {
+        studentTimeStr: formatTimeInTz(session.scheduled_at, studentTz, { withZone: true }),
+        mentorTimeStr: formatTimeInTz(session.scheduled_at, mentorTz, { withZone: true }),
+    };
+}
 
 /**
  * CRON API Route: Sends reminders to students and mentors before a session starts.
@@ -55,19 +78,40 @@ export async function GET(req: Request) {
 
             if (!student || !mentor || !session.scheduled_at) continue;
 
-            const scheduledAt = new Date(session.scheduled_at);
-            const timeStr = scheduledAt.toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            const { studentTimeStr, mentorTimeStr } = await recipientTimes(supabase, session);
 
-            // 1. Notify Student (email + in-app)
+            // On-demand start link: regenerates a fresh (non-expired) Zoom host
+            // URL when the mentor clicks it. Falls back to stored links.
+            const mentorStartLink = session.zoom_meeting_id
+                ? `${APP_BASE_URL}/api/sessions/${session.id}/start`
+                : (session.zoom_start_url || session.zoom_join_url || `${APP_BASE_URL}/dashboard/mentor/sessions`);
+            const studentJoinLink = session.zoom_join_url || `${APP_BASE_URL}/dashboard/student/sessions`;
+
+            // Branded reminder emails (verified sender, on-demand start link).
+            // Best-effort: a send failure must not break the loop or the
+            // reminder_sent update. We send the email directly here, so the
+            // notification rows below set recipient_email='' to stop the edge
+            // function from sending a second (generic) email.
+            try {
+                if (student.email) {
+                    const tpl = sessionReminderStudent(student.full_name || '', mentor.full_name || '', studentTimeStr, studentJoinLink);
+                    await sendEmail({ from: EMAIL_SENDER_TEAM, to: student.email, subject: tpl.subject, html: tpl.html });
+                }
+                if (mentor.email) {
+                    const tpl = sessionReminderMentor(mentor.full_name || '', student.full_name || '', mentorTimeStr, mentorStartLink);
+                    await sendEmail({ from: EMAIL_SENDER_TEAM, to: mentor.email, subject: tpl.subject, html: tpl.html });
+                }
+            } catch (emailError) {
+                console.error('Reminder email error:', emailError);
+            }
+
+            // 1. Notify Student (in-app; email handled above)
             await supabase.from('notifications').insert({
                 recipient_id: session.student_id,
-                recipient_email: student.email,
+                recipient_email: '',
                 type: 'session_reminder' as any,
                 title: 'Reminder: Mentorship Session in 1 hour!',
-                message: `Your session with ${mentor.full_name} starts at ${timeStr}. See you soon!`,
+                message: `Your session with ${mentor.full_name} starts at ${studentTimeStr}. See you soon!`,
                 data: {
                     session_id: session.id,
                     zoom_join_url: session.zoom_join_url,
@@ -75,21 +119,16 @@ export async function GET(req: Request) {
                 }
             });
 
-            // 2. Notify Mentor (email + in-app)
+            // 2. Notify Mentor (in-app; email handled above)
             await supabase.from('notifications').insert({
                 recipient_id: session.mentor_id,
-                recipient_email: mentor.email,
+                recipient_email: '',
                 type: 'session_reminder' as any,
                 title: 'Reminder: Mentorship Session in 1 hour!',
-                message: `Your session with ${student.full_name} starts at ${timeStr}. Ready?`,
+                message: `Your session with ${student.full_name} starts at ${mentorTimeStr}. Ready?`,
                 data: {
                     session_id: session.id,
-                    // On-demand start link: regenerates a fresh (non-expired)
-                    // Zoom host URL when the mentor clicks it. Falls back to the
-                    // stored links only if no meeting id is available.
-                    zoom_start_url: session.zoom_meeting_id
-                        ? `${APP_BASE_URL}/api/sessions/${session.id}/start`
-                        : (session.zoom_start_url || session.zoom_join_url),
+                    zoom_start_url: mentorStartLink,
                     scheduled_at: session.scheduled_at
                 }
             });
@@ -140,11 +179,7 @@ export async function GET(req: Request) {
 
             if (!student || !mentor || !session.scheduled_at) continue;
 
-            const scheduledAt = new Date(session.scheduled_at);
-            const timeStr = scheduledAt.toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            const { studentTimeStr, mentorTimeStr } = await recipientTimes(supabase, session);
 
             // In-app only: we deliberately omit recipient_email so the edge function
             // does not send an email (it will receive an empty address).
@@ -155,7 +190,7 @@ export async function GET(req: Request) {
                 recipient_email: '',
                 type: 'session_reminder' as any,
                 title: 'Starting soon: session in 15 minutes',
-                message: `Your session with ${mentor.full_name} starts at ${timeStr}. You can join from the Sessions page when you’re ready.`,
+                message: `Your session with ${mentor.full_name} starts at ${studentTimeStr}. You can join from the Sessions page when you’re ready.`,
                 data: {
                     session_id: session.id,
                     zoom_join_url: session.zoom_join_url,
@@ -171,7 +206,7 @@ export async function GET(req: Request) {
                 recipient_email: '',
                 type: 'session_reminder' as any,
                 title: 'Starting soon: session in 15 minutes',
-                message: `Your session with ${student.full_name} starts at ${timeStr}. Head to Zoom when you’re ready.`,
+                message: `Your session with ${student.full_name} starts at ${mentorTimeStr}. Head to Zoom when you’re ready.`,
                 data: {
                     session_id: session.id,
                     zoom_start_url: session.zoom_start_url || session.zoom_join_url,

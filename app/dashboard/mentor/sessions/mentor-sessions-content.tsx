@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface Session {
     id: string
@@ -20,11 +21,13 @@ interface Session {
 interface MentorSessionsContentProps {
     sessions: Session[]
     mentorId: string
+    timezone: string | null
 }
 
 export default function MentorSessionsContent({
     sessions,
-    mentorId
+    mentorId,
+    timezone
 }: MentorSessionsContentProps) {
     const [allSessions, setAllSessions] = useState<Session[]>(sessions)
     const [now, setNow] = useState<number>(() => Date.now())
@@ -36,13 +39,7 @@ export default function MentorSessionsContent({
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        })
+        return formatDateInTz(dateString, timezone)
     }
 
     useEffect(() => {
@@ -58,11 +55,7 @@ export default function MentorSessionsContent({
 
     const formatTime = (dateString: string | null) => {
         if (!dateString) return ''
-        const date = new Date(dateString)
-        return date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
+        return formatTimeInTz(dateString, timezone)
     }
 
     const isSessionSoon = (dateString: string | null) => {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Video, Clock, Calendar as CalendarIcon, ExternalLink } from 'lucide-react'
+import { formatTimeInTz } from '@/lib/timezone'
 
 interface Session {
     id: string
@@ -15,9 +16,10 @@ interface WeeklyCalendarProps {
     personLabel?: string // e.g., "Mentor" or "Student"
     zoomButtonLabel?: string
     credits?: number
+    timezone?: string | null
 }
 
-export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits = 0 }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits = 0, timezone = null }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
 
@@ -169,10 +171,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 font-medium">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 <span>
-                                                    {new Date(session.scheduled_at).toLocaleTimeString('en-GB', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
+                                                    {formatTimeInTz(session.scheduled_at, timezone)}
                                                 </span>
                                             </div>
                                         </div>

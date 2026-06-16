@@ -8,6 +8,7 @@ import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 import ApplicationTimeline from '@/components/dashboard/application-timeline'
 import BookSessionModal from '@/components/dashboard/book-session-modal'
 import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
+import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface UpcomingSession {
     id: string
@@ -43,6 +44,7 @@ interface StudentDashboardContentProps {
     userName: string
     greetingName: string
     sessionsThisWeek?: number
+    timezone?: string | null
 }
 
 export default function StudentDashboardContent({
@@ -55,24 +57,13 @@ export default function StudentDashboardContent({
     userId,
     userName,
     greetingName,
-    sessionsThisWeek = 0
+    sessionsThisWeek = 0,
+    timezone = null
 }: StudentDashboardContentProps) {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short'
-        })
-    }
+    const formatDate = (dateString: string) =>
+        formatDateInTz(dateString, timezone, { weekday: 'short', day: 'numeric', month: 'short' })
 
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
+    const formatTime = (dateString: string) => formatTimeInTz(dateString, timezone)
 
     const isSessionSoon = (dateString: string) => {
         const sessionTime = new Date(dateString).getTime()
@@ -173,14 +164,7 @@ export default function StudentDashboardContent({
                                 </div>
                                 {activeSession.scheduled_at && (
                                     <p className="text-accent font-bold text-sm mt-4">
-                                        {new Date(activeSession.scheduled_at).toLocaleDateString('en-GB', {
-                                            weekday: 'short',
-                                            day: 'numeric',
-                                            month: 'short'
-                                        })} · {new Date(activeSession.scheduled_at).toLocaleTimeString('en-GB', {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
+                                        {formatDate(activeSession.scheduled_at)} · {formatTime(activeSession.scheduled_at)}
                                     </p>
                                 )}
                             </div>
@@ -281,6 +265,7 @@ export default function StudentDashboardContent({
                         }))}
                         personLabel="Mentor"
                         credits={profile?.credits || 0}
+                        timezone={timezone}
                     />
                 </div>
 

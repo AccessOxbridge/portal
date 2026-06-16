@@ -23,6 +23,13 @@ export default async function MentorSessionsPage() {
         return redirect('/dashboard')
     }
 
+    const { data: mentorRow } = await supabase
+        .from('mentors')
+        .select('timezone')
+        .eq('id', user.id)
+        .maybeSingle()
+    const timezone = (mentorRow as { timezone?: string | null } | null)?.timezone ?? null
+
     // Fetch all sessions for this mentor
     const { data: sessions } = await supabase
         .from('sessions')
@@ -81,6 +88,7 @@ export default async function MentorSessionsPage() {
             <MentorSessionsContent
                 sessions={processedSessions}
                 mentorId={user.id}
+                timezone={timezone}
             />
         </div>
     )

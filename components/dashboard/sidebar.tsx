@@ -154,12 +154,44 @@ export default function Sidebar({
     const searchInputRef = useRef<HTMLInputElement>(null)
     const profileMenuRef = useRef<HTMLDivElement>(null)
 
+    // Custom sidebar tab order (persisted per user + role in localStorage)
+    const [navOrder, setNavOrder] = useState<string[]>([])
+    const [draggingName, setDraggingName] = useState<string | null>(null)
+    const [dragOverName, setDragOverName] = useState<string | null>(null)
+    const dragNameRef = useRef<string | null>(null)
+
     // Determine effective role for admin-dev to show relevant sidebar on different dashboard pages
     let effectiveRole = role
     if (role === 'admin-dev') {
         if (pathname.startsWith('/dashboard/student')) effectiveRole = 'student'
         else if (pathname.startsWith('/dashboard/mentor')) effectiveRole = 'mentor'
         else if (pathname.startsWith('/dashboard/admin')) effectiveRole = 'admin-dev'
+    }
+
+    // localStorage key for this user's tab order, scoped per role view
+    const orderStorageKey = useMemo(
+        () => `sidebar-order-${effectiveRole}${userId ? `-${userId}` : ''}`,
+        [effectiveRole, userId]
+    )
+
+    // Load saved tab order whenever the role view (or user) changes
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        try {
+            const saved = window.localStorage.getItem(orderStorageKey)
+            setNavOrder(saved ? JSON.parse(saved) : [])
+        } catch {
+            setNavOrder([])
+        }
+    }, [orderStorageKey])
+
+    const persistNavOrder = (names: string[]) => {
+        setNavOrder(names)
+        try {
+            window.localStorage.setItem(orderStorageKey, JSON.stringify(names))
+        } catch {
+            // ignore persistence errors (e.g. storage disabled)
+        }
     }
 
     useEffect(() => {
@@ -195,9 +227,28 @@ export default function Sidebar({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [effectiveRole, profileMenuOpen])
 
+    // Base nav items for the current role, reordered to match the saved custom order.
+    // Items not present in the saved order keep their original position (appended in
+    // original order), so newly added tabs still show up.
+    const orderedBaseItems = useMemo(() => {
+        const baseItems = navigation[effectiveRole as keyof typeof navigation] || navigation.student
+        if (navOrder.length === 0) return baseItems
+        const remaining = new Map(baseItems.map((item) => [item.name, item]))
+        const ordered: typeof baseItems = []
+        for (const name of navOrder) {
+            const item = remaining.get(name)
+            if (item) {
+                ordered.push(item)
+                remaining.delete(name)
+            }
+        }
+        for (const item of remaining.values()) ordered.push(item)
+        return ordered
+    }, [effectiveRole, navOrder])
+
     // Filter menu items based on search query; hide Training from mentor when complete
     const filteredMenuItems = useMemo(() => {
-        let items = navigation[effectiveRole as keyof typeof navigation] || navigation.student
+        let items = orderedBaseItems
         if (effectiveRole === 'mentor' && trainingComplete) {
             items = items.filter((item) => item.name !== 'Training')
         }
@@ -205,7 +256,25 @@ export default function Sidebar({
         return items.filter(item =>
             item.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
-    }, [effectiveRole, searchQuery, trainingComplete])
+    }, [orderedBaseItems, effectiveRole, searchQuery, trainingComplete])
+
+    // Drag-and-drop reordering: only active when expanded and not searching
+    const dndEnabled = !collapsed && searchQuery === ''
+
+    const handleNavDrop = (targetName: string) => {
+        const dragged = dragNameRef.current
+        dragNameRef.current = null
+        setDraggingName(null)
+        setDragOverName(null)
+        if (!dragged || dragged === targetName) return
+        const names = orderedBaseItems.map((item) => item.name)
+        const from = names.indexOf(dragged)
+        const to = names.indexOf(targetName)
+        if (from === -1 || to === -1) return
+        names.splice(from, 1)
+        names.splice(to, 0, dragged)
+        persistNavOrder(names)
+    }
 
     // Filter student sections based on search query
     const filteredStudentSections = useMemo(() => {
@@ -398,12 +467,21 @@ export default function Sidebar({
                             key={item.href}
                             href={item.href}
                             title={collapsed ? item.name : undefined}
+                            draggable={dndEnabled}
+                            onDragStart={dndEnabled ? () => { dragNameRef.current = item.name; setDraggingName(item.name) } : undefined}
+                            onDragEnd={dndEnabled ? () => { dragNameRef.current = null; setDraggingName(null); setDragOverName(null) } : undefined}
+                            onDragOver={dndEnabled ? (e) => { e.preventDefault(); if (dragOverName !== item.name) setDragOverName(item.name) } : undefined}
+                            onDragLeave={dndEnabled ? () => { if (dragOverName === item.name) setDragOverName(null) } : undefined}
+                            onDrop={dndEnabled ? (e) => { e.preventDefault(); handleNavDrop(item.name) } : undefined}
                             className={cn(
                                 'flex items-center rounded-xl transition-all group relative',
                                 collapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5',
                                 isActive
                                     ? 'bg-white/15 text-white shadow-sm'
-                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                                    : 'text-white/70 hover:bg-white/10 hover:text-white',
+                                dndEnabled && 'cursor-grab active:cursor-grabbing',
+                                draggingName === item.name && 'opacity-40',
+                                dragOverName === item.name && draggingName !== item.name && 'ring-2 ring-white/40'
                             )}
                         >
                             <div className={cn('flex items-center', !collapsed && 'gap-3')}>

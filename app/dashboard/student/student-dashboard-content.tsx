@@ -269,6 +269,7 @@ export default function StudentDashboardContent({
                     />
                 </div>
 
+                {/* Learning Resources — hidden from student home view
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div className={`p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group ${upcomingSessions.length === 0 ? 'lg:col-span-2' : ''}`}>
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Learning Resources</h2>
@@ -289,6 +290,7 @@ export default function StudentDashboardContent({
                         </div>
                     </div>
                 </div>
+                */}
             </div>
 
             {/* Booking Modal */}

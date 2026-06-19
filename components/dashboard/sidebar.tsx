@@ -60,14 +60,15 @@ interface NavSection {
 }
 
 const studentSections: NavSection[] = [
-    {
-        name: 'Events',
-        icon: CalendarDays,
-        subsections: [
-            { name: 'Webinars', href: '/dashboard/student/events/webinars', icon: Video },
-            { name: 'In Person Events', href: '/dashboard/student/events/in-person', icon: MapPin },
-        ],
-    },
+    // Hidden from student sidebar view
+    // {
+    //     name: 'Events',
+    //     icon: CalendarDays,
+    //     subsections: [
+    //         { name: 'Webinars', href: '/dashboard/student/events/webinars', icon: Video },
+    //         { name: 'In Person Events', href: '/dashboard/student/events/in-person', icon: MapPin },
+    //     ],
+    // },
 ]
 
 const navigation = {
@@ -77,7 +78,8 @@ const navigation = {
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentor', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
-        { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
+        // Hidden from student sidebar view
+        // { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
     ],
     mentor: [
         { name: 'Training', href: '/dashboard/mentor/training', icon: GraduationCap },

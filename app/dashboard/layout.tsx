@@ -211,6 +211,7 @@ export default async function DashboardLayout({
                   )
                 : profile.full_name || user.email?.split('@')[0] || 'User',
         userId: user.id,
+        photoUrl: (profile as any).mentors?.photo_url || null,
         pendingReportsCount,
         pendingRequestsCount,
         onboardingIncomplete,

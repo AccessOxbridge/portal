@@ -885,6 +885,10 @@ export type Database = {
           first_session_followup_sent: boolean | null
           id: string
           mentor_id: string
+          recording_available: boolean | null
+          recording_download_token: string | null
+          recording_download_url: string | null
+          recording_play_url: string | null
           reminder_sent: boolean | null
           request_id: string | null
           scheduled_at: string | null
@@ -905,6 +909,10 @@ export type Database = {
           first_session_followup_sent?: boolean | null
           id?: string
           mentor_id: string
+          recording_available?: boolean | null
+          recording_download_token?: string | null
+          recording_download_url?: string | null
+          recording_play_url?: string | null
           reminder_sent?: boolean | null
           request_id?: string | null
           scheduled_at?: string | null
@@ -925,6 +933,10 @@ export type Database = {
           first_session_followup_sent?: boolean | null
           id?: string
           mentor_id?: string
+          recording_available?: boolean | null
+          recording_download_token?: string | null
+          recording_download_url?: string | null
+          recording_play_url?: string | null
           reminder_sent?: boolean | null
           request_id?: string | null
           scheduled_at?: string | null

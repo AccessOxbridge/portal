@@ -78,6 +78,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             status,
             zoom_join_url,
             zoom_meeting_status,
+            recording_available,
             mentor:profiles!sessions_mentor_id_fkey (
                 full_name,
                 photo_url:mentors(photo_url)
@@ -117,6 +118,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
         status: session.status,
         zoom_join_url: session.zoom_join_url,
         zoom_meeting_status: session.zoom_meeting_status,
+        recording_available: !!session.recording_available,
         mentor_full_name: session.mentor?.full_name || 'Mentor',
         mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
         has_feedback: feedbackSet.has(session.id),

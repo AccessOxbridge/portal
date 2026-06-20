@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle } from 'lucide-react'
+import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X } from 'lucide-react'
 import BookSessionModal from '@/components/dashboard/book-session-modal'
 import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
@@ -20,6 +20,7 @@ interface Session {
     mentor_photo_url: string | null
     has_feedback: boolean
     has_report: boolean
+    recording_available: boolean
 }
 
 interface PendingRequest {
@@ -112,6 +113,7 @@ export default function StudentSessionsContent({
     const [cancelling, setCancelling] = useState(false)
     const [hadCurrent, setHadCurrent] = useState(false)
     const [reportSessionId, setReportSessionId] = useState<string | null>(null)
+    const [recordingSessionId, setRecordingSessionId] = useState<string | null>(null)
     const [showReportSuccess, setShowReportSuccess] = useState(false)
     const [reportSubmitting, setReportSubmitting] = useState(false)
     const [reportError, setReportError] = useState<string | null>(null)
@@ -595,6 +597,16 @@ export default function StudentSessionsContent({
                                             </>
                                         ) : (
                                             <div className="flex items-center gap-2">
+                                                {session.recording_available && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setRecordingSessionId(session.id)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-100 text-indigo-700 font-bold rounded-xl hover:bg-indigo-200 transition-colors"
+                                                    >
+                                                        <PlayCircle className="w-4 h-4" />
+                                                        Watch Recording
+                                                    </button>
+                                                )}
                                                 {session.has_report && (
                                                     <Link
                                                         href={`/dashboard/student/sessions/${session.id}/report`}
@@ -692,6 +704,35 @@ export default function StudentSessionsContent({
                                 {reportSubmitting ? 'Submitting…' : 'Yes, mentor is absent'}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {recordingSessionId && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center">
+                    <div
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                        onClick={() => setRecordingSessionId(null)}
+                    />
+                    <div className="relative z-[61] w-full max-w-4xl mx-4 bg-black rounded-2xl shadow-2xl overflow-hidden">
+                        <button
+                            type="button"
+                            onClick={() => setRecordingSessionId(null)}
+                            aria-label="Close recording"
+                            className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        <video
+                            key={recordingSessionId}
+                            src={`/api/recording/${recordingSessionId}`}
+                            controls
+                            autoPlay
+                            controlsList="nodownload"
+                            className="w-full max-h-[80vh] bg-black"
+                        >
+                            Your browser does not support video playback.
+                        </video>
                     </div>
                 </div>
             )}

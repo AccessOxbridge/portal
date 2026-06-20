@@ -33,7 +33,8 @@ import {
     AlertCircle,
     HelpCircle,
     User,
-    CalendarRange
+    CalendarRange,
+    Film
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
@@ -43,6 +44,7 @@ interface SidebarProps {
     role: string;
     userName: string;
     userId?: string;
+    photoUrl?: string | null;
     pendingReportsCount?: number;
     pendingRequestsCount?: number;
     onboardingIncomplete?: boolean;
@@ -75,6 +77,7 @@ const navigation = {
     student: [
         { name: 'Home', href: '/dashboard/student', icon: Home },
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
+        { name: 'Recordings', href: '/dashboard/student/recordings', icon: Film },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
         { name: 'My Mentor', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
@@ -86,10 +89,12 @@ const navigation = {
         { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
         { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
         { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
+        { name: 'My Students', href: '/dashboard/mentor/students', icon: Users },
         { name: 'Requests', href: '/dashboard/mentor/requests', icon: ClipboardList },
         { name: 'Reports', href: '/dashboard/mentor/reports', icon: FileText },
         { name: 'Payouts', href: '/dashboard/mentor/payouts', icon: Banknote },
         { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
+        { name: 'My Profile', href: '/dashboard/mentor/profile', icon: User },
     ],
     admin: [
         { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
@@ -137,6 +142,7 @@ export default function Sidebar({
     role,
     userName,
     userId,
+    photoUrl,
     pendingReportsCount = 0,
     pendingRequestsCount = 0,
     onboardingIncomplete = false,
@@ -662,8 +668,13 @@ export default function Sidebar({
                             )}
                         >
                             <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
-                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
-                                    {userName?.[0] || 'U'}
+                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10 overflow-hidden">
+                                    {photoUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        userName?.[0] || 'U'
+                                    )}
                                 </div>
                                 {!collapsed && (
                                     <div className="flex flex-col min-w-0 text-left">
@@ -689,8 +700,13 @@ export default function Sidebar({
                             title={userName || 'Profile'}
                         >
                             <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
-                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10">
-                                    {userName?.[0] || 'U'}
+                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10 overflow-hidden">
+                                    {photoUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        userName?.[0] || 'U'
+                                    )}
                                 </div>
                                 {!collapsed && (
                                     <div className="flex flex-col min-w-0">

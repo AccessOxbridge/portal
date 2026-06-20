@@ -150,7 +150,28 @@ export async function POST(req: Request) {
             const downloadToken = body?.download_token
 
             if (meetingIdStr && payload?.object?.recording_files) {
-                const transcriptFile = payload.object.recording_files.find(
+                // Capture the video recording (MP4) so students can watch it in-portal.
+                // Prefer the speaker+screen view, then any MP4.
+                const recordingFiles = payload.object.recording_files as any[]
+                const videoFile =
+                    recordingFiles.find(
+                        (file: any) => file.file_type === 'MP4' && file.recording_type === 'shared_screen_with_speaker_view'
+                    ) || recordingFiles.find((file: any) => file.file_type === 'MP4')
+
+                if (videoFile?.download_url) {
+                    console.log(`[ZOOM WEBHOOK] recording.completed has video for meeting: ${meetingIdStr}`)
+                    await supabase
+                        .from('sessions')
+                        .update({
+                            recording_play_url: videoFile.play_url || null,
+                            recording_download_url: videoFile.download_url,
+                            ...(downloadToken && { recording_download_token: downloadToken }),
+                            recording_available: true,
+                        })
+                        .eq('zoom_meeting_id', meetingIdStr)
+                }
+
+                const transcriptFile = recordingFiles.find(
                     (file: any) => file.file_type === 'TRANSCRIPT' || file.recording_type === 'audio_transcript'
                 )
 

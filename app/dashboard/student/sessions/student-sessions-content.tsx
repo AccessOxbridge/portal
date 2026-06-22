@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X } from 'lucide-react'
-import BookSessionModal from '@/components/dashboard/book-session-modal'
-import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
+import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
@@ -29,24 +28,10 @@ interface PendingRequest {
     mentor_full_name: string
 }
 
-interface AcademicProfileForBooking {
-    school_name: string | null
-    school_country: string | null
-    curriculum: string | null
-    curriculum_other?: string | null
-    subjects: { name: string; predicted_grade: string }[] | null
-    target_university: string | null
-    timezone: string | null
-    interests: string | null
-    extracurriculars: string | null
-    additional_notes?: string | null
-}
-
 interface StudentSessionsContentProps {
     sessions: Session[]
     pendingRequests: PendingRequest[]
     credits: number
-    academicProfile?: AcademicProfileForBooking | null
     canBook?: boolean
     hasMentor?: boolean
     autoOpenBooking?: boolean
@@ -58,7 +43,6 @@ export default function StudentSessionsContent({
     sessions,
     pendingRequests,
     credits,
-    academicProfile,
     canBook = false,
     hasMentor = false,
     autoOpenBooking = false,
@@ -107,9 +91,6 @@ export default function StudentSessionsContent({
         if (pendingRequests.length > 0) return 'pending'
         return 'upcoming'
     })
-    const [showBookingModal, setShowBookingModal] = useState(
-        autoOpenBooking && canBook && hasMentor && credits > 0
-    )
     const [cancelling, setCancelling] = useState(false)
     const [hadCurrent, setHadCurrent] = useState(false)
     const [reportSessionId, setReportSessionId] = useState<string | null>(null)
@@ -118,18 +99,15 @@ export default function StudentSessionsContent({
     const [reportSubmitting, setReportSubmitting] = useState(false)
     const [reportError, setReportError] = useState<string | null>(null)
 
+    // The booking modal is mounted globally by StudentCreditsProvider so the
+    // sidebar CTA works on every page. When deep-linked here with ?book=1,
+    // trigger that same shared flow (it gates on credits + a complete profile).
     useEffect(() => {
-        if (typeof window === 'undefined') return
-        const handler = () => {
-            if (bookingReady) {
-                setShowBookingModal(true)
-            }
+        if (autoOpenBooking && bookingReady) {
+            tryOpenBookSession()
         }
-        window.addEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
-        return () => {
-            window.removeEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
-        }
-    }, [bookingReady])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         setAllSessions(sessions)
@@ -735,25 +713,6 @@ export default function StudentSessionsContent({
                         </video>
                     </div>
                 </div>
-            )}
-
-            {academicProfile && bookingReady && (
-                <BookSessionModal
-                    isOpen={showBookingModal}
-                    onClose={() => setShowBookingModal(false)}
-                    studentProfile={{
-                        school_name: academicProfile.school_name || '',
-                        school_country: academicProfile.school_country || '',
-                        curriculum: academicProfile.curriculum || '',
-                        curriculum_other: academicProfile.curriculum_other || undefined,
-                        subjects: academicProfile.subjects || [],
-                        target_university: academicProfile.target_university || '',
-                        timezone: academicProfile.timezone || '',
-                        interests: academicProfile.interests || '',
-                        extracurriculars: academicProfile.extracurriculars || '',
-                        additional_notes: academicProfile.additional_notes || undefined
-                    }}
-                />
             )}
         </div>
     )

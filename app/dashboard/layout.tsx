@@ -4,6 +4,7 @@ import { getGreetingName } from '@/utils/lib'
 import DashboardShell from '@/components/dashboard/dashboard-shell'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
+import type { StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
@@ -199,6 +200,52 @@ export default async function DashboardLayout({
         studentHelpCount = count || 0
     }
 
+    // Student booking data for the global "Book a session" modal (mounted in
+    // StudentCreditsProvider) so the sidebar CTA works on every dashboard page,
+    // not just the dashboard and sessions pages. Mirrors the gating used by the
+    // sessions page: a complete profile AND an admin-assigned mentor.
+    let bookingProfile: StudentBookingProfile | null = null
+    let canBook = false
+    if (isStudent) {
+        const { data: academicProfile } = await supabase
+            .from('student_profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+        const { data: currentAssignment } = await supabase
+            .from('student_mentor_assignments')
+            .select('mentor_id')
+            .eq('student_id', user.id)
+            .eq('is_current', true)
+            .maybeSingle()
+
+        const hasMentor = !!currentAssignment?.mentor_id
+        const profileComplete = !!(
+            academicProfile?.is_complete &&
+            academicProfile?.school_name &&
+            academicProfile?.timezone &&
+            Array.isArray(academicProfile?.subjects) &&
+            academicProfile.subjects.length > 0
+        )
+        canBook = profileComplete && hasMentor
+
+        if (academicProfile) {
+            bookingProfile = {
+                school_name: academicProfile.school_name || '',
+                school_country: academicProfile.school_country || '',
+                curriculum: academicProfile.curriculum || '',
+                curriculum_other: academicProfile.curriculum_other || undefined,
+                subjects: (academicProfile.subjects as { name: string; predicted_grade: string }[] | null) || [],
+                target_university: academicProfile.target_university || '',
+                timezone: academicProfile.timezone || '',
+                interests: academicProfile.interests || '',
+                extracurriculars: academicProfile.extracurriculars || '',
+                additional_notes: academicProfile.additional_notes || undefined,
+            }
+        }
+    }
+
     const sidebarProps = {
         role: profile.role || 'student',
         userName:
@@ -231,7 +278,11 @@ export default async function DashboardLayout({
 
     if (isStudent) {
         return (
-            <StudentCreditsProvider initialCredits={(profile as any).credits ?? 0}>
+            <StudentCreditsProvider
+                initialCredits={(profile as any).credits ?? 0}
+                bookingProfile={canBook ? bookingProfile : null}
+                canBook={canBook}
+            >
                 {dashboardShell}
             </StudentCreditsProvider>
         )

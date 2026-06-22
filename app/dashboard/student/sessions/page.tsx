@@ -187,7 +187,6 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
                 sessions={processedSessions}
                 pendingRequests={processedPendingRequests}
                 credits={profile?.credits || 0}
-                academicProfile={academicProfile as any}
                 canBook={canBook}
                 hasMentor={hasMentor}
                 autoOpenBooking={autoOpenBooking}

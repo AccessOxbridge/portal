@@ -11,21 +11,23 @@ interface TimeSlot {
     endTime: string
 }
 
+export interface StudentBookingProfile {
+    school_name: string
+    school_country: string
+    curriculum: string
+    curriculum_other?: string
+    subjects: { name: string; predicted_grade: string }[]
+    target_university: string
+    timezone: string
+    interests: string
+    extracurriculars: string
+    additional_notes?: string
+}
+
 interface BookSessionModalProps {
     isOpen: boolean
     onClose: () => void
-    studentProfile: {
-        school_name: string
-        school_country: string
-        curriculum: string
-        curriculum_other?: string
-        subjects: { name: string; predicted_grade: string }[]
-        target_university: string
-        timezone: string
-        interests: string
-        extracurriculars: string
-        additional_notes?: string
-    }
+    studentProfile: StudentBookingProfile
 }
 
 export default function BookSessionModal({ isOpen, onClose, studentProfile }: BookSessionModalProps) {

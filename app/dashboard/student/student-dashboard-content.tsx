@@ -1,13 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 import ApplicationTimeline from '@/components/dashboard/application-timeline'
-import BookSessionModal from '@/components/dashboard/book-session-modal'
-import { useStudentCredits, OPEN_BOOK_ALLOWED } from '@/components/dashboard/student-credits-provider'
+import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface UpcomingSession {
@@ -72,7 +70,6 @@ export default function StudentDashboardContent({
         return sessionTime - now <= oneHour && sessionTime > now
     }
 
-    const [showBookingModal, setShowBookingModal] = useState(false)
     const { tryOpenBookSession } = useStudentCredits()
 
     // Check if profile is complete enough for booking
@@ -84,19 +81,6 @@ export default function StudentDashboardContent({
 
     // Booking also requires an admin-assigned mentor.
     const canBook = !!profileComplete && hasMentor
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return
-        const handler = () => {
-            if (canBook) {
-                setShowBookingModal(true)
-            }
-        }
-        window.addEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
-        return () => {
-            window.removeEventListener(OPEN_BOOK_ALLOWED, handler as EventListener)
-        }
-    }, [canBook])
 
     return (
         <>
@@ -292,28 +276,6 @@ export default function StudentDashboardContent({
                 </div>
                 */}
             </div>
-
-            {/* Booking Modal */}
-            {
-                academicProfile && canBook && (
-                    <BookSessionModal
-                        isOpen={showBookingModal}
-                        onClose={() => setShowBookingModal(false)}
-                        studentProfile={{
-                            school_name: academicProfile.school_name || '',
-                            school_country: academicProfile.school_country || '',
-                            curriculum: academicProfile.curriculum || '',
-                            curriculum_other: academicProfile.curriculum_other || undefined,
-                            subjects: academicProfile.subjects || [],
-                            target_university: academicProfile.target_university || '',
-                            timezone: academicProfile.timezone || '',
-                            interests: academicProfile.interests || '',
-                            extracurriculars: academicProfile.extracurriculars || '',
-                            additional_notes: academicProfile.additional_notes || undefined
-                        }}
-                    />
-                )
-            }
         </>
     )
 }

@@ -12,8 +12,7 @@ import {
 import { createClient } from '@/utils/supabase/client'
 import CreditsRequestModal, { type CreditsRequestReason } from '@/components/dashboard/credits-request-modal'
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
-
-const OPEN_BOOK_ALLOWED = 'open-book-session-allowed'
+import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 
 interface StudentCreditsContextValue {
     credits: number
@@ -38,15 +37,25 @@ export function useStudentCreditsOptional() {
 interface StudentCreditsProviderProps {
     children: ReactNode
     initialCredits?: number
+    /**
+     * The student's academic profile, supplied only when booking is currently
+     * possible (profile complete + an admin-assigned mentor). When null, the
+     * sidebar CTA falls back to the credits flow but the booking modal can't open.
+     */
+    bookingProfile?: StudentBookingProfile | null
+    canBook?: boolean
 }
 
 export default function StudentCreditsProvider({
     children,
     initialCredits = 0,
+    bookingProfile = null,
+    canBook = false,
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalReason, setModalReason] = useState<CreditsRequestReason>('topup')
+    const [bookingOpen, setBookingOpen] = useState(false)
     const supabase = useMemo(() => createClient(), [])
 
     useEffect(() => {
@@ -81,11 +90,16 @@ export default function StudentCreditsProvider({
             openCreditsRequest('booking')
             return
         }
-        if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent(OPEN_BOOK_ALLOWED))
+        // Profile incomplete or no mentor assigned yet — nothing to open. The
+        // in-page CTAs that show in those states route the student elsewhere.
+        if (canBook && bookingProfile) {
+            setBookingOpen(true)
         }
-    }, [credits, openCreditsRequest])
+    }, [credits, canBook, bookingProfile, openCreditsRequest])
 
+    // The sidebar "Book a session" button dispatches this event; listening here
+    // (in a provider mounted on every dashboard page) is what makes the CTA work
+    // everywhere the sidebar is visible.
     useEffect(() => {
         if (typeof window === 'undefined') return
         const handler = () => tryOpenBookSession()
@@ -108,8 +122,13 @@ export default function StudentCreditsProvider({
                 reason={modalReason}
                 credits={credits}
             />
+            {bookingProfile && canBook && (
+                <BookSessionModal
+                    isOpen={bookingOpen}
+                    onClose={() => setBookingOpen(false)}
+                    studentProfile={bookingProfile}
+                />
+            )}
         </StudentCreditsContext.Provider>
     )
 }
-
-export { OPEN_BOOK_ALLOWED }

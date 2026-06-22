@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
 
 export async function completeTraining() {
     const supabase = await createClient()
@@ -265,16 +266,16 @@ export async function completeProfile(formData: FormData) {
 
     // Upload photo if provided
     if (photo && photo.size > 0) {
-        if (photo.size > 5 * 1024 * 1024) {
-            return { error: 'Photo must be less than 5MB' }
+        const validation = await validatePhotoUpload(photo)
+        if (!validation.ok) {
+            return { error: validation.error }
         }
 
-        const fileExt = photo.name.split('.').pop()
-        const fileName = `${user.id}/profile_photo.${fileExt}`
+        const fileName = `${user.id}/profile_photo.${extForMime(validation.mime)}`
 
         const { error: uploadError } = await supabase.storage
             .from('mentor-assets')
-            .upload(fileName, photo, { upsert: true })
+            .upload(fileName, photo, { upsert: true, contentType: validation.mime })
 
         if (uploadError) {
             return { error: uploadError.message }

@@ -17,6 +17,7 @@ import {
     CheckCircle2,
 } from 'lucide-react'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
 import { updateMentorProfile } from './actions'
 
 interface MentorRow {
@@ -188,7 +189,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                             ref={fileInputRef}
                             type="file"
                             name="photo"
-                            accept="image/*"
+                            accept={PHOTO_ACCEPT_ATTR}
                             onChange={onPhotoChange}
                             className="hidden"
                         />

@@ -18,6 +18,7 @@ import {
 import { completeQuestionnaire, signContract, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 import { COUNTRIES } from '@/config/countries'
+import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
 
 interface OnboardingStatus {
     questionnaire: boolean
@@ -1030,7 +1031,7 @@ export default function TrainingContent({
                                         <input
                                             type="file"
                                             name="photo"
-                                            accept="image/*"
+                                            accept={PHOTO_ACCEPT_ATTR}
                                             className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20"
                                         />
                                     </div>

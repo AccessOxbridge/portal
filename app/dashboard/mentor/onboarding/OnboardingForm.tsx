@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { COUNTRIES } from '@/config/countries'
 import { submitOnboarding } from './actions'
+import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
 import { Logo } from "@/components/logo";
 import { LogoutButton } from "@/components/logout-button";
 
@@ -360,7 +361,7 @@ export default function OnboardingForm() {
                         id={question.id}
                         name={question.id}
                         required={question.required}
-                        accept={question.id === 'photo' ? 'image/*' : '.pdf,.doc,.docx'}
+                        accept={question.id === 'photo' ? PHOTO_ACCEPT_ATTR : '.pdf,.doc,.docx'}
                         onChange={validateFileSize(question.id)}
                         aria-invalid={Boolean(fileErrors[question.id])}
                         aria-describedby={`${question.id}-help ${question.id}-error`}

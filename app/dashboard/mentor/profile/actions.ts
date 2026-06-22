@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
 
 export async function updateMentorProfile(prevState: any, formData: FormData) {
     const supabase = await createClient()
@@ -37,12 +38,16 @@ export async function updateMentorProfile(prevState: any, formData: FormData) {
     let photoUrl: string | null = null
     const photo = formData.get('photo')
     if (photo instanceof File && photo.size > 0) {
-        const fileExt = photo.name.split('.').pop()
-        const filePath = `${user.id}/photo-${Math.random()}.${fileExt}`
+        const validation = await validatePhotoUpload(photo)
+        if (!validation.ok) {
+            return { error: validation.error }
+        }
+
+        const filePath = `${user.id}/photo-${Math.random()}.${extForMime(validation.mime)}`
 
         const { error: uploadError } = await supabase.storage
             .from('mentor-assets')
-            .upload(filePath, photo)
+            .upload(filePath, photo, { contentType: validation.mime })
 
         if (uploadError) {
             console.error('Error uploading profile photo:', uploadError)

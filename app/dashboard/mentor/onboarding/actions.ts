@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { sendMentorApplicationReceivedEmail } from '@/utils/email'
+import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
 
 export async function submitOnboarding(prevState: any, formData: FormData) {
     const supabase = await createClient()
@@ -26,11 +27,25 @@ export async function submitOnboarding(prevState: any, formData: FormData) {
         if (value instanceof File) {
             if (value.size === 0) continue
 
-            const fileExt = value.name.split('.').pop()
-            const fileName = `${user.id}/${key}-${Math.random()}.${fileExt}`
+            // The profile photo must be a browser-renderable image (no HEIC),
+            // otherwise it shows as a broken image everywhere it's displayed.
+            let uploadExt = value.name.split('.').pop()
+            let contentType: string | undefined
+            if (key === 'photo') {
+                const validation = await validatePhotoUpload(value)
+                if (!validation.ok) {
+                    return { error: validation.error }
+                }
+                uploadExt = extForMime(validation.mime)
+                contentType = validation.mime
+            }
+
+            const fileName = `${user.id}/${key}-${Math.random()}.${uploadExt}`
             const filePath = `${fileName}`
 
-            const { error: uploadError } = await supabase.storage.from('mentor-assets').upload(filePath, value)
+            const { error: uploadError } = await supabase.storage
+                .from('mentor-assets')
+                .upload(filePath, value, contentType ? { contentType } : undefined)
 
             if (uploadError) {
                 console.error(`Error uploading ${key}:`, uploadError)

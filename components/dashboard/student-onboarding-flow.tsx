@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
-import { DEFAULT_TIMEZONE, getDefaultTimezone, rememberTimezone, zonedTimeToUtcISO } from '@/lib/timezone'
+import { getDefaultTimezone, rememberTimezone, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 
 type StepId = 'basic' | 'targets' | 'additional'
 
@@ -153,7 +153,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
 
         // Interpret the wall-clock times in the student's chosen timezone (not
         // the browser's) before converting to UTC ISO strings.
-        const slotTz = formData.timezone || DEFAULT_TIMEZONE
+        const slotTz = resolveTz(formData.timezone)
 
         setFormData(prev => ({
             ...prev,
@@ -178,7 +178,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
         const start = new Date(slot.startTime)
         const end = new Date(slot.endTime)
 
-        const slotTz = formData.timezone || DEFAULT_TIMEZONE
+        const slotTz = resolveTz(formData.timezone)
         const dateStr = start.toLocaleDateString('en-GB', {
             weekday: 'short',
             day: 'numeric',

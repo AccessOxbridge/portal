@@ -146,9 +146,14 @@ export function addMinutesToWallTime(timeStr: string, minutes: number): string {
     return `${pad2(Math.floor(total / 60))}:${pad2(total % 60)}`
 }
 
-/** Resolve a usable IANA zone, falling back to {@link DEFAULT_TIMEZONE}. */
-function resolveTz(timeZone: string | null | undefined): string {
-    return isValidTimezone(timeZone) ? timeZone : DEFAULT_TIMEZONE
+/**
+ * Resolve a usable IANA zone, falling back to {@link DEFAULT_TIMEZONE}.
+ * Trims surrounding whitespace first, so a value like "Europe/London " (which
+ * the runtime would otherwise reject as an invalid time zone) still resolves.
+ */
+export function resolveTz(timeZone: string | null | undefined): string {
+    const trimmed = typeof timeZone === 'string' ? timeZone.trim() : timeZone
+    return isValidTimezone(trimmed) ? trimmed : DEFAULT_TIMEZONE
 }
 
 /**

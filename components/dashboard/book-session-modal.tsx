@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, Calendar, Clock, Plus } from 'lucide-react'
-import { DEFAULT_TIMEZONE, addMinutesToWallTime, getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
+import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 
 interface TimeSlot {
     date: string
@@ -35,7 +35,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
     // All wall-clock times in this modal are interpreted in the student's
     // timezone (not the browser's), so the label and the saved times agree.
-    const tz = studentProfile.timezone || DEFAULT_TIMEZONE
+    const tz = resolveTz(studentProfile.timezone)
     const todayDate = getZonedNow(tz).date
     const [newSlot, setNewSlot] = useState({ date: todayDate, startTime: '', endTime: '' })
 

@@ -106,7 +106,7 @@ export async function GET(req: Request) {
                     email: p.email || '',
                     stripe_account_id: m.stripe_account_id || null,
                     payouts_enabled: !!m.payouts_enabled,
-                    hourly_rate_cents: m.hourly_rate_cents || 2500,
+                    hourly_rate_cents: m.hourly_rate_cents || 3000,
                 }
             }
         }
@@ -139,7 +139,7 @@ export async function GET(req: Request) {
                     mentor_email: info?.email || '',
                     stripe_account_id: info?.stripe_account_id || null,
                     payouts_enabled: info?.payouts_enabled || false,
-                    hourly_rate_cents: info?.hourly_rate_cents || 2500,
+                    hourly_rate_cents: info?.hourly_rate_cents || 3000,
                     sessions: [],
                     total_minutes: 0,
                     total_cents: 0
@@ -296,7 +296,7 @@ export async function POST(req: Request) {
                 }
 
                 // Calculate total
-                const hourlyRateCents = mentor.hourly_rate_cents || 2500
+                const hourlyRateCents = mentor.hourly_rate_cents || 3000
                 let totalMinutes = 0
                 let totalCents = 0
 

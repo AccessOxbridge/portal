@@ -16,9 +16,9 @@ interface Message {
 
 interface Conversation {
     id: string
-    student_id: string
+    student_id: string | null
     mentor_id: string | null
-    type?: 'mentor' | 'support'
+    type?: 'mentor' | 'support' | 'mentor_support'
     last_message_at: string
     created_at: string
     student: {
@@ -130,14 +130,18 @@ export default function AdminMessagesContent({
     }, [messages])
 
     const isSupport = selectedConversation?.type === 'support'
+    const isMentorSupport = selectedConversation?.type === 'mentor_support'
+    // Direct threads (student↔help desk, or admin↔mentor as "Claire") are a plain
+    // 2-way chat; mentor↔student threads instead get a flagged "[ADMIN]" intervention.
+    const isDirect = isSupport || isMentorSupport
 
-    // Admin can send a message. In support threads this is a normal reply from the
-    // help desk; in mentor threads it is a flagged "[ADMIN]" intervention.
+    // Admin can send a message. In direct threads this is a normal reply; in
+    // mentor↔student threads it is a flagged "[ADMIN]" intervention.
     const handleSendAdminMessage = async () => {
         if (!selectedConversation || !adminMessage.trim() || isSending) return
 
         setIsSending(true)
-        const content = isSupport ? adminMessage.trim() : `[ADMIN] ${adminMessage.trim()}`
+        const content = isDirect ? adminMessage.trim() : `[ADMIN] ${adminMessage.trim()}`
 
         try {
             await supabase.from('messages').insert({
@@ -279,26 +283,32 @@ export default function AdminMessagesContent({
                                 </div>
                             ) : (
                                 messages.map((message) => {
-                                    const isStudentSender = message.sender_id === selectedConversation.student_id
-
-                                    // Support thread: render as a normal 2-way chat between the
-                                    // student and the Help & Support team (no "intervention" styling).
-                                    if (isSupport) {
+                                    // Direct thread: render as a normal 2-way chat (no
+                                    // "intervention" styling). The non-team party is the
+                                    // student for help-desk threads, or the mentor for
+                                    // admin↔mentor "Claire" threads.
+                                    if (isDirect) {
+                                        const otherPartyId = isMentorSupport ? selectedConversation.mentor_id : selectedConversation.student_id
+                                        const otherPartyName = isMentorSupport
+                                            ? (selectedConversation.mentor.full_name || 'Mentor')
+                                            : (selectedConversation.student.full_name || 'Student')
+                                        const teamLabel = isMentorSupport ? 'Claire Marlowe' : 'Help & Support'
+                                        const isOtherSender = message.sender_id === otherPartyId
                                         return (
                                             <div key={message.id} className="flex flex-col">
-                                                <div className={`max-w-[70%] ${isStudentSender ? 'self-start' : 'self-end'}`}>
+                                                <div className={`max-w-[70%] ${isOtherSender ? 'self-start' : 'self-end'}`}>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className={`text-xs font-medium ${isStudentSender ? 'text-blue-600' : 'text-accent'}`}>
-                                                            {isStudentSender ? (selectedConversation.student.full_name || 'Student') : 'Help & Support'}
+                                                        <span className={`text-xs font-medium ${isOtherSender ? 'text-blue-600' : 'text-accent'}`}>
+                                                            {isOtherSender ? otherPartyName : teamLabel}
                                                         </span>
                                                     </div>
-                                                    <div className={`px-4 py-2.5 rounded-2xl ${isStudentSender
+                                                    <div className={`px-4 py-2.5 rounded-2xl ${isOtherSender
                                                         ? 'bg-blue-500 text-white rounded-bl-md'
                                                         : 'bg-accent text-white rounded-br-md'
                                                         }`}>
                                                         <p className="text-sm">{message.content.replace('[ADMIN] ', '')}</p>
                                                     </div>
-                                                    <p className={`text-[10px] text-gray-400 mt-1 ${isStudentSender ? 'text-left' : 'text-right'}`}>
+                                                    <p className={`text-[10px] text-gray-400 mt-1 ${isOtherSender ? 'text-left' : 'text-right'}`}>
                                                         {format(new Date(message.created_at), 'MMM d, h:mm a')}
                                                     </p>
                                                 </div>
@@ -351,12 +361,14 @@ export default function AdminMessagesContent({
                         </div>
 
                         {/* Reply / Intervention Input */}
-                        <div className={`px-6 py-4 border-t border-gray-100 ${isSupport ? 'bg-white' : 'bg-amber-50'}`}>
+                        <div className={`px-6 py-4 border-t border-gray-100 ${isDirect ? 'bg-white' : 'bg-amber-50'}`}>
                             <div className="flex items-center gap-2 mb-2">
-                                {isSupport ? (
+                                {isDirect ? (
                                     <>
                                         <MessageCircle className="w-4 h-4 text-accent" />
-                                        <span className="text-xs font-medium text-accent">Reply as Help &amp; Support</span>
+                                        <span className="text-xs font-medium text-accent">
+                                            {isMentorSupport ? 'Reply as Claire Marlowe' : 'Reply as Help & Support'}
+                                        </span>
                                     </>
                                 ) : (
                                     <>
@@ -371,9 +383,9 @@ export default function AdminMessagesContent({
                                     value={adminMessage}
                                     onChange={(e) => setAdminMessage(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendAdminMessage()}
-                                    placeholder={isSupport ? 'Reply to the student...' : 'Send a message as admin...'}
+                                    placeholder={isMentorSupport ? 'Message the mentor...' : isSupport ? 'Reply to the student...' : 'Send a message as admin...'}
                                     className={`flex-1 px-4 py-2.5 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 ${
-                                        isSupport
+                                        isDirect
                                             ? 'border-gray-200 focus:ring-accent/20 focus:border-accent/40'
                                             : 'border-amber-200 focus:ring-amber-100 focus:border-amber-300'
                                     }`}
@@ -382,7 +394,7 @@ export default function AdminMessagesContent({
                                     onClick={handleSendAdminMessage}
                                     disabled={!adminMessage.trim() || isSending}
                                     className={`px-4 py-2.5 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
-                                        isSupport ? 'bg-accent hover:bg-accent/90' : 'bg-amber-500 hover:bg-amber-600'
+                                        isDirect ? 'bg-accent hover:bg-accent/90' : 'bg-amber-500 hover:bg-amber-600'
                                     }`}
                                 >
                                     {isSending ? (

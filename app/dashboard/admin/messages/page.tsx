@@ -65,17 +65,18 @@ export default async function AdminMessagesPage() {
                 .single()
 
             const isSupport = conv.type === 'support'
+            const isMentorSupport = conv.type === 'mentor_support'
 
             return {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
-                type: (conv.type || 'mentor') as 'mentor' | 'support',
+                type: (conv.type || 'mentor') as 'mentor' | 'support' | 'mentor_support',
                 last_message_at: conv.last_message_at || conv.created_at || new Date().toISOString(),
                 created_at: conv.created_at || new Date().toISOString(),
                 student: {
-                    id: conv.student?.id || conv.student_id,
-                    full_name: conv.student?.full_name || 'Unknown Student',
+                    id: conv.student?.id || conv.student_id || 'support',
+                    full_name: isMentorSupport ? 'Access Oxbridge (Claire)' : (conv.student?.full_name || 'Unknown Student'),
                     email: conv.student?.email || ''
                 },
                 mentor: {

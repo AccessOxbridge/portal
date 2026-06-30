@@ -308,7 +308,7 @@ export default function AdminMentorsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-5 py-4 text-right">
-                                                    <MentorActions mentorId={mentor.id} currentStatus={currentStatus} email={mentor.profile?.email || ''} />
+                                                    <MentorActions mentorId={mentor.id} currentStatus={currentStatus} email={mentor.profile?.email || ''} mentorName={mentor.profile?.full_name || 'Mentor'} photoUrl={mentor.photo_url} />
                                                 </td>
                                             </tr>
                                         )

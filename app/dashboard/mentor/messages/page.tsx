@@ -31,6 +31,7 @@ export default async function MentorMessagesPage() {
             student_id,
             mentor_id,
             admin_id,
+            type,
             last_message_at,
             student:profiles!conversations_student_id_fkey (
                 id,
@@ -95,18 +96,31 @@ export default async function MentorMessagesPage() {
                 .eq('is_read', false)
                 .neq('sender_id', user.id)
 
+            // Admin<->mentor "support" thread: rendered with the exact same logic
+            // as the student's Help & Support view — the mentor sees "Claire
+            // Marlowe / Senior Strategist" (the Access Oxbridge team).
+            const isMentorSupport = conv.type === 'mentor_support'
+
             return {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
                 admin_id: conv.admin_id,
+                type: conv.type as 'mentor' | 'support' | 'mentor_support',
                 last_message_at: conv.last_message_at,
-                other_user: {
-                    id: conv.student?.id || conv.student_id,
-                    full_name: conv.student?.full_name || 'Student',
-                    photo_url: null // Students don't have photos in current schema
-                },
-                admin_user: conv.admin ? {
+                other_user: isMentorSupport
+                    ? {
+                        id: conv.admin_id || 'support',
+                        full_name: 'Claire Marlowe',
+                        photo_url: '/logo.png',
+                        role_label: 'Senior Strategist',
+                    }
+                    : {
+                        id: conv.student?.id || conv.student_id,
+                        full_name: conv.student?.full_name || 'Student',
+                        photo_url: null // Students don't have photos in current schema
+                    },
+                admin_user: (!isMentorSupport && conv.admin) ? {
                     id: conv.admin.id,
                     full_name: 'Senior Strategist'
                 } : null,

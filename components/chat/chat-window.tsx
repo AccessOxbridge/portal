@@ -29,7 +29,7 @@ interface ChatWindowProps {
         full_name: string
     }
     allParticipants?: {
-        student_id: string
+        student_id?: string | null
         mentor_id: string | null
         admin_id?: string
     }
@@ -55,10 +55,11 @@ export default function ChatWindow({
 
     // A message is a third-party "Access Oxbridge Support" intervention when it lands
     // in a mentor↔student thread but was sent by neither of those two participants.
-    // (Support threads have no mentor, so admin replies there render normally.)
+    // (Support threads have no mentor, and admin<->mentor threads have no student,
+    // so admin replies there render normally as the "other user".)
     const isInterventionMessage = (message: Message) => {
         if (message.content.startsWith('[ADMIN] ')) return true
-        if (!allParticipants?.mentor_id) return false
+        if (!allParticipants?.mentor_id || !allParticipants?.student_id) return false
         return (
             message.sender_id !== allParticipants.student_id &&
             message.sender_id !== allParticipants.mentor_id

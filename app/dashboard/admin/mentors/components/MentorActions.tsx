@@ -4,14 +4,17 @@ import { createClient } from '@/utils/supabase/client'
 import { MoreHorizontal, Mail, ExternalLink, CheckCircle2, Clock, XCircle, ShieldCheck, ShieldAlert } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { MentorMessageButton } from './MentorMessageButton'
 
 interface MentorActionsProps {
     mentorId: string
     currentStatus: string
     email: string
+    mentorName: string
+    photoUrl?: string | null
 }
 
-export function MentorActions({ mentorId, currentStatus, email }: MentorActionsProps) {
+export function MentorActions({ mentorId, currentStatus, email, mentorName, photoUrl }: MentorActionsProps) {
     const supabase = createClient()
     const router = useRouter()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -37,6 +40,7 @@ export function MentorActions({ mentorId, currentStatus, email }: MentorActionsP
                 <a className="p-2 text-gray-400 hover:text-accent transition-colors" title="Email Mentor" href={`mailto:${email}`}>
                     <Mail className="w-4 h-4" />
                 </a>
+                <MentorMessageButton mentorId={mentorId} mentorName={mentorName} photoUrl={photoUrl} />
                 <div className="relative">
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}

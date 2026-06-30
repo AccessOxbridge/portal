@@ -9,10 +9,10 @@ import NewConversationDialog from '@/components/chat/new-conversation-dialog'
 
 interface Conversation {
     id: string
-    student_id: string
+    student_id: string | null
     mentor_id: string | null
     admin_id?: string | null
-    type?: 'mentor' | 'support'
+    type?: 'mentor' | 'support' | 'mentor_support'
     last_message_at: string
     other_user: {
         id: string

@@ -35,15 +35,22 @@ export default function AdminPayoutsPage() {
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
 
-    // Default to current calendar year to make sure all pending sessions are included
+    // Default to the last fortnight (payouts run fortnightly). A narrow default
+    // avoids accidentally bundling months of unpaid sessions into one run.
+    // Format from local date parts — toISOString() shifts to the previous UTC
+    // day in negative timezones and would silently widen the period.
+    const fmtDate = (d: Date) => {
+        const y = d.getFullYear()
+        const m = String(d.getMonth() + 1).padStart(2, '0')
+        const day = String(d.getDate()).padStart(2, '0')
+        return `${y}-${m}-${day}`
+    }
     const today = new Date()
-    const yearStart = new Date(today.getFullYear(), 0, 1)
-    yearStart.setHours(0, 0, 0, 0)
-    const yearEnd = new Date(today)
-    yearEnd.setHours(23, 59, 59, 999)
+    const fortnightAgo = new Date(today)
+    fortnightAgo.setDate(fortnightAgo.getDate() - 13) // 14-day inclusive window
 
-    const [startDate, setStartDate] = useState(yearStart.toISOString().split('T')[0])
-    const [endDate, setEndDate] = useState(yearEnd.toISOString().split('T')[0])
+    const [startDate, setStartDate] = useState(fmtDate(fortnightAgo))
+    const [endDate, setEndDate] = useState(fmtDate(today))
 
     const calculatePayouts = async () => {
         setLoading(true)
@@ -76,6 +83,15 @@ export default function AdminPayoutsPage() {
             return
         }
 
+        // Guard against accidental over-wide payouts: confirm the exact period,
+        // mentor count and total before any funds move.
+        const confirmed = window.confirm(
+            `Process ${selectedMentors.size} payout(s) totalling ${formatPrice(selectableTotal)}\n` +
+            `for the period ${startDate} to ${endDate}?\n\n` +
+            `This transfers funds to mentors' connected accounts and cannot be undone.`
+        )
+        if (!confirmed) return
+
         setProcessing(true)
         setError(null)
         setSuccess(null)
@@ -98,9 +114,14 @@ export default function AdminPayoutsPage() {
             const result = await res.json()
             const successCount = result.results.filter((r: any) => r.success).length
             const failCount = result.results.filter((r: any) => !r.success).length
+            const bankPendingCount = result.results.filter((r: any) => r.bank_payout_pending).length
 
             if (successCount > 0) {
-                setSuccess(`Successfully processed ${successCount} payout(s)${failCount > 0 ? `, ${failCount} failed` : ''}`)
+                let msg = `Successfully processed ${successCount} payout(s)${failCount > 0 ? `, ${failCount} failed` : ''}`
+                if (bankPendingCount > 0) {
+                    msg += ` — ⚠️ ${bankPendingCount} transferred but the bank payout is pending (funds are in the mentor's Stripe balance; check Stripe / retry).`
+                }
+                setSuccess(msg)
             }
             if (failCount > 0 && successCount === 0) {
                 setError('All payouts failed. Check mentor Stripe setup.')

@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { NextResponse } from 'next/server'
-import { createTransfer } from '@/utils/stripe'
+import { createTransfer, createPayout } from '@/utils/stripe'
 
 /**
  * Admin endpoints for managing mentor payouts
@@ -239,6 +239,8 @@ export async function POST(req: Request) {
             payout_id?: string
             transfer_id?: string
             error?: string
+            bank_payout_pending?: boolean
+            warning?: string
         }> = []
 
         // 3. Process each mentor
@@ -324,11 +326,14 @@ export async function POST(req: Request) {
                     continue
                 }
 
-                // Create payout record
+                // Create/refresh the payout record (status pending). The unique
+                // constraint on (mentor_id, period_start, period_end) guarantees a
+                // stable row id per period via onConflict — so a retry of the same
+                // period reuses the same payout id, which we use as the Stripe
+                // idempotency key below to make transfers safe against double-pay.
                 const { data: payout, error: payoutError } = await adminSupabase
                     .from('mentor_payouts')
                     .upsert({
-                        id: existingPayout?.id,
                         mentor_id: mentorId,
                         period_start,
                         period_end,
@@ -337,29 +342,16 @@ export async function POST(req: Request) {
                         amount_cents: totalCents,
                         currency: 'gbp',
                         status: 'pending'
-                    })
+                    }, { onConflict: 'mentor_id,period_start,period_end' })
                     .select()
                     .single()
 
                 if (payoutError) throw payoutError
 
-                // Create payout items
-                for (const session of eligibleSessions) {
-                    const duration = session.duration_minutes || 60
-                    await adminSupabase
-                        .from('mentor_payout_items')
-                        .insert({
-                            payout_id: payout.id,
-                            session_id: session.id,
-                            duration_minutes: duration,
-                            hourly_rate_cents: hourlyRateCents,
-                            amount_cents: Math.round((duration / 60) * hourlyRateCents)
-                        })
-                }
-
-                // Create Stripe Transfer. Transfers are synchronous – if this call
-                // succeeds, funds have been moved to the connected account, so we
-                // can safely mark the payout as paid.
+                // Create Stripe Transfer FIRST, keyed by the payout id. Transfers are
+                // synchronous, so once this resolves the funds are in the connected
+                // account. We only write payout items afterwards, so a failed transfer
+                // never leaves sessions "locked" in mentor_payout_items (see F4).
                 const transferId = await createTransfer(
                     mentor.stripe_account_id,
                     totalCents,
@@ -369,16 +361,68 @@ export async function POST(req: Request) {
                         mentor_id: mentorId,
                         period_start,
                         period_end
-                    }
+                    },
+                    payout.id // idempotency key — prevents double transfers
                 )
 
-                // Update payout with transfer ID and mark as paid
+                // Record the sessions included in this payout (now that the transfer
+                // is confirmed). Insert all items in ONE statement so it's all-or-nothing:
+                // a partial insert would change the eligible set (and thus the amount) on
+                // a retry, which would clash with the fixed-amount transfer idempotency
+                // key. Upsert on session_id so a self-healing retry doesn't duplicate.
+                const itemRows = eligibleSessions.map(session => {
+                    const duration = session.duration_minutes || 60
+                    return {
+                        payout_id: payout.id,
+                        session_id: session.id,
+                        duration_minutes: duration,
+                        hourly_rate_cents: hourlyRateCents,
+                        amount_cents: Math.round((duration / 60) * hourlyRateCents)
+                    }
+                })
+                const { error: itemsError } = await adminSupabase
+                    .from('mentor_payout_items')
+                    .upsert(itemRows, { onConflict: 'session_id' })
+                if (itemsError) throw itemsError
+
+                // Second hop (F3): move the transferred funds from the mentor's Stripe
+                // balance to their bank. Connected accounts use a manual payout schedule,
+                // so this won't happen automatically. A failure here does NOT undo the
+                // transfer — the money is safely in the mentor's Stripe balance — but it
+                // is common (e.g. funds not yet "available" on the connected account), so
+                // we must surface it rather than silently mark the bank hop done.
+                let bankPayoutId: string | null = null
+                let bankPayoutError: string | null = null
+                try {
+                    bankPayoutId = await createPayout(
+                        mentor.stripe_account_id,
+                        totalCents,
+                        'gbp',
+                        { payout_id: payout.id, mentor_id: mentorId },
+                        `${payout.id}-bank` // idempotency key
+                    )
+                } catch (payoutErr: any) {
+                    bankPayoutError = payoutErr.message || 'Bank payout failed'
+                    console.error(
+                        `Bank payout failed for mentor ${mentorId} (payout ${payout.id}). ` +
+                        `Transfer ${transferId} succeeded; funds are in the mentor's Stripe balance. ` +
+                        `Reason: ${bankPayoutError}`
+                    )
+                }
+
+                // Update payout. The transfer succeeded, so status is 'paid'; if the bank
+                // hop is still pending we record why in failure_message so it's visible
+                // and can be retried (stripe_payout_id stays null until it lands).
                 const nowIso = new Date().toISOString()
                 await adminSupabase
                     .from('mentor_payouts')
                     .update({
                         stripe_transfer_id: transferId,
+                        stripe_payout_id: bankPayoutId,
                         status: 'paid',
+                        failure_message: bankPayoutError
+                            ? `Funds transferred; bank payout pending: ${bankPayoutError}`
+                            : null,
                         processed_at: nowIso,
                         paid_at: nowIso
                     })
@@ -388,7 +432,13 @@ export async function POST(req: Request) {
                     mentor_id: mentorId,
                     success: true,
                     payout_id: payout.id,
-                    transfer_id: transferId
+                    transfer_id: transferId,
+                    ...(bankPayoutError
+                        ? {
+                            bank_payout_pending: true,
+                            warning: `Funds transferred but bank payout is pending: ${bankPayoutError}`
+                        }
+                        : {})
                 })
 
             } catch (error: any) {

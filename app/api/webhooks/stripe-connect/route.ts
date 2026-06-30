@@ -20,26 +20,23 @@ export async function POST(req: Request) {
 
     const webhookSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET
 
+    // Always require the signing secret. Never fall back to parsing unsigned
+    // bodies — without verification an attacker who knows this URL could forge
+    // `account.updated` (flip payouts_enabled) or `transfer.updated` events.
     if (!webhookSecret) {
-        console.warn('⚠️ STRIPE_CONNECT_WEBHOOK_SECRET is not set. Webhook verification skipped (NOT SECURE).')
-        // In development, you might want to allow this, but let's be safe and require it or at least log clearly.
-        // If you are using Stripe CLI, it will provide you with a secret.
-        try {
-            event = JSON.parse(body)
-        } catch (err: any) {
-            return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
-        }
-    } else {
-        try {
-            event = getStripe().webhooks.constructEvent(
-                body,
-                signature,
-                webhookSecret
-            )
-        } catch (err: any) {
-            console.error('Webhook signature verification failed:', err.message)
-            return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
-        }
+        console.error('STRIPE_CONNECT_WEBHOOK_SECRET is not set — rejecting Connect webhook.')
+        return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+
+    try {
+        event = getStripe().webhooks.constructEvent(
+            body,
+            signature,
+            webhookSecret
+        )
+    } catch (err: any) {
+        console.error('Webhook signature verification failed:', err.message)
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
     try {

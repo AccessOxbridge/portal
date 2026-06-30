@@ -6,9 +6,9 @@ interface StripeOnboardingButtonProps {
     variant: 'setup' | 'continue'
 }
 
-// Temporarily disabled: Stripe Connect onboarding is paused for mentors.
-// Flip this back to `false` to re-enable the button and its click handler.
-const STRIPE_CONNECT_DISABLED = true
+// Stripe Connect onboarding for mentors. Set to `true` to pause the button
+// and its click handler (e.g. during maintenance).
+const STRIPE_CONNECT_DISABLED = false
 
 export function StripeOnboardingButton({ variant }: StripeOnboardingButtonProps) {
     const [loading, setLoading] = useState(false)

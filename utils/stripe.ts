@@ -141,22 +141,59 @@ export async function isAccountPayoutsEnabled(accountId: string): Promise<boolea
 }
 
 /**
- * Create a transfer to a connected account (moves funds from platform to connected account)
+ * Create a transfer to a connected account (moves funds from platform to connected account).
+ *
+ * Pass `idempotencyKey` (e.g. the payout id) so retries / double-clicks / concurrent
+ * requests never issue a second real transfer — Stripe returns the original transfer
+ * for the same key instead of creating a new one.
  */
 export async function createTransfer(
     accountId: string,
     amountCents: number,
     currency: string = 'gbp',
-    metadata?: Record<string, string>
+    metadata?: Record<string, string>,
+    idempotencyKey?: string
 ): Promise<string> {
-    const transfer = await getStripe().transfers.create({
-        amount: amountCents,
-        currency,
-        destination: accountId,
-        metadata
-    })
+    const transfer = await getStripe().transfers.create(
+        {
+            amount: amountCents,
+            currency,
+            destination: accountId,
+            metadata
+        },
+        idempotencyKey ? { idempotencyKey } : undefined
+    )
 
     return transfer.id
+}
+
+/**
+ * Create a payout on a connected account (moves funds from the mentor's Stripe
+ * balance to their bank). This is the second hop after a Transfer — required
+ * because connected accounts use a `manual` payout schedule (admin-controlled).
+ *
+ * `idempotencyKey` (e.g. `<payout_id>-bank`) prevents duplicate bank payouts on retry.
+ */
+export async function createPayout(
+    accountId: string,
+    amountCents: number,
+    currency: string = 'gbp',
+    metadata?: Record<string, string>,
+    idempotencyKey?: string
+): Promise<string> {
+    const payout = await getStripe().payouts.create(
+        {
+            amount: amountCents,
+            currency,
+            metadata
+        },
+        {
+            stripeAccount: accountId,
+            ...(idempotencyKey ? { idempotencyKey } : {})
+        }
+    )
+
+    return payout.id
 }
 
 /**

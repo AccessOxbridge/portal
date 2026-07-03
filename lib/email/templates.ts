@@ -435,7 +435,7 @@ export function sessionReminderStudent(
             paragraphs: [
                 `Dear ${sName},`,
                 `This is a friendly reminder that your session with ${mName} starts at <strong>${when}</strong> today.`,
-                `${link('Join your session', joinUrl)} when you’re ready — we’d recommend hopping on a couple of minutes early.`,
+                `${link('Join your session', joinUrl)} when you’re ready - we’d recommend hopping on a couple of minutes early.`,
             ],
             signOff: TEAM_SIGN_OFF,
         }),
@@ -460,7 +460,65 @@ export function sessionReminderMentor(
             paragraphs: [
                 `Dear ${mName},`,
                 `This is a friendly reminder that your session with ${sName} starts at <strong>${when}</strong> today.`,
-                `${link('Start the session', startUrl)} when you’re ready — your Zoom host link opens straight from here.`,
+                `${link('Start the session', startUrl)} when you’re ready - your Zoom host link opens straight from here.`,
+            ],
+            signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}
+
+/** Invoice submitted ("Sent to Finance") → admin. */
+export function invoiceSubmittedAdmin(
+    details: { mentorName: string; invoiceNumber: string; amountLabel: string; payoutsUrl: string }
+): EmailTemplate {
+    const mentor = escapeHtml(details.mentorName || 'A mentor')
+    const num = escapeHtml(details.invoiceNumber || '')
+    const amount = escapeHtml(details.amountLabel || '')
+    return {
+        subject: `Invoice ${details.invoiceNumber} sent to finance | Access Oxbridge`,
+        html: layout({
+            title: 'Invoice sent to finance',
+            preheader: `${details.mentorName} sent invoice ${details.invoiceNumber} (${details.amountLabel}) to finance.`,
+            paragraphs: [
+                `Hi team,`,
+                `<strong>${mentor}</strong> has sent an invoice to finance and it’s ready to pay.`,
+                `<strong>Invoice:</strong> ${num}<br /><strong>Amount:</strong> ${amount}`,
+                `${link('Review and pay it in the admin payouts queue', details.payoutsUrl)}.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/**
+ * Post-payout remittance → mentor. Sent when an invoice is paid. The invoice and
+ * remittance-advice PDFs are ATTACHED to the email (no download link — raw signed
+ * storage URLs get flagged as unsafe by mail clients), with a safe portal link.
+ */
+export function paymentRemittanceMentor(
+    mentorName: string,
+    details: { invoiceNumber: string; amountLabel: string; periodLabel: string; portalUrl: string }
+): EmailTemplate {
+    const mName = escapeHtml(mentorName || 'there')
+    const num = escapeHtml(details.invoiceNumber || '')
+    const amount = escapeHtml(details.amountLabel || '')
+    const period = escapeHtml(details.periodLabel || '')
+    const detailLines = [
+        `<strong>Invoice:</strong> ${num}`,
+        `<strong>Amount:</strong> ${amount}`,
+        period ? `<strong>Period:</strong> ${period}` : '',
+    ].filter(Boolean).join('<br />')
+    return {
+        subject: `You’ve been paid ${details.amountLabel} | Access Oxbridge`,
+        html: layout({
+            title: 'Payment Confirmation',
+            preheader: `You’ve been paid ${details.amountLabel} for invoice ${details.invoiceNumber}.`,
+            paragraphs: [
+                `Dear ${mName},`,
+                `Great news - you’ve been paid for your recent mentoring sessions with Access Oxbridge.`,
+                detailLines,
+                `Your invoice and remittance advice are attached to this email for your records. You can also ${link('view your payments in the portal', details.portalUrl)}.`,
+                `If you have any questions about your payment, just reach out to the team on the portal.`,
             ],
             signOff: THANKS_SIGN_OFF,
         }),

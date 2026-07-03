@@ -17,11 +17,18 @@ export const EMAIL_SENDER_TEAM =
 export const EMAIL_SENDER_CLAIRE =
     process.env.RESEND_FROM_EMAIL_CLAIRE || 'Claire Marlowe <onboarding@resend.dev>'
 
+/** A file attachment. `content` is the file's bytes, base64-encoded. */
+export interface EmailAttachment {
+    filename: string
+    content: string
+}
+
 interface SendEmailArgs {
     from: string
     to: string
     subject: string
     html: string
+    attachments?: EmailAttachment[]
 }
 
 export async function sendEmail({
@@ -29,6 +36,7 @@ export async function sendEmail({
     to,
     subject,
     html,
+    attachments,
 }: SendEmailArgs): Promise<{ ok: boolean; error?: string }> {
     const key = process.env.RESEND_API_KEY
     if (!key) {
@@ -37,13 +45,16 @@ export async function sendEmail({
     }
 
     try {
+        const payload: Record<string, unknown> = { from, to, subject, html }
+        if (attachments && attachments.length > 0) payload.attachments = attachments
+
         const res = await fetch(RESEND_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${key}`,
             },
-            body: JSON.stringify({ from, to, subject, html }),
+            body: JSON.stringify(payload),
         })
 
         if (!res.ok) {

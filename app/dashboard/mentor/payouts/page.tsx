@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { formatPrice } from '@/utils/stripe'
 import { StripeDashboardButton } from '@/components/dashboard/stripe-dashboard-button'
 import ReportIssueForm from './report-issue-form'
+import InvoicingPanel from './invoicing-panel'
 
 export default async function MentorPayoutsPage() {
     const supabase = await createClient()
@@ -82,20 +83,6 @@ export default async function MentorPayoutsPage() {
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
         .gte('scheduled_at', startOfMonth.toISOString())
 
-    // Fortnightly payouts: next payout day is the next 1st or 15th of the month
-    const now = new Date()
-    const day = now.getDate()
-    const year = now.getFullYear()
-    const month = now.getMonth()
-    const nextPayoutDate = day < 15
-        ? new Date(year, month, 15)
-        : new Date(year, month + 1, 1)
-    const nextPayoutLabel = nextPayoutDate.toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    })
-
     return (
         <div className="space-y-12">
             <header>
@@ -107,12 +94,12 @@ export default async function MentorPayoutsPage() {
                 </p>
             </header>
 
-            {/* Pending Payments Banner */}
-            {totalPending > 0 && (
-                <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[24px] text-white shadow-xl">
+            {/* Earnings summary — single card: To Be Paid hero + key stats */}
+            <section className="bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
+                <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-blue-100 text-sm font-medium mb-1">Pending Payments</p>
+                            <p className="text-blue-100 text-sm font-medium mb-1">To Be Paid</p>
                             <p className="text-4xl font-bold">
                                 {formatPrice(totalPending)}
                             </p>
@@ -127,88 +114,40 @@ export default async function MentorPayoutsPage() {
                         </div>
                     </div>
                 </div>
-            )}
-
-            {/* Next payout date — highlighted pill, only when there is money to be paid */}
-            {totalPending > 0 && (
-                <div className="flex justify-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold shadow-sm border border-blue-100">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Next payout on {nextPayoutLabel}</span>
+                <div className="p-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">Total Paid</p>
+                        <p className="text-2xl font-bold text-green-600">{formatPrice(totalPaid)}</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                            {paidPayouts.length} completed payment{paidPayouts.length !== 1 ? 's' : ''}
+                        </p>
                     </div>
-                </div>
-            )}
-
-            {/* Payment Breakdown */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Total Paid</p>
-                            <p className="text-2xl font-bold text-green-600">{formatPrice(totalPaid)}</p>
-                        </div>
+                    <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">Hourly Rate</p>
+                        <p className="text-2xl font-bold text-accent">{formatPrice(hourlyRate)}</p>
                     </div>
-                    <p className="text-sm text-gray-500">
-                        {paidPayouts.length} completed payment{paidPayouts.length !== 1 ? 's' : ''}
-                    </p>
-                </div>
-
-                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                            <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">To Be Paid</p>
-                            <p className="text-2xl font-bold text-amber-600">{formatPrice(totalPending)}</p>
+                    <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">Sessions This Month</p>
+                        <p className="text-2xl font-bold text-accent">{sessionsThisMonth || 0}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">Payment Status</p>
+                        <div className="flex items-center gap-2 mt-2">
+                            {mentor?.payouts_enabled ? (
+                                <>
+                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <span className="text-lg font-semibold text-green-600">Connected</span>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                                    <span className="text-lg font-semibold text-amber-600">Setup Required</span>
+                                </>
+                            )}
                         </div>
                     </div>
-                    <p className="text-sm text-gray-500">
-                        {pendingPayouts.length} pending payment{pendingPayouts.length !== 1 ? 's' : ''}
-                    </p>
                 </div>
             </section>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Hourly Rate</p>
-                    <p className="text-3xl font-bold text-accent">
-                        {formatPrice(hourlyRate)}
-                    </p>
-                </div>
-                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Sessions This Month</p>
-                    <p className="text-3xl font-bold text-accent">
-                        {sessionsThisMonth || 0}
-                    </p>
-                </div>
-                <div className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Payment Status</p>
-                    <div className="flex items-center gap-2">
-                        {mentor?.payouts_enabled ? (
-                            <>
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                <span className="text-lg font-semibold text-green-600">Connected</span>
-                            </>
-                        ) : (
-                            <>
-                                <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                                <span className="text-lg font-semibold text-amber-600">Setup Required</span>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
 
             {/* Stripe Dashboard Link */}
             {mentor?.payouts_enabled && (
@@ -224,6 +163,9 @@ export default async function MentorPayoutsPage() {
                     </div>
                 </div>
             )}
+
+            {/* Invoicing (two-pane) */}
+            <InvoicingPanel mentorName={profile?.full_name || 'Mentor'} mentorEmail={user.email || ''} />
 
             {/* Payout History */}
             <section>

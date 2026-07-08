@@ -7,6 +7,7 @@ import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass,
 import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import { MentorSessionRequestCard } from './mentor-session-request-card'
 
 interface Session {
     id: string
@@ -26,6 +27,10 @@ interface PendingRequest {
     id: string
     created_at: string
     mentor_full_name: string
+    initiated_by?: 'student' | 'mentor'
+    proposed_start?: string | null
+    proposed_end?: string | null
+    note?: string | null
 }
 
 interface StudentSessionsContentProps {
@@ -247,8 +252,10 @@ export default function StudentSessionsContent({
         }
     }, [studentId])
 
+    const studentInitiatedPending = pendingRequests.filter(r => (r.initiated_by || 'student') === 'student')
+
     const handleCancelAllPending = async () => {
-        if (cancelling || pendingRequests.length === 0) return
+        if (cancelling || studentInitiatedPending.length === 0) return
         setCancelling(true)
         try {
             const res = await fetch('/api/student/pending-requests/cancel', { method: 'POST' })
@@ -367,7 +374,7 @@ export default function StudentSessionsContent({
                         )}
                     </button>
                 </div>
-                {activeTab === 'pending' && pendingRequests.length > 0 && (
+                {activeTab === 'pending' && studentInitiatedPending.length > 0 && (
                     <button
                         type="button"
                         onClick={handleCancelAllPending}
@@ -375,7 +382,7 @@ export default function StudentSessionsContent({
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-all disabled:opacity-50 disabled:pointer-events-none"
                     >
                         <XCircle className="w-4 h-4 shrink-0" />
-                        {cancelling ? 'Cancelling…' : 'Cancel all pending requests'}
+                        {cancelling ? 'Cancelling…' : 'Cancel my pending requests'}
                     </button>
                 )}
             </div>
@@ -418,32 +425,45 @@ export default function StudentSessionsContent({
                 ) : (
                     <div className="grid gap-4">
                         {pendingRequests.map((request) => (
-                            <div
-                                key={request.id}
-                                className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
-                            >
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
-                                            {request.mentor_full_name?.[0] || 'M'}
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                                Request sent to {request.mentor_full_name}
-                                            </h3>
-                                            <div className="flex items-center gap-3 text-sm text-gray-500">
-                                                <span className="flex items-center gap-1.5">
-                                                    <Calendar className="w-4 h-4" />
-                                                    {formatDate(request.created_at)}
-                                                </span>
+                            request.initiated_by === 'mentor' ? (
+                                <MentorSessionRequestCard
+                                    key={request.id}
+                                    request={{
+                                        id: request.id,
+                                        mentor_full_name: request.mentor_full_name,
+                                        proposed_start: request.proposed_start ?? null,
+                                        note: request.note ?? null,
+                                    }}
+                                    timezone={timezone}
+                                />
+                            ) : (
+                                <div
+                                    key={request.id}
+                                    className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
+                                >
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
+                                                {request.mentor_full_name?.[0] || 'M'}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                                    Request sent to {request.mentor_full_name}
+                                                </h3>
+                                                <div className="flex items-center gap-3 text-sm text-gray-500">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Calendar className="w-4 h-4" />
+                                                        {formatDate(request.created_at)}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold">
+                                            Awaiting Response
+                                        </span>
                                     </div>
-                                    <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold">
-                                        Awaiting Response
-                                    </span>
                                 </div>
-                            </div>
+                            )
                         ))}
                     </div>
                 )

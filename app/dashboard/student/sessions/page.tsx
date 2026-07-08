@@ -60,6 +60,8 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             id,
             created_at,
             status,
+            initiated_by,
+            responses,
             mentor:profiles!mentorship_requests_mentor_id_fkey (
                 full_name
             )
@@ -126,11 +128,18 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
     }))
 
     // Process pending requests
-    const processedPendingRequests = (pendingRequests || []).map((req: any) => ({
-        id: req.id,
-        created_at: req.created_at,
-        mentor_full_name: req.mentor?.full_name || 'Mentor'
-    }))
+    const processedPendingRequests = (pendingRequests || []).map((req: any) => {
+        const slot = req.responses?.timeSlots?.[0] || null
+        return {
+            id: req.id,
+            created_at: req.created_at,
+            mentor_full_name: req.mentor?.full_name || 'Mentor',
+            initiated_by: (req.initiated_by || 'student') as 'student' | 'mentor',
+            proposed_start: slot?.startTime || null,
+            proposed_end: slot?.endTime || null,
+            note: req.responses?.note || null,
+        }
+    })
 
     // Split into upcoming and past
     const upcomingSessions = processedSessions.filter(session => {

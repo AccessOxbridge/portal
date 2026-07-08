@@ -74,6 +74,51 @@ export default async function MentorSessionsPage() {
         has_report: reportSet.has(session.id)
     }))
 
+    // Pending requests this mentor has sent to students, awaiting their response.
+    const { data: pendingRequests } = await supabase
+        .from('mentorship_requests')
+        .select(`
+            id,
+            created_at,
+            responses,
+            student:profiles!mentorship_requests_student_id_fkey (
+                full_name
+            )
+        `)
+        .eq('mentor_id', user.id)
+        .eq('initiated_by', 'mentor')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+
+    const processedPendingRequests = (pendingRequests || []).map((req: any) => {
+        const slot = req.responses?.timeSlots?.[0] || null
+        return {
+            id: req.id,
+            created_at: req.created_at,
+            student_full_name: req.student?.full_name || 'Student',
+            proposed_start: slot?.startTime || null,
+            proposed_end: slot?.endTime || null,
+            note: req.responses?.note || null,
+        }
+    })
+
+    // Currently assigned students, for the "Request a Session" modal dropdown.
+    const { data: assignments } = await supabase
+        .from('student_mentor_assignments')
+        .select(`
+            student_id,
+            student:profiles!student_mentor_assignments_student_id_fkey (
+                full_name
+            )
+        `)
+        .eq('mentor_id', user.id)
+        .eq('is_current', true)
+
+    const assignedStudents = (assignments || []).map((a: any) => ({
+        id: a.student_id,
+        full_name: a.student?.full_name || 'Student',
+    }))
+
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
@@ -87,6 +132,8 @@ export default async function MentorSessionsPage() {
 
             <MentorSessionsContent
                 sessions={processedSessions}
+                pendingRequests={processedPendingRequests}
+                assignedStudents={assignedStudents}
                 mentorId={user.id}
                 timezone={timezone}
             />

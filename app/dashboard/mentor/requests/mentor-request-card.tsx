@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { handleMentorshipRequest } from './actions'
+import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { Info, AlertTriangle } from 'lucide-react'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 

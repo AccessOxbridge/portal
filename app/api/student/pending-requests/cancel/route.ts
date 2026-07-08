@@ -2,8 +2,10 @@ import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
 /**
- * POST: Cancel all pending mentorship requests for the current student.
- * Sets status to 'rejected' (student withdrew).
+ * POST: Cancel all pending mentorship requests *the student initiated* for
+ * the current student. Sets status to 'rejected' (student withdrew).
+ * Mentor-initiated pending requests are handled individually via
+ * Accept/Decline on their own card, not by this bulk-cancel action.
  */
 export async function POST() {
     try {
@@ -32,6 +34,7 @@ export async function POST() {
             .update({ status: 'rejected' })
             .eq('student_id', user.id)
             .eq('status', 'pending')
+            .eq('initiated_by', 'student')
             .select('id')
 
         if (error) {

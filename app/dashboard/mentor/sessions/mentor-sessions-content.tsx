@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare, Hourglass, XCircle, CalendarPlus } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 
 interface Session {
     id: string
@@ -18,24 +20,40 @@ interface Session {
     has_report: boolean
 }
 
+interface PendingRequest {
+    id: string
+    created_at: string
+    student_full_name: string
+    proposed_start: string | null
+    proposed_end: string | null
+    note: string | null
+}
+
 interface MentorSessionsContentProps {
     sessions: Session[]
+    pendingRequests?: PendingRequest[]
+    assignedStudents?: MentorRequestStudentOption[]
     mentorId: string
     timezone: string | null
 }
 
 export default function MentorSessionsContent({
     sessions,
+    pendingRequests = [],
+    assignedStudents = [],
     mentorId,
     timezone
 }: MentorSessionsContentProps) {
+    const router = useRouter()
     const [allSessions, setAllSessions] = useState<Session[]>(sessions)
     const [now, setNow] = useState<number>(() => Date.now())
-    const [activeTab, setActiveTab] = useState<'upcoming' | 'current' | 'past'>('upcoming')
+    const [activeTab, setActiveTab] = useState<'pending' | 'upcoming' | 'current' | 'past'>('upcoming')
     const [reportSessionId, setReportSessionId] = useState<string | null>(null)
     const [showReportSuccess, setShowReportSuccess] = useState(false)
     const [reportSubmitting, setReportSubmitting] = useState(false)
     const [reportError, setReportError] = useState<string | null>(null)
+    const [showRequestModal, setShowRequestModal] = useState(false)
+    const [cancellingId, setCancellingId] = useState<string | null>(null)
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
@@ -173,6 +191,30 @@ export default function MentorSessionsContent({
         }
     }, [mentorId])
 
+    const formatSlot = (start: string | null) => {
+        if (!start) return 'TBD'
+        return `${formatDateInTz(start, timezone)} at ${formatTimeInTz(start, timezone)}`
+    }
+
+    const handleCancelPending = async (requestId: string) => {
+        if (cancellingId) return
+        setCancellingId(requestId)
+        try {
+            const res = await fetch('/api/mentor/pending-requests/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requestId })
+            })
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(data.error || 'Failed to cancel request')
+            router.refresh()
+        } catch (e) {
+            alert(e instanceof Error ? e.message : 'Failed to cancel request')
+        } finally {
+            setCancellingId(null)
+        }
+    }
+
     const sessionsForTab = activeTab === 'current'
         ? currentSessions
         : activeTab === 'upcoming'
@@ -193,54 +235,148 @@ export default function MentorSessionsContent({
                     </button>
                 </div>
             )}
-            {/* Tab Switcher */}
-            <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+            {/* Tab Switcher + Request a Session */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+                    <button
+                        onClick={() => setActiveTab('pending')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
+                            ? 'bg-white text-amber-600 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Pending
+                        {pendingRequests.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full text-xs">
+                                {pendingRequests.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('upcoming')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Upcoming
+                        {upcomingSessions.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
+                                {upcomingSessions.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('current')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Current
+                        {currentSessions.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                                {currentSessions.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('past')}
+                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
+                            ? 'bg-white text-accent shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        Completed
+                        {pastSessions.length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                                {pastSessions.length}
+                            </span>
+                        )}
+                    </button>
+                </div>
                 <button
-                    onClick={() => setActiveTab('upcoming')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                    type="button"
+                    onClick={() => setShowRequestModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20"
                 >
-                    Upcoming
-                    {upcomingSessions.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
-                            {upcomingSessions.length}
-                        </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => setActiveTab('current')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Current
-                    {currentSessions.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
-                            {currentSessions.length}
-                        </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => setActiveTab('past')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                        ? 'bg-white text-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    Completed
-                    {pastSessions.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
-                            {pastSessions.length}
-                        </span>
-                    )}
+                    <CalendarPlus className="w-4 h-4" />
+                    Request a Session
                 </button>
             </div>
 
+            {/* Pending Requests Tab (sent by this mentor, awaiting student response) */}
+            {activeTab === 'pending' && (
+                pendingRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                            <Hourglass className="w-10 h-10 text-gray-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            No pending requests
+                        </h3>
+                        <p className="text-gray-500 max-w-sm">
+                            When you request a session with a student, it will appear here until they respond.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setShowRequestModal(true)}
+                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                        >
+                            Request a Session
+                            <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid gap-4">
+                        {pendingRequests.map((request) => (
+                            <div
+                                key={request.id}
+                                className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
+                            >
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
+                                            {request.student_full_name?.[0] || 'S'}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                                Request sent to {request.student_full_name}
+                                            </h3>
+                                            <div className="flex items-center gap-3 text-sm text-gray-500">
+                                                <span className="flex items-center gap-1.5">
+                                                    <Calendar className="w-4 h-4" />
+                                                    Proposed: {formatSlot(request.proposed_start)}
+                                                </span>
+                                            </div>
+                                            {request.note && (
+                                                <p className="mt-2 text-sm text-gray-600 italic">&ldquo;{request.note}&rdquo;</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold whitespace-nowrap">
+                                            Awaiting Response
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCancelPending(request.id)}
+                                            disabled={cancellingId === request.id}
+                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
+                                        >
+                                            <XCircle className="w-3.5 h-3.5" />
+                                            {cancellingId === request.id ? 'Cancelling…' : 'Cancel request'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )
+            )}
+
             {/* Sessions List */}
-            {sessionsForTab.length === 0 ? (
+            {activeTab !== 'pending' && (sessionsForTab.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
                         <Calendar className="w-10 h-10 text-gray-400" />
@@ -375,7 +511,15 @@ export default function MentorSessionsContent({
                         </div>
                     ))}
                 </div>
-            )}
+            ))}
+
+            <MentorRequestSessionModal
+                isOpen={showRequestModal}
+                onClose={() => setShowRequestModal(false)}
+                students={assignedStudents}
+                mentorTimezone={timezone}
+            />
+
             {reportSessionId && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center">
                     <div

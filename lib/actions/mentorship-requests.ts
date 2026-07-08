@@ -13,6 +13,19 @@ interface TimeSlot {
     endTime: string   // "15:00"
 }
 
+/**
+ * Accept or reject a mentorship_requests row, regardless of who initiated it.
+ *
+ * A request can be created by either party:
+ *   - `initiated_by: 'student'` (default) — the student proposes time slots,
+ *     the mentor picks one and accepts/rejects. `selectedSlot` is required.
+ *   - `initiated_by: 'mentor'` — the mentor proposes a single fixed time, the
+ *     student just accepts/rejects it. `selectedSlot` can be omitted; it is
+ *     derived from the single stored slot in `responses.timeSlots[0]`.
+ *
+ * Whichever party did NOT initiate the request is the "responder" who is
+ * authorized to accept/reject it.
+ */
 export async function handleMentorshipRequest(
     requestId: string,
     action: 'accept' | 'reject',
@@ -26,46 +39,49 @@ export async function handleMentorshipRequest(
 
     if (!user) throw new Error('Unauthorized')
 
+    // 0. Fetch the request up front so we know who is allowed to respond.
+    const { data: request, error: fetchError } = await supabase
+        .from('mentorship_requests')
+        .select('*')
+        .eq('id', requestId)
+        .single()
+
+    if (fetchError || !request) throw new Error('Request not found')
+
+    const initiatedByMentor = request.initiated_by === 'mentor'
+    const responderField = initiatedByMentor ? 'student_id' : 'mentor_id'
+
+    if (request[responderField] !== user.id) {
+        throw new Error('Unauthorized')
+    }
+
     if (action === 'reject') {
         const { error } = await supabase
             .from('mentorship_requests')
             .update({ status: 'rejected' })
             .eq('id', requestId)
-            .eq('mentor_id', user.id)
 
         if (error) throw error
     } else {
-        // ACCEPT logic - requires selectedSlot
-        if (!selectedSlot) {
+        // ACCEPT logic - requires a slot, either passed explicitly (student
+        // picking from the mentor's proposed options) or derived from the
+        // single slot the mentor proposed (mentor-initiated requests).
+        const responses = (request.responses || {}) as { timeSlots?: TimeSlot[] }
+        const effectiveSlot = selectedSlot ?? responses.timeSlots?.[0]
+
+        if (!effectiveSlot) {
             throw new Error('A time slot must be selected when accepting a request')
         }
 
-        // 1. Get the request details
-        const { data: request, error: fetchError } = await supabase
-            .from('mentorship_requests')
-            .select('*')
-            .eq('id', requestId)
-            .single()
-
-        if (fetchError || !request) throw new Error('Request not found')
-
-        // 2. Check if already accepted or expired (24h)
-        // const createdAt = new Date(request.created_at || Date.now()).getTime()
-        // const now = new Date().getTime()
-        // if (now - createdAt > 24 * 60 * 60 * 1000) {
-        //     await supabase.from('mentorship_requests').update({ status: 'expired' }).eq('id', requestId)
-        //     throw new Error('Request has expired (24h window passed)')
-        // }
-
-        // 3. Parse the selected slot to create a scheduled datetime
-        // The client now sends UTC ISO strings for startTime and endTime
-        const scheduledAt = new Date(selectedSlot.startTime)
-        const endAt = new Date(selectedSlot.endTime)
+        // 1. Parse the selected slot to create a scheduled datetime.
+        // The client sends UTC ISO strings for startTime and endTime.
+        const scheduledAt = new Date(effectiveSlot.startTime)
+        const endAt = new Date(effectiveSlot.endTime)
 
         // Calculate duration in minutes using Date objects
         const durationMinutes = Math.round((endAt.getTime() - scheduledAt.getTime()) / (60 * 1000))
 
-        // 4. Get both profiles for the meeting and emails
+        // 2. Get both profiles for the meeting and emails
         const { data: studentProfile } = await supabase
             .from('profiles')
             .select('full_name, email')
@@ -94,7 +110,7 @@ export async function handleMentorshipRequest(
             .maybeSingle()
         const mentorTz = (mentorTzRow as { timezone?: string | null } | null)?.timezone ?? null
 
-        // 5. Create Zoom meeting
+        // 3. Create Zoom meeting
         let zoomMeeting: { id: string; joinUrl: string; startUrl: string } | null = null
         try {
             zoomMeeting = await createZoomMeeting({
@@ -107,7 +123,7 @@ export async function handleMentorshipRequest(
             // Continue without Zoom if it fails - we can add manually later
         }
 
-        // 6. Create session with Zoom details
+        // 4. Create session with Zoom details
         const { error: sessionError } = await supabase
             .from('sessions')
             .insert({
@@ -117,7 +133,7 @@ export async function handleMentorshipRequest(
                 status: 'active',
                 scheduled_at: scheduledAt.toISOString(),
                 duration_minutes: durationMinutes > 0 ? durationMinutes : 60,
-                selected_slot: JSON.parse(JSON.stringify(selectedSlot)),
+                selected_slot: JSON.parse(JSON.stringify(effectiveSlot)),
                 zoom_meeting_id: zoomMeeting?.id || null,
                 zoom_join_url: zoomMeeting?.joinUrl || null,
                 zoom_start_url: zoomMeeting?.startUrl || null,
@@ -125,20 +141,20 @@ export async function handleMentorshipRequest(
 
         if (sessionError) throw sessionError
 
-        // 7. Update request status
+        // 5. Update request status
         await supabase
             .from('mentorship_requests')
             .update({ status: 'accepted' })
             .eq('id', requestId)
 
-        // 8. Reject other pending requests for this student (since they found a match)
+        // 6. Reject other pending requests for this student (since they found a match)
         await supabase
             .from('mentorship_requests')
             .update({ status: 'rejected' })
             .eq('student_id', request.student_id)
             .eq('status', 'pending')
 
-        // 9. Send email/in-app notifications to both parties via notifications table.
+        // 7. Send email/in-app notifications to both parties via notifications table.
         //    Each recipient sees the time in their own timezone (with label).
         const dateOpts: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' }
         const studentDate = formatDateInTz(scheduledAt, studentTz, dateOpts)
@@ -149,14 +165,16 @@ export async function handleMentorshipRequest(
         const mentorTime = formatTimeInTz(scheduledAt, mentorTz, { withZone: true })
         const mentorTimeDisplay = `${mentorDate} at ${mentorTime}`
 
-        // Notification for student
+        // Notification for student — wording works regardless of who booked.
         if (studentProfile?.email) {
             await supabase.from('notifications').insert({
                 recipient_id: request.student_id,
                 recipient_email: studentProfile.email,
                 type: 'match_accepted' as const,
-                title: 'Mentorship Request Accepted!',
-                message: `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your request. Your session is scheduled for ${studentTimeDisplay}.`,
+                title: 'Session Confirmed!',
+                message: initiatedByMentor
+                    ? `Your session with ${mentorProfile?.full_name || 'your mentor'} is confirmed for ${studentTimeDisplay}.`
+                    : `Great news! ${mentorProfile?.full_name || 'A mentor'} has accepted your request. Your session is scheduled for ${studentTimeDisplay}.`,
                 data: {
                     mentor_id: request.mentor_id,
                     mentor_name: mentorProfile?.full_name || 'Mentor',
@@ -174,7 +192,9 @@ export async function handleMentorshipRequest(
                 recipient_email: mentorProfile.email,
                 type: 'session_confirmed' as const,
                 title: 'Session Confirmed!',
-                message: `You have successfully scheduled a session with ${studentProfile?.full_name || 'your student'} for ${mentorTimeDisplay}.`,
+                message: initiatedByMentor
+                    ? `${studentProfile?.full_name || 'Your student'} has accepted your session request. Your session is scheduled for ${mentorTimeDisplay}.`
+                    : `You have successfully scheduled a session with ${studentProfile?.full_name || 'your student'} for ${mentorTimeDisplay}.`,
                 data: {
                     student_id: request.student_id,
                     student_name: studentProfile?.full_name || 'Student',
@@ -185,8 +205,8 @@ export async function handleMentorshipRequest(
             })
         }
 
-        // 10. Branded "session confirmed" emails to both parties. Email failures
-        //     must not roll back the confirmed session.
+        // 8. Branded "session confirmed" emails to both parties. Email failures
+        //    must not roll back the confirmed session.
         try {
             const zoomLink = zoomMeeting?.joinUrl || null
 
@@ -225,6 +245,7 @@ export async function handleMentorshipRequest(
     revalidatePath('/dashboard/mentor/requests')
     revalidatePath('/dashboard/mentor')
     revalidatePath('/dashboard/mentor/sessions')
+    revalidatePath('/dashboard/mentor/students')
     revalidatePath('/dashboard/student')
     revalidatePath('/dashboard/student/sessions')
 }

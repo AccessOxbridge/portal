@@ -671,6 +671,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          initiated_by: string
           mentor_id: string
           responses: Json
           status: string
@@ -680,6 +681,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          initiated_by?: string
           mentor_id: string
           responses: Json
           status?: string
@@ -689,6 +691,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          initiated_by?: string
           mentor_id?: string
           responses?: Json
           status?: string
@@ -1236,6 +1239,7 @@ export type Database = {
       | "system_alert"
       | "session_confirmed"
       | "session_reminder"
+      | "mentor_session_request"
       user_role: "student" | "mentor" | "admin" | "client" | "admin-dev"
     }
     CompositeTypes: {
@@ -1385,6 +1389,7 @@ export const Constants = {
         "system_alert",
         "session_confirmed",
         "session_reminder",
+        "mentor_session_request",
       ],
       user_role: ["student", "mentor", "admin", "client", "admin-dev"],
     },

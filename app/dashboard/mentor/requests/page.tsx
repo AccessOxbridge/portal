@@ -21,6 +21,7 @@ export default async function MentorRequestsPage() {
         `)
         .eq('mentor_id', user.id)
         .eq('status', 'pending')
+        .eq('initiated_by', 'student')
         .order('created_at', { ascending: false })
 
     return (

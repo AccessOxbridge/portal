@@ -12,10 +12,12 @@ import {
     Target,
     Mail,
     MessageCircle,
+    CalendarPlus,
     CheckCircle2,
     AlertCircle,
 } from 'lucide-react'
 import { formatDateInTz } from '@/lib/timezone'
+import MentorRequestSessionModal from '@/components/dashboard/mentor-request-session-modal'
 
 export interface StudentMetric {
     id: string
@@ -62,6 +64,7 @@ function fmtDate(iso: string | null, tz: string | null) {
 export default function MentorStudentsContent({ students, summary, timezone }: Props) {
     const [query, setQuery] = useState('')
     const [sort, setSort] = useState<SortKey>('recent')
+    const [requestStudentId, setRequestStudentId] = useState<string | null>(null)
 
     const visible = useMemo(() => {
         const q = query.trim().toLowerCase()
@@ -257,13 +260,23 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                     <span className="text-xs text-gray-400">
                                         Assigned {fmtDate(s.assigned_at, timezone)}
                                     </span>
-                                    <Link
-                                        href="/dashboard/mentor/messages"
-                                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:translate-x-0.5 transition-transform"
-                                    >
-                                        <MessageCircle className="w-4 h-4" />
-                                        Message
-                                    </Link>
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setRequestStudentId(s.id)}
+                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:translate-x-0.5 transition-transform"
+                                        >
+                                            <CalendarPlus className="w-4 h-4" />
+                                            Request session
+                                        </button>
+                                        <Link
+                                            href="/dashboard/mentor/messages"
+                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:translate-x-0.5 transition-transform"
+                                        >
+                                            <MessageCircle className="w-4 h-4" />
+                                            Message
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -276,6 +289,14 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                     )}
                 </>
             )}
+
+            <MentorRequestSessionModal
+                isOpen={!!requestStudentId}
+                onClose={() => setRequestStudentId(null)}
+                students={students.map((s) => ({ id: s.id, full_name: s.full_name }))}
+                preselectedStudentId={requestStudentId || undefined}
+                mentorTimezone={timezone}
+            />
         </div>
     )
 }

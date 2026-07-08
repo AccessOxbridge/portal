@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
 import ManageSessionsTable from './manage-sessions-table'
+import AdminBookSessionModal from './admin-book-session-modal'
 
 export default async function AdminManageSessionsPage() {
     const supabase = await createClient()
@@ -71,16 +72,52 @@ export default async function AdminManageSessionsPage() {
         mentorId: s.mentor_id as string,
     }))
 
+    const { data: assignments } = await adminSupabase
+        .from('student_mentor_assignments')
+        .select(`
+            student_id,
+            mentor_id,
+            student:profiles!student_mentor_assignments_student_id_fkey ( full_name ),
+            mentor:profiles!student_mentor_assignments_mentor_id_fkey ( full_name )
+        `)
+        .eq('is_current', true)
+
+    const mentorIds = Array.from(new Set((assignments || []).map((a: any) => a.mentor_id as string)))
+
+    const { data: mentorTzRows } = mentorIds.length
+        ? await adminSupabase
+            .from('mentors')
+            .select('id, timezone')
+            .in('id', mentorIds)
+        : { data: [] as { id: string; timezone: string | null }[] }
+
+    const mentorTzById = new Map(
+        (mentorTzRows || []).map((m: any) => [m.id as string, m.timezone as string | null])
+    )
+
+    const assignedPairs = (assignments || [])
+        .filter((a: any) => a.student?.full_name && a.mentor?.full_name)
+        .map((a: any) => ({
+            studentId: a.student_id as string,
+            studentName: a.student.full_name as string,
+            mentorId: a.mentor_id as string,
+            mentorName: a.mentor.full_name as string,
+            mentorTimezone: mentorTzById.get(a.mentor_id as string) ?? null,
+        }))
+
     return (
         <div className="max-w-6xl mx-auto">
-            <header className="mb-8">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Manage Sessions
-                </h1>
-                <p className="mt-3 text-gray-500 text-lg">
-                    View all mentorship sessions and manually reassign mentors when needed.
-                    Students remain fixed; you can only change the assigned mentor.
-                </p>
+            <header className="mb-8 flex items-start justify-between gap-6 flex-wrap">
+                <div>
+                    <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                        Manage Sessions
+                    </h1>
+                    <p className="mt-3 text-gray-500 text-lg">
+                        View all mentorship sessions and manually reassign mentors when needed.
+                        Students remain fixed; you can only change the assigned mentor.
+                    </p>
+                </div>
+                <AdminBookSessionModal assignedPairs={assignedPairs} />
             </header>
 
             <ManageSessionsTable sessions={tableSessions} mentors={mentorOptions} />

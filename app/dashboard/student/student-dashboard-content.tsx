@@ -37,7 +37,7 @@ interface StudentDashboardContentProps {
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
     academicProfile: AcademicProfile | null
-    hasMentor?: boolean
+    hasMentors?: boolean
     userId: string
     userName: string
     greetingName: string
@@ -51,7 +51,7 @@ export default function StudentDashboardContent({
     pendingRequests,
     upcomingSessions,
     academicProfile,
-    hasMentor = false,
+    hasMentors = false,
     userId,
     userName,
     greetingName,
@@ -79,8 +79,8 @@ export default function StudentDashboardContent({
         academicProfile?.subjects &&
         academicProfile.subjects.length > 0
 
-    // Booking also requires an admin-assigned mentor.
-    const canBook = !!profileComplete && hasMentor
+    // Booking also requires at least one admin-assigned mentor.
+    const canBook = !!profileComplete && hasMentors
 
     return (
         <>
@@ -162,7 +162,7 @@ export default function StudentDashboardContent({
                                     </div>
                                     <div className="min-w-0">
                                         <h3 className="text-base font-bold text-gray-900 truncate">Request Pending</h3>
-                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to your assigned mentor. We'll notify you once they confirm a time!</p>
+                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to your mentor. We'll notify you once they confirm a time!</p>
                                     </div>
                                 </div>
 

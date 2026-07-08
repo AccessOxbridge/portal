@@ -134,12 +134,12 @@ export default function MyMentorsContent({
                         <Users className="w-10 h-10 text-gray-400" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {effectiveTab === 'active' ? 'No mentor assigned yet' : 'No past mentors'}
+                        {effectiveTab === 'active' ? 'No mentors assigned yet' : 'No past mentors'}
                     </h3>
                     <p className="text-gray-500 max-w-sm">
                         {effectiveTab === 'active'
-                            ? 'The Access Oxbridge team will assign your mentor shortly. Once assigned, they will appear here and you can book a session.'
-                            : 'If your mentor is ever changed, your previous mentors will appear here.'}
+                            ? 'The Access Oxbridge team will assign your mentor(s) shortly. Once assigned, they will appear here and you can book a session.'
+                            : 'If a mentor is ever unassigned, they will appear here.'}
                     </p>
                 </div>
             ) : (

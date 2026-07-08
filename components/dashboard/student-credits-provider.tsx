@@ -44,6 +44,8 @@ interface StudentCreditsProviderProps {
      */
     bookingProfile?: StudentBookingProfile | null
     canBook?: boolean
+    /** The student's currently assigned mentors, for the booking modal's mentor picker. */
+    mentors?: { id: string; name: string }[]
 }
 
 export default function StudentCreditsProvider({
@@ -51,6 +53,7 @@ export default function StudentCreditsProvider({
     initialCredits = 0,
     bookingProfile = null,
     canBook = false,
+    mentors = [],
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
@@ -127,6 +130,7 @@ export default function StudentCreditsProvider({
                     isOpen={bookingOpen}
                     onClose={() => setBookingOpen(false)}
                     studentProfile={bookingProfile}
+                    mentors={mentors}
                 />
             )}
         </StudentCreditsContext.Provider>

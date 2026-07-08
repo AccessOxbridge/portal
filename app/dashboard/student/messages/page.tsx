@@ -28,15 +28,14 @@ export default async function StudentMessagesPage({
         return redirect('/dashboard')
     }
 
-    // 1. Current assigned mentor (if any)
-    const { data: assignment } = await supabase
+    // 1. Current assigned mentors (if any)
+    const { data: assignments } = await supabase
         .from('student_mentor_assignments')
         .select('mentor_id')
         .eq('student_id', user.id)
         .eq('is_current', true)
-        .maybeSingle()
 
-    const assignedMentorId = assignment?.mentor_id || null
+    const assignedMentorIds = [...new Set((assignments || []).map((a: any) => a.mentor_id as string).filter(Boolean))]
 
     // 2. Ensure the Help & Support conversation exists (student <-> admin).
     const { data: existingSupport } = await supabase
@@ -62,22 +61,26 @@ export default async function StudentMessagesPage({
         })
     }
 
-    // 3. Ensure the assigned-mentor conversation exists.
-    if (assignedMentorId) {
-        const { data: existingMentorConv } = await supabase
+    // 3. Ensure a mentor conversation exists for each currently assigned mentor.
+    if (assignedMentorIds.length > 0) {
+        const { data: existingMentorConvs } = await supabase
             .from('conversations')
-            .select('id')
+            .select('mentor_id')
             .eq('student_id', user.id)
-            .eq('mentor_id', assignedMentorId)
             .eq('type', 'mentor')
-            .maybeSingle()
+            .in('mentor_id', assignedMentorIds)
 
-        if (!existingMentorConv) {
-            await supabase.from('conversations').insert({
-                student_id: user.id,
-                mentor_id: assignedMentorId,
-                type: 'mentor',
-            })
+        const existingMentorIds = new Set((existingMentorConvs || []).map((c: any) => c.mentor_id))
+        const missingMentorIds = assignedMentorIds.filter((id) => !existingMentorIds.has(id))
+
+        if (missingMentorIds.length > 0) {
+            await supabase.from('conversations').insert(
+                missingMentorIds.map((mentorId) => ({
+                    student_id: user.id,
+                    mentor_id: mentorId,
+                    type: 'mentor',
+                }))
+            )
         }
     }
 

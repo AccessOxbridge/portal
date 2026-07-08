@@ -35,7 +35,7 @@ export default function AdminStudentsPage() {
     const supabase = createClient()
     const [students, setStudents] = useState<Student[]>([])
     const [mentors, setMentors] = useState<MentorOption[]>([])
-    const [assignments, setAssignments] = useState<Record<string, string>>({})
+    const [assignments, setAssignments] = useState<Record<string, string[]>>({})
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [page, setPage] = useState(1)
@@ -63,9 +63,10 @@ export default function AdminStudentsPage() {
             .select('student_id, mentor_id')
             .eq('is_current', true)
 
-        const map: Record<string, string> = {}
+        const map: Record<string, string[]> = {}
         ;(assignmentRows || []).forEach((row: any) => {
-            map[row.student_id] = row.mentor_id
+            if (!map[row.student_id]) map[row.student_id] = []
+            map[row.student_id].push(row.mentor_id)
         })
         setAssignments(map)
     }
@@ -206,7 +207,7 @@ export default function AdminStudentsPage() {
                                             <td className="px-6 py-4">
                                                 <MentorAssignCell
                                                     studentId={student.id}
-                                                    currentMentorId={assignments[student.id] || null}
+                                                    currentMentorIds={assignments[student.id] || []}
                                                     mentors={mentors}
                                                     onSaved={() => fetchMentorsAndAssignments()}
                                                 />

@@ -79,7 +79,7 @@ const navigation = {
         { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
         { name: 'Recordings', href: '/dashboard/student/recordings', icon: Film },
         { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
-        { name: 'My Mentor', href: '/dashboard/student/mentors', icon: Users },
+        { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
         { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
         // Hidden from student sidebar view
         // { name: 'Resources', href: '/dashboard/student/resources', icon: Book },

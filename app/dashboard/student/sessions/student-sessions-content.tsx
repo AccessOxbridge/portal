@@ -38,7 +38,7 @@ interface StudentSessionsContentProps {
     pendingRequests: PendingRequest[]
     credits: number
     canBook?: boolean
-    hasMentor?: boolean
+    hasMentors?: boolean
     autoOpenBooking?: boolean
     studentId: string
     timezone?: string | null
@@ -49,15 +49,15 @@ export default function StudentSessionsContent({
     pendingRequests,
     credits,
     canBook = false,
-    hasMentor = false,
+    hasMentors = false,
     autoOpenBooking = false,
     studentId,
     timezone = null
 }: StudentSessionsContentProps) {
     const router = useRouter()
     // Booking is only possible once the profile is complete AND an admin has
-    // assigned a mentor to this student.
-    const bookingReady = canBook && hasMentor
+    // assigned at least one mentor to this student.
+    const bookingReady = canBook && hasMentors
     const { tryOpenBookSession, openCreditsRequest } = useStudentCredits()
     const [allSessions, setAllSessions] = useState<Session[]>(sessions)
     const [now, setNow] = useState<number>(() => Date.now())

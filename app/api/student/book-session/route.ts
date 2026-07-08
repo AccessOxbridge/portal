@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
         const body = await req.json()
         const {
+            mentorId: requestedMentorId,
             schoolName,
             schoolCountry,
             curriculum,
@@ -39,22 +40,37 @@ export async function POST(req: Request) {
             )
         }
 
-        // Find the student's current assigned mentor.
-        const { data: assignment } = await supabase
+        // Find the student's current assigned mentors.
+        const { data: assignments } = await supabase
             .from('student_mentor_assignments')
             .select('mentor_id')
             .eq('student_id', user.id)
             .eq('is_current', true)
-            .maybeSingle()
 
-        if (!assignment?.mentor_id) {
+        const assignedMentorIds = (assignments || []).map((a: any) => a.mentor_id)
+
+        if (assignedMentorIds.length === 0) {
             return NextResponse.json(
                 { error: 'You do not have a mentor assigned yet. Your mentor will be assigned by the Access Oxbridge team.' },
                 { status: 400 }
             )
         }
 
-        const mentorId = assignment.mentor_id
+        if (!requestedMentorId || typeof requestedMentorId !== 'string') {
+            return NextResponse.json(
+                { error: 'Please select which mentor to book this session with.' },
+                { status: 400 }
+            )
+        }
+
+        if (!assignedMentorIds.includes(requestedMentorId)) {
+            return NextResponse.json(
+                { error: 'That mentor is not currently assigned to you.' },
+                { status: 400 }
+            )
+        }
+
+        const mentorId = requestedMentorId
 
         // Avoid stacking duplicate pending requests with the same mentor.
         const { data: existingPending } = await supabase

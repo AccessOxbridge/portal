@@ -30,19 +30,24 @@ export default async function MyMentorsPage() {
         .eq('student_id', user.id)
         .order('created_at', { ascending: false })
 
-    const currentAssignment = (assignments || []).find((a: any) => a.is_current) || null
-    const currentMentorId = currentAssignment?.mentor_id || null
-
-    // Past mentors = distinct previously-assigned mentors that are not the current one.
-    const pastMentorIds = [
+    const currentMentorIds = [
         ...new Set(
             (assignments || [])
-                .filter((a: any) => !a.is_current && a.mentor_id && a.mentor_id !== currentMentorId)
+                .filter((a: any) => a.is_current && a.mentor_id)
                 .map((a: any) => a.mentor_id as string)
         ),
     ]
 
-    const allMentorIds = [...new Set([currentMentorId, ...pastMentorIds].filter(Boolean) as string[])]
+    // Past mentors = distinct previously-assigned mentors that are not currently assigned.
+    const pastMentorIds = [
+        ...new Set(
+            (assignments || [])
+                .filter((a: any) => !a.is_current && a.mentor_id && !currentMentorIds.includes(a.mentor_id))
+                .map((a: any) => a.mentor_id as string)
+        ),
+    ]
+
+    const allMentorIds = [...new Set([...currentMentorIds, ...pastMentorIds])]
 
     // Mentor profile details
     const { data: mentorDetails } = allMentorIds.length > 0
@@ -100,17 +105,17 @@ export default async function MyMentorsPage() {
         }
     }
 
-    const activeMentors = currentMentorId ? [buildMentor(currentMentorId)] : []
+    const activeMentors = currentMentorIds.map(buildMentor)
     const pastMentors = pastMentorIds.map(buildMentor)
 
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
                 <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    My Mentor
+                    My Mentors
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
-                    Your assigned mentor and your mentorship history
+                    Your assigned mentors and your mentorship history
                 </p>
             </header>
 

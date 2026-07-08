@@ -90,15 +90,14 @@ export default async function StudentDashboard() {
         .eq('id', user.id)
         .single()
 
-    // Current assigned mentor (booking requires one)
-    const { data: currentAssignment } = await supabase
+    // Current assigned mentors (booking requires at least one)
+    const { data: currentAssignments } = await supabase
         .from('student_mentor_assignments')
         .select('mentor_id')
         .eq('student_id', user.id)
         .eq('is_current', true)
-        .maybeSingle()
 
-    const hasMentor = !!currentAssignment?.mentor_id
+    const hasMentors = (currentAssignments || []).length > 0
 
     // Count sessions booked this week (Mon–Sun)
     const weekStart = new Date()
@@ -129,7 +128,7 @@ export default async function StudentDashboard() {
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
             academicProfile={academicProfile as any}
-            hasMentor={hasMentor}
+            hasMentors={hasMentors}
             userId={user.id}
             userName={greetingName}
             greetingName={greetingName}

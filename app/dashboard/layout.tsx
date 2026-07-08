@@ -206,6 +206,7 @@ export default async function DashboardLayout({
     // sessions page: a complete profile AND an admin-assigned mentor.
     let bookingProfile: StudentBookingProfile | null = null
     let canBook = false
+    let bookingMentors: { id: string; name: string }[] = []
     if (isStudent) {
         const { data: academicProfile } = await supabase
             .from('student_profiles')
@@ -213,14 +214,17 @@ export default async function DashboardLayout({
             .eq('id', user.id)
             .single()
 
-        const { data: currentAssignment } = await supabase
+        const { data: currentAssignments } = await supabase
             .from('student_mentor_assignments')
-            .select('mentor_id')
+            .select('mentor_id, mentor:profiles!student_mentor_assignments_mentor_id_fkey (full_name)')
             .eq('student_id', user.id)
             .eq('is_current', true)
-            .maybeSingle()
 
-        const hasMentor = !!currentAssignment?.mentor_id
+        bookingMentors = (currentAssignments || []).map((a: any) => ({
+            id: a.mentor_id,
+            name: a.mentor?.full_name || 'Mentor',
+        }))
+        const hasMentors = bookingMentors.length > 0
         const profileComplete = !!(
             academicProfile?.is_complete &&
             academicProfile?.school_name &&
@@ -228,7 +232,7 @@ export default async function DashboardLayout({
             Array.isArray(academicProfile?.subjects) &&
             academicProfile.subjects.length > 0
         )
-        canBook = profileComplete && hasMentor
+        canBook = profileComplete && hasMentors
 
         if (academicProfile) {
             bookingProfile = {
@@ -282,6 +286,7 @@ export default async function DashboardLayout({
                 initialCredits={(profile as any).credits ?? 0}
                 bookingProfile={canBook ? bookingProfile : null}
                 canBook={canBook}
+                mentors={bookingMentors}
             >
                 {dashboardShell}
             </StudentCreditsProvider>

@@ -28,13 +28,16 @@ interface BookSessionModalProps {
     isOpen: boolean
     onClose: () => void
     studentProfile: StudentBookingProfile
+    /** The student's currently assigned mentors. When there's more than one, the student picks who to book with. */
+    mentors: { id: string; name: string }[]
 }
 
-export default function BookSessionModal({ isOpen, onClose, studentProfile }: BookSessionModalProps) {
+export default function BookSessionModal({ isOpen, onClose, studentProfile, mentors }: BookSessionModalProps) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+    const [mentorId, setMentorId] = useState<string>(mentors.length === 1 ? mentors[0].id : '')
     // All wall-clock times in this modal are interpreted in the student's
     // timezone (not the browser's), so the label and the saved times agree.
     const tz = resolveTz(studentProfile.timezone)
@@ -48,8 +51,9 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
             setNewSlot({ date: getZonedNow(tz).date, startTime: '', endTime: '' })
             setError(null)
             setLoading(false)
+            setMentorId(mentors.length === 1 ? mentors[0].id : '')
         }
-    }, [isOpen, tz])
+    }, [isOpen, tz, mentors])
 
     // When startTime changes, always default endTime to +60 minutes (1 hr)
     useEffect(() => {
@@ -169,6 +173,11 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
     }
 
     const handleSubmit = async () => {
+        if (mentors.length > 1 && !mentorId) {
+            setError('Please choose which mentor to book this session with')
+            return
+        }
+
         if (timeSlots.length < 3) {
             setError('Please add at least 3 time slots so your mentor can pick one that works')
             return
@@ -182,6 +191,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    mentorId: mentorId || mentors[0]?.id,
                     schoolName: studentProfile.school_name,
                     schoolCountry: studentProfile.school_country,
                     curriculum: studentProfile.curriculum,
@@ -256,7 +266,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-700 leading-relaxed">
-                                        Add at least <strong>3 time slots</strong> when you're available. Your assigned mentor will confirm one that works for them.
+                                        Add at least <strong>3 time slots</strong> when you're available. Your mentor will confirm one that works for them.
                                     </p>
                                     <p className="text-xs text-gray-500 mt-1">
                                         Timezone: <strong>{tz}</strong>
@@ -264,6 +274,25 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                                 </div>
                             </div>
                         </div>
+
+                        {/* Mentor picker (only needed when the student has more than one mentor) */}
+                        {mentors.length > 1 && (
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Book with</label>
+                                <select
+                                    value={mentorId}
+                                    onChange={(e) => setMentorId(e.target.value)}
+                                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                >
+                                    <option value="">Select a mentor</option>
+                                    {mentors.map((mentor) => (
+                                        <option key={mentor.id} value={mentor.id}>
+                                            {mentor.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         {/* Existing slots */}
                         {timeSlots.length > 0 && (
@@ -408,7 +437,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile }: Bo
                     </button>
                     <button
                         onClick={handleSubmit}
-                        disabled={loading || timeSlots.length < 3}
+                        disabled={loading || timeSlots.length < 3 || (mentors.length > 1 && !mentorId)}
                         className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                     >
                         {loading ? (

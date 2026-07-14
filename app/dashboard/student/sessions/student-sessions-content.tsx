@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X } from 'lucide-react'
+import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X, CalendarClock } from 'lucide-react'
 import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import { MentorSessionRequestCard } from './mentor-session-request-card'
+import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
 
 interface Session {
     id: string
@@ -31,11 +32,14 @@ interface PendingRequest {
     proposed_start?: string | null
     proposed_end?: string | null
     note?: string | null
+    reschedule_of_session_id?: string | null
+    original_scheduled_at?: string | null
 }
 
 interface StudentSessionsContentProps {
     sessions: Session[]
     pendingRequests: PendingRequest[]
+    reschedulePendingSessionIds?: string[]
     credits: number
     canBook?: boolean
     hasMentors?: boolean
@@ -47,6 +51,7 @@ interface StudentSessionsContentProps {
 export default function StudentSessionsContent({
     sessions,
     pendingRequests,
+    reschedulePendingSessionIds = [],
     credits,
     canBook = false,
     hasMentors = false,
@@ -103,6 +108,12 @@ export default function StudentSessionsContent({
     const [showReportSuccess, setShowReportSuccess] = useState(false)
     const [reportSubmitting, setReportSubmitting] = useState(false)
     const [reportError, setReportError] = useState<string | null>(null)
+    const [rescheduleSession, setRescheduleSession] = useState<Session | null>(null)
+
+    const pendingRescheduleSet = useMemo(
+        () => new Set(reschedulePendingSessionIds),
+        [reschedulePendingSessionIds]
+    )
 
     // The booking modal is mounted globally by StudentCreditsProvider so the
     // sidebar CTA works on every page. When deep-linked here with ?book=1,
@@ -433,6 +444,8 @@ export default function StudentSessionsContent({
                                         mentor_full_name: request.mentor_full_name,
                                         proposed_start: request.proposed_start ?? null,
                                         note: request.note ?? null,
+                                        is_reschedule: !!request.reschedule_of_session_id,
+                                        original_scheduled_at: request.original_scheduled_at ?? null,
                                     }}
                                     timezone={timezone}
                                 />
@@ -448,14 +461,23 @@ export default function StudentSessionsContent({
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                                    Request sent to {request.mentor_full_name}
+                                                    {request.reschedule_of_session_id
+                                                        ? `Reschedule pending with ${request.mentor_full_name}`
+                                                        : `Request sent to ${request.mentor_full_name}`}
                                                 </h3>
-                                                <div className="flex items-center gap-3 text-sm text-gray-500">
+                                                <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
                                                     <span className="flex items-center gap-1.5">
                                                         <Calendar className="w-4 h-4" />
-                                                        {formatDate(request.created_at)}
+                                                        {request.proposed_start
+                                                            ? `${formatDate(request.proposed_start)} at ${formatTime(request.proposed_start)}`
+                                                            : formatDate(request.created_at)}
                                                     </span>
                                                 </div>
+                                                {request.reschedule_of_session_id && request.original_scheduled_at && (
+                                                    <p className="mt-1 text-xs text-gray-400">
+                                                        Current session: {formatDate(request.original_scheduled_at)} at {formatTime(request.original_scheduled_at)}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold">
@@ -550,7 +572,7 @@ export default function StudentSessionsContent({
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-wrap justify-end">
                                         {activeTab === 'upcoming' || activeTab === 'current' ? (
                                             <>
                                                 {session.zoom_join_url ? (
@@ -581,6 +603,16 @@ export default function StudentSessionsContent({
                                                     <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
                                                         Zoom link coming soon
                                                     </span>
+                                                )}
+                                                {activeTab === 'upcoming' && !pendingRescheduleSet.has(session.id) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setRescheduleSession(session)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                                    >
+                                                        <CalendarClock className="w-4 h-4" />
+                                                        Reschedule
+                                                    </button>
                                                 )}
                                                 {activeTab === 'current' && (
                                                     <button
@@ -734,6 +766,15 @@ export default function StudentSessionsContent({
                     </div>
                 </div>
             )}
+
+            <RescheduleSessionModal
+                isOpen={!!rescheduleSession}
+                onClose={() => setRescheduleSession(null)}
+                sessionId={rescheduleSession?.id || ''}
+                counterpartName={rescheduleSession?.mentor_full_name || 'your mentor'}
+                currentScheduledAt={rescheduleSession?.scheduled_at ?? null}
+                timezone={timezone}
+            />
         </div>
     )
 }

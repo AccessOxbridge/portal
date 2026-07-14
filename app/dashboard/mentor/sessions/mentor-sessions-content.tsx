@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare, Hourglass, XCircle, CalendarPlus } from 'lucide-react'
+import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare, Hourglass, XCircle, CalendarPlus, CalendarClock } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
+import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
 
 interface Session {
     id: string
@@ -27,11 +28,14 @@ interface PendingRequest {
     proposed_start: string | null
     proposed_end: string | null
     note: string | null
+    reschedule_of_session_id?: string | null
+    original_scheduled_at?: string | null
 }
 
 interface MentorSessionsContentProps {
     sessions: Session[]
     pendingRequests?: PendingRequest[]
+    reschedulePendingSessionIds?: string[]
     assignedStudents?: MentorRequestStudentOption[]
     mentorId: string
     timezone: string | null
@@ -40,6 +44,7 @@ interface MentorSessionsContentProps {
 export default function MentorSessionsContent({
     sessions,
     pendingRequests = [],
+    reschedulePendingSessionIds = [],
     assignedStudents = [],
     mentorId,
     timezone
@@ -54,6 +59,12 @@ export default function MentorSessionsContent({
     const [reportError, setReportError] = useState<string | null>(null)
     const [showRequestModal, setShowRequestModal] = useState(false)
     const [cancellingId, setCancellingId] = useState<string | null>(null)
+    const [rescheduleSession, setRescheduleSession] = useState<Session | null>(null)
+
+    const pendingRescheduleSet = useMemo(
+        () => new Set(reschedulePendingSessionIds),
+        [reschedulePendingSessionIds]
+    )
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'TBD'
@@ -341,7 +352,9 @@ export default function MentorSessionsContent({
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                                Request sent to {request.student_full_name}
+                                                {request.reschedule_of_session_id
+                                                    ? `Reschedule pending with ${request.student_full_name}`
+                                                    : `Request sent to ${request.student_full_name}`}
                                             </h3>
                                             <div className="flex items-center gap-3 text-sm text-gray-500">
                                                 <span className="flex items-center gap-1.5">
@@ -349,6 +362,11 @@ export default function MentorSessionsContent({
                                                     Proposed: {formatSlot(request.proposed_start)}
                                                 </span>
                                             </div>
+                                            {request.reschedule_of_session_id && request.original_scheduled_at && (
+                                                <p className="mt-1 text-xs text-gray-400">
+                                                    Current session: {formatSlot(request.original_scheduled_at)}
+                                                </p>
+                                            )}
                                             {request.note && (
                                                 <p className="mt-2 text-sm text-gray-600 italic">&ldquo;{request.note}&rdquo;</p>
                                             )}
@@ -443,7 +461,7 @@ export default function MentorSessionsContent({
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap justify-end">
                                     {activeTab === 'upcoming' || activeTab === 'current' ? (
                                         <>
                                             {session.zoom_start_url ? (
@@ -476,6 +494,16 @@ export default function MentorSessionsContent({
                                                 <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
                                                     Zoom link coming soon
                                                 </span>
+                                            )}
+                                            {activeTab === 'upcoming' && !pendingRescheduleSet.has(session.id) && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setRescheduleSession(session)}
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <CalendarClock className="w-4 h-4" />
+                                                    Reschedule
+                                                </button>
                                             )}
                                             {activeTab === 'current' && (
                                                 <button
@@ -518,6 +546,15 @@ export default function MentorSessionsContent({
                 onClose={() => setShowRequestModal(false)}
                 students={assignedStudents}
                 mentorTimezone={timezone}
+            />
+
+            <RescheduleSessionModal
+                isOpen={!!rescheduleSession}
+                onClose={() => setRescheduleSession(null)}
+                sessionId={rescheduleSession?.id || ''}
+                counterpartName={rescheduleSession?.student_full_name || 'your student'}
+                currentScheduledAt={rescheduleSession?.scheduled_at ?? null}
+                timezone={timezone}
             />
 
             {reportSessionId && (

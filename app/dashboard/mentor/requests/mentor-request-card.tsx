@@ -19,6 +19,7 @@ interface Subject {
 interface Request {
     id: string
     created_at: string
+    reschedule_of_session_id?: string | null
     responses: {
         subjects?: (string | Subject)[]
         timezone?: string
@@ -31,6 +32,8 @@ interface Request {
         extracurriculars?: string
         academicInterests?: string
         targetUniversities?: string[]
+        note?: string
+        original_scheduled_at?: string
     }
     student: {
         full_name: string
@@ -43,6 +46,8 @@ export function MentorRequestCard({ request }: { request: Request }) {
     const [showRejectDialog, setShowRejectDialog] = useState(false)
     const [loading, setLoading] = useState(false)
 
+    const isReschedule = !!request.reschedule_of_session_id
+
     const formatSlotDisplay = (slot: TimeSlot) => {
         // The student proposed these slots in their own timezone — show them in
         // that timezone (with label) so the mentor reads them unambiguously.
@@ -54,14 +59,15 @@ export function MentorRequestCard({ request }: { request: Request }) {
         return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
     }
 
-    const handleAccept = async () => {
-        if (!selectedSlot) return
+    const handleAccept = async (slot?: TimeSlot) => {
+        const effective = slot ?? selectedSlot ?? request.responses?.timeSlots?.[0]
+        if (!effective) return
         setLoading(true)
         try {
-            await handleMentorshipRequest(request.id, 'accept', selectedSlot)
+            await handleMentorshipRequest(request.id, 'accept', effective)
         } catch (error) {
             console.error('Failed to accept:', error)
-            alert('Failed to accept request. Please try again.')
+            alert(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -80,22 +86,96 @@ export function MentorRequestCard({ request }: { request: Request }) {
         }
     }
 
-    // // Calculate time remaining
-    // const getTimeRemaining = () => {
-    //     const created = new Date(request.created_at).getTime()
-    //     const now = Date.now()
-    //     const expiry = created + 24 * 60 * 60 * 1000
-    //     const remaining = expiry - now
-
-    //     if (remaining <= 0) return 'Expired'
-
-    //     const hours = Math.floor(remaining / (60 * 60 * 1000))
-    //     const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000))
-    //     return `${hours}h ${minutes}m`
-    // }
-
     const timeSlots = request.responses?.timeSlots || []
     const responses = request.responses || {}
+    const originalDisplay = responses.original_scheduled_at
+        ? formatDateInTz(responses.original_scheduled_at, responses.timezone || null) +
+          ' at ' +
+          formatTimeInTz(responses.original_scheduled_at, responses.timezone || null)
+        : null
+
+    if (isReschedule) {
+        const proposed = timeSlots[0]
+        return (
+            <div className="bg-white rounded-[32px] border border-amber-200 shadow-xl shadow-amber-100/40 overflow-hidden p-10">
+                <div className="flex items-start justify-between gap-6 flex-wrap">
+                    <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner shrink-0">
+                            {request.student?.full_name?.charAt(0) || 'S'}
+                        </div>
+                        <div>
+                            <span className="text-xs font-bold text-amber-700 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full">
+                                Reschedule Request
+                            </span>
+                            <h3 className="text-2xl font-black text-gray-900 mt-3">{request.student?.full_name}</h3>
+                            <p className="text-sm text-gray-500 mt-2">
+                                Proposed new time:{' '}
+                                <strong className="text-gray-800">
+                                    {proposed ? formatSlotDisplay(proposed) : 'TBD'}
+                                </strong>
+                            </p>
+                            {originalDisplay && (
+                                <p className="text-xs text-gray-400 mt-1">Current session: {originalDisplay}</p>
+                            )}
+                            {responses.note && (
+                                <p className="mt-3 text-sm text-gray-600 italic">&ldquo;{responses.note}&rdquo;</p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setShowRejectDialog(true)}
+                            disabled={loading}
+                            className="px-5 py-3 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-bold hover:bg-red-100 transition-colors disabled:opacity-50"
+                        >
+                            Decline
+                        </button>
+                        <button
+                            onClick={() => handleAccept(proposed)}
+                            disabled={loading || !proposed}
+                            className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50"
+                        >
+                            {loading ? 'Confirming…' : 'Accept New Time'}
+                        </button>
+                    </div>
+                </div>
+
+                {showRejectDialog && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                            onClick={() => !loading && setShowRejectDialog(false)}
+                        />
+                        <div className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden p-10">
+                            <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center text-red-600 mb-8 mx-auto shadow-inner">
+                                <AlertTriangle className="w-10 h-10" />
+                            </div>
+                            <h3 className="text-2xl font-black text-gray-900 text-center mb-3">Decline Reschedule?</h3>
+                            <p className="text-gray-500 text-center mb-10 font-medium leading-relaxed">
+                                The original session with <span className="text-gray-900 font-bold">{request.student?.full_name}</span> will remain booked.
+                            </p>
+                            <div className="flex flex-col gap-4">
+                                <button
+                                    onClick={handleReject}
+                                    disabled={loading}
+                                    className="w-full py-5 bg-red-600 text-white font-black rounded-2xl hover:bg-red-700 transition-all disabled:opacity-50"
+                                >
+                                    {loading ? 'Declining...' : 'Yes, Decline'}
+                                </button>
+                                <button
+                                    onClick={() => setShowRejectDialog(false)}
+                                    disabled={loading}
+                                    className="w-full py-3 text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        )
+    }
 
     return (
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
@@ -241,7 +321,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                         </div>
 
                         <button
-                            onClick={handleAccept}
+                            onClick={() => handleAccept()}
                             disabled={!selectedSlot || loading}
                             className="w-full py-4 bg-green-600 text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                         >

@@ -81,6 +81,7 @@ export default async function MentorSessionsPage() {
             id,
             created_at,
             responses,
+            reschedule_of_session_id,
             student:profiles!mentorship_requests_student_id_fkey (
                 full_name
             )
@@ -89,6 +90,15 @@ export default async function MentorSessionsPage() {
         .eq('initiated_by', 'mentor')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
+
+    // Also load student-initiated pending reschedules targeting this mentor
+    // so we can hide Reschedule on those sessions.
+    const { data: incomingReschedules } = await supabase
+        .from('mentorship_requests')
+        .select('reschedule_of_session_id')
+        .eq('mentor_id', user.id)
+        .eq('status', 'pending')
+        .not('reschedule_of_session_id', 'is', null)
 
     const processedPendingRequests = (pendingRequests || []).map((req: any) => {
         const slot = req.responses?.timeSlots?.[0] || null
@@ -99,8 +109,15 @@ export default async function MentorSessionsPage() {
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,
             note: req.responses?.note || null,
+            reschedule_of_session_id: req.reschedule_of_session_id || null,
+            original_scheduled_at: req.responses?.original_scheduled_at || null,
         }
     })
+
+    const reschedulePendingSessionIds = [
+        ...processedPendingRequests.map((r) => r.reschedule_of_session_id),
+        ...(incomingReschedules || []).map((r) => r.reschedule_of_session_id),
+    ].filter((id): id is string => !!id)
 
     // Currently assigned students, for the "Request a Session" modal dropdown.
     const { data: assignments } = await supabase
@@ -133,6 +150,7 @@ export default async function MentorSessionsPage() {
             <MentorSessionsContent
                 sessions={processedSessions}
                 pendingRequests={processedPendingRequests}
+                reschedulePendingSessionIds={reschedulePendingSessionIds}
                 assignedStudents={assignedStudents}
                 mentorId={user.id}
                 timezone={timezone}

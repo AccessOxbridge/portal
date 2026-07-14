@@ -12,6 +12,8 @@ interface Props {
         mentor_full_name: string
         proposed_start: string | null
         note: string | null
+        is_reschedule?: boolean
+        original_scheduled_at?: string | null
     }
     timezone?: string | null
 }
@@ -24,6 +26,10 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
     const formattedTime = request.proposed_start
         ? `${formatDateInTz(request.proposed_start, timezone)} at ${formatTimeInTz(request.proposed_start, timezone)}`
         : 'Time TBD'
+
+    const originalTime = request.original_scheduled_at
+        ? `${formatDateInTz(request.original_scheduled_at, timezone)} at ${formatTimeInTz(request.original_scheduled_at, timezone)}`
+        : null
 
     const handleAccept = async () => {
         setLoading('accept')
@@ -60,14 +66,21 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 mb-1">
-                            {request.mentor_full_name} requested a session
+                            {request.is_reschedule
+                                ? `${request.mentor_full_name} wants to reschedule`
+                                : `${request.mentor_full_name} requested a session`}
                         </h3>
                         <div className="flex items-center gap-3 text-sm text-gray-500">
                             <span className="flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4" />
-                                {formattedTime}
+                                {request.is_reschedule ? `New time: ${formattedTime}` : formattedTime}
                             </span>
                         </div>
+                        {request.is_reschedule && originalTime && (
+                            <p className="mt-1 text-xs text-gray-400">
+                                Current session: {originalTime}
+                            </p>
+                        )}
                         {request.note && (
                             <p className="mt-2 text-sm text-gray-600 italic">&ldquo;{request.note}&rdquo;</p>
                         )}

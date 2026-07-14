@@ -61,6 +61,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             status,
             initiated_by,
             responses,
+            reschedule_of_session_id,
             mentor:profiles!mentorship_requests_mentor_id_fkey (
                 full_name
             )
@@ -137,8 +138,14 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,
             note: req.responses?.note || null,
+            reschedule_of_session_id: req.reschedule_of_session_id || null,
+            original_scheduled_at: req.responses?.original_scheduled_at || null,
         }
     })
+
+    const reschedulePendingSessionIds = processedPendingRequests
+        .map((r) => r.reschedule_of_session_id)
+        .filter((id): id is string => !!id)
 
     // Split into upcoming and past
     const upcomingSessions = processedSessions.filter(session => {
@@ -194,6 +201,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             <StudentSessionsContent
                 sessions={processedSessions}
                 pendingRequests={processedPendingRequests}
+                reschedulePendingSessionIds={reschedulePendingSessionIds}
                 credits={profile?.credits || 0}
                 canBook={canBook}
                 hasMentors={hasMentors}

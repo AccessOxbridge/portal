@@ -376,6 +376,190 @@ export function sessionConfirmedMentor(
     }
 }
 
+interface RescheduleSlotDetails {
+    originalDate: string
+    originalTime: string
+    proposedDate: string
+    proposedTime: string
+}
+
+function rescheduleProposalParagraph(details: RescheduleSlotDetails): string {
+    return [
+        `<strong>Current session:</strong> ${escapeHtml(details.originalDate)} at ${escapeHtml(details.originalTime)}`,
+        `<strong>Proposed new time:</strong> ${escapeHtml(details.proposedDate)} at ${escapeHtml(details.proposedTime)}`,
+    ].join('<br />')
+}
+
+/** Reschedule proposed → student. */
+export function sessionRescheduleRequestedStudent(
+    studentName: string,
+    mentorName: string,
+    details: RescheduleSlotDetails,
+    initiatedBy: 'student' | 'mentor'
+): EmailTemplate {
+    const sName = escapeHtml(studentName || 'there')
+    const mName = escapeHtml(mentorName || 'your mentor')
+    const body =
+        initiatedBy === 'mentor'
+            ? `${mName} has requested to reschedule your upcoming session. Please review the proposed time in your Pending sessions and accept or decline.`
+            : `We've sent your reschedule request to ${mName}. Your current session remains booked until they respond.`
+    return {
+        subject: 'Session Reschedule Request | Access Oxbridge',
+        html: layout({
+            title: 'Session Reschedule Request',
+            preheader:
+                initiatedBy === 'mentor'
+                    ? `${mentorName || 'Your mentor'} has proposed a new time for your session.`
+                    : `Your reschedule request has been sent to ${mentorName || 'your mentor'}.`,
+            paragraphs: [
+                `Dear ${sName},`,
+                body,
+                rescheduleProposalParagraph(details),
+                `${link('Log in to the portal', LOGIN_URL)} to manage your sessions.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/** Reschedule proposed → mentor. */
+export function sessionRescheduleRequestedMentor(
+    mentorName: string,
+    studentName: string,
+    details: RescheduleSlotDetails,
+    initiatedBy: 'student' | 'mentor'
+): EmailTemplate {
+    const mName = escapeHtml(mentorName || 'there')
+    const sName = escapeHtml(studentName || 'your student')
+    const body =
+        initiatedBy === 'student'
+            ? `${sName} has requested to reschedule your upcoming session. Please review the proposed time and accept or decline.`
+            : `We've sent your reschedule request to ${sName}. Your current session remains booked until they respond.`
+    return {
+        subject: 'Session Reschedule Request | Access Oxbridge',
+        html: layout({
+            title: 'Session Reschedule Request',
+            preheader:
+                initiatedBy === 'student'
+                    ? `${studentName || 'Your student'} has proposed a new time for your session.`
+                    : `Your reschedule request has been sent to ${studentName || 'your student'}.`,
+            paragraphs: [
+                `Dear ${mName},`,
+                body,
+                rescheduleProposalParagraph(details),
+                `${link('Log in to the portal', LOGIN_URL)} to manage your sessions.`,
+            ],
+            signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}
+
+/** Reschedule accepted → student. */
+export function sessionRescheduleAcceptedStudent(
+    studentName: string,
+    mentorName: string,
+    details: SessionDetails
+): EmailTemplate {
+    const sName = escapeHtml(studentName || 'there')
+    const mName = escapeHtml(mentorName || 'your mentor')
+    return {
+        subject: 'Session Rescheduled | Access Oxbridge',
+        html: layout({
+            title: 'Session Rescheduled',
+            preheader: `Your session with ${mentorName || 'your mentor'} has been moved to a new time.`,
+            paragraphs: [
+                `Dear ${sName},`,
+                `Your session with ${mName} has been successfully rescheduled. The previous booking has been cancelled.`,
+                sessionDetailsParagraph(details),
+                `${link('Log in to the portal', LOGIN_URL)} anytime to manage your upcoming sessions.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/** Reschedule accepted → mentor. */
+export function sessionRescheduleAcceptedMentor(
+    mentorName: string,
+    studentName: string,
+    details: SessionDetails
+): EmailTemplate {
+    const mName = escapeHtml(mentorName || 'there')
+    const sName = escapeHtml(studentName || 'your student')
+    return {
+        subject: 'Session Rescheduled | Access Oxbridge',
+        html: layout({
+            title: 'Session Rescheduled',
+            preheader: `Your session with ${studentName || 'your student'} has been moved to a new time.`,
+            paragraphs: [
+                `Dear ${mName},`,
+                `Your session with ${sName} has been successfully rescheduled. The previous booking has been cancelled.`,
+                sessionDetailsParagraph(details),
+                `If anything changes, you can manage sessions via ${link('the portal', LOGIN_URL)}.`,
+            ],
+            signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}
+
+/** Reschedule declined / withdrawn → student. */
+export function sessionRescheduleDeclinedStudent(
+    studentName: string,
+    mentorName: string,
+    originalDate: string,
+    originalTime: string,
+    withdrawnByProposer: boolean
+): EmailTemplate {
+    const sName = escapeHtml(studentName || 'there')
+    const mName = escapeHtml(mentorName || 'your mentor')
+    const body = withdrawnByProposer
+        ? `The reschedule request for your session with ${mName} has been withdrawn. Your original session still stands.`
+        : `The reschedule request for your session with ${mName} was declined. Your original session still stands.`
+    return {
+        subject: 'Reschedule Update | Access Oxbridge',
+        html: layout({
+            title: 'Reschedule Update',
+            preheader: 'Your original session time is unchanged.',
+            paragraphs: [
+                `Dear ${sName},`,
+                body,
+                `<strong>Original session:</strong> ${escapeHtml(originalDate)} at ${escapeHtml(originalTime)}`,
+                `${link('Log in to the portal', LOGIN_URL)} to view your upcoming sessions.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/** Reschedule declined / withdrawn → mentor. */
+export function sessionRescheduleDeclinedMentor(
+    mentorName: string,
+    studentName: string,
+    originalDate: string,
+    originalTime: string,
+    withdrawnByProposer: boolean
+): EmailTemplate {
+    const mName = escapeHtml(mentorName || 'there')
+    const sName = escapeHtml(studentName || 'your student')
+    const body = withdrawnByProposer
+        ? `The reschedule request for your session with ${sName} has been withdrawn. Your original session still stands.`
+        : `The reschedule request for your session with ${sName} was declined. Your original session still stands.`
+    return {
+        subject: 'Reschedule Update | Access Oxbridge',
+        html: layout({
+            title: 'Reschedule Update',
+            preheader: 'Your original session time is unchanged.',
+            paragraphs: [
+                `Dear ${mName},`,
+                body,
+                `<strong>Original session:</strong> ${escapeHtml(originalDate)} at ${escapeHtml(originalTime)}`,
+                `${link('Log in to the portal', LOGIN_URL)} to view your upcoming sessions.`,
+            ],
+            signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}
+
 /** Inactivity nudge → student (no session for a while). */
 export function sessionInactivityStudent(studentName: string, mentorName: string): EmailTemplate {
     const sName = escapeHtml(studentName || 'there')

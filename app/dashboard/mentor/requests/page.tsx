@@ -30,7 +30,9 @@ export default async function MentorRequestsPage() {
                 <h1 className="text-5xl font-extrabold text-accent tracking-tight">
                     Mentorship Requests
                 </h1>
-                <p className="mt-4 text-gray-500 text-xl font-medium">Review and accept incoming requests from students.</p>
+                <p className="mt-4 text-gray-500 text-xl font-medium">
+                    Review and accept incoming session and reschedule requests from students.
+                </p>
             </header>
 
             {!requests || requests.length === 0 ? (

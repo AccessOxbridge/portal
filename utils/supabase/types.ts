@@ -673,6 +673,7 @@ export type Database = {
           id: string
           initiated_by: string
           mentor_id: string
+          reschedule_of_session_id: string | null
           responses: Json
           status: string
           student_id: string
@@ -683,6 +684,7 @@ export type Database = {
           id?: string
           initiated_by?: string
           mentor_id: string
+          reschedule_of_session_id?: string | null
           responses: Json
           status?: string
           student_id: string
@@ -693,6 +695,7 @@ export type Database = {
           id?: string
           initiated_by?: string
           mentor_id?: string
+          reschedule_of_session_id?: string | null
           responses?: Json
           status?: string
           student_id?: string
@@ -704,6 +707,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_requests_reschedule_of_session_id_fkey"
+            columns: ["reschedule_of_session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
           {
@@ -1240,6 +1250,9 @@ export type Database = {
       | "session_confirmed"
       | "session_reminder"
       | "mentor_session_request"
+      | "session_reschedule_request"
+      | "session_reschedule_accepted"
+      | "session_reschedule_declined"
       user_role: "student" | "mentor" | "admin" | "client" | "admin-dev"
     }
     CompositeTypes: {
@@ -1390,6 +1403,9 @@ export const Constants = {
         "session_confirmed",
         "session_reminder",
         "mentor_session_request",
+        "session_reschedule_request",
+        "session_reschedule_accepted",
+        "session_reschedule_declined",
       ],
       user_role: ["student", "mentor", "admin", "client", "admin-dev"],
     },

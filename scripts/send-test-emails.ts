@@ -32,7 +32,6 @@ const MENTOR = 'Dr. Sarah Bennett'
 const SESSION = {
     date: 'Monday, 23 June 2026',
     time: '4:00 pm – 5:00 pm (BST)',
-    zoomLink: 'https://zoom.us/j/1234567890',
 }
 
 const previews: { key: string; template: EmailTemplate }[] = [
@@ -45,8 +44,8 @@ const previews: { key: string; template: EmailTemplate }[] = [
     { key: 'sessionConfirmedMentor', template: sessionConfirmedMentor(MENTOR, STUDENT, SESSION) },
     { key: 'sessionInactivityStudent', template: sessionInactivityStudent(STUDENT, MENTOR) },
     { key: 'sessionInactivityMentor', template: sessionInactivityMentor(MENTOR, STUDENT) },
-    { key: 'sessionReminderStudent', template: sessionReminderStudent(STUDENT, MENTOR, '14:00 BST', 'https://zoom.us/j/1234567890') },
-    { key: 'sessionReminderMentor', template: sessionReminderMentor(MENTOR, STUDENT, '14:00 BST', 'https://app.accessoxbridge.io/api/sessions/demo/start') },
+    { key: 'sessionReminderStudent', template: sessionReminderStudent(STUDENT, MENTOR, '14:00 BST') },
+    { key: 'sessionReminderMentor', template: sessionReminderMentor(MENTOR, STUDENT, '14:00 BST') },
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))

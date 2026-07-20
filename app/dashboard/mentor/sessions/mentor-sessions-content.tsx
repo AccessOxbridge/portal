@@ -464,7 +464,7 @@ export default function MentorSessionsContent({
                                 <div className="flex items-center gap-2 flex-wrap justify-end">
                                     {activeTab === 'upcoming' || activeTab === 'current' ? (
                                         <>
-                                            {session.zoom_start_url ? (
+                                            {session.zoom_meeting_id || session.zoom_start_url ? (
                                                 <a
                                                     href={`/api/sessions/${session.id}/start`}
                                                     target="_blank"
@@ -476,19 +476,6 @@ export default function MentorSessionsContent({
                                                 >
                                                     <Video className="w-4 h-4" />
                                                     Start Session
-                                                </a>
-                                            ) : session.zoom_join_url ? (
-                                                <a
-                                                    href={session.zoom_join_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
-                                                        ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                        : 'bg-accent text-white hover:scale-[1.02]'
-                                                        }`}
-                                                >
-                                                    <Video className="w-4 h-4" />
-                                                    Join Session
                                                 </a>
                                             ) : (
                                                 <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">

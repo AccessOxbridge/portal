@@ -188,7 +188,8 @@ export async function handleMentorshipRequest(
             console.error('Failed to create Zoom meeting:', zoomError)
         }
 
-        const { error: sessionError } = await supabase
+        const admin = createAdminClient()
+        const { data: createdSession, error: sessionError } = await admin
             .from('sessions')
             .insert({
                 student_id: request.student_id,
@@ -202,6 +203,8 @@ export async function handleMentorshipRequest(
                 zoom_join_url: zoomMeeting?.joinUrl || null,
                 zoom_start_url: zoomMeeting?.startUrl || null,
             })
+            .select('id')
+            .single()
 
         if (sessionError) throw sessionError
 
@@ -241,8 +244,8 @@ export async function handleMentorshipRequest(
                         mentor_id: request.mentor_id,
                         mentor_name: mentorProfile?.full_name || 'Mentor',
                         request_id: request.id,
+                        session_id: createdSession?.id || null,
                         scheduled_at: scheduledAt.toISOString(),
-                        zoom_join_url: zoomMeeting?.joinUrl || null,
                     },
                 })
             }
@@ -258,20 +261,18 @@ export async function handleMentorshipRequest(
                         student_id: request.student_id,
                         student_name: studentProfile?.full_name || 'Student',
                         request_id: request.id,
+                        session_id: createdSession?.id || null,
                         scheduled_at: scheduledAt.toISOString(),
-                        zoom_join_url: zoomMeeting?.joinUrl || null,
                     },
                 })
             }
 
             try {
-                const zoomLink = zoomMeeting?.joinUrl || null
-
                 if (studentProfile?.email) {
                     const tpl = sessionRescheduleAcceptedStudent(
                         studentProfile.full_name || '',
                         mentorProfile?.full_name || '',
-                        { date: studentDate, time: studentTime, zoomLink }
+                        { date: studentDate, time: studentTime }
                     )
                     await sendEmail({
                         from: EMAIL_SENDER_TEAM,
@@ -285,7 +286,7 @@ export async function handleMentorshipRequest(
                     const tpl = sessionRescheduleAcceptedMentor(
                         mentorProfile.full_name || '',
                         studentProfile?.full_name || '',
-                        { date: mentorDate, time: mentorTime, zoomLink }
+                        { date: mentorDate, time: mentorTime }
                     )
                     await sendEmail({
                         from: EMAIL_SENDER_TEAM,
@@ -311,8 +312,8 @@ export async function handleMentorshipRequest(
                         mentor_id: request.mentor_id,
                         mentor_name: mentorProfile?.full_name || 'Mentor',
                         request_id: request.id,
+                        session_id: createdSession?.id || null,
                         scheduled_at: scheduledAt.toISOString(),
-                        zoom_join_url: zoomMeeting?.joinUrl || null,
                     },
                 })
             }
@@ -330,20 +331,18 @@ export async function handleMentorshipRequest(
                         student_id: request.student_id,
                         student_name: studentProfile?.full_name || 'Student',
                         request_id: request.id,
+                        session_id: createdSession?.id || null,
                         scheduled_at: scheduledAt.toISOString(),
-                        zoom_join_url: zoomMeeting?.joinUrl || null,
                     },
                 })
             }
 
             try {
-                const zoomLink = zoomMeeting?.joinUrl || null
-
                 if (studentProfile?.email) {
                     const tpl = sessionConfirmedStudent(
                         studentProfile.full_name || '',
                         mentorProfile?.full_name || '',
-                        { date: studentDate, time: studentTime, zoomLink }
+                        { date: studentDate, time: studentTime }
                     )
                     await sendEmail({
                         from: EMAIL_SENDER_TEAM,
@@ -357,7 +356,7 @@ export async function handleMentorshipRequest(
                     const tpl = sessionConfirmedMentor(
                         mentorProfile.full_name || '',
                         studentProfile?.full_name || '',
-                        { date: mentorDate, time: mentorTime, zoomLink }
+                        { date: mentorDate, time: mentorTime }
                     )
                     await sendEmail({
                         from: EMAIL_SENDER_TEAM,

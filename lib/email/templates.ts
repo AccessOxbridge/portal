@@ -317,14 +317,10 @@ export function firstSessionFollowup(studentName: string, mentorName: string): E
 interface SessionDetails {
     date: string
     time: string
-    zoomLink: string | null
 }
 
-function sessionDetailsParagraph({ date, time, zoomLink }: SessionDetails): string {
-    const zoom = zoomLink
-        ? link('Join Zoom Meeting', zoomLink)
-        : 'Will be shared on the portal before your session'
-    return `<strong>Date:</strong> ${escapeHtml(date)}<br /><strong>Time:</strong> ${escapeHtml(time)}<br /><strong>Zoom link:</strong> ${zoom}`
+function sessionDetailsParagraph({ date, time }: SessionDetails): string {
+    return `<strong>Date:</strong> ${escapeHtml(date)}<br /><strong>Time:</strong> ${escapeHtml(time)}`
 }
 
 /** Session booked → student. */
@@ -345,6 +341,7 @@ export function sessionConfirmedStudent(
                 `Great news! Your next session with ${mName} is confirmed.`,
                 sessionDetailsParagraph(details),
                 `We’d recommend having any materials, questions, or topics you want to cover ready ahead of time so you get the most out of it.`,
+                `When it’s time, ${link('open your sessions in the portal', `${APP_URL}/dashboard/student/sessions`)} to join. Zoom links are only available there.`,
                 `${link('Log in to the portal', LOGIN_URL)} anytime to message ${mName} or manage your upcoming sessions.`,
             ],
             signOff: TEAM_SIGN_OFF,
@@ -369,6 +366,7 @@ export function sessionConfirmedMentor(
                 `Dear ${mName},`,
                 `This is a confirmation that your upcoming session with ${sName} is booked in.`,
                 sessionDetailsParagraph(details),
+                `When it’s time, ${link('open your sessions in the portal', `${APP_URL}/dashboard/mentor/sessions`)} and use <strong>Start Session</strong> so you join Zoom as host.`,
                 `If anything changes or you need to get in touch with your student ahead of the session, you can do so via ${link('the portal', LOGIN_URL)}.`,
             ],
             signOff: THANKS_SIGN_OFF,
@@ -471,6 +469,7 @@ export function sessionRescheduleAcceptedStudent(
                 `Dear ${sName},`,
                 `Your session with ${mName} has been successfully rescheduled. The previous booking has been cancelled.`,
                 sessionDetailsParagraph(details),
+                `When it’s time, ${link('open your sessions in the portal', `${APP_URL}/dashboard/student/sessions`)} to join.`,
                 `${link('Log in to the portal', LOGIN_URL)} anytime to manage your upcoming sessions.`,
             ],
             signOff: TEAM_SIGN_OFF,
@@ -495,6 +494,7 @@ export function sessionRescheduleAcceptedMentor(
                 `Dear ${mName},`,
                 `Your session with ${sName} has been successfully rescheduled. The previous booking has been cancelled.`,
                 sessionDetailsParagraph(details),
+                `When it’s time, ${link('open your sessions in the portal', `${APP_URL}/dashboard/mentor/sessions`)} and use <strong>Start Session</strong> so you join Zoom as host.`,
                 `If anything changes, you can manage sessions via ${link('the portal', LOGIN_URL)}.`,
             ],
             signOff: THANKS_SIGN_OFF,
@@ -605,8 +605,7 @@ export function sessionInactivityMentor(mentorName: string, studentName: string)
 export function sessionReminderStudent(
     studentName: string,
     mentorName: string,
-    timeLabel: string,
-    joinUrl: string
+    timeLabel: string
 ): EmailTemplate {
     const sName = escapeHtml(studentName || 'there')
     const mName = escapeHtml(mentorName || 'your mentor')
@@ -619,7 +618,7 @@ export function sessionReminderStudent(
             paragraphs: [
                 `Dear ${sName},`,
                 `This is a friendly reminder that your session with ${mName} starts at <strong>${when}</strong> today.`,
-                `${link('Join your session', joinUrl)} when you’re ready - we’d recommend hopping on a couple of minutes early.`,
+                `${link('Open your sessions in the portal', `${APP_URL}/dashboard/student/sessions`)} when you’re ready — we’d recommend hopping on a couple of minutes early.`,
             ],
             signOff: TEAM_SIGN_OFF,
         }),
@@ -630,8 +629,7 @@ export function sessionReminderStudent(
 export function sessionReminderMentor(
     mentorName: string,
     studentName: string,
-    timeLabel: string,
-    startUrl: string
+    timeLabel: string
 ): EmailTemplate {
     const mName = escapeHtml(mentorName || 'there')
     const sName = escapeHtml(studentName || 'your student')
@@ -644,7 +642,7 @@ export function sessionReminderMentor(
             paragraphs: [
                 `Dear ${mName},`,
                 `This is a friendly reminder that your session with ${sName} starts at <strong>${when}</strong> today.`,
-                `${link('Start the session', startUrl)} when you’re ready - your Zoom host link opens straight from here.`,
+                `${link('Open your sessions in the portal', `${APP_URL}/dashboard/mentor/sessions`)} and use <strong>Start Session</strong> so you join Zoom as host.`,
             ],
             signOff: THANKS_SIGN_OFF,
         }),

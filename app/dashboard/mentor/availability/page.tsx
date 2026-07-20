@@ -37,6 +37,7 @@ export default async function MentorAvailabilityPage() {
         .select(`
             id,
             scheduled_at,
+            zoom_meeting_id,
             zoom_start_url,
             student:profiles!sessions_student_id_fkey (
                 full_name
@@ -53,8 +54,11 @@ export default async function MentorAvailabilityPage() {
         id: session.id,
         scheduled_at: session.scheduled_at,
         // Route through the on-demand start endpoint so the mentor always gets
-        // a fresh (non-expired) Zoom host link.
-        zoom_url: session.zoom_start_url ? `/api/sessions/${session.id}/start` : null,
+        // a fresh (non-expired) Zoom host link (meeting id is enough; stored
+        // start_url may be expired or null).
+        zoom_url: (session.zoom_meeting_id || session.zoom_start_url)
+            ? `/api/sessions/${session.id}/start`
+            : null,
         person_name: session.student?.full_name || 'Student'
     }))
 

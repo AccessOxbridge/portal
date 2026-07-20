@@ -126,7 +126,7 @@ export async function POST(req: Request) {
             // Continue without Zoom if it fails - can be added manually later.
         }
 
-        const { error: sessionError } = await adminSupabase
+        const { data: createdSession, error: sessionError } = await adminSupabase
             .from('sessions')
             .insert({
                 student_id: studentId,
@@ -140,6 +140,8 @@ export async function POST(req: Request) {
                 zoom_join_url: zoomMeeting?.joinUrl || null,
                 zoom_start_url: zoomMeeting?.startUrl || null,
             })
+            .select('id')
+            .single()
 
         if (sessionError) throw sessionError
 
@@ -170,8 +172,8 @@ export async function POST(req: Request) {
                 data: {
                     mentor_id: mentorId,
                     mentor_name: mentorProfile?.full_name || 'Mentor',
+                    session_id: createdSession?.id || null,
                     scheduled_at: scheduledAt.toISOString(),
-                    zoom_join_url: zoomMeeting?.joinUrl || null,
                 }
             })
         }
@@ -186,20 +188,18 @@ export async function POST(req: Request) {
                 data: {
                     student_id: studentId,
                     student_name: studentProfile?.full_name || 'Student',
+                    session_id: createdSession?.id || null,
                     scheduled_at: scheduledAt.toISOString(),
-                    zoom_join_url: zoomMeeting?.joinUrl || null,
                 }
             })
         }
 
         try {
-            const zoomLink = zoomMeeting?.joinUrl || null
-
             if (studentProfile?.email) {
                 const tpl = sessionConfirmedStudent(
                     studentProfile.full_name || '',
                     mentorProfile?.full_name || '',
-                    { date: studentDate, time: studentTime, zoomLink }
+                    { date: studentDate, time: studentTime }
                 )
                 await sendEmail({
                     from: EMAIL_SENDER_TEAM,
@@ -213,7 +213,7 @@ export async function POST(req: Request) {
                 const tpl = sessionConfirmedMentor(
                     mentorProfile.full_name || '',
                     studentProfile?.full_name || '',
-                    { date: mentorDate, time: mentorTime, zoomLink }
+                    { date: mentorDate, time: mentorTime }
                 )
                 await sendEmail({
                     from: EMAIL_SENDER_TEAM,

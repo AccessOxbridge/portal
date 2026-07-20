@@ -15,13 +15,17 @@ interface WeeklyCalendarProps {
     sessions: Session[]
     personLabel?: string // e.g., "Mentor" or "Student"
     zoomButtonLabel?: string
+    /** When set, students with 0 credits are sent to top-up instead of Zoom. Omit for mentors. */
     credits?: number
     timezone?: string | null
 }
 
-export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits = 0, timezone = null }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits, timezone = null }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
+    // Mentors omit `credits`; only students pass a balance and need the top-up gate.
+    const creditsRequired = typeof credits === 'number'
+    const canJoinZoom = !creditsRequired || credits > 0
 
     useEffect(() => {
         const dates = []
@@ -155,7 +159,10 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                 className="group relative bg-white border border-gray-100 p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
                                 onClick={() => {
                                     if (session.zoom_url) {
-                                        window.open(credits > 0 ? session.zoom_url : '/dashboard/student/services', credits > 0 ? '_blank' : '_self')
+                                        window.open(
+                                            canJoinZoom ? session.zoom_url : '/dashboard/student/services',
+                                            canJoinZoom ? '_blank' : '_self'
+                                        )
                                     }
                                 }}
                             >
@@ -179,9 +186,9 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
 
                                     {session.zoom_url ? (
                                         <div className="flex items-center gap-2">
-                                            <button className={`${credits > 0 ? 'bg-accent' : 'bg-amber-500'} text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
+                                            <button className={`${canJoinZoom ? 'bg-accent' : 'bg-amber-500'} text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
                                                 <Video className="w-4 h-4" />
-                                                {credits > 0 ? zoomButtonLabel : 'Top up to Join'}
+                                                {canJoinZoom ? zoomButtonLabel : 'Top up to Join'}
                                             </button>
                                         </div>
                                     ) : (

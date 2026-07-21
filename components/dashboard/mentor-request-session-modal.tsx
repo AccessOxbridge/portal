@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, Calendar, Clock } from 'lucide-react'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
+import DatePicker from '@/components/dashboard/date-picker'
+import SelectMenu from '@/components/dashboard/select-menu'
 
 export interface MentorRequestStudentOption {
     id: string
@@ -57,6 +59,33 @@ export default function MentorRequestSessionModal({
         if (!startTime) return
         setEndTime(addMinutesToWallTime(startTime, 60))
     }, [startTime, date])
+
+    const startTimeOptions = (() => {
+        const options: string[] = []
+        const nowMins =
+            date === todayDate
+                ? (() => {
+                    const [nowH, nowM] = getZonedNow(tz).time.split(':').map(Number)
+                    return nowH * 60 + nowM
+                })()
+                : -1
+
+        for (let h = 6; h <= 23; h++) {
+            for (const m of [0, 15, 30, 45]) {
+                const total = h * 60 + m
+                if (nowMins >= 0 && total <= nowMins) continue
+                options.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+            }
+        }
+        return options
+    })()
+
+    useEffect(() => {
+        if (date !== todayDate) return
+        if (startTime && startTimeOptions.includes(startTime)) return
+        setStartTime(startTimeOptions[0] || '')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [date, startTime, todayDate, tz])
 
     const durationLabel = (minutes: number) => {
         if (minutes < 60) return `${minutes} mins`
@@ -160,74 +189,56 @@ export default function MentorRequestSessionModal({
                     {!preselectedStudentId && (
                         <div>
                             <label className="block text-xs font-bold text-gray-500 mb-1.5">Student</label>
-                            <select
+                            <SelectMenu
                                 value={studentId}
-                                onChange={(e) => setStudentId(e.target.value)}
-                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
-                            >
-                                <option value="">Select a student</option>
-                                {students.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.full_name}</option>
-                                ))}
-                            </select>
+                                onChange={setStudentId}
+                                placeholder="Select a student"
+                                options={students.map((s) => ({ value: s.id, label: s.full_name }))}
+                                maxHeight={200}
+                            />
                         </div>
                     )}
 
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                        <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Date</label>
+                            <DatePicker
+                                value={date}
+                                min={todayDate}
+                                onChange={setDate}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Date</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    min={todayDate}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Start Time</label>
+                                <SelectMenu
+                                    value={startTime}
+                                    onChange={setStartTime}
+                                    options={startTimeOptions.map((value) => ({ value, label: value }))}
+                                    placeholder="Select start time"
+                                    maxHeight={200}
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Start Time</label>
-                                <select
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
-                                >
-                                    <option value="">Select start time</option>
-                                    {(() => {
-                                        const nodes: any[] = []
-                                        for (let h = 6; h <= 23; h++) {
-                                            for (let m = 0; m < 60; m += 15) {
-                                                const value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
-                                                nodes.push(<option key={value} value={value}>{value}</option>)
-                                            }
-                                        }
-                                        return nodes
-                                    })()}
-                                </select>
-                            </div>
-                            <div>
                                 <label className="block text-xs font-bold text-gray-500 mb-1.5">End Time</label>
-                                {startTime ? (
-                                    <select
-                                        value={endTime}
-                                        onChange={(e) => setEndTime(e.target.value)}
-                                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
-                                    >
-                                        <option value="">Select end time / duration</option>
-                                        {[60, 120].map((d) => {
-                                            const value = addMinutesToWallTime(startTime, d)
-                                            return (
-                                                <option key={value} value={value}>
-                                                    {value} ({durationLabel(d)})
-                                                </option>
-                                            )
-                                        })}
-                                    </select>
-                                ) : (
-                                    <select disabled className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-400">
-                                        <option>Select start time first</option>
-                                    </select>
-                                )}
+                                <SelectMenu
+                                    value={endTime}
+                                    onChange={setEndTime}
+                                    disabled={!startTime}
+                                    placeholder={startTime ? 'Select end time / duration' : 'Select start time first'}
+                                    options={
+                                        startTime
+                                            ? [60, 120].map((d) => {
+                                                const value = addMinutesToWallTime(startTime, d)
+                                                return {
+                                                    value,
+                                                    label: `${value} (${durationLabel(d)})`,
+                                                }
+                                            })
+                                            : []
+                                    }
+                                    maxHeight={160}
+                                />
                             </div>
                         </div>
                     </div>

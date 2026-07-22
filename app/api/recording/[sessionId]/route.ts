@@ -53,53 +53,77 @@ export async function GET(
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
         }
 
-        // Resolve a fetchable MP4 URL + auth header.
-        // A) Stored webhook download_token (works for webhook_download URLs)
-        let fetchUrl: string | null = null
-        let authHeader: Record<string, string> = {}
+        // Resolve a fetchable MP4. Try each auth strategy until Zoom returns a
+        // usable response — webhook download_tokens expire (~24h), so we must
+        // fall through to OAuth instead of failing on the first attempt.
+        const range = req.headers.get('range')
+        const rangeHeaders = range ? { Range: range } : {}
 
-        if (session.recording_download_url && session.recording_download_token) {
-            fetchUrl = session.recording_download_url
-            authHeader = { Authorization: `Bearer ${session.recording_download_token}` }
+        async function tryFetch(
+            url: string,
+            extraHeaders: Record<string, string> = {}
+        ): Promise<Response | null> {
+            const res = await fetch(url, {
+                headers: { ...extraHeaders, ...rangeHeaders },
+            })
+            if (res.ok || res.status === 206) return res
+            console.warn(
+                `[RECORDING] Upstream ${res.status} for session ${sessionId}`
+            )
+            return null
         }
 
-        // B) Fall back to the Recordings API + OAuth access token (token in query)
-        if (!fetchUrl && session.zoom_meeting_id) {
+        let upstream: Response | null = null
+
+        // A) Stored webhook download_token (works while the token is fresh)
+        if (session.recording_download_url && session.recording_download_token) {
+            upstream = await tryFetch(session.recording_download_url, {
+                Authorization: `Bearer ${session.recording_download_token}`,
+            })
+        }
+
+        // B) Recordings API + OAuth access token (token in query)
+        if (!upstream && session.zoom_meeting_id) {
             const accessToken = await getZoomAccessToken()
             const recordings = await getZoomRecordings(session.zoom_meeting_id)
             const videoFile =
                 recordings?.recording_files?.find(
-                    (f) => f.file_type === 'MP4' && f.recording_type === 'shared_screen_with_speaker_view'
+                    (f) =>
+                        f.file_type === 'MP4' &&
+                        f.recording_type === 'shared_screen_with_speaker_view'
                 ) || recordings?.recording_files?.find((f) => f.file_type === 'MP4')
             if (videoFile?.download_url) {
                 const u = new URL(videoFile.download_url)
                 u.searchParams.set('access_token', accessToken)
-                fetchUrl = u.toString()
+                upstream = await tryFetch(u.toString())
             }
         }
 
-        // C) Stored URL alone + OAuth token (last resort)
-        if (!fetchUrl && session.recording_download_url) {
+        // C) Stored URL + OAuth token (last resort)
+        if (!upstream && session.recording_download_url) {
             const accessToken = await getZoomAccessToken()
-            const sep = session.recording_download_url.includes('?') ? '&' : '?'
-            fetchUrl = `${session.recording_download_url}${sep}access_token=${accessToken}`
+            try {
+                const u = new URL(session.recording_download_url)
+                u.searchParams.set('access_token', accessToken)
+                upstream = await tryFetch(u.toString())
+            } catch {
+                const sep = session.recording_download_url.includes('?') ? '&' : '?'
+                upstream = await tryFetch(
+                    `${session.recording_download_url}${sep}access_token=${accessToken}`
+                )
+            }
+            if (!upstream) {
+                upstream = await tryFetch(session.recording_download_url, {
+                    Authorization: `Bearer ${accessToken}`,
+                })
+            }
         }
 
-        if (!fetchUrl) {
-            return NextResponse.json({ error: 'No recording available for this session' }, { status: 404 })
-        }
-
-        // Forward Range for seekable playback.
-        const range = req.headers.get('range')
-        const upstream = await fetch(fetchUrl, {
-            headers: {
-                ...authHeader,
-                ...(range ? { Range: range } : {}),
-            },
-        })
-
-        if (!upstream.ok && upstream.status !== 206) {
-            return NextResponse.json({ error: 'Failed to fetch recording from Zoom' }, { status: 502 })
+        if (!upstream) {
+            return NextResponse.json(
+                { error: 'Failed to fetch recording from Zoom' },
+                { status: 502 }
+            )
         }
 
         const headers = new Headers()

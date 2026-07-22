@@ -155,6 +155,13 @@ export default function AdminMessagesContent({
                 .update({ last_message_at: new Date().toISOString() })
                 .eq('id', selectedConversation.id)
 
+            // Fire-and-forget: throttled "new message" email to student and/or mentor.
+            fetch('/api/messages/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId: selectedConversation.id }),
+            }).catch(() => {})
+
             setAdminMessage('')
         } catch (error) {
             console.error('Failed to send admin message:', error)

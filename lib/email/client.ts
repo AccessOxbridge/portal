@@ -13,9 +13,21 @@ const RESEND_API_URL = 'https://api.resend.com/emails'
 export const EMAIL_SENDER_TEAM =
     process.env.RESEND_FROM_EMAIL || 'Access Oxbridge <onboarding@resend.dev>'
 
-// Personal "Claire Marlowe" sender for the match emails (#3/#4).
+// Personal "Claire Marlowe" sender for match + Claire chat emails.
+// Prefer RESEND_FROM_EMAIL_CLAIRE; otherwise reuse the verified team domain
+// with Claire's display name so we don't fall back to Resend's test inbox.
+function claireSenderFromTeam(teamFrom: string): string {
+    const match = teamFrom.match(/<([^>]+)>/)
+    const address = match?.[1]
+    return address ? `Claire Marlowe <${address}>` : `Claire Marlowe <${teamFrom}>`
+}
+
 export const EMAIL_SENDER_CLAIRE =
-    process.env.RESEND_FROM_EMAIL_CLAIRE || 'Claire Marlowe <onboarding@resend.dev>'
+    process.env.RESEND_FROM_EMAIL_CLAIRE ||
+    (process.env.RESEND_FROM_EMAIL
+        ? claireSenderFromTeam(process.env.RESEND_FROM_EMAIL)
+        : 'Claire Marlowe <onboarding@resend.dev>')
+
 
 /** A file attachment. `content` is the file's bytes, base64-encoded. */
 export interface EmailAttachment {

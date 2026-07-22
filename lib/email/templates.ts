@@ -250,6 +250,40 @@ export function newMessageToMentor(mentorName: string): EmailTemplate {
     }
 }
 
+/** New message from Claire (admin) → student. */
+export function newMessageFromClaireToStudent(studentName: string): EmailTemplate {
+    const name = escapeHtml(studentName || 'there')
+    return {
+        subject: 'New Message from Claire | Access Oxbridge',
+        html: layout({
+            title: 'New Message from Claire',
+            preheader: 'You have a new message from Claire on the Access Oxbridge portal.',
+            paragraphs: [
+                `Dear ${name},`,
+                `You’ve received a new message from Claire on the Access Oxbridge portal. ${link('Log in to view it and reply', STUDENT_MESSAGES_URL)}.`,
+            ],
+            signOff: CLAIRE_SIGN_OFF,
+        }),
+    }
+}
+
+/** New message from Claire (admin) → mentor. */
+export function newMessageFromClaireToMentor(mentorName: string): EmailTemplate {
+    const name = escapeHtml(mentorName || 'there')
+    return {
+        subject: 'New Message from Claire | Access Oxbridge',
+        html: layout({
+            title: 'New Message from Claire',
+            preheader: 'You have a new message from Claire on the Access Oxbridge portal.',
+            paragraphs: [
+                `Dear ${name},`,
+                `You’ve received a new message from Claire on the Access Oxbridge portal. ${link('Log in to view it and reply', MENTOR_MESSAGES_URL)}.`,
+            ],
+            signOff: CLAIRE_SIGN_OFF,
+        }),
+    }
+}
+
 /** #3 — Student matched with mentor (from Claire). */
 export function studentMatched(studentName: string, mentorName: string): EmailTemplate {
     const sName = escapeHtml(studentName || 'there')

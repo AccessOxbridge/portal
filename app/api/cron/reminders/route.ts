@@ -34,9 +34,14 @@ async function recipientTimes(
  * This route should be triggered every 10–15 minutes by a CRON scheduler.
  */
 export async function GET(req: Request) {
-    // Security check: optional CRON_SECRET from env
+    // Fail closed: the secret MUST be configured, and the caller MUST present it.
+    const cronSecret = process.env.CRON_SECRET;
     const authHeader = req.headers.get('authorization');
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!cronSecret) {
+        console.error('CRON_SECRET is not set; refusing to run /api/cron/reminders.');
+        return NextResponse.json({ error: 'Cron not configured' }, { status: 503 });
+    }
+    if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

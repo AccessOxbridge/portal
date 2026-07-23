@@ -16,8 +16,14 @@ import { firstSessionFollowup } from '@/lib/email/templates'
  * Schedule: once daily (e.g. 09:00 UTC).
  */
 export async function GET(req: Request) {
+    // Fail closed: the secret MUST be configured, and the caller MUST present it.
+    const cronSecret = process.env.CRON_SECRET
     const authHeader = req.headers.get('authorization')
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!cronSecret) {
+        console.error('CRON_SECRET is not set; refusing to run /api/cron/first-session-followup.')
+        return NextResponse.json({ error: 'Cron not configured' }, { status: 503 })
+    }
+    if (authHeader !== `Bearer ${cronSecret}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

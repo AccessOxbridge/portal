@@ -1,9 +1,30 @@
 'use server'
 
 import { createAdminClient } from '@/utils/supabase/admin'
+import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+const ADMIN_ROLES = ['admin', 'admin-dev']
+
 export async function registerPremiumClient(formData: FormData) {
+    // Authorize the CALLER first: this action uses the service-role key and can
+    // create admin/client accounts, so it must be restricted to signed-in admins.
+    const authClient = await createClient()
+    const {
+        data: { user },
+    } = await authClient.auth.getUser()
+    if (!user) {
+        return { error: 'Not authenticated' }
+    }
+    const { data: callerProfile } = await authClient
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+    if (!callerProfile || !ADMIN_ROLES.includes(callerProfile.role)) {
+        return { error: 'Not authorized' }
+    }
+
     const supabase = createAdminClient()
 
     const email = formData.get('email') as string

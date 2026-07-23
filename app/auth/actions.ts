@@ -13,12 +13,8 @@ export async function login(formData: FormData) {
         password: formData.get('password') as string,
     }
 
-    console.log('Login attempt for:', data.email)
-
     const result = await supabase.auth.signInWithPassword(data)
     const { error } = result
-
-    console.log('Login result:', JSON.stringify(result, null, 2))
 
     if (error) {
         console.error('Login error:', error.message)
@@ -36,7 +32,11 @@ export async function signup(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const full_name = formData.get('full_name') as string
-    const role = formData.get('role') as string
+    // Public signup is disabled and all accounts are created by admin/dev. If
+    // this action is ever reached, hard-force the least-privileged role so a
+    // client-supplied role can never mint an admin/mentor account. (The DB-level
+    // fix lands in Chunk 1 when handle_new_user() stops trusting client role.)
+    const role = 'student'
     const member_code = formData.get('member_code') as string || null
 
     const data = {
@@ -52,17 +52,8 @@ export async function signup(formData: FormData) {
         },
     }
 
-    console.log('Signup attempt:', { email, role, full_name, member_code })
-
     const result = await supabase.auth.signUp(data)
     const { data: { user, session }, error } = result
-
-    console.log('Signup result:', {
-        hasUser: !!user,
-        hasSession: !!session,
-        error: error?.message,
-        userConfirmed: user?.email_confirmed_at
-    })
 
     if (error) {
         console.error('Signup error:', error.message)

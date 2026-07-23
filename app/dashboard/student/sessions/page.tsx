@@ -129,7 +129,8 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
 
     // Process pending requests
     const processedPendingRequests = (pendingRequests || []).map((req: any) => {
-        const slot = req.responses?.timeSlots?.[0] || null
+        const slots = Array.isArray(req.responses?.timeSlots) ? req.responses.timeSlots : []
+        const slot = slots[0] || null
         return {
             id: req.id,
             created_at: req.created_at,
@@ -137,6 +138,12 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             initiated_by: (req.initiated_by || 'student') as 'student' | 'mentor',
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,
+            proposed_slots: slots
+                .filter((s: any) => s?.startTime)
+                .map((s: any) => ({
+                    startTime: s.startTime as string,
+                    endTime: (s.endTime as string) || null,
+                })),
             note: req.responses?.note || null,
             reschedule_of_session_id: req.reschedule_of_session_id || null,
             original_scheduled_at: req.responses?.original_scheduled_at || null,

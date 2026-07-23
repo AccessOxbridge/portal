@@ -31,6 +31,7 @@ interface PendingRequest {
     initiated_by?: 'student' | 'mentor'
     proposed_start?: string | null
     proposed_end?: string | null
+    proposed_slots?: { startTime: string; endTime: string | null }[]
     note?: string | null
     reschedule_of_session_id?: string | null
     original_scheduled_at?: string | null
@@ -465,13 +466,30 @@ export default function StudentSessionsContent({
                                                         ? `Reschedule pending with ${request.mentor_full_name}`
                                                         : `Request sent to ${request.mentor_full_name}`}
                                                 </h3>
-                                                <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
-                                                    <span className="flex items-center gap-1.5">
-                                                        <Calendar className="w-4 h-4" />
-                                                        {request.proposed_start
-                                                            ? `${formatDate(request.proposed_start)} at ${formatTime(request.proposed_start)}`
-                                                            : formatDate(request.created_at)}
-                                                    </span>
+                                                <div className="mt-1 space-y-1">
+                                                    {(request.proposed_slots && request.proposed_slots.length > 0
+                                                        ? request.proposed_slots
+                                                        : request.proposed_start
+                                                            ? [{ startTime: request.proposed_start, endTime: request.proposed_end ?? null }]
+                                                            : []
+                                                    ).map((slot) => (
+                                                        <div
+                                                            key={`${slot.startTime}-${slot.endTime || ''}`}
+                                                            className="flex items-center gap-1.5 text-sm text-gray-500"
+                                                        >
+                                                            <Calendar className="w-4 h-4 shrink-0" />
+                                                            <span>
+                                                                {`${formatDate(slot.startTime)} at ${formatTime(slot.startTime)}`}
+                                                                {slot.endTime ? ` – ${formatTime(slot.endTime)}` : ''}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                    {!(request.proposed_slots?.length || request.proposed_start) && (
+                                                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                                                            <Calendar className="w-4 h-4 shrink-0" />
+                                                            <span>{formatDate(request.created_at)}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 {request.reschedule_of_session_id && request.original_scheduled_at && (
                                                     <p className="mt-1 text-xs text-gray-400">

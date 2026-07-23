@@ -2,10 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Clock } from 'lucide-react'
+import { X, Clock, Plus } from 'lucide-react'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'
 import SelectMenu from '@/components/dashboard/select-menu'
+
+interface TimeSlot {
+    date: string
+    startTime: string
+    endTime: string
+}
 
 export interface StudentBookingProfile {
     school_name: string
@@ -38,6 +44,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [mentorId, setMentorId] = useState<string>(mentors.length === 1 ? mentors[0].id : '')
+    const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
     const [date, setDate] = useState(todayDate)
     const [startTime, setStartTime] = useState('')
     const [endTime, setEndTime] = useState('')
@@ -45,6 +52,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
     // Reset form state when the modal closes
     useEffect(() => {
         if (!isOpen) {
+            setTimeSlots([])
             setDate(getZonedNow(tz).date)
             setStartTime('')
             setEndTime('')
@@ -86,7 +94,6 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
         if (date !== todayDate) return
         if (startTime && startTimeOptions.includes(startTime)) return
         setStartTime(startTimeOptions[0] || '')
-        // startTimeOptions is derived from date/todayDate/tz each render
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [date, startTime, todayDate, tz])
 
@@ -97,13 +104,32 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
         return `${(minutes / 60).toFixed(1)} hrs`
     }
 
-    const handleSubmit = async () => {
-        setError(null)
+    const formatSlotDisplay = (slot: TimeSlot) => {
+        const start = new Date(slot.startTime)
+        const end = new Date(slot.endTime)
 
-        if (mentors.length > 1 && !mentorId) {
-            setError('Please choose which mentor to book this session with')
-            return
-        }
+        const dateStr = start.toLocaleDateString('en-GB', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            timeZone: tz,
+        })
+        const startTimeStr = start.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: tz,
+        })
+        const endTimeStr = end.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: tz,
+        })
+
+        return `${dateStr}, ${startTimeStr} - ${endTimeStr}`
+    }
+
+    const addTimeSlot = () => {
+        setError(null)
 
         if (!date || !startTime || !endTime) {
             setError('Please choose a date, start time and end time.')
@@ -121,8 +147,50 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
             endISO = zonedTimeToUtcISO(nextDay.toISOString().split('T')[0], endTime, tz)
         }
 
-        if (new Date(endISO) <= new Date(startISO)) {
+        const startDateTime = new Date(startISO)
+        const endDateTime = new Date(endISO)
+
+        if (endDateTime <= startDateTime) {
             setError('End time must be after start time.')
+            return
+        }
+
+        const duplicate = timeSlots.some((s) => s.startTime === startISO && s.endTime === endISO)
+        if (duplicate) {
+            setError('This exact time slot has already been added')
+            return
+        }
+
+        const overlap = timeSlots.find((s) => {
+            const existingStart = new Date(s.startTime)
+            const existingEnd = new Date(s.endTime)
+            return startDateTime < existingEnd && endDateTime > existingStart
+        })
+        if (overlap) {
+            setError(`This slot overlaps an existing slot: ${formatSlotDisplay(overlap)}. Please choose a different time.`)
+            return
+        }
+
+        setTimeSlots((prev) => [...prev, { date, startTime: startISO, endTime: endISO }])
+        // Keep the date; clear start so the next slot is easy to pick
+        setStartTime('')
+        setEndTime('')
+    }
+
+    const removeTimeSlot = (index: number) => {
+        setTimeSlots((prev) => prev.filter((_, i) => i !== index))
+    }
+
+    const handleSubmit = async () => {
+        setError(null)
+
+        if (mentors.length > 1 && !mentorId) {
+            setError('Please choose which mentor to book this session with')
+            return
+        }
+
+        if (timeSlots.length < 3) {
+            setError('Please add at least 3 time slots so your mentor can pick one that works')
             return
         }
 
@@ -141,7 +209,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                     subjects: studentProfile.subjects,
                     targetUniversities: [studentProfile.target_university],
                     timezone: studentProfile.timezone,
-                    timeSlots: [{ date, startTime: startISO, endTime: endISO }],
+                    timeSlots,
                     academicInterests: studentProfile.interests,
                     extracurriculars: studentProfile.extracurriculars,
                     anythingElse: studentProfile.additional_notes
@@ -173,9 +241,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
 
     const canSubmit =
         !loading &&
-        !!date &&
-        !!startTime &&
-        !!endTime &&
+        timeSlots.length >= 3 &&
         !(mentors.length > 1 && !mentorId)
 
     return (
@@ -189,7 +255,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-extrabold text-gray-900">Book a Session</h2>
-                        <p className="text-gray-500 mt-1">Propose a time for your mentor to confirm</p>
+                        <p className="text-gray-500 mt-1">Add at least 3 times for your mentor to choose from</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -221,6 +287,36 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                             With <span className="font-semibold text-gray-800">{mentors[0].name}</span>
                         </p>
                     ) : null}
+
+                    {timeSlots.length > 0 && (
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-gray-700">Added slots</span>
+                                <span className={`text-sm font-medium ${timeSlots.length >= 3 ? 'text-green-600' : 'text-amber-600'}`}>
+                                    {timeSlots.length >= 3 ? `✓ ${timeSlots.length} slots` : `${timeSlots.length}/3 minimum`}
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {timeSlots.map((slot, index) => (
+                                    <div
+                                        key={`${slot.startTime}-${slot.endTime}`}
+                                        className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-xl font-medium text-sm"
+                                    >
+                                        <Clock className="w-4 h-4 shrink-0" />
+                                        <span>{formatSlotDisplay(slot)}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTimeSlot(index)}
+                                            className="hover:bg-accent/20 rounded-full p-1 transition-colors"
+                                            aria-label="Remove time slot"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 space-y-4">
                         <div>
@@ -267,6 +363,15 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                         <p className="text-xs text-gray-500">
                             Times shown in <strong>{tz}</strong>
                         </p>
+                        <button
+                            type="button"
+                            onClick={addTimeSlot}
+                            disabled={!date || !startTime || !endTime}
+                            className="w-full py-3 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Add Time Slot
+                        </button>
                     </div>
 
                     {error && (

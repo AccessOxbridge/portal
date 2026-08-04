@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Users, Calendar, Briefcase, MessageCircle } from 'lucide-react'
+import { Users, Calendar, Briefcase, MessageCircle, UserCircle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
 interface Mentor {
@@ -181,6 +181,13 @@ export default function MyMentorsContent({
                                         </div>
 
                                         <div className="flex items-center gap-2 shrink-0">
+                                            <Link
+                                                href={`/dashboard/student/mentors/${mentor.id}`}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors text-sm"
+                                            >
+                                                <UserCircle className="w-4 h-4" />
+                                                View Profile
+                                            </Link>
                                             <button
                                                 onClick={() => handleStartChat(mentor.id)}
                                                 disabled={chatLoadingId === mentor.id}

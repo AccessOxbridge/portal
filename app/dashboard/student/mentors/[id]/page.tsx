@@ -52,7 +52,6 @@ export default async function StudentMentorProfilePage({ params }: PageProps) {
             photo_url,
             cv_url,
             timezone,
-            created_at,
             profile:profiles!mentors_id_fkey ( full_name )
         `)
         .eq('id', mentorId)
@@ -95,7 +94,6 @@ export default async function StudentMentorProfilePage({ params }: PageProps) {
                     university: mentor.university,
                     photo_url: mentor.photo_url,
                     cv_url: mentor.cv_url,
-                    created_at: mentor.created_at,
                 }}
                 isCurrent={isCurrent}
                 totalSessions={totalSessions}

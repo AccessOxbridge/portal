@@ -23,7 +23,6 @@ interface MentorDetail {
     university: string | null
     photo_url: string | null
     cv_url: string | null
-    created_at: string
 }
 
 interface StudentMentorProfileContentProps {
@@ -170,10 +169,6 @@ export default function StudentMentorProfileContent({
                                     <span>Last session: {formatDate(lastSessionAt)}</span>
                                 </div>
                             )}
-                            <div className="flex items-center gap-2 text-gray-400">
-                                <Calendar className="w-4 h-4" />
-                                <span>Mentoring since {formatDate(mentor.created_at)}</span>
-                            </div>
                         </div>
                     </div>
                 </div>

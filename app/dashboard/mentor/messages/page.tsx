@@ -131,8 +131,9 @@ export default async function MentorMessagesPage() {
     )
 
     return (
-        <div className="max-w-6xl mx-auto flex flex-col h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
-            <header className="shrink-0 mb-4">
+        // See the student page for why the bottom padding is left in place.
+        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 h-[calc(100dvh-160px)] md:h-[calc(100vh-80px)]">
+            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-10 pb-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>

@@ -134,6 +134,15 @@ export default function ConversationList({
                     </button>
                 )
             })}
+
+            {/* A single conversation leaves a tall white void below. A quiet
+                closing line gives the column a bottom edge and explains what
+                would otherwise appear here. */}
+            <p className="px-4 py-4 text-[11px] leading-relaxed text-gray-300 border-t border-gray-100 mt-1">
+                {conversations.length === 1
+                    ? 'Your other conversations will appear here as they start.'
+                    : `${conversations.length} conversations`}
+            </p>
         </div>
     )
 }

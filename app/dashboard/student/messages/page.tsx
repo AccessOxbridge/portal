@@ -174,12 +174,16 @@ export default async function StudentMessagesPage({
     })
 
     return (
-        <div className="max-w-6xl mx-auto flex flex-col h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
-            {/* One header, then the card owns the rest of the height. The
+        // Full-bleed: cancels the shell's horizontal and top padding so the
+        // panes reach the edges. The shell's bottom padding is deliberately
+        // NOT cancelled — on phones it is pb-24, which keeps the fixed mobile
+        // tab bar clear of the composer.
+        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 h-[calc(100dvh-160px)] md:h-[calc(100vh-80px)]">
+            {/* One header, then the panes own the rest of the height. The
                 subtitle is gone deliberately: the thread already says what
                 this page is, and three stacked headers before any content
                 was the main thing making this screen feel cluttered. */}
-            <header className="shrink-0 mb-4">
+            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-10 pb-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>

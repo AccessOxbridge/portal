@@ -232,9 +232,11 @@ export default function AdminMessagesContent({
     }
 
     return (
-        <div className="flex gap-6 h-[calc(100vh-200px)]">
+        // One surface split by a hairline, matching the student and mentor
+        // threads — no floating cards.
+        <div className="flex flex-1 min-h-0 bg-white border-t border-gray-200/70 overflow-hidden">
             {/* Conversations */}
-            <div className="w-96 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="w-80 lg:w-96 shrink-0 border-r border-gray-200/70 flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-gray-100">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -315,7 +317,7 @@ export default function AdminMessagesContent({
             </div>
 
             {/* Thread */}
-            <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                 {selectedConversation ? (
                     <>
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -338,7 +340,7 @@ export default function AdminMessagesContent({
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto px-6 py-4 bg-[#FAFBFC]">
+                        <div className="flex-1 overflow-y-auto px-6 py-4 bg-[#FAFBFC] [&>*]:max-w-[720px] [&>*]:mx-auto [&>*]:w-full">
                             {isLoadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
                                     <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -447,7 +449,7 @@ export default function AdminMessagesContent({
                         </div>
 
                         <div className={isDirect ? 'bg-white' : 'bg-amber-50/60'}>
-                            <div className="flex items-center gap-2 px-4 pt-3">
+                            <div className="max-w-[720px] mx-auto w-full flex items-center gap-2 px-3 md:px-6 pt-3">
                                 {isDirect ? (
                                     <>
                                         <MessageCircle className="w-4 h-4 text-accent" />

@@ -32,8 +32,11 @@ export default function AttachmentGrid({
         <div className={cn('flex flex-col gap-2', isSent ? 'items-end' : 'items-start')}>
             {images.length > 0 && (
                 <div
+                    // Capped at 280px: attachments were rendering large enough
+                    // to dominate the thread. Full size is a click away in the
+                    // lightbox.
                     className={cn(
-                        'grid gap-1.5 max-w-[300px]',
+                        'grid gap-1.5 max-w-[280px]',
                         images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
                     )}
                 >
@@ -59,7 +62,7 @@ export default function AttachmentGrid({
                                     'relative overflow-hidden rounded-xl bg-gray-100 border border-black/5',
                                     'transition-transform hover:scale-[1.01] active:scale-100',
                                     'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
-                                    single && 'max-h-[320px]'
+                                    single && 'max-h-[280px]'
                                 )}
                             >
                                 {url ? (
@@ -92,7 +95,7 @@ export default function AttachmentGrid({
                         rel="noopener noreferrer"
                         download={file.name}
                         className={cn(
-                            'group flex items-center gap-3 max-w-[300px] w-full px-3 py-2.5 rounded-xl border transition-colors',
+                            'group flex items-center gap-3 max-w-[280px] w-full px-3 py-2.5 rounded-xl border transition-colors',
                             url
                                 ? 'bg-white border-gray-200 hover:border-accent/40 hover:bg-accent/[0.03]'
                                 : 'bg-gray-50 border-gray-100 pointer-events-none opacity-60'

@@ -155,13 +155,15 @@ export default function MessageInput({
 
     return (
         <div
-            className="border-t border-gray-100 bg-white px-3 py-3 md:px-4"
+            className="shrink-0 border-t border-gray-200/70 bg-white px-3 py-3 md:px-6"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
                 e.preventDefault()
                 addFiles(Array.from(e.dataTransfer.files))
             }}
         >
+          {/* Same 720px column as the thread, so the composer lines up. */}
+          <div className="max-w-[720px] mx-auto w-full">
             {/* Chosen files preview above the input, removable before sending. */}
             {(pending.length > 0 || isPreparing) && (
                 <div className="flex flex-wrap gap-2 mb-2.5">
@@ -224,6 +226,9 @@ export default function MessageInput({
                     onClick={() => fileInputRef.current?.click()}
                     disabled={disabled || isSending}
                     aria-label="Attach a photo or file"
+                    // The standing hint line under the composer is gone; keep
+                    // paste/drag discoverable here instead.
+                    title="Attach a photo or file — you can also paste or drag one in"
                     className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/[0.06] transition-colors disabled:opacity-40"
                 >
                     <Paperclip className="w-5 h-5" />
@@ -257,9 +262,7 @@ export default function MessageInput({
                 </button>
             </div>
 
-            <p className="hidden md:block text-[10px] text-gray-300 mt-2 text-center">
-                Enter to send · Shift+Enter for a new line · paste or drop an image to attach
-            </p>
+          </div>
         </div>
     )
 }

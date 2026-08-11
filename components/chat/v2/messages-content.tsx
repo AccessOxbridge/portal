@@ -77,12 +77,14 @@ export default function MessagesContent({
 
     return (
         <>
-            {/* flex-1 rather than a magic height offset, so the card fills
-                whatever the page header leaves behind. */}
-            <div className="flex flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* No card. Work chat tools (Slack, Teams, Missive, ManyChat) run
+                the panes edge to edge and separate them with a hairline; a
+                floating rounded box on grey is what made this read as a widget
+                rather than a workspace. */}
+            <div className="flex flex-1 min-h-0 bg-white border-t border-gray-200/70 overflow-hidden">
                 <div
                     className={cn(
-                        'w-full md:w-80 shrink-0 md:border-r border-gray-100 bg-white flex-col',
+                        'w-full md:w-80 shrink-0 md:border-r border-gray-200/70 bg-white flex-col',
                         mobilePane === 'list' ? 'flex' : 'hidden md:flex'
                     )}
                 >

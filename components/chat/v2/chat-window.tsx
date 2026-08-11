@@ -202,6 +202,26 @@ export default function ChatWindow({
                     supabase.from('messages').update({ is_read: true }).eq('id', incoming.id).then()
                 }
             )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`,
+                },
+                (payload) => {
+                    // Read receipts. Only reaches us because messages carries
+                    // REPLICA IDENTITY FULL — Realtime needs the whole old row
+                    // to evaluate RLS on UPDATE events, and drops them without it.
+                    const updated = payload.new as { id: string; is_read: boolean | null }
+                    setMessages((prev) =>
+                        prev.map((m) =>
+                            m.id === updated.id ? { ...m, is_read: updated.is_read } : m
+                        )
+                    )
+                }
+            )
             .subscribe()
 
         return () => {

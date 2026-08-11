@@ -1,0 +1,33 @@
+-- ==========================================
+-- Live read receipts
+-- Date: 2026-08-11
+-- ==========================================
+-- Supabase Realtime must evaluate RLS against UPDATE events before deciding
+-- who may receive them, and that requires the complete old row. With the
+-- default replica identity (primary key only), UPDATE events on an
+-- RLS-protected table are dropped — so a sender's tick never flipped from
+-- single to double until the page was reloaded.
+--
+-- Benchmarked before applying, on a synthetic table shaped like this one
+-- (2,000 rows at 232 bytes, matching the 234-byte production average),
+-- steady state after full-page writes settle:
+--
+--   REPLICA IDENTITY DEFAULT : 428 bytes of WAL per row UPDATE
+--   REPLICA IDENTITY FULL    : 624 bytes of WAL per row UPDATE
+--                              -> +196 bytes, +46%
+--
+-- A message is marked read about once, so at the current ~40 read-updates a
+-- month this is ~8 KB/month of extra WAL; at 100x growth it stays under
+-- 1 MB/month. WAL is recycled rather than accumulated, so disk does not grow.
+--
+-- Cost scales with row width, so unusually long messages cost proportionally
+-- more. FULL also widens DELETE records, which is irrelevant here: nothing in
+-- the application deletes messages.
+--
+-- Metadata-only: no rows are read, rewritten, or held under a meaningful lock.
+--
+-- ROLLBACK:
+--   ALTER TABLE public.messages REPLICA IDENTITY DEFAULT;
+-- ==========================================
+
+ALTER TABLE public.messages REPLICA IDENTITY FULL;

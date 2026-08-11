@@ -95,13 +95,10 @@ export default async function AdminMessagesPage() {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <header className="mb-8">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+            <header className="mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages Overview
                 </h1>
-                <p className="mt-2 text-gray-500 text-lg">
-                    Monitor and intervene in student-mentor conversations
-                </p>
             </header>
 
             <AdminMessagesContent

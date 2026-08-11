@@ -2,7 +2,12 @@
 
 import { format, isToday, isYesterday, isThisYear } from 'date-fns'
 
-/** Sticky day marker between runs of messages. */
+/**
+ * Day marker: a hairline rule with the label sitting in the gap.
+ *
+ * The earlier floating pill fought for attention against an unbubbled thread;
+ * a rule recedes and lets the messages carry the page.
+ */
 export default function DateSeparator({ timestamp }: { timestamp: string }) {
     const date = new Date(timestamp)
 
@@ -15,10 +20,10 @@ export default function DateSeparator({ timestamp }: { timestamp: string }) {
                 : format(date, 'd MMMM yyyy')
 
     return (
-        <div className="sticky top-0 z-10 flex justify-center py-1">
-            <span className="px-3 py-1 rounded-full bg-white/85 backdrop-blur-sm border border-gray-200/70 text-[11px] font-semibold text-gray-500 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
-                {label}
-            </span>
+        <div className="flex items-center gap-3 py-3" role="separator" aria-label={label}>
+            <span className="flex-1 h-px bg-gray-200/70" />
+            <span className="text-[11px] font-medium text-gray-400 tracking-wide">{label}</span>
+            <span className="flex-1 h-px bg-gray-200/70" />
         </div>
     )
 }

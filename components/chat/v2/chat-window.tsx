@@ -398,7 +398,7 @@ export default function ChatWindow({
                         <p className="text-xs text-gray-300 mt-1">Say hello to start the conversation.</p>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-0.5">
                         {messages.map((message, index) => {
                             const previous = index > 0 ? messages[index - 1] : null
                             const next = index < messages.length - 1 ? messages[index + 1] : null
@@ -408,23 +408,30 @@ export default function ChatWindow({
                                 !previous ||
                                 !isSameDay(new Date(previous.created_at || timestamp), new Date(timestamp))
 
+                            // A day break also breaks the run, so the sender is
+                            // re-introduced with avatar and name after a separator.
+                            const isFirstInGroup =
+                                showDate || !previous || previous.sender_id !== message.sender_id
                             const isLastInGroup = !next || next.sender_id !== message.sender_id
 
                             const separator = showDate ? (
                                 <DateSeparator key={`sep-${message.id}`} timestamp={timestamp} />
                             ) : null
 
+                            const spacing = cnGroupSpacing(isFirstInGroup, showDate)
+
                             if (isInterventionMessage(message)) {
                                 return (
                                     <div key={message.id} className="contents">
                                         {separator}
-                                        <div className={showDate ? 'mt-1.5' : undefined}>
+                                        <div className={spacing}>
                                             <InterventionBubble
                                                 content={message.content.replace(/^\[ADMIN\]\s*/, '')}
                                                 timestamp={timestamp}
                                                 attachments={message.attachments}
                                                 signedUrls={signedUrls}
                                                 onOpenImage={setLightbox}
+                                                isFirstInGroup={isFirstInGroup}
                                             />
                                         </div>
                                     </div>
@@ -432,12 +439,11 @@ export default function ChatWindow({
                             }
 
                             const isSent = message.sender_id === currentUserId
-                            const isFirstFromSender = !previous || previous.sender_id !== message.sender_id
 
                             return (
                                 <div key={message.id} className="contents">
                                     {separator}
-                                    <div className={cnGroupSpacing(isFirstFromSender, showDate)}>
+                                    <div className={spacing}>
                                         <MessageBubble
                                             content={message.content}
                                             attachments={message.attachments}
@@ -445,8 +451,8 @@ export default function ChatWindow({
                                             timestamp={timestamp}
                                             isRead={message.is_read ?? false}
                                             senderName={isSent ? undefined : otherUser.full_name || 'User'}
-                                            showAvatar={!isSent && isLastInGroup}
                                             avatarUrl={otherUser.photo_url}
+                                            isFirstInGroup={isFirstInGroup}
                                             isLastInGroup={isLastInGroup}
                                             status={message.status}
                                             signedUrls={signedUrls}
@@ -475,8 +481,12 @@ export default function ChatWindow({
     )
 }
 
-/** Extra breathing room when a new speaker (or day) starts. */
-function cnGroupSpacing(isFirstFromSender: boolean, showDate: boolean) {
-    if (showDate) return 'mt-1.5'
-    return isFirstFromSender ? 'mt-2.5' : undefined
+/**
+ * Runs from one sender sit tight together; a new speaker gets clear air. This
+ * is what makes an unbubbled thread scan — the whitespace does the grouping
+ * work the bubble outlines used to.
+ */
+function cnGroupSpacing(isFirstInGroup: boolean, showDate: boolean) {
+    if (showDate) return 'mt-2'
+    return isFirstInGroup ? 'mt-4' : undefined
 }

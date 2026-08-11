@@ -9,6 +9,14 @@ import type { ChatAttachment } from '@/lib/chat-attachments'
 
 export type MessageStatus = 'sending' | 'sent' | 'failed'
 
+/**
+ * Asymmetric by design: only *your own* messages get a tinted bubble.
+ * Incoming messages render as avatar + name + plain text, the way Nextdoor and
+ * Slack do it. Two-sided bubbles are the default look of a thrown-together
+ * chat, and they read badly here specifically because mentors write long
+ * paragraphs — prose is much easier to read unboxed.
+ */
+
 interface MessageBubbleProps {
     content: string
     attachments?: ChatAttachment[] | null
@@ -16,9 +24,10 @@ interface MessageBubbleProps {
     timestamp: string
     isRead?: boolean
     senderName?: string
-    showAvatar?: boolean
     avatarUrl?: string | null
-    /** Last message in a run from the same sender — gets the tail corner. */
+    /** First message in a run from the same sender — carries avatar and name. */
+    isFirstInGroup?: boolean
+    /** Last message in a run — carries the tail corner and the sent receipt. */
     isLastInGroup?: boolean
     status?: MessageStatus
     signedUrls: Map<string, string>
@@ -39,8 +48,8 @@ export default function MessageBubble({
     timestamp,
     isRead,
     senderName,
-    showAvatar = false,
     avatarUrl,
+    isFirstInGroup = true,
     isLastInGroup = true,
     status = 'sent',
     signedUrls,
@@ -51,11 +60,30 @@ export default function MessageBubble({
     const hasAttachments = !!attachments && attachments.length > 0
     const failed = status === 'failed'
 
-    return (
-        <div className={cn('flex gap-2', isSent ? 'flex-row-reverse' : 'flex-row')}>
-            {!isSent && (
-                <div className="w-8 shrink-0 mt-auto">
-                    {showAvatar &&
+    const failureNotice = (
+        <button
+            type="button"
+            onClick={onRetry}
+            className="flex items-center gap-1 text-[11px] font-medium text-red-500 hover:text-red-600 transition-colors"
+        >
+            <AlertCircle className="w-3 h-3" />
+            Not sent
+            {onRetry && (
+                <>
+                    <span className="text-red-300">·</span>
+                    <RotateCw className="w-3 h-3" />
+                    Retry
+                </>
+            )}
+        </button>
+    )
+
+    // ---------------------------------------------------------------- incoming
+    if (!isSent) {
+        return (
+            <div className="flex gap-2.5">
+                <div className="w-8 shrink-0">
+                    {isFirstInGroup &&
                         (avatarUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -69,79 +97,91 @@ export default function MessageBubble({
                             </div>
                         ))}
                 </div>
-            )}
 
-            <div className={cn('flex flex-col gap-1.5 max-w-[75%] sm:max-w-[70%]', isSent ? 'items-end' : 'items-start')}>
-                {hasAttachments && (
+                <div className="min-w-0 max-w-[85%]">
+                    {isFirstInGroup && (
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-[13px] font-semibold text-gray-900">
+                                {senderName || 'User'}
+                            </span>
+                            <span className="text-[11px] text-gray-400 tabular-nums">
+                                {formatTime(timestamp)}
+                            </span>
+                        </div>
+                    )}
+
+                    {hasAttachments && (
+                        <div className={cn(hasText && 'mb-1.5')}>
+                            <AttachmentGrid
+                                attachments={attachments}
+                                signedUrls={signedUrls}
+                                isSent={false}
+                                onOpenImage={onOpenImage}
+                            />
+                        </div>
+                    )}
+
+                    {hasText && (
+                        <div className="text-gray-700">
+                            <RichText content={content} />
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
+    // ---------------------------------------------------------------- outgoing
+    return (
+        <div className="flex flex-col items-end">
+            {hasAttachments && (
+                <div className={cn(hasText && 'mb-1.5')}>
                     <AttachmentGrid
                         attachments={attachments}
                         signedUrls={signedUrls}
-                        isSent={isSent}
+                        isSent
                         onOpenImage={onOpenImage}
                     />
-                )}
+                </div>
+            )}
 
-                {hasText && (
-                    <div
-                        className={cn(
-                            'px-3.5 py-2.5 rounded-2xl transition-opacity',
-                            isSent
-                                ? 'bg-accent text-white'
-                                : 'bg-white text-gray-800 border border-gray-200/80 shadow-[0_1px_2px_rgba(16,24,40,0.04)]',
-                            // Tail corner only on the final bubble of a run.
-                            isLastInGroup && (isSent ? 'rounded-br-md' : 'rounded-bl-md'),
-                            status === 'sending' && 'opacity-70',
-                            failed && 'border-red-200'
-                        )}
-                    >
-                        <RichText content={content} onDark={isSent} />
-                    </div>
-                )}
+            {hasText && (
+                <div
+                    className={cn(
+                        'max-w-[75%] sm:max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-accent text-white transition-opacity',
+                        isLastInGroup && 'rounded-br-md',
+                        status === 'sending' && 'opacity-70',
+                        failed && 'bg-accent/70'
+                    )}
+                >
+                    <RichText content={content} onDark />
+                </div>
+            )}
 
-                {isLastInGroup && (
-                    <div
-                        className={cn(
-                            'flex items-center gap-1.5 px-0.5',
-                            isSent ? 'justify-end' : 'justify-start'
-                        )}
-                    >
-                        {failed ? (
-                            <button
-                                type="button"
-                                onClick={onRetry}
-                                className="flex items-center gap-1 text-[11px] font-medium text-red-500 hover:text-red-600 transition-colors"
-                            >
-                                <AlertCircle className="w-3 h-3" />
-                                Not sent
-                                {onRetry && (
-                                    <>
-                                        <span className="text-red-300">·</span>
-                                        <RotateCw className="w-3 h-3" />
-                                        Retry
-                                    </>
-                                )}
-                            </button>
-                        ) : (
-                            <>
-                                <span className="text-[11px] text-gray-400 tabular-nums">
-                                    {formatTime(timestamp)}
+            {isLastInGroup && (
+                <div className="flex items-center gap-1.5 mt-1 px-0.5">
+                    {failed ? (
+                        failureNotice
+                    ) : (
+                        <>
+                            <span className="text-[11px] text-gray-400 tabular-nums">
+                                {formatTime(timestamp)}
+                            </span>
+                            {status === 'sent' && (
+                                // Icons rather than '✓✓' text, which renders as
+                                // different glyphs across platforms.
+                                <span className={isRead ? 'text-accent' : 'text-gray-300'}>
+                                    {isRead ? (
+                                        <CheckCheck className="w-3.5 h-3.5" />
+                                    ) : (
+                                        <Check className="w-3.5 h-3.5" />
+                                    )}
                                 </span>
-                                {isSent && status === 'sent' && (
-                                    // Icons rather than '✓✓' text: the literal
-                                    // glyphs render inconsistently across platforms.
-                                    <span className={isRead ? 'text-accent' : 'text-gray-300'}>
-                                        {isRead ? (
-                                            <CheckCheck className="w-3.5 h-3.5" />
-                                        ) : (
-                                            <Check className="w-3.5 h-3.5" />
-                                        )}
-                                    </span>
-                                )}
-                            </>
-                        )}
-                    </div>
-                )}
-            </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

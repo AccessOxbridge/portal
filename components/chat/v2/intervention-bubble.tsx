@@ -1,6 +1,7 @@
 'use client'
 
 import { format, isToday, isYesterday } from 'date-fns'
+import { cn } from '@/utils/lib'
 import RichText from './rich-text'
 import AttachmentGrid from './attachment-grid'
 import type { ChatAttachment } from '@/lib/chat-attachments'
@@ -11,12 +12,16 @@ interface InterventionBubbleProps {
     attachments?: ChatAttachment[] | null
     signedUrls: Map<string, string>
     onOpenImage: (attachment: ChatAttachment) => void
+    isFirstInGroup?: boolean
 }
 
 /**
- * A third-party message from the Access Oxbridge team stepping into a
- * mentor↔student thread. Deliberately distinct from either participant's
- * bubbles so it reads as an official note rather than a reply.
+ * The Access Oxbridge team stepping into a mentor↔student thread.
+ *
+ * Reads as an incoming message like any other — same avatar/name/plain-text
+ * shape — with identity carried by the logo, the accent-coloured name and a
+ * quiet role tag. The previous bordered card shouted for attention; a calm
+ * treatment actually reads as more official, not less.
  */
 export default function InterventionBubble({
     content,
@@ -24,6 +29,7 @@ export default function InterventionBubble({
     attachments,
     signedUrls,
     onOpenImage,
+    isFirstInGroup = true,
 }: InterventionBubbleProps) {
     const date = new Date(timestamp)
     const time =
@@ -31,34 +37,47 @@ export default function InterventionBubble({
             ? format(date, 'h:mm a')
             : format(date, 'MMM d, h:mm a')
 
+    const hasText = content.trim().length > 0
+    const hasAttachments = !!attachments && attachments.length > 0
+
     return (
-        <div className="flex gap-2">
-            <div className="shrink-0 mt-auto">
-                <div className="w-8 h-8 rounded-full bg-white border border-accent/20 flex items-center justify-center overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/logo.png" alt="Access Oxbridge" className="w-5 h-5 object-contain" />
-                </div>
+        <div className="flex gap-2.5">
+            <div className="w-8 shrink-0">
+                {isFirstInGroup && (
+                    <div className="w-8 h-8 rounded-full bg-white border border-accent/20 flex items-center justify-center overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo.png" alt="Access Oxbridge" className="w-5 h-5 object-contain" />
+                    </div>
+                )}
             </div>
 
-            <div className="flex flex-col gap-1.5 max-w-[75%] sm:max-w-[70%] items-start">
-                <span className="text-[11px] font-semibold text-accent ml-1">Claire Marlowe</span>
-
-                {attachments && attachments.length > 0 && (
-                    <AttachmentGrid
-                        attachments={attachments}
-                        signedUrls={signedUrls}
-                        isSent={false}
-                        onOpenImage={onOpenImage}
-                    />
-                )}
-
-                {content.trim().length > 0 && (
-                    <div className="px-3.5 py-2.5 rounded-2xl rounded-bl-md bg-accent/[0.06] border border-accent/15 text-gray-800">
-                        <RichText content={content} />
+            <div className="min-w-0 max-w-[85%]">
+                {isFirstInGroup && (
+                    <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-[13px] font-semibold text-accent">Claire Marlowe</span>
+                        <span className="px-1.5 py-px rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
+                            Access Oxbridge
+                        </span>
+                        <span className="text-[11px] text-gray-400 tabular-nums">{time}</span>
                     </div>
                 )}
 
-                <span className="text-[11px] text-gray-400 px-0.5 tabular-nums">{time}</span>
+                {hasAttachments && (
+                    <div className={cn(hasText && 'mb-1.5')}>
+                        <AttachmentGrid
+                            attachments={attachments}
+                            signedUrls={signedUrls}
+                            isSent={false}
+                            onOpenImage={onOpenImage}
+                        />
+                    </div>
+                )}
+
+                {hasText && (
+                    <div className="text-gray-700">
+                        <RichText content={content} />
+                    </div>
+                )}
             </div>
         </div>
     )

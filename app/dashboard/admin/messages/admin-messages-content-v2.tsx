@@ -415,14 +415,16 @@ export default function AdminMessagesContent({
                                                     )}
 
                                                     {body.trim().length > 0 && (
+                                                        // Same rule as the student/mentor thread:
+                                                        // only the team's own messages get a bubble,
+                                                        // participants' words render as plain prose.
                                                         <div
                                                             className={cn(
-                                                                'px-3.5 py-2.5 rounded-2xl',
                                                                 isIntervention
-                                                                    ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-br-md'
+                                                                    ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-amber-50 border border-amber-200 text-amber-900'
                                                                     : alignRight
-                                                                        ? 'bg-accent text-white rounded-br-md'
-                                                                        : 'bg-white border border-gray-200/80 text-gray-800 rounded-bl-md'
+                                                                        ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-accent text-white'
+                                                                        : 'text-gray-700'
                                                             )}
                                                         >
                                                             <RichText

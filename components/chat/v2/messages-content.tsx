@@ -77,7 +77,9 @@ export default function MessagesContent({
 
     return (
         <>
-            <div className="flex bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-[calc(100%-80px)]">
+            {/* flex-1 rather than a magic height offset, so the card fills
+                whatever the page header leaves behind. */}
+            <div className="flex flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div
                     className={cn(
                         'w-full md:w-80 shrink-0 md:border-r border-gray-100 bg-white flex-col',

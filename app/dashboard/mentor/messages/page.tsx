@@ -131,14 +131,11 @@ export default async function MentorMessagesPage() {
     )
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
-            <header className="mb-6">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
+        <div className="max-w-6xl mx-auto flex flex-col h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
+            <header className="shrink-0 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>
-                <p className="mt-2 text-gray-500 text-lg">
-                    Chat with your students in real-time
-                </p>
             </header>
 
             <MessagesContent

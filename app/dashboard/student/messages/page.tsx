@@ -174,14 +174,15 @@ export default async function StudentMessagesPage({
     })
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
-            <header className="mb-6">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
+        <div className="max-w-6xl mx-auto flex flex-col h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
+            {/* One header, then the card owns the rest of the height. The
+                subtitle is gone deliberately: the thread already says what
+                this page is, and three stacked headers before any content
+                was the main thing making this screen feel cluttered. */}
+            <header className="shrink-0 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>
-                <p className="mt-2 text-gray-500 text-lg">
-                    Chat with your mentor or reach the Access Oxbridge team for help.
-                </p>
             </header>
 
             <MessagesContent

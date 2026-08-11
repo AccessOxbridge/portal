@@ -178,10 +178,11 @@ export default async function StudentMessagesPage({
         // edges — including the bottom on desktop (md:-mb-10), where that
         // padding existed only to clear the mobile tab bar and so was dead
         // space. On phones pb-24 is deliberately left alone: the tab bar is
-        // fixed there and the composer has to stay clear of it. Hence the
-        // asymmetric heights — 100dvh minus 64px top bar and 96px pb-24 on
-        // phones, a full 100vh on desktop.
-        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 md:-mb-10 h-[calc(100dvh-160px)] md:h-screen">
+        // fixed there and the composer has to stay clear of it.
+        //
+        // Heights: phones are 100dvh less the 64px MobileTopBar and the 96px
+        // pb-24; desktop is 100vh less the 80px DesktopTopBar.
+        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-6 md:-mb-10 h-[calc(100dvh-160px)] md:h-[calc(100vh-80px)]">
             {/* One header, then the panes own the rest of the height. The
                 subtitle is gone deliberately: the thread already says what
                 this page is, and three stacked headers before any content

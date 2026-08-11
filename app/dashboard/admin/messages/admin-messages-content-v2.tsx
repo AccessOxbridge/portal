@@ -10,6 +10,7 @@ import AttachmentGrid from '@/components/chat/v2/attachment-grid'
 import DateSeparator from '@/components/chat/v2/date-separator'
 import ImageLightbox from '@/components/chat/v2/image-lightbox'
 import MessageInput from '@/components/chat/v2/message-input'
+import { useLiveConversations } from '@/components/chat/v2/use-live-conversations'
 import {
     signAttachmentUrls,
     uploadAttachment,
@@ -62,11 +63,19 @@ interface AdminMessagesContentProps {
 }
 
 export default function AdminMessagesContent({
-    conversations,
+    conversations: initialConversations,
     currentUserId,
 }: AdminMessagesContentProps) {
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+
+    // Same live list as the student and mentor views: previews, timestamps and
+    // ordering update as messages land, with no refresh.
+    const { conversations } = useLiveConversations(
+        initialConversations,
+        currentUserId,
+        selectedConversation?.id ?? null
+    )
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoadingMessages, setIsLoadingMessages] = useState(false)
     const [signedUrls, setSignedUrls] = useState<Map<string, string>>(new Map())

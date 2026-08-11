@@ -6,6 +6,7 @@ import { Plus, MessageSquare } from 'lucide-react'
 import { cn } from '@/utils/lib'
 import ConversationList, { type ConversationSummary } from './conversation-list'
 import ChatWindow from './chat-window'
+import { useLiveConversations } from './use-live-conversations'
 // Reused as-is from the original chat components — unchanged behaviour.
 import NewConversationDialog from '@/components/chat/new-conversation-dialog'
 
@@ -32,7 +33,7 @@ interface MessagesContentProps {
  * same master/detail behaviour, rebuilt on the v2 chat components.
  */
 export default function MessagesContent({
-    conversations,
+    conversations: initialConversations,
     currentUserId,
     connectedUsers,
     userRole,
@@ -42,15 +43,32 @@ export default function MessagesContent({
 }: MessagesContentProps) {
     const router = useRouter()
     const [selectedConversation, setSelectedConversation] = useState<ConversationSummary | null>(
-        conversations.length > 0 ? conversations[0] : null
+        initialConversations.length > 0 ? initialConversations[0] : null
     )
     const [isNewConversationOpen, setIsNewConversationOpen] = useState(false)
     const [mobilePane, setMobilePane] = useState<'list' | 'thread'>('list')
 
+    // Previews, timestamps, ordering and unread counts now update as messages
+    // arrive, instead of being frozen at whatever the server rendered.
+    const { conversations, markRead } = useLiveConversations(
+        initialConversations,
+        currentUserId,
+        selectedConversation?.id ?? null
+    )
+
     const openConversation = (conversation: ConversationSummary) => {
         setSelectedConversation(conversation)
         setMobilePane('thread')
+        markRead(conversation.id)
     }
+
+    // The thread that opens on load has its messages marked read by ChatWindow,
+    // so clear the pill the server rendered for it too.
+    useEffect(() => {
+        if (selectedConversation) markRead(selectedConversation.id)
+        // Mount only: later opens go through openConversation.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         if (!initialMentorId || conversations.length === 0) return
@@ -58,9 +76,10 @@ export default function MessagesContent({
         if (withMentor) {
             setSelectedConversation(withMentor)
             setMobilePane('thread')
+            markRead(withMentor.id)
             router.replace('/dashboard/student/messages', { scroll: false })
         }
-    }, [initialMentorId, conversations, router])
+    }, [initialMentorId, conversations, router, markRead])
 
     useEffect(() => {
         if (!initialSupport || conversations.length === 0) return
@@ -68,9 +87,10 @@ export default function MessagesContent({
         if (support) {
             setSelectedConversation(support)
             setMobilePane('thread')
+            markRead(support.id)
             router.replace('/dashboard/student/messages', { scroll: false })
         }
-    }, [initialSupport, conversations, router])
+    }, [initialSupport, conversations, router, markRead])
 
     const placeholderText =
         userRole === 'student' ? 'Choose a mentor to start chatting' : 'Choose a student to start chatting'

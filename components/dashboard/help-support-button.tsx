@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { LifeBuoy, X, Send, CheckCircle2 } from 'lucide-react'
 
 export default function HelpSupportButton() {
+    const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [message, setMessage] = useState('')
     const [isSending, setIsSending] = useState(false)
@@ -44,6 +46,12 @@ export default function HelpSupportButton() {
             setIsSending(false)
         }
     }
+
+    // The messages page runs full-bleed, so this fixed launcher lands on top of
+    // the composer's send button. It is also redundant there: that page already
+    // contains the Help & Support thread with Claire, which is exactly where
+    // this button posts to.
+    if (pathname?.endsWith('/messages')) return null
 
     return (
         <>

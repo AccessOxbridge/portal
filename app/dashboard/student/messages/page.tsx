@@ -186,7 +186,7 @@ export default async function StudentMessagesPage({
                 subtitle is gone deliberately: the thread already says what
                 this page is, and three stacked headers before any content
                 was the main thing making this screen feel cluttered. */}
-            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-5 pb-3">
+            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-5 pb-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>

@@ -157,21 +157,21 @@ export default function MessageInput({
 
     return (
         <div
-            className="shrink-0 border-t border-gray-200/70 bg-white px-3 py-3 md:px-6"
+            className="shrink-0 border-t border-gray-200/70 bg-white px-4 py-3 md:px-6"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
                 e.preventDefault()
                 addFiles(Array.from(e.dataTransfer.files))
             }}
         >
-          {/* Same 720px column as the thread, so the composer lines up.
+          {/* Full pane width, matching the thread above.
               One bordered container holding everything — attachment chips,
               the field and the controls — the way Slack, n8n, Cursor and
               ManyChat all do it. Free-floating icon buttons either side of a
               separate input is what made this look unfinished. */}
           <div
             className={cn(
-                'max-w-[720px] mx-auto w-full rounded-2xl border bg-white transition-colors',
+                'w-full rounded-2xl border bg-white transition-colors',
                 isFocused ? 'border-accent/40 ring-2 ring-accent/10' : 'border-gray-200'
             )}
           >

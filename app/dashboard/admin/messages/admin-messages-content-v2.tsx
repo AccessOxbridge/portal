@@ -340,7 +340,7 @@ export default function AdminMessagesContent({
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto px-6 py-4 bg-[#FAFBFC] [&>*]:max-w-[720px] [&>*]:mx-auto [&>*]:w-full">
+                        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]">
                             {isLoadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
                                     <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -449,7 +449,7 @@ export default function AdminMessagesContent({
                         </div>
 
                         <div className={isDirect ? 'bg-white' : 'bg-amber-50/60'}>
-                            <div className="max-w-[720px] mx-auto w-full flex items-center gap-2 px-3 md:px-6 pt-3">
+                            <div className="flex items-center gap-2 px-4 md:px-6 pt-3">
                                 {isDirect ? (
                                     <>
                                         <MessageCircle className="w-4 h-4 text-accent" />

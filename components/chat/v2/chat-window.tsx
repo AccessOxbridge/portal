@@ -342,10 +342,9 @@ export default function ChatWindow({
 
     return (
         <div className="flex flex-col h-full">
-            {/* Header. Its inner column matches the thread's, so the avatar
-                here lines up with the message avatars below. */}
-            <div className="shrink-0 border-b border-gray-200/70 bg-white px-3 md:px-6 py-3">
-                <div className="max-w-[720px] mx-auto w-full flex items-center gap-3">
+            {/* Header. Full pane width, like the thread below it. */}
+            <div className="shrink-0 border-b border-gray-200/70 bg-white px-4 md:px-6 py-3">
+                <div className="flex items-center gap-3">
                 {onBack && (
                     <button
                         type="button"
@@ -392,10 +391,9 @@ export default function ChatWindow({
                 </div>
             </div>
 
-            {/* Thread. The scroll container spans the pane; the content inside
-                is capped so a short message isn't stranded across 1100px. */}
-            <div className="flex-1 overflow-y-auto px-3 md:px-6 py-4 bg-[#FAFBFC]">
-              <div className="max-w-[720px] mx-auto w-full h-full">
+            {/* Thread runs the full width of the pane — no centred column. */}
+            <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]">
+              <div className="w-full h-full">
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
                         <MessageSquare className="w-12 h-12 mb-3 text-gray-200" strokeWidth={1.5} />

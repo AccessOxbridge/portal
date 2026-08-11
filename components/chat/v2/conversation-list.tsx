@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import { MessageSquare } from 'lucide-react'
 import { cn } from '@/utils/lib'
-import { attachmentPreviewLabel, type ChatAttachment } from '@/lib/chat-attachments'
+import { attachmentPreviewLabel } from '@/lib/chat-attachments'
 
 export interface ConversationSummary {
     id: string
@@ -22,7 +22,8 @@ export interface ConversationSummary {
     last_message?: {
         content: string
         sender_id: string
-        attachments?: ChatAttachment[] | null
+        /** Raw jsonb from the database; narrowed by toChatAttachments. */
+        attachments?: unknown
     } | null
     unread_count?: number
 }

@@ -35,7 +35,7 @@ export type Database = {
         Insert: {
           author: string
           body: string
-          categories: Database["public"]["Enums"]["blog_category"][]
+          categories?: Database["public"]["Enums"]["blog_category"][]
           created_at?: string | null
           description: string
           featured?: boolean | null
@@ -77,7 +77,7 @@ export type Database = {
           mentor_id: string | null
           mentor_notified_at: string | null
           session_id: string | null
-          student_id: string
+          student_id: string | null
           student_notified_at: string | null
           type: string
           updated_at: string | null
@@ -90,7 +90,7 @@ export type Database = {
           mentor_id?: string | null
           mentor_notified_at?: string | null
           session_id?: string | null
-          student_id: string
+          student_id?: string | null
           student_notified_at?: string | null
           type?: string
           updated_at?: string | null
@@ -103,7 +103,7 @@ export type Database = {
           mentor_id?: string | null
           mentor_notified_at?: string | null
           session_id?: string | null
-          student_id?: string
+          student_id?: string | null
           student_notified_at?: string | null
           type?: string
           updated_at?: string | null
@@ -450,6 +450,173 @@ export type Database = {
           },
         ]
       }
+      mentor_invoice_documents: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_id: string
+          kind: string
+          pdf_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_id: string
+          kind: string
+          pdf_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          kind?: string
+          pdf_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_invoice_documents_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_invoice_items: {
+        Row: {
+          amount_cents: number
+          description: string
+          duration_minutes: number
+          hourly_rate_cents: number
+          id: string
+          invoice_id: string
+          session_date: string | null
+          session_id: string | null
+          student_name: string | null
+        }
+        Insert: {
+          amount_cents: number
+          description?: string
+          duration_minutes: number
+          hourly_rate_cents: number
+          id?: string
+          invoice_id: string
+          session_date?: string | null
+          session_id?: string | null
+          student_name?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          description?: string
+          duration_minutes?: number
+          hourly_rate_cents?: number
+          id?: string
+          invoice_id?: string
+          session_date?: string | null
+          session_id?: string | null
+          student_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_invoice_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_invoices: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          invoice_date: string | null
+          invoice_number: string | null
+          invoice_reference: string | null
+          is_self_billed: boolean
+          mentor_id: string
+          paid_at: string | null
+          payout_id: string | null
+          period_end: string | null
+          period_start: string | null
+          status: string
+          submitted_at: string | null
+          subtotal_cents: number
+          total_cents: number
+          updated_at: string
+          vat_cents: number
+          voided_at: string | null
+          withholding_cents: number
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_date?: string | null
+          invoice_number?: string | null
+          invoice_reference?: string | null
+          is_self_billed?: boolean
+          mentor_id: string
+          paid_at?: string | null
+          payout_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          submitted_at?: string | null
+          subtotal_cents?: number
+          total_cents?: number
+          updated_at?: string
+          vat_cents?: number
+          voided_at?: string | null
+          withholding_cents?: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          invoice_date?: string | null
+          invoice_number?: string | null
+          invoice_reference?: string | null
+          is_self_billed?: boolean
+          mentor_id?: string
+          paid_at?: string | null
+          payout_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string
+          submitted_at?: string | null
+          subtotal_cents?: number
+          total_cents?: number
+          updated_at?: string
+          vat_cents?: number
+          voided_at?: string | null
+          withholding_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_invoices_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_invoices_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_payouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_payout_items: {
         Row: {
           amount_cents: number
@@ -502,6 +669,7 @@ export type Database = {
           currency: string
           failure_message: string | null
           id: string
+          invoice_id: string | null
           mentor_id: string
           paid_at: string | null
           period_end: string
@@ -520,6 +688,7 @@ export type Database = {
           currency?: string
           failure_message?: string | null
           id?: string
+          invoice_id?: string | null
           mentor_id: string
           paid_at?: string | null
           period_end: string
@@ -538,6 +707,7 @@ export type Database = {
           currency?: string
           failure_message?: string | null
           id?: string
+          invoice_id?: string | null
           mentor_id?: string
           paid_at?: string | null
           period_end?: string
@@ -551,6 +721,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "mentor_payouts_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_invoices"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mentor_payouts_mentor_id_fkey"
             columns: ["mentor_id"]
@@ -727,6 +904,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachments: Json | null
           content: string
           conversation_id: string
           created_at: string | null
@@ -735,6 +913,7 @@ export type Database = {
           sender_id: string
         }
         Insert: {
+          attachments?: Json | null
           content: string
           conversation_id: string
           created_at?: string | null
@@ -743,6 +922,7 @@ export type Database = {
           sender_id: string
         }
         Update: {
+          attachments?: Json | null
           content?: string
           conversation_id?: string
           created_at?: string | null
@@ -897,8 +1077,9 @@ export type Database = {
           duration_minutes: number | null
           first_session_followup_sent: boolean | null
           id: string
+          invoice_id: string | null
           mentor_id: string
-          recording_available: boolean | null
+          recording_available: boolean
           recording_download_token: string | null
           recording_download_url: string | null
           recording_play_url: string | null
@@ -906,6 +1087,7 @@ export type Database = {
           request_id: string | null
           scheduled_at: string | null
           selected_slot: Json | null
+          short_reminder_sent: boolean | null
           status: string
           student_id: string
           transcript_download_token: string | null
@@ -921,8 +1103,9 @@ export type Database = {
           duration_minutes?: number | null
           first_session_followup_sent?: boolean | null
           id?: string
+          invoice_id?: string | null
           mentor_id: string
-          recording_available?: boolean | null
+          recording_available?: boolean
           recording_download_token?: string | null
           recording_download_url?: string | null
           recording_play_url?: string | null
@@ -930,6 +1113,7 @@ export type Database = {
           request_id?: string | null
           scheduled_at?: string | null
           selected_slot?: Json | null
+          short_reminder_sent?: boolean | null
           status?: string
           student_id: string
           transcript_download_token?: string | null
@@ -945,8 +1129,9 @@ export type Database = {
           duration_minutes?: number | null
           first_session_followup_sent?: boolean | null
           id?: string
+          invoice_id?: string | null
           mentor_id?: string
-          recording_available?: boolean | null
+          recording_available?: boolean
           recording_download_token?: string | null
           recording_download_url?: string | null
           recording_play_url?: string | null
@@ -954,6 +1139,7 @@ export type Database = {
           request_id?: string | null
           scheduled_at?: string | null
           selected_slot?: Json | null
+          short_reminder_sent?: boolean | null
           status?: string
           student_id?: string
           transcript_download_token?: string | null
@@ -966,6 +1152,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "sessions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_invoices"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sessions_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
@@ -977,6 +1170,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_mentor_id_mentors_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_directory"
             referencedColumns: ["id"]
           },
           {
@@ -1209,9 +1409,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      mentors_directory: {
+        Row: {
+          active: boolean | null
+          bio: string | null
+          college: string | null
+          degree_subject: string | null
+          id: string | null
+          name: string | null
+          oxbridge_institution: string | null
+          specialisms: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentors_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      can_access_conversation_folder: {
+        Args: { object_name: string }
+        Returns: boolean
+      }
       match_mentors: {
         Args: {
           match_count: number
@@ -1227,32 +1451,33 @@ export type Database = {
           similarity: number
         }[]
       }
+      next_mentor_invoice_number: { Args: never; Returns: string }
     }
     Enums: {
       blog_category:
-      | "Oxbridge Admissions"
-      | "Interview Tips"
-      | "Personal Statement"
-      | "UK Universities"
-      | "Student Stories"
-      | "Admissions Guide"
-      | "International Students"
+        | "Oxbridge Admissions"
+        | "Interview Tips"
+        | "Personal Statement"
+        | "UK Universities"
+        | "Student Stories"
+        | "Admissions Guide"
+        | "International Students"
       mentor_status: "active" | "pending_approval" | "details_required"
       notification_type:
-      | "mentorship_request"
-      | "match_accepted"
-      | "match_rejected"
-      | "session_started"
-      | "mentor_application_review_request"
-      | "mentor_application_approved"
-      | "mentor_application_denied"
-      | "system_alert"
-      | "session_confirmed"
-      | "session_reminder"
-      | "mentor_session_request"
-      | "session_reschedule_request"
-      | "session_reschedule_accepted"
-      | "session_reschedule_declined"
+        | "mentorship_request"
+        | "match_accepted"
+        | "match_rejected"
+        | "session_started"
+        | "mentor_application_review_request"
+        | "mentor_application_approved"
+        | "mentor_application_denied"
+        | "system_alert"
+        | "session_confirmed"
+        | "session_reminder"
+        | "mentor_session_request"
+        | "session_reschedule_request"
+        | "session_reschedule_accepted"
+        | "session_reschedule_declined"
       user_role: "student" | "mentor" | "admin" | "client" | "admin-dev"
     }
     CompositeTypes: {
@@ -1267,116 +1492,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

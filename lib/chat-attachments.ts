@@ -214,9 +214,32 @@ export async function signAttachmentUrls(
     return urls
 }
 
+/**
+ * Narrow a raw `jsonb` value from the database into attachments.
+ *
+ * Postgres jsonb surfaces as the generated `Json` type, which is a union wide
+ * enough to include strings and numbers. Rather than casting and hoping, we
+ * check the shape — a malformed or hand-edited row degrades to "no
+ * attachments" instead of crashing the thread.
+ */
+export function toChatAttachments(value: unknown): ChatAttachment[] | null {
+    if (!Array.isArray(value)) return null
+
+    const valid = value.filter(
+        (entry): entry is ChatAttachment =>
+            !!entry &&
+            typeof entry === 'object' &&
+            typeof (entry as ChatAttachment).path === 'string' &&
+            typeof (entry as ChatAttachment).name === 'string'
+    )
+
+    return valid.length > 0 ? valid : null
+}
+
 /** Conversation-list preview text for a message that may carry attachments. */
-export function attachmentPreviewLabel(attachments: ChatAttachment[] | null | undefined): string | null {
-    if (!attachments || attachments.length === 0) return null
+export function attachmentPreviewLabel(raw: unknown): string | null {
+    const attachments = toChatAttachments(raw)
+    if (!attachments) return null
 
     const images = attachments.filter((a) => a.kind === 'image').length
     const files = attachments.length - images

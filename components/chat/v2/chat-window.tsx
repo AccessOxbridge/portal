@@ -11,6 +11,7 @@ import DateSeparator from './date-separator'
 import ImageLightbox from './image-lightbox'
 import {
     signAttachmentUrls,
+    toChatAttachments,
     uploadAttachment,
     type ChatAttachment,
     type PendingAttachment,
@@ -143,7 +144,10 @@ export default function ChatWindow({
             if (cancelled) return
 
             if (!error && data) {
-                const rows = data as unknown as Message[]
+                const rows: Message[] = (data as any[]).map((row) => ({
+                    ...row,
+                    attachments: toChatAttachments(row.attachments),
+                }))
                 setMessages(rows)
                 ensureSignedUrls(rows)
             }
@@ -181,7 +185,11 @@ export default function ChatWindow({
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 (payload) => {
-                    const incoming = payload.new as unknown as Message
+                    const raw = payload.new as any
+                    const incoming: Message = {
+                        ...raw,
+                        attachments: toChatAttachments(raw.attachments),
+                    }
 
                     // Our own sends are already on screen optimistically.
                     if (incoming.sender_id === currentUserId) return
@@ -226,9 +234,9 @@ export default function ChatWindow({
 
             const { data, error } = await supabase
                 .from('messages')
-                // Cast: utils/supabase/types.ts predates messages.attachments and
-                // is already stale against the live DB (see next.config.ts). Drop
-                // the cast once the migration is applied and types regenerated.
+                // Cast: attachments is generated as `Json`, and TypeScript will
+                // not assign an interface array to Json's index-signature type
+                // without one. The shape is guaranteed by uploadAttachment.
                 .insert({
                     id: messageId,
                     conversation_id: conversationId,

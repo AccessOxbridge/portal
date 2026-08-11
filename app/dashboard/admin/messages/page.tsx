@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import AdminMessagesContent from './admin-messages-content'
+import AdminMessagesContent from './admin-messages-content-v2'
 
 export default async function AdminMessagesPage() {
     const supabase = await createClient()
@@ -58,7 +58,7 @@ export default async function AdminMessagesPage() {
             // Get last message
             const { data: lastMessage } = await supabase
                 .from('messages')
-                .select('content, sender_id, created_at')
+                .select('content, sender_id, created_at, attachments')
                 .eq('conversation_id', conv.id)
                 .order('created_at', { ascending: false })
                 .limit(1)

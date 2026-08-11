@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import MessagesContent from '@/components/chat/messages-content'
+import MessagesContent from '@/components/chat/v2/messages-content'
 
 export default async function StudentMessagesPage({
     searchParams
@@ -125,7 +125,7 @@ export default async function StudentMessagesPage({
         (conversations || []).map(async (conv: any) => {
             const { data: lastMessage } = await supabase
                 .from('messages')
-                .select('content, sender_id')
+                .select('content, sender_id, attachments')
                 .eq('conversation_id', conv.id)
                 .order('created_at', { ascending: false })
                 .limit(1)

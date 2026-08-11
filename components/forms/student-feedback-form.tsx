@@ -152,7 +152,7 @@ export default function StudentFeedbackForm({ sessionId, onClose }: StudentFeedb
                 {/* Left Column: Help Section */}
                 <div className="lg:sticky lg:top-10 space-y-8">
                     <div className="space-y-4">
-                        <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
                             Experiencing an issue?
                         </h1>
                         <h2 className="text-2xl font-semibold text-gray-700">
@@ -204,7 +204,7 @@ export default function StudentFeedbackForm({ sessionId, onClose }: StudentFeedb
 
                 {/* Right Column: Feedback Form */}
                 <div className="bg-white rounded-[32px] w-full overflow-hidden shadow-xl border border-gray-100">
-                    <div className="p-8 sm:p-12">
+                    <div className="p-5 sm:p-12">
                         <div className="flex justify-between items-center mb-8">
                             <div>
                                 <span className="text-accent font-bold text-sm tracking-wider uppercase">

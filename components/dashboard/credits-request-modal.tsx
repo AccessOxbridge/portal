@@ -79,7 +79,7 @@ export default function CreditsRequestModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
@@ -89,7 +89,7 @@ export default function CreditsRequestModal({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="credits-request-title"
-                className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden"
+                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-md max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden"
             >
                 <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">

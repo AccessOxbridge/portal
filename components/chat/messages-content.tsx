@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
+import { cn } from '@/utils/lib'
 import ConversationList from '@/components/chat/conversation-list'
 import ChatWindow from '@/components/chat/chat-window'
 import NewConversationDialog from '@/components/chat/new-conversation-dialog'
@@ -66,6 +67,14 @@ export default function MessagesContent({
         conversations.length > 0 ? conversations[0] : null
     )
     const [isNewConversationOpen, setIsNewConversationOpen] = useState(false)
+    // Phones show one pane at a time (master/detail); from `md` up both are
+    // visible side by side and this is ignored.
+    const [mobilePane, setMobilePane] = useState<'list' | 'thread'>('list')
+
+    const openConversation = (conversation: Conversation) => {
+        setSelectedConversation(conversation)
+        setMobilePane('thread')
+    }
 
     // Open specific mentor chat when navigating with ?mentor=
     useEffect(() => {
@@ -73,6 +82,7 @@ export default function MessagesContent({
         const withMentor = conversations.find((c) => c.mentor_id === initialMentorId)
         if (withMentor) {
             setSelectedConversation(withMentor)
+            setMobilePane('thread')
             // Clear URL so refreshing doesn't re-apply
             router.replace('/dashboard/student/messages', { scroll: false })
         }
@@ -84,6 +94,7 @@ export default function MessagesContent({
         const support = conversations.find((c) => c.type === 'support')
         if (support) {
             setSelectedConversation(support)
+            setMobilePane('thread')
             router.replace('/dashboard/student/messages', { scroll: false })
         }
     }, [initialSupport, conversations, router])
@@ -97,7 +108,13 @@ export default function MessagesContent({
         <>
             <div className="flex bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-[calc(100%-80px)]">
                 {/* Conversation List */}
-                <div className="w-80 border-r border-gray-100 overflow-y-auto bg-white flex flex-col">
+                <div
+                    className={cn(
+                        'w-full md:w-80 shrink-0 md:border-r border-gray-100 overflow-y-auto bg-white flex-col',
+                        // Master/detail on phones: one pane at a time.
+                        mobilePane === 'list' ? 'flex' : 'hidden md:flex'
+                    )}
+                >
                     <div className="sticky top-0 bg-white z-10 px-4 py-3 border-b border-gray-50 flex items-center justify-between">
                         <h2 className="font-semibold text-gray-700 text-sm">Conversations</h2>
                         {allowNewConversation && (
@@ -114,14 +131,19 @@ export default function MessagesContent({
                         <ConversationList
                             conversations={conversations}
                             selectedId={selectedConversation?.id || null}
-                            onSelect={setSelectedConversation}
+                            onSelect={openConversation}
                             currentUserId={currentUserId}
                         />
                     </div>
                 </div>
 
                 {/* Chat Window */}
-                <div className="flex-1 flex flex-col">
+                <div
+                    className={cn(
+                        'flex-1 min-w-0 flex-col',
+                        mobilePane === 'thread' ? 'flex' : 'hidden md:flex'
+                    )}
+                >
                     {selectedConversation ? (
                         <ChatWindow
                             conversationId={selectedConversation.id}
@@ -133,6 +155,7 @@ export default function MessagesContent({
                                 mentor_id: selectedConversation.mentor_id,
                                 admin_id: selectedConversation.admin_id || undefined
                             }}
+                            onBack={() => setMobilePane('list')}
                         />
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-gray-400">

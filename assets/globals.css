@@ -75,30 +75,19 @@
   :root {
     --brand-color: #092c68
   }
-
-  /* .container {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-
-  @media (max-width: 767px) {
-    .container {
-      padding-left: 16px;
-      padding-right: 16px;
-    }
-  }
-
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .container {
-      padding-left: 24px;
-      padding-right: 24px;
-    }
-  } */
 }
 @layer utilities {
+  /* Horizontally scrollable strips (session tabs, onboarding steppers) that
+     should scroll without showing a scrollbar. Referenced in markup already
+     but never previously defined. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
   }

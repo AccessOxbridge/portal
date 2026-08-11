@@ -97,7 +97,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                                 {activeLabel?.emoji ?? '📚'}
                             </div>
                             <div>
-                                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
                                     {activeLabel?.label ?? categorySlug}
                                 </h1>
                                 {activeLabel?.description && (
@@ -108,7 +108,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                     </>
                 ) : (
                     <>
-                        <h1 className="text-5xl font-extrabold text-accent tracking-tight">Learning Resources</h1>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">Learning Resources</h1>
                         <p className="mt-2 text-gray-500 text-xl font-medium">
                             Expert guides to help you get into Oxford or Cambridge.
                         </p>

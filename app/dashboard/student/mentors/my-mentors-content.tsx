@@ -167,7 +167,7 @@ export default function MyMentorsContent({
                                 )}
 
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-start justify-between gap-4">
+                                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                         <div>
                                             <h3 className="text-xl font-bold text-gray-900">
                                                 {mentor.full_name}
@@ -180,7 +180,7 @@ export default function MyMentorsContent({
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-2 shrink-0">
+                                        <div className="flex flex-wrap items-center gap-2 md:shrink-0">
                                             <Link
                                                 href={`/dashboard/student/mentors/${mentor.id}`}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors text-sm"

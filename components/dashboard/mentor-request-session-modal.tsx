@@ -152,11 +152,11 @@ export default function MentorRequestSessionModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-xl sm:mx-4 max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between gap-3">
                     <div>
                         <h2 className="text-2xl font-extrabold text-gray-900">Request a Session</h2>
                         <p className="text-gray-500 mt-1">Propose a time for your student to confirm</p>
@@ -169,7 +169,7 @@ export default function MentorRequestSessionModal({
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
                     <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
                         <div className="flex items-start gap-3">
                             <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
@@ -269,7 +269,7 @@ export default function MentorRequestSessionModal({
                     )}
                 </div>
 
-                <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
+                <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                     <button
                         onClick={onClose}
                         className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:text-gray-700 transition-colors"
@@ -279,7 +279,7 @@ export default function MentorRequestSessionModal({
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !studentId || !date || !startTime || !endTime}
-                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center gap-2"
+                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">

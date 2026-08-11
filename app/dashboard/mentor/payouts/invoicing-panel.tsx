@@ -209,11 +209,11 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
 
     return (
         <section>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
                 <button
                     onClick={openCreate}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold bg-accent text-white hover:opacity-90 transition-all shadow-lg"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-accent text-white hover:opacity-90 transition-all shadow-lg"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                     Create invoice
@@ -260,7 +260,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                                     </label>
                                 ))}
                             </div>
-                            <div className="flex items-center justify-between mt-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
                                 <p className="text-sm text-gray-500">
                                     {picked.size} selected · <span className="font-bold text-gray-900">{fmtDur(pickedMinutes)}</span> · <span className="font-bold text-gray-900">{fmtGBP(pickedTotal)}</span>
                                     {picked.size > 0 && belowMinimum && (
@@ -346,15 +346,15 @@ function InvoiceDetail({ inv, mentorName, mentorEmail, busy, onSubmit, onDiscard
 }) {
     const period = inv.period_start && inv.period_end ? `${fmtDate(inv.period_start)} – ${fmtDate(inv.period_end)}` : fmtDate(inv.invoice_date)
     return (
-        <div className="bg-white rounded-[24px] border border-gray-100 shadow-lg p-8">
+        <div className="bg-white rounded-[24px] border border-gray-100 shadow-lg p-5 sm:p-8">
             {inv.is_self_billed && (
                 <div className="mb-4 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold tracking-widest inline-block">SELF-BILLING</div>
             )}
 
             {/* Header */}
-            <div className="flex items-start justify-between">
-                <div>
-                    <h3 className="text-2xl font-extrabold text-gray-900">{inv.status === 'paid' ? 'Remittance' : 'Invoice'}</h3>
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900">{inv.status === 'paid' ? 'Remittance' : 'Invoice'}</h3>
                     <p className="text-sm text-gray-500 mt-1">{period}</p>
                     <p className="text-sm text-gray-500">{inv.completed_count} of {inv.sessions_count} completed</p>
                 </div>
@@ -369,7 +369,7 @@ function InvoiceDetail({ inv, mentorName, mentorEmail, busy, onSubmit, onDiscard
             <div className="border-t border-gray-100 my-6" />
 
             {/* FROM / BILL TO */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">From</p>
                     <p className="font-bold text-gray-900">{mentorName}</p>
@@ -395,25 +395,36 @@ function InvoiceDetail({ inv, mentorName, mentorEmail, busy, onSubmit, onDiscard
 
             {/* Line items */}
             <div className="mt-6 border border-gray-100 rounded-xl overflow-hidden">
-                <div className="grid grid-cols-12 bg-gray-50 px-4 py-2.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                {/* Column headers only make sense once the row is a grid (sm+). */}
+                <div className="hidden sm:grid grid-cols-12 bg-gray-50 px-4 py-2.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
                     <div className="col-span-4">Session</div>
                     <div className="col-span-5">Description</div>
                     <div className="col-span-1 text-right">Dur.</div>
                     <div className="col-span-2 text-right">Amount</div>
                 </div>
                 {inv.items.map((it, i) => (
-                    <div key={i} className="grid grid-cols-12 px-4 py-3 border-t border-gray-100 text-sm">
-                        <div className="col-span-4">
+                    <div
+                        key={i}
+                        className="flex flex-col gap-2 sm:grid sm:grid-cols-12 sm:gap-0 px-4 py-3 border-t border-gray-100 text-sm first:border-t-0 sm:first:border-t"
+                    >
+                        <div className="sm:col-span-4">
                             <p className="font-medium text-gray-900">{fmtDate(it.session_date)}</p>
                             <p className="text-xs text-gray-400">{fmtTimeRange(it.scheduled_at, it.duration_minutes)}</p>
                             {it.completed && <p className="text-xs text-green-600">Completed</p>}
                         </div>
-                        <div className="col-span-5">
+                        <div className="sm:col-span-5">
                             <p className="font-medium text-gray-900">{it.description || '1-1 Mentorship Session'}</p>
                             <p className="text-xs text-gray-500">Student: {it.student_name || '—'}</p>
                         </div>
-                        <div className="col-span-1 text-right text-gray-600">{fmtDur(it.duration_minutes)}</div>
-                        <div className="col-span-2 text-right font-medium text-gray-900">{fmtGBP(it.amount_cents, inv.currency)}</div>
+                        {/* Stacked rows need their own labels; the grid has headers. */}
+                        <div className="flex items-baseline justify-between gap-3 sm:contents">
+                            <span className="text-xs text-gray-400 sm:hidden">Duration</span>
+                            <span className="text-gray-600 sm:col-span-1 sm:text-right">{fmtDur(it.duration_minutes)}</span>
+                        </div>
+                        <div className="flex items-baseline justify-between gap-3 sm:contents">
+                            <span className="text-xs text-gray-400 sm:hidden">Amount</span>
+                            <span className="font-medium text-gray-900 sm:col-span-2 sm:text-right">{fmtGBP(it.amount_cents, inv.currency)}</span>
+                        </div>
                     </div>
                 ))}
             </div>

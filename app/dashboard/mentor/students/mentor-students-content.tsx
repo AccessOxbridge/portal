@@ -189,10 +189,10 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                         {s.email && (
                                             <a
                                                 href={`mailto:${s.email}`}
-                                                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-accent transition-colors mt-0.5"
+                                                className="inline-flex items-center gap-1.5 max-w-full text-sm text-gray-500 hover:text-accent transition-colors mt-0.5"
                                             >
-                                                <Mail className="w-3.5 h-3.5" />
-                                                {s.email}
+                                                <Mail className="w-3.5 h-3.5 shrink-0" />
+                                                <span className="truncate">{s.email}</span>
                                             </a>
                                         )}
                                         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
@@ -213,7 +213,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                 </div>
 
                                 {/* Metrics */}
-                                <div className="grid grid-cols-3 gap-3 mt-5">
+                                <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-5">
                                     <div className="rounded-xl bg-gray-50 p-3 text-center">
                                         <p className="text-xl font-bold text-gray-900 leading-none">{s.sessions_completed}</p>
                                         <p className="text-[11px] text-gray-500 mt-1">Completed</p>

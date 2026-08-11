@@ -88,7 +88,7 @@ export default function StudentDashboardContent({
                 {/* Top row: heading + welcome aligned with hours remaining & bell (same vertical level) */}
                 <div className="flex flex-wrap items-center justify-between gap-4 -mt-1 md:-mt-5">
                     <div>
-                        <h1 className="text-5xl font-extrabold text-accent tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
                             Student Dashboard
                         </h1>
                         <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {greetingName}!</p>

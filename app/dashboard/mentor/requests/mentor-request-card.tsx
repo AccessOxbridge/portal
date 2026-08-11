@@ -97,7 +97,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
     if (isReschedule) {
         const proposed = timeSlots[0]
         return (
-            <div className="bg-white rounded-[32px] border border-amber-200 shadow-xl shadow-amber-100/40 overflow-hidden p-10">
+            <div className="bg-white rounded-[32px] border border-amber-200 shadow-xl shadow-amber-100/40 overflow-hidden p-6 sm:p-10">
                 <div className="flex items-start justify-between gap-6 flex-wrap">
                     <div className="flex items-start gap-4">
                         <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner shrink-0">
@@ -141,12 +141,12 @@ export function MentorRequestCard({ request }: { request: Request }) {
                 </div>
 
                 {showRejectDialog && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
                         <div
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                             onClick={() => !loading && setShowRejectDialog(false)}
                         />
-                        <div className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden p-10">
+                        <div className="relative bg-white shadow-2xl w-full max-w-sm max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-10">
                             <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center text-red-600 mb-8 mx-auto shadow-inner">
                                 <AlertTriangle className="w-10 h-10" />
                             </div>
@@ -179,7 +179,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
 
     return (
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
-            <div className="p-10 flex-1">
+            <div className="p-6 sm:p-10 flex-1">
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner">
                         {request.student?.full_name?.charAt(0) || 'S'}
@@ -274,7 +274,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                 </div>
             </div>
 
-            <div className="p-10 bg-gray-50/50 w-full md:w-80 flex flex-col justify-center gap-4">
+            <div className="p-6 sm:p-10 bg-gray-50/50 w-full md:w-80 flex flex-col justify-center gap-4">
                 {/* <div className="mb-6">
                     <div className="text-sm font-bold text-gray-400 mb-2">EXPIRES IN</div>
                     <div className="text-3xl font-black text-gray-900 tabular-nums">
@@ -343,12 +343,12 @@ export function MentorRequestCard({ request }: { request: Request }) {
 
             {/* Reject Confirmation Dialog */}
             {showRejectDialog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => !loading && setShowRejectDialog(false)}
                     />
-                    <div className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden p-10 animate-in zoom-in slide-in-from-bottom-4 duration-300">
+                    <div className="relative bg-white shadow-2xl w-full max-w-sm max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-10 animate-in zoom-in slide-in-from-bottom-4 duration-300">
                         <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center text-red-600 mb-8 mx-auto shadow-inner">
                             <AlertTriangle className="w-10 h-10" />
                         </div>

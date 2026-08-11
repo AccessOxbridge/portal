@@ -4,41 +4,22 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-    LayoutDashboard,
-    Users,
     Calendar,
     Settings,
     LogOut,
     Search,
-    CreditCard,
-    FileText,
     CheckCircle,
-    PenBoxIcon,
-    Coins,
-    Banknote,
-    MessageSquare,
-    MessageCircle,
-    Book,
-    BookOpen,
-    CalendarDays,
-    Video,
-    MapPin,
     ChevronDown,
     ChevronLeft,
     ChevronUp,
-    ClipboardList,
-    Home,
-    Briefcase,
-    GraduationCap,
     AlertCircle,
-    HelpCircle,
     User,
-    CalendarRange,
-    Film
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import { Logo } from '../logo'
+import { navigation, studentSections } from './nav-items'
+import { useUnreadMessages } from './use-unread-messages'
 
 interface SidebarProps {
     role: string;
@@ -54,91 +35,6 @@ interface SidebarProps {
     onToggleCollapse?: () => void;
 }
 
-// Define section type for expandable sections
-interface NavSection {
-    name: string;
-    icon: React.ElementType;
-    subsections: { name: string; href: string; icon: React.ElementType }[];
-}
-
-const studentSections: NavSection[] = [
-    // Hidden from student sidebar view
-    // {
-    //     name: 'Events',
-    //     icon: CalendarDays,
-    //     subsections: [
-    //         { name: 'Webinars', href: '/dashboard/student/events/webinars', icon: Video },
-    //         { name: 'In Person Events', href: '/dashboard/student/events/in-person', icon: MapPin },
-    //     ],
-    // },
-]
-
-const navigation = {
-    student: [
-        { name: 'Home', href: '/dashboard/student', icon: Home },
-        { name: 'My Sessions', href: '/dashboard/student/sessions', icon: Calendar },
-        { name: 'Recordings', href: '/dashboard/student/recordings', icon: Film },
-        { name: 'Messages', href: '/dashboard/student/messages', icon: MessageCircle },
-        { name: 'My Mentors', href: '/dashboard/student/mentors', icon: Users },
-        { name: 'Reports', href: '/dashboard/student/reports', icon: FileText },
-        // Hidden from student sidebar view
-        // { name: 'Resources', href: '/dashboard/student/resources', icon: Book },
-    ],
-    mentor: [
-        { name: 'Training', href: '/dashboard/mentor/training', icon: GraduationCap },
-        { name: 'Dashboard', href: '/dashboard/mentor', icon: LayoutDashboard },
-        { name: 'Messages', href: '/dashboard/mentor/messages', icon: MessageCircle },
-        { name: 'Sessions', href: '/dashboard/mentor/sessions', icon: Calendar },
-        { name: 'My Students', href: '/dashboard/mentor/students', icon: Users },
-        { name: 'Requests', href: '/dashboard/mentor/requests', icon: ClipboardList },
-        { name: 'Reports', href: '/dashboard/mentor/reports', icon: FileText },
-        { name: 'Payouts', href: '/dashboard/mentor/payouts', icon: Banknote },
-        { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
-        { name: 'My Profile', href: '/dashboard/mentor/profile', icon: User },
-    ],
-    admin: [
-        { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
-        { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
-        { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
-        { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
-        { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
-        { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
-        { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
-        { name: 'Sessions', href: '/dashboard/admin/sessions', icon: Video },
-        { name: 'Manage Sessions', href: '/dashboard/admin/manage-sessions', icon: CalendarRange },
-        { name: 'Session Recordings', href: '/dashboard/admin/recordings', icon: Film },
-        { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
-        { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
-        { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
-        { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
-        { name: 'Fortnightly Report', href: '/dashboard/admin/fortnightly-report', icon: CalendarRange },
-        { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
-        { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
-        { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },
-        { name: 'Legal', href: '/dashboard/admin/legal', icon: Briefcase },
-    ],
-    'admin-dev': [ // Same as admin for now
-        { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
-        { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
-        { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
-        { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
-        { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
-        { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
-        { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
-        { name: 'Sessions', href: '/dashboard/admin/sessions', icon: Video },
-        { name: 'Manage Sessions', href: '/dashboard/admin/manage-sessions', icon: CalendarRange },
-        { name: 'Session Recordings', href: '/dashboard/admin/recordings', icon: Film },
-        { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
-        { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
-        { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
-        { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
-        { name: 'Fortnightly Report', href: '/dashboard/admin/fortnightly-report', icon: CalendarRange },
-        { name: 'Transactions', href: '/dashboard/admin/transactions', icon: CreditCard },
-        { name: 'Payouts', href: '/dashboard/admin/payouts', icon: Banknote },
-        { name: 'Issues', href: '/dashboard/admin/issues', icon: AlertCircle },
-        { name: 'Legal', href: '/dashboard/admin/legal', icon: Briefcase },
-    ]
-}
 
 export default function Sidebar({
     role,
@@ -158,7 +54,6 @@ export default function Sidebar({
     const [expandedSections, setExpandedSections] = useState<string[]>(['Events'])
     const [searchQuery, setSearchQuery] = useState('')
     const [profileMenuOpen, setProfileMenuOpen] = useState(false)
-    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0)
     const searchInputRef = useRef<HTMLInputElement>(null)
     const profileMenuRef = useRef<HTMLDivElement>(null)
 
@@ -175,6 +70,8 @@ export default function Sidebar({
         else if (pathname.startsWith('/dashboard/mentor')) effectiveRole = 'mentor'
         else if (pathname.startsWith('/dashboard/admin')) effectiveRole = 'admin-dev'
     }
+
+    const unreadMessagesCount = useUnreadMessages(userId, effectiveRole)
 
     // localStorage key for this user's tab order, scoped per role view
     const orderStorageKey = useMemo(
@@ -301,74 +198,11 @@ export default function Sidebar({
         window.location.href = '/login'
     }
 
-    // Fetch unread messages count for student and mentor sidebars,
-    // and keep it updated via realtime + light polling.
-    useEffect(() => {
-        if (!userId) return
-        if (effectiveRole !== 'student' && effectiveRole !== 'mentor') return
-
-        let isMounted = true
-
-        const fetchUnreadCount = async () => {
-            if (!isMounted) return
-            try {
-                // 1) Get all conversations for this user (as student or mentor)
-                const { data: conversations } = await supabase
-                    .from('conversations')
-                    .select('id')
-                    .eq(effectiveRole === 'student' ? 'student_id' : 'mentor_id', userId)
-
-                const conversationIds = (conversations || []).map((c: any) => c.id)
-                if (conversationIds.length === 0) {
-                    if (isMounted) setUnreadMessagesCount(0)
-                    return
-                }
-
-                // 2) Count unread messages not sent by the current user
-                const { count } = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .in('conversation_id', conversationIds)
-                    .eq('is_read', false)
-                    .neq('sender_id', userId)
-
-                if (isMounted) {
-                    setUnreadMessagesCount(count || 0)
-                }
-            } catch (err) {
-                console.error('[Sidebar] Failed to fetch unread messages count:', err)
-            }
-        }
-
-        // Initial fetch
-        fetchUnreadCount()
-
-        // Re-fetch when new messages arrive via realtime
-        const channel = supabase
-            .channel('messages-sidebar')
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'messages' },
-                () => {
-                    fetchUnreadCount()
-                }
-            )
-            .subscribe()
-
-        // Light polling as a safety net (every 60s)
-        const interval = setInterval(fetchUnreadCount, 60_000)
-
-        return () => {
-            isMounted = false
-            clearInterval(interval)
-            supabase.removeChannel(channel)
-        }
-    }, [effectiveRole, supabase, userId])
-
     return (
         <aside
             className={cn(
-                'bg-accent border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
+                // Hidden below `md` — phones get MobileTopBar + MobileTabBar instead.
+                'bg-accent border-r border-white/10 hidden md:flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
                 collapsed ? 'w-[4.5rem]' : 'w-64'
             )}
         >

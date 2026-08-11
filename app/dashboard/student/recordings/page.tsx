@@ -57,7 +57,7 @@ export default async function StudentRecordingsPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-8">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
                     Session Recordings
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">

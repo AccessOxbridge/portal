@@ -247,11 +247,11 @@ export default function MentorSessionsContent({
                 </div>
             )}
             {/* Tab Switcher + Request a Session */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
+                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
                     <button
                         onClick={() => setActiveTab('pending')}
-                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
                             ? 'bg-white text-amber-600 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
@@ -265,7 +265,7 @@ export default function MentorSessionsContent({
                     </button>
                     <button
                         onClick={() => setActiveTab('upcoming')}
-                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
                             ? 'bg-white text-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
@@ -279,7 +279,7 @@ export default function MentorSessionsContent({
                     </button>
                     <button
                         onClick={() => setActiveTab('current')}
-                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
                             ? 'bg-white text-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
@@ -293,7 +293,7 @@ export default function MentorSessionsContent({
                     </button>
                     <button
                         onClick={() => setActiveTab('past')}
-                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
                             ? 'bg-white text-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
@@ -345,7 +345,7 @@ export default function MentorSessionsContent({
                                 key={request.id}
                                 className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
                             >
-                                <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                     <div className="flex items-start gap-4">
                                         <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
                                             {request.student_full_name?.[0] || 'S'}
@@ -372,7 +372,7 @@ export default function MentorSessionsContent({
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
+                                    <div className="flex flex-col items-start md:items-end gap-2">
                                         <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold whitespace-nowrap">
                                             Awaiting Response
                                         </span>
@@ -426,7 +426,7 @@ export default function MentorSessionsContent({
                             key={session.id}
                             className="p-6 bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:shadow-gray-200/50 transition-all group"
                         >
-                            <div className="flex items-start justify-between gap-4">
+                            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div className="flex items-start gap-4">
                                     {/* Student Avatar */}
                                     <div className="w-14 h-14 rounded-2xl bg-accent text-white flex items-center justify-center text-lg font-bold shrink-0">
@@ -461,7 +461,7 @@ export default function MentorSessionsContent({
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-2 flex-wrap justify-end">
+                                <div className="flex items-center gap-2 flex-wrap md:justify-end">
                                     {activeTab === 'upcoming' || activeTab === 'current' ? (
                                         <>
                                             {session.zoom_meeting_id || session.zoom_start_url ? (
@@ -504,7 +504,7 @@ export default function MentorSessionsContent({
                                             )}
                                         </>
                                     ) : (
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             {!session.has_report ? (
                                                 <Link
                                                     href={`/dashboard/mentor/sessions/${session.id}/report`}

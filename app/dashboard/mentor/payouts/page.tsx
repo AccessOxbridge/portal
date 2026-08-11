@@ -86,7 +86,7 @@ export default async function MentorPayoutsPage() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-5xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
                     Earnings & Payouts
                 </h1>
                 <p className="mt-4 text-gray-500 text-xl font-medium">
@@ -97,24 +97,24 @@ export default async function MentorPayoutsPage() {
             {/* Earnings summary — single card: To Be Paid hero + key stats */}
             <section className="bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
                 <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                    <div className="flex items-center justify-between">
-                        <div>
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0">
                             <p className="text-blue-100 text-sm font-medium mb-1">To Be Paid</p>
-                            <p className="text-4xl font-bold">
+                            <p className="text-3xl sm:text-4xl font-bold">
                                 {formatPrice(totalPending)}
                             </p>
                             <p className="text-blue-200 text-sm mt-2">
                                 {pendingPayouts.length} payment{pendingPayouts.length !== 1 ? 's' : ''} being processed
                             </p>
                         </div>
-                        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-white/10 rounded-2xl flex items-center justify-center">
                             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
                 </div>
-                <div className="p-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <div>
                         <p className="text-sm font-medium text-gray-500 mb-1">Total Paid</p>
                         <p className="text-2xl font-bold text-green-600">{formatPrice(totalPaid)}</p>
@@ -152,7 +152,7 @@ export default async function MentorPayoutsPage() {
             {/* Stripe Dashboard Link */}
             {mentor?.payouts_enabled && (
                 <div className="p-6 bg-gradient-to-r from-[#635BFF] to-[#7B73FF] rounded-[24px] text-white">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <h3 className="text-xl font-bold mb-1">Stripe Dashboard</h3>
                             <p className="text-white/80 text-sm">
@@ -172,7 +172,40 @@ export default async function MentorPayoutsPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Payout History</h2>
 
                 {payouts && payouts.length > 0 ? (
-                    <div className="bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
+                    <>
+                    {/* Phones: one card per payout. The five-column table below
+                        can't be read at 375px and its wrapper clips overflow. */}
+                    <div className="md:hidden space-y-3">
+                        {payouts.map((payout: any) => (
+                            <div
+                                key={payout.id}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4"
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <span className="font-semibold text-gray-900 text-sm">
+                                        {new Date(payout.period_start).toLocaleDateString('en-GB', {
+                                            day: 'numeric', month: 'short'
+                                        })} - {new Date(payout.period_end).toLocaleDateString('en-GB', {
+                                            day: 'numeric', month: 'short', year: 'numeric'
+                                        })}
+                                    </span>
+                                    <PayoutStatusBadge status={payout.status} />
+                                </div>
+                                <div className="mt-3 flex items-baseline justify-between gap-3">
+                                    <span className="text-2xl font-bold text-gray-900">
+                                        {formatPrice(payout.amount_cents)}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                        {payout.sessions_count} session{payout.sessions_count !== 1 ? 's' : ''}
+                                        {' · '}
+                                        {(payout.total_minutes / 60).toFixed(1)}h
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="hidden md:block bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-100">
                                 <tr>
@@ -212,6 +245,7 @@ export default async function MentorPayoutsPage() {
                             </tbody>
                         </table>
                     </div>
+                    </>
                 ) : (
                     <div className="p-12 bg-gray-50 rounded-[24px] text-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

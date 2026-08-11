@@ -44,7 +44,7 @@ export default async function MentorDashboard() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h1 className="text-4xl font-bold text-accent mb-6">Application Pending</h1>
+                <h1 className="text-3xl sm:text-4xl font-bold text-accent mb-6">Application Pending</h1>
                 <p className="text-gray-600 text-lg max-w-md mb-8 leading-relaxed">
                     Thank you for applying, <span className="font-semibold">{profile.full_name}</span>! Our team is currently reviewing your profile. We&apos;ll notify you via email once you&apos;re approved.
                 </p>
@@ -84,7 +84,7 @@ export default async function MentorDashboard() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-5xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
                     Mentor Dashboard
                 </h1>
                 <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>

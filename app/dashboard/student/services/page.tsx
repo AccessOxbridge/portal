@@ -39,7 +39,7 @@ export default async function CreditsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
                     Expert Guidance, For You
                 </h1>
             </header>

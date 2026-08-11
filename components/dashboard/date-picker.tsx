@@ -40,6 +40,8 @@ function toDateValue(d: Date): string {
 
 const POPOVER_WIDTH = 280
 const POPOVER_GAP = 6
+/** Fallback height used on the first open, before the popover has been measured. */
+const POPOVER_EST_HEIGHT = 340
 
 export default function DatePicker({ value, onChange, min, id, className = '' }: DatePickerProps) {
     const [open, setOpen] = useState(false)
@@ -74,10 +76,19 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
             Math.max(8, rect.left),
             window.innerWidth - POPOVER_WIDTH - 8
         )
-        setPosition({
-            top: rect.bottom + POPOVER_GAP,
-            left,
-        })
+
+        // Flip above the trigger when there isn't room below — otherwise a
+        // picker opened low in a scrolling modal renders off-screen on a phone.
+        const height = popoverRef.current?.offsetHeight ?? POPOVER_EST_HEIGHT
+        const spaceBelow = window.innerHeight - rect.bottom - POPOVER_GAP
+        const spaceAbove = rect.top - POPOVER_GAP
+        const flipUp = spaceBelow < height && spaceAbove > spaceBelow
+
+        const top = flipUp
+            ? Math.max(8, rect.top - POPOVER_GAP - height)
+            : Math.min(rect.bottom + POPOVER_GAP, window.innerHeight - height - 8)
+
+        setPosition({ top: Math.max(8, top), left })
     }
 
     useLayoutEffect(() => {
@@ -146,7 +157,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                     type="button"
                     onClick={() => setViewMonth((m) => subMonths(m, 1))}
                     disabled={!canGoPrev}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                    className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
                     aria-label="Previous month"
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -157,7 +168,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                 <button
                     type="button"
                     onClick={() => setViewMonth((m) => addMonths(m, 1))}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                    className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
                     aria-label="Next month"
                 >
                     <ChevronRight className="w-4 h-4" />
@@ -190,7 +201,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                             disabled={disabled}
                             onClick={() => pickDay(day)}
                             className={[
-                                'h-9 w-full rounded-lg text-sm font-medium transition-colors',
+                                'h-11 sm:h-9 w-full rounded-lg text-sm font-medium transition-colors',
                                 !inMonth && !isSelected ? 'text-gray-300' : '',
                                 inMonth && !isSelected && !disabled ? 'text-gray-800 hover:bg-accent/10' : '',
                                 disabled ? 'text-gray-200 cursor-not-allowed' : '',

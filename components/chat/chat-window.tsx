@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble from './message-bubble'
 import MessageInput from './message-input'
@@ -33,6 +34,8 @@ interface ChatWindowProps {
         mentor_id: string | null
         admin_id?: string
     }
+    /** Mobile master/detail: renders a back-to-list button in the header. */
+    onBack?: () => void
 }
 
 export default function ChatWindow({
@@ -40,7 +43,8 @@ export default function ChatWindow({
     currentUserId,
     otherUser,
     adminUser,
-    allParticipants
+    allParticipants,
+    onBack
 }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -245,7 +249,17 @@ export default function ChatWindow({
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="border-b border-gray-100 bg-white px-6 py-4 flex items-center gap-4">
+            <div className="border-b border-gray-100 bg-white px-4 md:px-6 py-4 flex items-center gap-3 md:gap-4">
+                {onBack && (
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        aria-label="Back to conversations"
+                        className="md:hidden -ml-2 shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-gray-600 active:bg-gray-100 transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                )}
                 <div className="relative">
                     {otherUser.photo_url ? (
                         <img

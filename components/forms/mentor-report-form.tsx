@@ -115,9 +115,9 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
     }
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-[32px] w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
-                <div className="p-8 sm:p-12">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div className="bg-white rounded-t-[32px] sm:rounded-[32px] w-full max-w-xl max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                <div className="p-5 sm:p-12">
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <span className="text-accent font-bold text-sm tracking-wider uppercase">

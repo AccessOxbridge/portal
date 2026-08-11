@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "../assets/globals.css";
 import NotificationBell from "@/components/dashboard/notification-bell";
@@ -23,6 +23,15 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+};
+
+// `viewportFit: 'cover'` is what makes `env(safe-area-inset-*)` resolve to real
+// values — the mobile tab bar relies on it for home-indicator clearance.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#092c68",
 };
 
 export default function RootLayout({

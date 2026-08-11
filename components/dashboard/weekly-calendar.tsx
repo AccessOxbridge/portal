@@ -86,14 +86,14 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
     return (
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+            <div className="p-4 sm:p-6 border-b border-gray-50 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
                         {selectedDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
                     </h2>
                     <p className="text-gray-500 text-sm font-medium">Your schedule for the week</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                     <button
                         onClick={handlePrevWeek}
                         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -110,12 +110,12 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
             </div>
 
             {/* Week Days */}
-            <div className="px-6 py-4 flex justify-between bg-gray-50/50">
+            <div className="px-2 sm:px-6 py-4 flex justify-between bg-gray-50/50">
                 {weekDates.map((date, i) => (
                     <button
                         key={i}
                         onClick={() => setSelectedDate(date)}
-                        className={`flex flex-col items-center gap-1 group transition-all ${isSelected(date) ? 'scale-110' : 'hover:scale-105'
+                        className={`flex flex-col items-center gap-1 group transition-all shrink-0 ${isSelected(date) ? 'scale-110' : 'hover:scale-105'
                             }`}
                     >
                         <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected(date) ? 'text-accent' : 'text-gray-400'
@@ -133,13 +133,15 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
             </div>
 
             {/* Selected Day's Sessions */}
-            <div className="p-6 min-h-[300px]">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                        <CalendarIcon className="w-5 h-5 text-accent" />
-                        {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <div className="p-4 sm:p-6 min-h-[300px]">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-800 flex items-center gap-2 min-w-0">
+                        <CalendarIcon className="w-5 h-5 text-accent shrink-0" />
+                        <span className="truncate">
+                            {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                        </span>
                     </h3>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">
                         {daySessions.length} {daySessions.length === 1 ? 'Session' : 'Sessions'}
                     </span>
                 </div>
@@ -156,7 +158,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                         {daySessions.map((session) => (
                             <div
                                 key={session.id}
-                                className="group relative bg-white border border-gray-100 p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
+                                className="group relative bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
                                 onClick={() => {
                                     if (session.zoom_url) {
                                         window.open(
@@ -166,12 +168,12 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent font-bold text-xl">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                                    <div className="flex items-center gap-4 min-w-0">
+                                        <div className="w-12 h-12 shrink-0 bg-accent/10 rounded-xl flex items-center justify-center text-accent font-bold text-xl">
                                             {session.person_name?.[0] || personLabel[0]}
                                         </div>
-                                        <div>
+                                        <div className="min-w-0">
                                             <h4 className="font-bold text-gray-900 group-hover:text-accent transition-colors">
                                                 Session with {session.person_name}
                                             </h4>
@@ -185,8 +187,8 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                     </div>
 
                                     {session.zoom_url ? (
-                                        <div className="flex items-center gap-2">
-                                            <button className={`${canJoinZoom ? 'bg-accent' : 'bg-amber-500'} text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <button className={`${canJoinZoom ? 'bg-accent' : 'bg-amber-500'} text-white w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
                                                 <Video className="w-4 h-4" />
                                                 {canJoinZoom ? zoomButtonLabel : 'Top up to Join'}
                                             </button>

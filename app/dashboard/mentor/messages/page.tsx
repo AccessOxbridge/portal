@@ -131,9 +131,9 @@ export default async function MentorMessagesPage() {
     )
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100vh-120px)]">
+        <div className="max-w-6xl mx-auto h-[calc(100dvh-176px)] md:h-[calc(100vh-120px)]">
             <header className="mb-6">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
                     Messages
                 </h1>
                 <p className="mt-2 text-gray-500 text-lg">

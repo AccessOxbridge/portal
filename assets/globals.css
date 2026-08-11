@@ -102,3 +102,13 @@
     background: rgba(255, 255, 255, 0.2);
   }
 }
+
+/*
+ * Full-screen overlays (the chat image viewer) set `data-overlay-open` on
+ * <body>. The dashboard's floating chrome — credits pill, notification bell,
+ * Help & Support — is fixed at z-100/z-999 and would otherwise sit on top of
+ * the overlay and cover its close/download controls.
+ */
+body[data-overlay-open] [data-floating-ui] {
+  display: none;
+}

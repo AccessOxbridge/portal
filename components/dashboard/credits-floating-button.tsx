@@ -13,6 +13,7 @@ export default function CreditsFloatingButton({ credits, onClick }: Props) {
             type="button"
             onClick={onClick}
             aria-label={`${credits} session hours remaining. Request more hours.`}
+            data-floating-ui
             className="fixed top-5 right-16 sm:right-20 md:right-24 z-100 group flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2 rounded-2xl
             bg-white/70 backdrop-blur-md border border-white/40 transition-all duration-300 hover:scale-[1.02]
             active:scale-[0.98] shadow-2xl shadow-black/5 cursor-pointer"

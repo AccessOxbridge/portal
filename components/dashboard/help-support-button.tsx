@@ -51,6 +51,7 @@ export default function HelpSupportButton() {
                 type="button"
                 onClick={() => setIsOpen(true)}
                 aria-label="Help & Support"
+                data-floating-ui
                 className="fixed bottom-24 md:bottom-6 right-6 z-100 group flex items-center gap-2 px-5 py-3 rounded-2xl
                 bg-accent text-white shadow-2xl shadow-accent/30 transition-all duration-300
                 hover:scale-[1.03] active:scale-[0.97]"

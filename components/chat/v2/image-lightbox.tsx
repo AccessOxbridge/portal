@@ -22,9 +22,16 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
         const previousOverflow = document.body.style.overflow
         document.body.style.overflow = 'hidden'
 
+        // The dashboard's floating chrome (credits pill, notification bell,
+        // Help & Support) is fixed at z-100/z-999 and would cover this
+        // overlay's download and close buttons. globals.css hides anything
+        // marked [data-floating-ui] while this attribute is set.
+        document.body.setAttribute('data-overlay-open', '')
+
         return () => {
             document.removeEventListener('keydown', onKeyDown)
             document.body.style.overflow = previousOverflow
+            document.body.removeAttribute('data-overlay-open')
         }
     }, [onClose])
 
@@ -34,7 +41,10 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
             aria-modal="true"
             aria-label={attachment.name}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col animate-in fade-in duration-150"
+            // Above the notification bell (z-999) as a second line of defence,
+            // so the viewer is never buried even if some chrome lacks the
+            // [data-floating-ui] marker.
+            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex flex-col animate-in fade-in duration-150"
         >
             <div
                 className="flex items-center justify-between gap-4 px-4 py-3 text-white/90"

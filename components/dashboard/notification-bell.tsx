@@ -170,7 +170,7 @@ export default function NotificationBell() {
     if (isAuthPage) return null
 
     return (
-        <div className="fixed top-5 right-4 bg-white/70 shadow rounded-full p-3 backdrop-blur-md z-999 cursor-pointer" ref={dropdownRef}>
+        <div data-floating-ui className="fixed top-5 right-4 bg-white/70 shadow rounded-full p-3 backdrop-blur-md z-999 cursor-pointer" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-xl  transition-all group"

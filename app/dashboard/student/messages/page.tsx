@@ -174,16 +174,19 @@ export default async function StudentMessagesPage({
     })
 
     return (
-        // Full-bleed: cancels the shell's horizontal and top padding so the
-        // panes reach the edges. The shell's bottom padding is deliberately
-        // NOT cancelled — on phones it is pb-24, which keeps the fixed mobile
-        // tab bar clear of the composer.
-        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 h-[calc(100dvh-160px)] md:h-[calc(100vh-80px)]">
+        // Full-bleed. The shell's padding is cancelled so the panes reach the
+        // edges — including the bottom on desktop (md:-mb-10), where that
+        // padding existed only to clear the mobile tab bar and so was dead
+        // space. On phones pb-24 is deliberately left alone: the tab bar is
+        // fixed there and the composer has to stay clear of it. Hence the
+        // asymmetric heights — 100dvh minus 64px top bar and 96px pb-24 on
+        // phones, a full 100vh on desktop.
+        <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 md:-mb-10 h-[calc(100dvh-160px)] md:h-screen">
             {/* One header, then the panes own the rest of the height. The
                 subtitle is gone deliberately: the thread already says what
                 this page is, and three stacked headers before any content
                 was the main thing making this screen feel cluttered. */}
-            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-10 pb-4">
+            <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-5 pb-3">
                 <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
                     Messages
                 </h1>

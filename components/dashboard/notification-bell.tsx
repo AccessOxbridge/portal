@@ -170,10 +170,20 @@ export default function NotificationBell() {
     if (isAuthPage) return null
 
     return (
-        <div data-floating-ui className="fixed top-5 right-4 bg-white/70 shadow rounded-full p-3 backdrop-blur-md z-999 cursor-pointer" ref={dropdownRef}>
+        // Shares its shape language with CreditsFloatingButton so the two read
+        // as one deliberate control cluster rather than two unrelated things:
+        // same 52px height (p-2 + a 36px hit area), same rounded-2xl, same
+        // translucent blur, border and shadow. The credits pill is offset to
+        // sit immediately left of this with a consistent 8px gap.
+        <div
+            data-floating-ui
+            className="fixed top-5 right-4 z-999 p-2 rounded-2xl bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl shadow-black/5 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            ref={dropdownRef}
+        >
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-xl  transition-all group"
+                aria-label="Notifications"
+                className="relative p-2 rounded-xl transition-all group"
             >
                 <Bell className="w-5 h-5 fill-accent" />
                 {unreadCount > 0 && (

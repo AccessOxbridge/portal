@@ -14,7 +14,11 @@ export default function CreditsFloatingButton({ credits, onClick }: Props) {
             onClick={onClick}
             aria-label={`${credits} session hours remaining. Request more hours.`}
             data-floating-ui
-            className="fixed top-5 right-16 sm:right-20 md:right-24 z-100 group flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2 rounded-2xl
+            // right-[4.75rem] = 76px: the bell is 52px wide sitting at right-4
+            // (16px), so this lands with a consistent 8px gap beside it at every
+            // breakpoint. Matching height, radius, blur, border and shadow are
+            // what make the pair read as one cluster.
+            className="fixed top-5 right-[4.75rem] z-100 group flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2 rounded-2xl
             bg-white/70 backdrop-blur-md border border-white/40 transition-all duration-300 hover:scale-[1.02]
             active:scale-[0.98] shadow-2xl shadow-black/5 cursor-pointer"
         >

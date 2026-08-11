@@ -92,10 +92,15 @@ async function notifyRecipient(
     })
 
     if (result.ok) {
-        await admin
-            .from('conversations')
-            .update({ [target.column]: new Date().toISOString() })
-            .eq('id', conv.id)
+        const now = new Date().toISOString()
+        // Branched rather than a computed key: `{ [target.column]: ... }` widens
+        // to a string index signature, which the generated Update type rejects.
+        const patch =
+            target.column === 'student_notified_at'
+                ? { student_notified_at: now }
+                : { mentor_notified_at: now }
+
+        await admin.from('conversations').update(patch).eq('id', conv.id)
     }
 
     return { id: target.id, sent: result.ok, error: result.error }

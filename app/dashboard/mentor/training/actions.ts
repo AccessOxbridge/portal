@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
+import type { TablesUpdate } from '@/utils/supabase/types'
 
 export async function completeTraining() {
     const supabase = await createClient()
@@ -288,7 +289,8 @@ export async function completeProfile(formData: FormData) {
         photoUrl = publicUrl
     }
 
-    const updateData: Record<string, any> = {
+    // See profile/actions.ts — typed against the generated schema.
+    const updateData: TablesUpdate<'mentors'> = {
         profile_completed_at: new Date().toISOString()
     }
 

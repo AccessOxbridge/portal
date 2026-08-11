@@ -32,15 +32,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
-  typescript: {
-    // The generated Supabase types in utils/supabase/types.ts are stale relative
-    // to the live DB (e.g. sessions.short_reminder_sent), which makes several
-    // pre-existing files fail `next build` typecheck. Allow the production build
-    // to complete until the types are regenerated (`supabase gen types typescript`)
-    // and the strict check can be re-enabled.
-    // TODO: regenerate Supabase types and remove this.
-    ignoreBuildErrors: true,
-  },
+  // Typecheck is enforced again. utils/supabase/types.ts has been regenerated
+  // against the live database and the errors it was masking are fixed, so
+  // `next build` fails on type errors rather than shipping past them.
 };
 
 export default nextConfig;

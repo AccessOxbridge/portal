@@ -57,7 +57,9 @@ export async function GET(
         // usable response — webhook download_tokens expire (~24h), so we must
         // fall through to OAuth instead of failing on the first attempt.
         const range = req.headers.get('range')
-        const rangeHeaders = range ? { Range: range } : {}
+        // Typed rather than inferred: the ternary otherwise produces
+        // `{ Range: string } | {}`, which is not assignable to HeadersInit.
+        const rangeHeaders: Record<string, string> = range ? { Range: range } : {}
 
         async function tryFetch(
             url: string,

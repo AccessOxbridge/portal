@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
+import type { TablesUpdate } from '@/utils/supabase/types'
 
 export async function updateMentorProfile(prevState: any, formData: FormData) {
     const supabase = await createClient()
@@ -61,7 +62,9 @@ export async function updateMentorProfile(prevState: any, formData: FormData) {
     }
 
     // Update mentor-specific fields. RLS allows mentors to UPDATE their own row.
-    const mentorUpdate: Record<string, any> = {
+    // Typed against the generated schema rather than Record<string, any>, so a
+    // renamed or removed column fails here instead of silently no-opping.
+    const mentorUpdate: TablesUpdate<'mentors'> = {
         bio,
         expertise,
         phone: phone || null,

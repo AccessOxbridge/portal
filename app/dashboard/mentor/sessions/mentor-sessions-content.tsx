@@ -10,6 +10,8 @@ import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/co
 import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
 
 interface Session {
+    /** Present on public.sessions; was missing from this local interface. */
+    zoom_meeting_id?: string | null
     id: string
     scheduled_at: string | null
     duration_minutes: number

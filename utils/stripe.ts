@@ -5,7 +5,12 @@ let _stripe: Stripe | null = null
 export function getStripe(): Stripe {
     if (!_stripe) {
         _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-            apiVersion: '2025-12-15.clover',
+            // Deliberately pinned. The installed SDK's types default to the
+            // newest version it knows about (2026-02-25.clover), but changing
+            // this string changes live Stripe API behaviour — response shapes
+            // and defaults differ between versions — so it is a tested upgrade,
+            // not a typecheck fix. The cast keeps the pin while satisfying TS.
+            apiVersion: '2025-12-15.clover' as Stripe.LatestApiVersion,
             typescript: true
         })
     }

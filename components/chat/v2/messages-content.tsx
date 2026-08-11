@@ -53,7 +53,8 @@ export default function MessagesContent({
     const { conversations, markRead } = useLiveConversations(
         initialConversations,
         currentUserId,
-        selectedConversation?.id ?? null
+        selectedConversation?.id ?? null,
+        router.refresh
     )
 
     const openConversation = (conversation: ConversationSummary) => {

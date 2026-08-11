@@ -59,7 +59,16 @@ export function useLiveConversations<T extends LiveConversation>(
     initial: T[],
     currentUserId: string,
     /** The open conversation never accrues unread — ChatWindow marks it read. */
-    selectedId: string | null
+    selectedId: string | null,
+    /**
+     * Called when a message arrives for a conversation this list has never
+     * seen. Pass `router.refresh` — the server re-renders the list with the
+     * participant names and photos already joined, and the merge effect below
+     * folds the new row in without discarding live state. Doing it this way
+     * avoids both a database change and a per-surface fetcher, since each page
+     * shapes `other_user` differently.
+     */
+    onUnknownConversation?: () => void
 ) {
     const [conversations, setConversations] = useState<T[]>(() => sortConversations(initial))
 
@@ -68,6 +77,18 @@ export function useLiveConversations<T extends LiveConversation>(
     useEffect(() => {
         selectedIdRef.current = selectedId
     }, [selectedId])
+
+    const onUnknownRef = useRef(onUnknownConversation)
+    useEffect(() => {
+        onUnknownRef.current = onUnknownConversation
+    }, [onUnknownConversation])
+
+    // Guards against a burst of messages in an unseen conversation firing a
+    // refresh per message.
+    const refreshPendingRef = useRef(false)
+    useEffect(() => {
+        refreshPendingRef.current = false
+    }, [initial])
 
     // Merge in conversations the server knows about that we don't yet, without
     // clobbering rows the subscription has already updated.
@@ -99,10 +120,17 @@ export function useLiveConversations<T extends LiveConversation>(
 
                     setConversations((prev) => {
                         const index = prev.findIndex((c) => c.id === message.conversation_id)
-                        // A message for a conversation not in this list (e.g. one
-                        // created since the page loaded) is ignored: we have no
-                        // row to attach it to and cannot invent the participants.
-                        if (index === -1) return prev
+
+                        // A thread started since this page loaded. We have no row
+                        // to patch and cannot invent the participants, so ask the
+                        // server for a fresh list; the merge effect adds it.
+                        if (index === -1) {
+                            if (!refreshPendingRef.current) {
+                                refreshPendingRef.current = true
+                                onUnknownRef.current?.()
+                            }
+                            return prev
+                        }
 
                         const conversation = prev[index]
                         const isMine = message.sender_id === currentUserId

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format, isSameDay } from 'date-fns'
 import { Search, MessageCircle, Users, X, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
@@ -66,6 +67,7 @@ export default function AdminMessagesContent({
     conversations: initialConversations,
     currentUserId,
 }: AdminMessagesContentProps) {
+    const router = useRouter()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
 
@@ -74,7 +76,8 @@ export default function AdminMessagesContent({
     const { conversations } = useLiveConversations(
         initialConversations,
         currentUserId,
-        selectedConversation?.id ?? null
+        selectedConversation?.id ?? null,
+        router.refresh
     )
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoadingMessages, setIsLoadingMessages] = useState(false)

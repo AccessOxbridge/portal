@@ -72,12 +72,15 @@ export default function AdminMessagesContent({
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
 
     // Same live list as the student and mentor views: previews, timestamps and
-    // ordering update as messages land, with no refresh.
+    // ordering update as messages land, with no refresh. Support threads are
+    // not pinned here — they are most of what an admin sees, so pinning them
+    // would bury the recently active mentor threads.
     const { conversations } = useLiveConversations(
         initialConversations,
         currentUserId,
         selectedConversation?.id ?? null,
-        router.refresh
+        router.refresh,
+        false
     )
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoadingMessages, setIsLoadingMessages] = useState(false)

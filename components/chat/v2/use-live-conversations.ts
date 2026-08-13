@@ -41,12 +41,17 @@ export interface LiveConversation {
 let channelSeq = 0
 
 /**
- * Support threads stay pinned above mentor threads, then most recent first.
- * This matches the order the student page already applies server-side, so the
- * list does not reshuffle the moment the subscription takes over.
+ * Most recent first, optionally with support threads pinned above the rest.
+ *
+ * Pinning is right for a participant's own list — a student or mentor has a
+ * single support thread and always wants it reachable — but wrong for the
+ * admin overview, where support threads are the majority and pinning them
+ * pushes every recently active mentor thread below a pile of stale (often
+ * empty) ones. Hence `pinSupport`, rather than the pin being unconditional.
  */
-function sortConversations<T extends LiveConversation>(list: T[]): T[] {
-    const rank = (c: T) => (c.type === 'support' || c.type === 'mentor_support' ? 0 : 1)
+function sortConversations<T extends LiveConversation>(list: T[], pinSupport: boolean): T[] {
+    const rank = (c: T) =>
+        pinSupport && (c.type === 'support' || c.type === 'mentor_support') ? 0 : 1
 
     return [...list].sort((a, b) => {
         const byType = rank(a) - rank(b)
@@ -68,9 +73,21 @@ export function useLiveConversations<T extends LiveConversation>(
      * avoids both a database change and a per-surface fetcher, since each page
      * shapes `other_user` differently.
      */
-    onUnknownConversation?: () => void
+    onUnknownConversation?: () => void,
+    /**
+     * Keep support threads at the top. Defaults to the participant-side
+     * behaviour; the admin overview passes false so the list is pure recency.
+     */
+    pinSupport = true
 ) {
-    const [conversations, setConversations] = useState<T[]>(() => sortConversations(initial))
+    const [conversations, setConversations] = useState<T[]>(() =>
+        sortConversations(initial, pinSupport)
+    )
+
+    const pinSupportRef = useRef(pinSupport)
+    useEffect(() => {
+        pinSupportRef.current = pinSupport
+    }, [pinSupport])
 
     // Read inside the subscription callback, which is created once.
     const selectedIdRef = useRef(selectedId)
@@ -97,7 +114,7 @@ export function useLiveConversations<T extends LiveConversation>(
             const known = new Set(prev.map((c) => c.id))
             const added = initial.filter((c) => !known.has(c.id))
             if (added.length === 0) return prev
-            return sortConversations([...prev, ...added])
+            return sortConversations([...prev, ...added], pinSupportRef.current)
         })
     }, [initial])
 
@@ -149,7 +166,7 @@ export function useLiveConversations<T extends LiveConversation>(
                             unread_count: isMine || isOpen ? current : current + 1,
                         }
 
-                        return sortConversations(next)
+                        return sortConversations(next, pinSupportRef.current)
                     })
                 }
             )

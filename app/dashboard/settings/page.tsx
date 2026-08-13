@@ -44,8 +44,32 @@ export default async function SettingsPage() {
         timezone = (data as { timezone?: string | null } | null)?.timezone ?? null
     }
 
+    const isAdmin = role === 'admin' || role === 'admin-dev'
+
+    // Own sign-ins. RLS already scopes this to the caller, but the filter keeps
+    // the admin policy from widening it for an admin looking at their own tile.
+    const { data: ownEvents } = await supabase
+        .from('login_events')
+        .select('id, created_at, ip, user_agent, status')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+    // The global feed, for admins only. The email comes off the row itself
+    // rather than a join so failed attempts against an address with no account
+    // still say what was tried.
+    const { data: allEvents } = isAdmin
+        ? await supabase
+              .from('login_events')
+              .select('id, created_at, ip, user_agent, status, email')
+              .order('created_at', { ascending: false })
+              .limit(50)
+        : { data: null }
+
     return (
         <SettingsContent
+            loginEvents={ownEvents ?? []}
+            allLoginEvents={allEvents ?? null}
             email={profile.email || user.email || ''}
             fullName={profile.full_name || 'User'}
             role={role}

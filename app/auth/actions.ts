@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
+import { recordLoginEvent } from '@/lib/login-events'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -15,6 +16,10 @@ export async function login(formData: FormData) {
 
     const result = await supabase.auth.signInWithPassword(data)
     const { error } = result
+
+    // Recorded before the redirect below: `redirect()` works by throwing, so
+    // anything after it in this branch would never run.
+    await recordLoginEvent(data.email, error ? 'failed' : 'success')
 
     if (error) {
         console.error('Login error:', error.message)

@@ -450,6 +450,36 @@ export type Database = {
           },
         ]
       }
+      login_events: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ip: string | null
+          status: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          status: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       mentor_invoice_documents: {
         Row: {
           created_at: string
@@ -1455,6 +1485,7 @@ export type Database = {
         }[]
       }
       next_mentor_invoice_number: { Args: never; Returns: string }
+      prune_login_events: { Args: never; Returns: undefined }
     }
     Enums: {
       blog_category:

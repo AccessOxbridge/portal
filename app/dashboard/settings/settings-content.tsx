@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { User, Mail, Shield, CalendarDays, Globe, KeyRound, Check, AlertCircle, Loader2 } from 'lucide-react'
 import { updateTimezone, sendPasswordResetLink } from './actions'
 import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
+import LoginHistory, { type LoginEvent } from './login-history'
 
 interface SettingsContentProps {
     email: string
@@ -11,6 +12,9 @@ interface SettingsContentProps {
     role: string
     createdAt?: string
     timezone: string | null
+    loginEvents: LoginEvent[]
+    /** Every user's events — admins only; null for everyone else. */
+    allLoginEvents: LoginEvent[] | null
 }
 
 // Common IANA timezones, plus whatever the user already has saved.
@@ -67,7 +71,15 @@ const roleLabel = (role: string) => {
     }
 }
 
-export default function SettingsContent({ email, fullName, role, createdAt, timezone }: SettingsContentProps) {
+export default function SettingsContent({
+    email,
+    fullName,
+    role,
+    createdAt,
+    timezone,
+    loginEvents,
+    allLoginEvents,
+}: SettingsContentProps) {
     const [tz, setTz] = useState(timezone || getDefaultTimezone())
     const [savedTz, setSavedTz] = useState(timezone || '')
     const [tzFeedback, setTzFeedback] = useState<{ ok: boolean; message: string } | null>(null)
@@ -219,6 +231,13 @@ export default function SettingsContent({ email, fullName, role, createdAt, time
                     </button>
                 </div>
             </section>
+
+            {/* Security */}
+            <LoginHistory
+                events={loginEvents}
+                allEvents={allLoginEvents}
+                timezone={timezone}
+            />
         </div>
     )
 }

@@ -84,15 +84,22 @@ export async function updateMentorProfile(prevState: any, formData: FormData) {
         return { error: 'Failed to save profile. Please try again.' }
     }
 
-    // Keep the display name on the shared profiles row in sync
-    if (fullName) {
-        const { error: nameError } = await supabase
+    // Keep the shared profiles row in sync. The photo is mirrored as well as
+    // the name so `profiles.photo_url` is dependable for every role: students
+    // write only there, and anything reading an avatar off a plain profiles
+    // join would otherwise find nothing for a mentor.
+    const profileUpdate: TablesUpdate<'profiles'> = {}
+    if (fullName) profileUpdate.full_name = fullName
+    if (photoUrl) profileUpdate.photo_url = photoUrl
+
+    if (Object.keys(profileUpdate).length > 0) {
+        const { error: profileError } = await supabase
             .from('profiles')
-            .update({ full_name: fullName })
+            .update(profileUpdate)
             .eq('id', user.id)
 
-        if (nameError) {
-            console.error('Error updating profile name:', nameError)
+        if (profileError) {
+            console.error('Error updating shared profile row:', profileError)
         }
     }
 

@@ -29,6 +29,7 @@ export default async function DashboardLayout({
             full_name, 
             role,
             credits,
+            photo_url,
             mentors (
                 status,
                 bio,
@@ -83,6 +84,7 @@ export default async function DashboardLayout({
                     full_name, 
                     role,
                     credits,
+                    photo_url,
                     mentors (
                         status,
                         bio,
@@ -262,7 +264,9 @@ export default async function DashboardLayout({
                   )
                 : profile.full_name || user.email?.split('@')[0] || 'User',
         userId: user.id,
-        photoUrl: (profile as any).mentors?.photo_url || null,
+        // Mentors keep their photo on `mentors`; everyone else — students,
+        // admins — carries it on `profiles`.
+        photoUrl: (profile as any).mentors?.photo_url || profile.photo_url || null,
         pendingReportsCount,
         pendingRequestsCount,
         onboardingIncomplete,

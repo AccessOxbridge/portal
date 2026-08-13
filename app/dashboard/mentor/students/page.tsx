@@ -38,7 +38,8 @@ export default async function MentorStudentsPage() {
             created_at,
             student:profiles!student_mentor_assignments_student_id_fkey (
                 full_name,
-                email
+                email,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -126,6 +127,7 @@ export default async function MentorStudentsPage() {
         return {
             id: sid,
             full_name: a.student?.full_name || 'Student',
+            photo_url: a.student?.photo_url || null,
             email: a.student?.email || null,
             assigned_at: a.created_at,
             total_sessions: theirSessions.length,

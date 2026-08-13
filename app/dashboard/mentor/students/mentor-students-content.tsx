@@ -23,6 +23,7 @@ export interface StudentMetric {
     id: string
     full_name: string
     email: string | null
+    photo_url: string | null
     assigned_at: string
     total_sessions: number
     sessions_completed: number
@@ -170,8 +171,17 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                 className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6"
                             >
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0">
-                                        {(s.full_name?.[0] || 'S').toUpperCase()}
+                                    <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
+                                        {s.photo_url ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img
+                                                src={s.photo_url}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            (s.full_name?.[0] || 'S').toUpperCase()
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">

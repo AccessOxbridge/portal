@@ -35,7 +35,8 @@ export default async function MentorMessagesPage() {
             last_message_at,
             student:profiles!conversations_student_id_fkey (
                 id,
-                full_name
+                full_name,
+                photo_url
             ),
             admin:profiles!conversations_admin_id_fkey (
                 id,
@@ -52,7 +53,8 @@ export default async function MentorMessagesPage() {
             student_id,
             student:profiles!sessions_student_id_fkey (
                 id,
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -67,7 +69,7 @@ export default async function MentorMessagesPage() {
                 studentMap.set(session.student_id, {
                     id: session.student.id,
                     full_name: session.student.full_name,
-                    photo_url: null, // Students don't have photos
+                    photo_url: session.student.photo_url || null,
                     hasExistingConversation: existingConvStudentIds.has(session.student_id),
                     conversationId: (conversations || []).find((c: any) => c.student_id === session.student_id)?.id
                 })
@@ -118,7 +120,7 @@ export default async function MentorMessagesPage() {
                     : {
                         id: conv.student?.id || conv.student_id,
                         full_name: conv.student?.full_name || 'Student',
-                        photo_url: null // Students don't have photos in current schema
+                        photo_url: conv.student?.photo_url || null,
                     },
                 admin_user: (!isMentorSupport && conv.admin) ? {
                     id: conv.admin.id,

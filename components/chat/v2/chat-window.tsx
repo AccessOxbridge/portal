@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { isSameDay } from 'date-fns'
-import { ChevronLeft, MessageSquare } from 'lucide-react'
+import { ChevronLeft, MessageSquare, ArrowDown } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble, { type MessageStatus } from './message-bubble'
 import MessageInput from './message-input'
@@ -62,14 +62,30 @@ export default function ChatWindow({
     const [lightbox, setLightbox] = useState<ChatAttachment | null>(null)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const scrollRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
+
+    // Drives the jump-to-latest button, and decides whether an arriving message
+    // is allowed to move the view at all.
+    const [isAtBottom, setIsAtBottom] = useState(true)
 
     // Files for messages that failed to send, kept so Retry can re-upload
     // without asking the user to pick them again.
     const failedPayloads = useRef<Map<string, { content: string; attachments: PendingAttachment[] }>>(new Map())
 
-    const scrollToBottom = useCallback(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+        messagesEndRef.current?.scrollIntoView({ behavior })
+    }, [])
+
+    /**
+     * "Near" rather than exactly at the bottom: a fractional scroll height, an
+     * image finishing its load, or a browser's own rounding all leave a couple
+     * of pixels behind, and none of them mean the reader has scrolled away.
+     */
+    const handleScroll = useCallback(() => {
+        const el = scrollRef.current
+        if (!el) return
+        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 80)
     }, [])
 
     /** Sign any attachment paths we don't already have a URL for. */
@@ -230,8 +246,15 @@ export default function ChatWindow({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId, currentUserId])
 
+    // Following the conversation keeps you pinned to the newest message; having
+    // scrolled up to read something does not, because yanking the view back
+    // down mid-sentence is the worst thing a chat pane can do. The button
+    // below is how you get back.
     useEffect(() => {
-        scrollToBottom()
+        if (isAtBottom) scrollToBottom()
+        // `isAtBottom` is deliberately not a dependency — this should fire when
+        // messages arrive, not when the reader's scroll position changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages, scrollToBottom])
 
     const deliver = useCallback(
@@ -317,6 +340,8 @@ export default function ChatWindow({
         }
 
         setMessages((prev) => [...prev, optimistic])
+        // Sending is an explicit act of joining the end of the conversation.
+        setIsAtBottom(true)
         scrollToBottom()
 
         try {
@@ -411,8 +436,15 @@ export default function ChatWindow({
                 </div>
             </div>
 
-            {/* Thread runs the full width of the pane — no centred column. */}
-            <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]">
+            {/* Thread runs the full width of the pane — no centred column.
+                The scroller is wrapped so the jump-to-latest button can sit over
+                it; inside, it would scroll along with the messages. */}
+            <div className="relative flex-1 min-h-0">
+            <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="h-full overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]"
+            >
               <div className="w-full h-full">
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
@@ -490,6 +522,18 @@ export default function ChatWindow({
                     </div>
                 )}
               </div>
+            </div>
+
+            {!isAtBottom && (
+                <button
+                    type="button"
+                    onClick={() => scrollToBottom()}
+                    aria-label="Jump to latest message"
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-accent hover:border-accent/30 transition-colors"
+                >
+                    <ArrowDown className="w-4 h-4" />
+                </button>
+            )}
             </div>
 
             <MessageInput onSend={handleSend} />

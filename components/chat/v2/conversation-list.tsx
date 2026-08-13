@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { MessageSquare } from 'lucide-react'
 import { cn } from '@/utils/lib'
 import { attachmentPreviewLabel } from '@/lib/chat-attachments'
+import { stripFormatting } from '@/lib/chat-format'
 
 export interface ConversationSummary {
     id: string
@@ -58,7 +59,10 @@ export default function ConversationList({
                 const hasUnread = (conversation.unread_count ?? 0) > 0
                 const isSender = conversation.last_message?.sender_id === currentUserId
 
-                const text = conversation.last_message?.content?.replace(/^\[ADMIN\]\s*/, '').trim()
+                // Markers off: a one-line preview should read as the sentence
+                // does in the thread, not as `*urgent* — see the _brief_`.
+                const raw = conversation.last_message?.content?.replace(/^\[ADMIN\]\s*/, '')
+                const text = raw ? stripFormatting(raw) : ''
 
                 // An image-only message has empty content — without this the row
                 // would render blank.

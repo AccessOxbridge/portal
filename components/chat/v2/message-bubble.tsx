@@ -3,7 +3,7 @@
 import { format, isToday, isYesterday } from 'date-fns'
 import { Check, CheckCheck, AlertCircle, RotateCw } from 'lucide-react'
 import { cn } from '@/utils/lib'
-import RichText from './rich-text'
+import CollapsibleText from './collapsible-text'
 import AttachmentGrid from './attachment-grid'
 import type { ChatAttachment } from '@/lib/chat-attachments'
 
@@ -123,7 +123,7 @@ export default function MessageBubble({
 
                     {hasText && (
                         <div className="text-gray-700">
-                            <RichText content={content} />
+                            <CollapsibleText content={content} />
                         </div>
                     )}
                 </div>
@@ -154,7 +154,7 @@ export default function MessageBubble({
                         failed && 'bg-accent/70'
                     )}
                 >
-                    <RichText content={content} onDark />
+                    <CollapsibleText content={content} onDark fadeFrom="from-accent" />
                 </div>
             )}
 

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Send, Paperclip, X, FileText, Loader2 } from 'lucide-react'
 import { cn } from '@/utils/lib'
+import FormatToolbar, { applyCommand, commandForEvent, type FormatCommand } from './format-toolbar'
+import RichComposer, { serializeEditor } from './rich-composer'
 import {
     ATTACHMENT_ACCEPT_ATTR,
     MAX_ATTACHMENTS_PER_MESSAGE,
@@ -32,15 +34,8 @@ export default function MessageInput({
     // The container carries the focus ring now that the field is borderless.
     const [isFocused, setIsFocused] = useState(false)
 
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const editorRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    useEffect(() => {
-        const el = textareaRef.current
-        if (!el) return
-        el.style.height = 'auto'
-        el.style.height = Math.min(el.scrollHeight, 140) + 'px'
-    }, [message])
 
     // Object URLs are created per preview; release them when unmounting so
     // a long chat session doesn't leak blobs.
@@ -138,21 +133,20 @@ export default function MessageInput({
         }
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault()
-            handleSend()
-        }
+    // Run a formatting command, then read the editor back out — the command
+    // mutates the DOM directly, so state has to catch up to it.
+    const runCommand = (command: FormatCommand) => {
+        const el = editorRef.current
+        if (!el) return
+        applyCommand(command, el)
+        setMessage(serializeEditor(el))
     }
 
-    // Pasting a screenshot straight into the composer is the fastest path for
-    // the thing students actually do — sharing an essay or a results page.
-    const handlePaste = (e: React.ClipboardEvent) => {
-        const files = Array.from(e.clipboardData.files)
-        if (files.length > 0) {
-            e.preventDefault()
-            addFiles(files)
-        }
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        const command = commandForEvent(e)
+        if (!command) return
+        e.preventDefault()
+        runCommand(command)
     }
 
     return (
@@ -233,21 +227,28 @@ export default function MessageInput({
 
             {/* Borderless field — the container above owns the border, so the
                 field and the controls read as one control. */}
-            <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder={placeholder}
-                disabled={disabled || isSending}
-                rows={1}
-                className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-[15px] placeholder:text-gray-400 focus:outline-none disabled:opacity-50"
-            />
+            <div onKeyDown={handleKeyDown}>
+                <RichComposer
+                    editorRef={editorRef}
+                    value={message}
+                    onChange={setMessage}
+                    onSend={handleSend}
+                    placeholder={placeholder}
+                    disabled={disabled || isSending}
+                    onFocusChange={setIsFocused}
+                    onFiles={addFiles}
+                />
+            </div>
 
-            <div className="flex items-center justify-between gap-2 px-2 pb-2">
+            {/* One row of controls: formatting on the left, send pinned right.
+                Keeping the marks here rather than in a strip of their own means
+                the composer never gets taller than it already was. */}
+            <div className="flex items-center justify-between gap-1 px-2 pb-2">
+              <div className="flex items-center gap-1 min-w-0">
+                <FormatToolbar onCommand={runCommand} disabled={disabled || isSending} />
+
+                <span className="shrink-0 w-px h-4 bg-gray-200" />
+
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -260,25 +261,26 @@ export default function MessageInput({
                 >
                     <Paperclip className="w-[18px] h-[18px]" />
                 </button>
+              </div>
 
-                <button
-                    type="button"
-                    onClick={handleSend}
-                    disabled={!canSend}
-                    aria-label="Send message"
-                    className={cn(
-                        'shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all',
-                        canSend
-                            ? 'bg-accent text-white hover:bg-accent/90'
-                            : 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                    )}
-                >
-                    {isSending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Send className="w-4 h-4" />
-                    )}
-                </button>
+              <button
+                  type="button"
+                  onClick={handleSend}
+                  disabled={!canSend}
+                  aria-label="Send message"
+                  className={cn(
+                      'shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                      canSend
+                          ? 'bg-accent text-white hover:bg-accent/90'
+                          : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                  )}
+              >
+                  {isSending ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                      <Send className="w-4 h-4" />
+                  )}
+              </button>
             </div>
 
           </div>

@@ -1,29 +1,22 @@
 'use client'
 
-/**
- * Renders message text with clickable links.
- *
- * Why not react-markdown: mentors and students write prose, not markup. Full
- * markdown would silently eat asterisks around a word, turn "1." into a list
- * and mangle underscores in filenames. We autolink and nothing else.
- *
- * The visual fix this exists for: a raw URL in a plain <p> with `break-words`
- * gets chopped mid-character into a ragged block. Here the href stays intact
- * while the *displayed* text is truncated in the middle, so a long calendar
- * link reads as `calendar.google.com/…/eventedit` on one line.
- */
+import { Fragment, type ReactNode } from 'react'
+import { cn } from '@/utils/lib'
+import { parseMessage, type Block, type InlineNode } from '@/lib/chat-format'
 
-const URL_PATTERN =
-    /((?:https?:\/\/|www\.)[^\s<>()]+[^\s<>().,;:!?'"]|[\w.+-]+@[\w-]+\.[\w.-]+)/gi
+/**
+ * Renders a message body: the Slack-style marks parsed in `lib/chat-format`,
+ * plus clickable links.
+ *
+ * The link handling predates formatting and still earns its keep. A raw URL in
+ * a plain <p> with `break-words` gets chopped mid-character into a ragged
+ * block. Here the href stays intact while the *displayed* text is shortened in
+ * the middle, so a long calendar link reads as `calendar.google.com/…/eventedit`
+ * on one line.
+ */
 
 /** Longest link text we show before shortening the middle. */
 const MAX_LINK_TEXT = 44
-
-function toHref(raw: string): string {
-    if (raw.includes('@') && !raw.includes('/')) return `mailto:${raw}`
-    if (raw.startsWith('www.')) return `https://${raw}`
-    return raw
-}
 
 /**
  * Shorten a URL for display while keeping both ends readable — the host tells
@@ -48,40 +41,155 @@ function displayText(raw: string): string {
     return `${host}${tail}`
 }
 
+function renderInline(nodes: InlineNode[], onDark: boolean): ReactNode {
+    return nodes.map((node, i) => {
+        switch (node.type) {
+            case 'text':
+                return <Fragment key={i}>{node.value}</Fragment>
+
+            case 'link':
+                return (
+                    <a
+                        key={i}
+                        href={node.href}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        title={node.raw}
+                        className={cn(
+                            'underline underline-offset-2 font-medium transition-colors',
+                            onDark
+                                ? 'decoration-white/40 hover:decoration-white'
+                                : 'text-accent decoration-accent/30 hover:decoration-accent'
+                        )}
+                    >
+                        {displayText(node.raw)}
+                    </a>
+                )
+
+            case 'code':
+                return (
+                    <code
+                        key={i}
+                        className={cn(
+                            'px-1 py-0.5 rounded text-[0.85em] font-mono',
+                            onDark
+                                ? 'bg-white/15 text-white'
+                                : 'bg-gray-100 text-gray-800 border border-gray-200/80'
+                        )}
+                    >
+                        {node.value}
+                    </code>
+                )
+
+            case 'bold':
+                return <strong key={i} className="font-semibold">{renderInline(node.children, onDark)}</strong>
+
+            case 'italic':
+                return <em key={i}>{renderInline(node.children, onDark)}</em>
+
+            case 'underline':
+                return (
+                    <span key={i} className="underline underline-offset-2">
+                        {renderInline(node.children, onDark)}
+                    </span>
+                )
+
+            case 'strike':
+                return <s key={i} className="opacity-80">{renderInline(node.children, onDark)}</s>
+        }
+    })
+}
+
+function renderBlock(block: Block, key: number, onDark: boolean): ReactNode {
+    switch (block.type) {
+        case 'paragraph':
+            return (
+                // `overflow-wrap: anywhere` instead of `break-words`: it only
+                // breaks a word when the line genuinely cannot fit, rather than
+                // eagerly. `pre-wrap` keeps the sender's own line breaks.
+                <p key={key} className="whitespace-pre-wrap [overflow-wrap:anywhere]">
+                    {renderInline(block.children, onDark)}
+                </p>
+            )
+
+        case 'quote':
+            return (
+                <blockquote
+                    key={key}
+                    className={cn(
+                        'pl-2.5 border-l-2 whitespace-pre-wrap [overflow-wrap:anywhere]',
+                        onDark ? 'border-white/40 text-white/85' : 'border-gray-300 text-gray-500'
+                    )}
+                >
+                    {renderInline(block.children, onDark)}
+                </blockquote>
+            )
+
+        case 'codeblock':
+            return (
+                <pre
+                    key={key}
+                    className={cn(
+                        'px-2.5 py-2 rounded-lg text-[13px] font-mono overflow-x-auto',
+                        onDark
+                            ? 'bg-black/20 text-white/95'
+                            : 'bg-gray-50 text-gray-800 border border-gray-200'
+                    )}
+                >
+                    <code>{block.value}</code>
+                </pre>
+            )
+
+        case 'list':
+            return (
+                <ListTag
+                    key={key}
+                    ordered={block.ordered}
+                    className={cn(
+                        'pl-5 space-y-0.5',
+                        block.ordered ? 'list-decimal' : 'list-disc'
+                    )}
+                >
+                    {block.items.map((item, i) => (
+                        <li key={i} className="[overflow-wrap:anywhere]">
+                            {renderInline(item, onDark)}
+                        </li>
+                    ))}
+                </ListTag>
+            )
+    }
+}
+
+function ListTag({
+    ordered,
+    className,
+    children,
+}: {
+    ordered: boolean
+    className: string
+    children: ReactNode
+}) {
+    return ordered ? (
+        <ol className={className}>{children}</ol>
+    ) : (
+        <ul className={className}>{children}</ul>
+    )
+}
+
 interface RichTextProps {
     content: string
-    /** Sent bubbles are navy, so links need a light treatment there. */
+    /** Sent bubbles are navy, so links and code need a light treatment there. */
     onDark?: boolean
 }
 
 export default function RichText({ content, onDark = false }: RichTextProps) {
-    const parts = content.split(URL_PATTERN)
+    const blocks = parseMessage(content)
 
     return (
-        // `overflow-wrap: anywhere` instead of `break-words`: it only breaks a
-        // word when the line genuinely cannot fit, rather than eagerly.
-        <p className="text-[15px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
-            {parts.map((part, i) => {
-                // split() with a capturing group puts matches at odd indices.
-                if (i % 2 === 0) return part
-
-                return (
-                    <a
-                        key={i}
-                        href={toHref(part)}
-                        target="_blank"
-                        rel="noopener noreferrer nofollow"
-                        title={part}
-                        className={
-                            onDark
-                                ? 'underline underline-offset-2 decoration-white/40 hover:decoration-white font-medium transition-colors'
-                                : 'text-accent underline underline-offset-2 decoration-accent/30 hover:decoration-accent font-medium transition-colors'
-                        }
-                    >
-                        {displayText(part)}
-                    </a>
-                )
-            })}
-        </p>
+        // space-y rather than margins on the blocks themselves, so a message
+        // that is a single paragraph — almost all of them — adds no extra height.
+        <div className="text-[15px] leading-relaxed space-y-2">
+            {blocks.map((block, i) => renderBlock(block, i, onDark))}
+        </div>
     )
 }

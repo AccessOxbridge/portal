@@ -2,7 +2,7 @@
 
 import { format, isToday, isYesterday } from 'date-fns'
 import { cn } from '@/utils/lib'
-import RichText from './rich-text'
+import CollapsibleText from './collapsible-text'
 import AttachmentGrid from './attachment-grid'
 import type { ChatAttachment } from '@/lib/chat-attachments'
 
@@ -75,7 +75,7 @@ export default function InterventionBubble({
 
                 {hasText && (
                     <div className="text-gray-700">
-                        <RichText content={content} />
+                        <CollapsibleText content={content} />
                     </div>
                 )}
             </div>

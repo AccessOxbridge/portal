@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format, isSameDay } from 'date-fns'
-import { Search, MessageCircle, Users, X, AlertTriangle } from 'lucide-react'
+import { Search, MessageCircle, Users, X, AlertTriangle, ArrowDown } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
-import RichText from '@/components/chat/v2/rich-text'
+import CollapsibleText from '@/components/chat/v2/collapsible-text'
+import { stripFormatting } from '@/lib/chat-format'
 import AttachmentGrid from '@/components/chat/v2/attachment-grid'
 import DateSeparator from '@/components/chat/v2/date-separator'
 import ImageLightbox from '@/components/chat/v2/image-lightbox'
@@ -88,6 +89,8 @@ export default function AdminMessagesContent({
     const [lightbox, setLightbox] = useState<ChatAttachment | null>(null)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const [isAtBottom, setIsAtBottom] = useState(true)
     const supabase = createClient()
 
     const filteredConversations = conversations.filter((conv) => {
@@ -172,9 +175,22 @@ export default function AdminMessagesContent({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedConversation])
 
-    useEffect(() => {
+    const scrollToBottom = useCallback(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+    }, [])
+
+    /** "Near" the bottom — see the same guard in chat-window. */
+    const handleScroll = useCallback(() => {
+        const el = scrollRef.current
+        if (!el) return
+        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 80)
+    }, [])
+
+    // Only follow the thread when the reader is already at the end of it.
+    useEffect(() => {
+        if (isAtBottom) scrollToBottom()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages, scrollToBottom])
 
     const isSupport = selectedConversation?.type === 'support'
     const isMentorSupport = selectedConversation?.type === 'mentor_support'
@@ -283,7 +299,10 @@ export default function AdminMessagesContent({
                         </div>
                     ) : (
                         filteredConversations.map((conv) => {
-                            const text = conv.last_message?.content?.replace(/^\[ADMIN\]\s*/, '').trim()
+                            // Same as the student/mentor list: previews show the
+                            // sentence, not the formatting markers around it.
+                            const rawPreview = conv.last_message?.content?.replace(/^\[ADMIN\]\s*/, '')
+                            const text = rawPreview ? stripFormatting(rawPreview) : ''
                             const preview =
                                 text || attachmentPreviewLabel(conv.last_message?.attachments) || null
 
@@ -355,7 +374,12 @@ export default function AdminMessagesContent({
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]">
+                        <div className="relative flex-1 min-h-0">
+                        <div
+                            ref={scrollRef}
+                            onScroll={handleScroll}
+                            className="h-full overflow-y-auto px-4 md:px-6 py-4 bg-[#FAFBFC]"
+                        >
                             {isLoadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
                                     <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -444,9 +468,16 @@ export default function AdminMessagesContent({
                                                                         : 'text-gray-700'
                                                             )}
                                                         >
-                                                            <RichText
+                                                            <CollapsibleText
                                                                 content={body}
                                                                 onDark={alignRight && !isIntervention}
+                                                                fadeFrom={
+                                                                    isIntervention
+                                                                        ? 'from-amber-50'
+                                                                        : alignRight
+                                                                            ? 'from-accent'
+                                                                            : 'from-[#FAFBFC]'
+                                                                }
                                                             />
                                                         </div>
                                                     )}
@@ -461,6 +492,18 @@ export default function AdminMessagesContent({
                                     <div ref={messagesEndRef} />
                                 </div>
                             )}
+                        </div>
+
+                        {!isAtBottom && (
+                            <button
+                                type="button"
+                                onClick={scrollToBottom}
+                                aria-label="Jump to latest message"
+                                className="absolute bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-accent hover:border-accent/30 transition-colors"
+                            >
+                                <ArrowDown className="w-4 h-4" />
+                            </button>
+                        )}
                         </div>
 
                         <div className={isDirect ? 'bg-white' : 'bg-amber-50/60'}>

@@ -19,6 +19,7 @@ import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import { Logo } from '../logo'
 import { navigation, studentSections } from './nav-items'
+import { version as appVersion } from '@/package.json'
 import { useUnreadMessages } from './use-unread-messages'
 
 interface SidebarProps {
@@ -578,6 +579,13 @@ export default function Sidebar({
                             {!collapsed && <span>Sign Out</span>}
                         </button>
                     </>
+                )}
+
+                {!collapsed && (
+                    <div className="mt-3 flex items-center justify-center gap-2">
+                        <span className="text-[11px] font-medium text-white/40">Access Oxbridge Portal</span>
+                        <span className="font-mono text-[11px] tracking-wide text-white/50">v{appVersion}</span>
+                    </div>
                 )}
             </div>
         </aside>

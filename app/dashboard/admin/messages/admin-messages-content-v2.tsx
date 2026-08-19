@@ -6,6 +6,8 @@ import { formatDistanceToNow, format, isSameDay } from 'date-fns'
 import { Search, MessageCircle, Users, X, AlertTriangle, ArrowDown } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
+import ComposeDialog, { ComposeButton } from './compose-dialog'
+import type { ClaireThread, MessageRecipient } from './actions'
 import CollapsibleText from '@/components/chat/v2/collapsible-text'
 import { stripFormatting } from '@/lib/chat-format'
 import AttachmentGrid from '@/components/chat/v2/attachment-grid'
@@ -71,13 +73,15 @@ export default function AdminMessagesContent({
     const router = useRouter()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+    const [isComposeOpen, setIsComposeOpen] = useState(false)
+    const [seededConversations, setSeededConversations] = useState<Conversation[]>([])
 
     // Same live list as the student and mentor views: previews, timestamps and
     // ordering update as messages land, with no refresh. Support threads are
     // not pinned here — they are most of what an admin sees, so pinning them
     // would bury the recently active mentor threads.
     const { conversations } = useLiveConversations(
-        initialConversations,
+        [...seededConversations, ...initialConversations],
         currentUserId,
         selectedConversation?.id ?? null,
         router.refresh,
@@ -252,6 +256,71 @@ export default function AdminMessagesContent({
         ensureSignedUrls([saved])
     }
 
+    const openComposedThread = (thread: ClaireThread, recipient: MessageRecipient) => {
+        const existing =
+            conversations.find((c) => c.id === thread.conversationId) ||
+            conversations.find((c) =>
+                thread.type === 'support'
+                    ? c.type === 'support' && c.student_id === recipient.id
+                    : c.type === 'mentor_support' && c.mentor_id === recipient.id
+            )
+
+        if (existing) {
+            setSelectedConversation(existing)
+            return
+        }
+
+        const now = thread.createdAt
+        const row: Conversation =
+            thread.type === 'support'
+                ? {
+                    id: thread.conversationId,
+                    student_id: recipient.id,
+                    mentor_id: null,
+                    type: 'support',
+                    last_message_at: now,
+                    created_at: now,
+                    student: {
+                        id: recipient.id,
+                        full_name: recipient.full_name || 'Student',
+                        email: recipient.email || '',
+                    },
+                    mentor: {
+                        id: 'support',
+                        full_name: 'Help & Support',
+                        email: '',
+                    },
+                    message_count: 0,
+                    last_message: null,
+                }
+                : {
+                    id: thread.conversationId,
+                    student_id: null,
+                    mentor_id: recipient.id,
+                    type: 'mentor_support',
+                    last_message_at: now,
+                    created_at: now,
+                    student: {
+                        id: 'support',
+                        full_name: 'Access Oxbridge (Claire)',
+                        email: '',
+                    },
+                    mentor: {
+                        id: recipient.id,
+                        full_name: recipient.full_name || 'Mentor',
+                        email: recipient.email || '',
+                    },
+                    message_count: 0,
+                    last_message: null,
+                }
+
+        setSeededConversations((prev) =>
+            prev.some((c) => c.id === row.id) ? prev : [row, ...prev]
+        )
+        setSelectedConversation(row)
+        router.refresh()
+    }
+
     const senderInfo = (senderId: string): { name: string; role: string } => {
         if (!selectedConversation) return { name: 'Unknown', role: '' }
         if (senderId === selectedConversation.student_id)
@@ -269,15 +338,18 @@ export default function AdminMessagesContent({
             {/* Conversations */}
             <div className="w-80 lg:w-96 shrink-0 border-r border-gray-200/70 flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-gray-100">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search by name or email…"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent/30"
-                        />
+                    <div className="flex items-center gap-2">
+                        <div className="relative flex-1 min-w-0">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by name or email…"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent/30"
+                            />
+                        </div>
+                        <ComposeButton onClick={() => setIsComposeOpen(true)} />
                     </div>
                     <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
                         <span>
@@ -537,10 +609,17 @@ export default function AdminMessagesContent({
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 px-6">
                         <MessageCircle className="w-16 h-16 mb-4 text-gray-200" strokeWidth={1.5} />
                         <p className="text-lg font-medium">Select a conversation</p>
-                        <p className="text-sm text-gray-300 mt-1">Choose a chat to view and monitor</p>
+                        <p className="text-sm text-gray-300 mt-1">Choose a chat to view, or start a new one</p>
+                        <button
+                            type="button"
+                            onClick={() => setIsComposeOpen(true)}
+                            className="mt-5 px-4 py-2.5 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors"
+                        >
+                            New message
+                        </button>
                     </div>
                 )}
             </div>
@@ -550,6 +629,14 @@ export default function AdminMessagesContent({
                     attachment={lightbox}
                     url={signedUrls.get(lightbox.path)}
                     onClose={() => setLightbox(null)}
+                />
+            )}
+
+            {isComposeOpen && (
+                <ComposeDialog
+                    onClose={() => setIsComposeOpen(false)}
+                    conversations={conversations}
+                    onOpened={openComposedThread}
                 />
             )}
         </div>

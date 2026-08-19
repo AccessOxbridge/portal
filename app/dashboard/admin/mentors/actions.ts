@@ -1,72 +1,11 @@
 'use server'
 
 import { createAdminClient } from '@/utils/supabase/admin'
-import { createClient } from '@/utils/supabase/server'
 
-export interface MentorSupportThread {
-    conversationId: string
-    adminId: string
-}
-
-/**
- * Ensure the admin <-> mentor "support" conversation exists for a mentor and
- * return its id plus the current admin's user id. To the mentor these threads
- * render as coming from "Claire Marlowe" (the Access Oxbridge team).
- *
- * There is at most one mentor_support thread per mentor (shared by all admins),
- * enforced by a partial unique index.
- */
-export async function ensureMentorSupportThread(mentorId: string): Promise<MentorSupportThread> {
-    const authed = await createClient()
-    const {
-        data: { user },
-    } = await authed.auth.getUser()
-
-    if (!user) {
-        throw new Error('Not authenticated')
-    }
-
-    const { data: profile } = await authed
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'admin-dev')) {
-        throw new Error('Not authorized')
-    }
-
-    const supabase = createAdminClient()
-
-    // Reuse the existing thread if one was already opened for this mentor.
-    const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('mentor_id', mentorId)
-        .eq('type', 'mentor_support')
-        .maybeSingle()
-
-    if (existing) {
-        return { conversationId: existing.id, adminId: user.id }
-    }
-
-    const { data: created, error } = await supabase
-        .from('conversations')
-        .insert({
-            student_id: null,
-            mentor_id: mentorId,
-            admin_id: user.id,
-            type: 'mentor_support',
-        } as never)
-        .select('id')
-        .single()
-
-    if (error || !created) {
-        throw new Error(error?.message || 'Failed to create conversation')
-    }
-
-    return { conversationId: created.id, adminId: user.id }
-}
+export {
+    ensureMentorSupportThread,
+    type MentorSupportThread,
+} from '../messages/actions'
 
 export interface Mentor {
     id: string

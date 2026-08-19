@@ -13,13 +13,16 @@ export const DEFAULT_HOURLY_RATE_CENTS = 3000
 export const DEFAULT_DURATION_MINUTES = 60
 
 /**
- * Amount owed for a single session: (minutes / 60) × hourly rate, rounded to the
- * nearest penny. Matches the calculation already used by the payout route.
+ * Amount owed for a single session.
+ * If `payoutOverrideCents` is set (admin one-off flat payout), that wins.
+ * Otherwise: (minutes / 60) × hourly rate, rounded to the nearest penny.
  */
 export function sessionAmountCents(
     durationMinutes: number | null | undefined,
-    hourlyRateCents: number | null | undefined
+    hourlyRateCents: number | null | undefined,
+    payoutOverrideCents?: number | null
 ): number {
+    if (payoutOverrideCents != null) return payoutOverrideCents
     const minutes = durationMinutes ?? DEFAULT_DURATION_MINUTES
     const rate = hourlyRateCents ?? DEFAULT_HOURLY_RATE_CENTS
     return Math.round((minutes / 60) * rate)

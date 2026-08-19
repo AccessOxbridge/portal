@@ -56,7 +56,7 @@ export async function GET() {
         // Unbilled + finished sessions for this mentor.
         const { data: sessions, error: sessionsError } = await db
             .from('sessions')
-            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status')
+            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, payout_amount_cents')
             .eq('mentor_id', user.id)
             .is('invoice_id', null)
             .or('status.eq.completed,zoom_meeting_status.eq.ended')
@@ -82,7 +82,11 @@ export async function GET() {
             scheduled_at: s.scheduled_at,
             duration_minutes: s.duration_minutes ?? 60,
             student_name: nameById[s.student_id] || 'Student',
-            amount_cents: sessionAmountCents(s.duration_minutes, hourlyRateCents),
+            amount_cents: sessionAmountCents(
+                s.duration_minutes,
+                hourlyRateCents,
+                s.payout_amount_cents
+            ),
         }))
 
         return NextResponse.json({

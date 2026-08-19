@@ -59,6 +59,7 @@ const adminNav: NavItem[] = [
     { name: 'Products', href: '/dashboard/admin/products', icon: Coins },
     { name: 'Sessions', href: '/dashboard/admin/sessions', icon: Video },
     { name: 'Manage Sessions', href: '/dashboard/admin/manage-sessions', icon: CalendarRange },
+    { name: 'Session Payouts', href: '/dashboard/admin/session-payouts', icon: Banknote },
     { name: 'Session Recordings', href: '/dashboard/admin/recordings', icon: Film },
     { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
     { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },

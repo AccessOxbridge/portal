@@ -1112,6 +1112,7 @@ export type Database = {
           id: string
           invoice_id: string | null
           mentor_id: string
+          payout_amount_cents: number | null
           recording_available: boolean
           recording_download_token: string | null
           recording_download_url: string | null
@@ -1138,6 +1139,7 @@ export type Database = {
           id?: string
           invoice_id?: string | null
           mentor_id: string
+          payout_amount_cents?: number | null
           recording_available?: boolean
           recording_download_token?: string | null
           recording_download_url?: string | null
@@ -1164,6 +1166,7 @@ export type Database = {
           id?: string
           invoice_id?: string | null
           mentor_id?: string
+          payout_amount_cents?: number | null
           recording_available?: boolean
           recording_download_token?: string | null
           recording_download_url?: string | null

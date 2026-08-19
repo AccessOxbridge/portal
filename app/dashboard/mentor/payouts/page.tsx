@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatPrice } from '@/utils/stripe'
+import { sessionAmountCents, DEFAULT_HOURLY_RATE_CENTS } from '@/utils/invoices'
 import { StripeDashboardButton } from '@/components/dashboard/stripe-dashboard-button'
 import ReportIssueForm from './report-issue-form'
 import InvoicingPanel from './invoicing-panel'
@@ -57,16 +58,19 @@ export default async function MentorPayoutsPage() {
 
     const { data: eligibleSessions } = await supabase
         .from('sessions')
-        .select('id, duration_minutes, status, zoom_meeting_status')
+        .select('id, duration_minutes, status, zoom_meeting_status, payout_amount_cents')
         .eq('mentor_id', user.id)
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
 
-    const hourlyRate = mentor?.hourly_rate_cents || 2500
+    const hourlyRate = mentor?.hourly_rate_cents || DEFAULT_HOURLY_RATE_CENTS
     const unbatchedPending = (eligibleSessions || [])
         .filter((s: any) => !paidOrBatchedSessionIds.has(s.id))
         .reduce((sum: number, s: any) => {
-            const duration = s.duration_minutes || 60
-            return sum + Math.round((duration / 60) * hourlyRate)
+            return sum + sessionAmountCents(
+                s.duration_minutes,
+                hourlyRate,
+                s.payout_amount_cents
+            )
         }, 0)
 
     const totalPending = batchedPending + unbatchedPending

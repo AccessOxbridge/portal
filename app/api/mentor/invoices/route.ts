@@ -220,7 +220,7 @@ export async function POST(req: Request) {
                 .in('id', eligibleIds)
                 .is('invoice_id', null)
                 .eq('mentor_id', user.id)
-                .select('id, scheduled_at, duration_minutes, student_id')
+                .select('id, scheduled_at, duration_minutes, student_id, payout_amount_cents')
             if (claimErr) throw claimErr
 
             const claimed = claimedRows || []
@@ -253,6 +253,8 @@ export async function POST(req: Request) {
             }
 
             // 3. Snapshot each claimed session as a line item.
+            // amount_cents honours sessions.payout_amount_cents when set; hourly
+            // rate + duration stay honest on the PDF even for flat overrides.
             const itemRows = claimed.map(s => {
                 const duration = s.duration_minutes ?? 60
                 return {
@@ -263,7 +265,11 @@ export async function POST(req: Request) {
                     session_date: s.scheduled_at ? String(s.scheduled_at).slice(0, 10) : null,
                     duration_minutes: duration,
                     hourly_rate_cents: hourlyRateCents,
-                    amount_cents: sessionAmountCents(duration, hourlyRateCents),
+                    amount_cents: sessionAmountCents(
+                        duration,
+                        hourlyRateCents,
+                        s.payout_amount_cents
+                    ),
                 }
             })
             const { error: itemsErr } = await db.from('mentor_invoice_items').insert(itemRows)

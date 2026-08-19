@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { MessageSquare, X, Loader2 } from 'lucide-react'
 import ChatWindow from '@/components/chat/v2/chat-window'
-import { ensureMentorSupportThread } from '../actions'
+import { ensureMentorSupportThread } from '../../messages/actions'
 
 interface MentorMessageButtonProps {
     mentorId: string

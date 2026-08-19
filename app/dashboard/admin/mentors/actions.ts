@@ -2,11 +2,6 @@
 
 import { createAdminClient } from '@/utils/supabase/admin'
 
-export {
-    ensureMentorSupportThread,
-    type MentorSupportThread,
-} from '../messages/actions'
-
 export interface Mentor {
     id: string
     bio: string | null

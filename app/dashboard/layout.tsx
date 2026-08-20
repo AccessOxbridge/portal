@@ -47,10 +47,16 @@ export default async function DashboardLayout({
 
     // User exists in auth but no profile returned (either missing or initial select failed e.g. join).
     if (!profile) {
+        // Never trust admin/client/admin-dev from user_metadata. The only
+        // self-serve role we will honour here is mentor, so a missing-profile
+        // fallback cannot mint staff accounts and cannot demote a mentor.
+        const metadataRole = user.user_metadata?.role
+        const fallbackRole = metadataRole === 'mentor' ? 'mentor' : 'student'
+
         const { error: insertError } = await supabase.from('profiles').insert({
             id: user.id,
             full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User',
-            role: 'student',
+            role: fallbackRole,
             email: user.email ?? '',
         })
         if (insertError) {

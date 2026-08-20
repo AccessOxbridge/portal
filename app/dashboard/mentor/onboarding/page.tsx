@@ -13,16 +13,27 @@ export default async function OnboardingPage() {
         return redirect('/login')
     }
 
-    // Check if already applied
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, full_name')
+        .eq('id', user.id)
+        .single()
+
+    if (!profile || (profile.role !== 'mentor' && profile.role !== 'admin-dev')) {
+        return redirect('/dashboard')
+    }
+
     const { data: mentor } = await supabase
         .from('mentors')
         .select('status')
         .eq('id', user.id)
         .single()
 
-    // if (mentor && mentor.status !== 'details_required') {
-    //     return redirect('/dashboard/mentor')
-    // }
+    if (mentor && mentor.status !== 'details_required') {
+        return redirect('/dashboard/mentor')
+    }
 
-    return <OnboardingForm />
+    const firstName = profile.full_name?.trim().split(/\s+/)[0]
+
+    return <OnboardingForm firstName={firstName} />
 }

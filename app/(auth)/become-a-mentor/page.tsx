@@ -1,19 +1,21 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { LoginForm } from './LoginForm'
+import { MentorRegisterForm } from './MentorRegisterForm'
 
-export default async function LoginPage({
+export default async function BecomeAMentorPage({
     searchParams,
 }: {
     searchParams: Promise<{ error?: string }>
 }) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
 
     if (user) {
         redirect('/dashboard')
     }
 
     const params = await searchParams
-    return <LoginForm notice={params.error} />
+    return <MentorRegisterForm error={params.error} />
 }

@@ -112,3 +112,16 @@
 body[data-overlay-open] [data-floating-ui] {
   display: none;
 }
+
+
+/*
+ * The mentor "Application Pending" screen is a terminal waiting state — there
+ * is nothing to notify on until an admin approves — so it suppresses the
+ * floating notification bell. The bell is mounted in the root layout, above
+ * the dashboard tree, so it cannot be gated from the page itself; and the
+ * route (/dashboard/mentor) is shared with the real mentor dashboard, so a
+ * path check in the bell would hide it for approved mentors too.
+ */
+body:has([data-hide-floating-ui]) [data-floating-ui] {
+  display: none;
+}

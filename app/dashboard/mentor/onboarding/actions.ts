@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { sendMentorApplicationReceivedEmail } from '@/utils/email'
+import { sendMentorApplicationReceivedEmail, notifyAdminsOfMentorApplication } from '@/utils/email'
 import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
 
 export async function submitOnboarding(prevState: any, formData: FormData) {
@@ -117,8 +117,8 @@ export async function submitOnboarding(prevState: any, formData: FormData) {
         return { error: 'Your mentor profile is not initialized yet. Please sign out and sign back in, then try again.' }
     }
 
-    // Mock email
     await sendMentorApplicationReceivedEmail(user.email || '', user.user_metadata?.full_name || 'Mentor')
+    await notifyAdminsOfMentorApplication(user.user_metadata?.full_name || 'A mentor')
 
     revalidatePath('/dashboard/mentor')
     redirect('/dashboard/mentor')

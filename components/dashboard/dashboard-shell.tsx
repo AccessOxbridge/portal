@@ -52,22 +52,32 @@ export default function DashboardShell({
 
             <main
                 className={cn(
-                    'flex-1 min-h-0 bg-[#F9FAFB] overflow-y-auto overflow-x-hidden overscroll-contain transition-[margin-left] duration-300 ease-in-out',
+                    'flex-1 min-h-0 overflow-x-hidden overscroll-contain transition-[margin-left] duration-300 ease-in-out',
+                    showSidebar
+                        ? 'bg-[#F9FAFB] overflow-y-auto'
+                        // Sidebar-less screens (mentor onboarding, Application
+                        // Pending) still need to scroll, or short viewports
+                        // strand content — e.g. Sign Out — below the fold.
+                        : 'bg-white overflow-y-auto',
                     // Sidebar is `hidden md:flex`, so the offset only applies from md up.
                     showSidebar && (collapsed ? 'md:ml-[4.5rem]' : 'md:ml-64')
                 )}
             >
                 {showSidebar && <MobileTopBar />}
 
-                <div
-                    className={cn(
-                        'max-w-[1600px] mx-auto p-4 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-700',
-                        // Clear the fixed bottom tab bar on phones.
-                        showSidebar && 'pb-24 md:pb-10'
-                    )}
-                >
-                    {children}
-                </div>
+                {showSidebar ? (
+                    <div
+                        className={cn(
+                            'max-w-[1600px] mx-auto p-4 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-700',
+                            // Clear the fixed bottom tab bar on phones.
+                            'pb-24 md:pb-10'
+                        )}
+                    >
+                        {children}
+                    </div>
+                ) : (
+                    <div className="h-full min-h-0">{children}</div>
+                )}
             </main>
 
             {showSidebar && <MobileTabBar {...sidebarProps} />}

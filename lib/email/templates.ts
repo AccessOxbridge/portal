@@ -13,6 +13,8 @@ const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.accessoxbridge.
 
 const STUDENT_MESSAGES_URL = `${APP_URL}/dashboard/student/messages`
 const MENTOR_MESSAGES_URL = `${APP_URL}/dashboard/mentor/messages`
+const MENTOR_TRAINING_URL = `${APP_URL}/dashboard/mentor/training`
+const MENTOR_APPROVALS_URL = `${APP_URL}/dashboard/admin/approvals`
 const LOGIN_URL = `${APP_URL}/login`
 
 const LOGO_URL = 'https://accessoxbridge.io/email-logo.png'
@@ -737,6 +739,58 @@ export function paymentRemittanceMentor(
                 `If you have any questions about your payment, just reach out to the team on the portal.`,
             ],
             signOff: THANKS_SIGN_OFF,
+        }),
+    }
+}
+
+export function mentorApplicationReceived(mentorName: string): EmailTemplate {
+    const name = escapeHtml(mentorName || 'there')
+    return {
+        subject: 'We received your mentor application | Access Oxbridge',
+        html: layout({
+            title: 'Application received',
+            preheader: 'Thanks for applying to mentor with Access Oxbridge. We will review your application shortly.',
+            paragraphs: [
+                `Dear ${name},`,
+                `Thank you for applying to become an Access Oxbridge mentor. We have received your application and our team will review it.`,
+                `This usually takes 24 to 48 hours. We will email you when a decision is ready.`,
+                `You can ${link('log in to the portal', LOGIN_URL)} at any time to check your status.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+export function mentorApplicationApproved(mentorName: string): EmailTemplate {
+    const name = escapeHtml(mentorName || 'there')
+    return {
+        subject: 'Your mentor application was approved | Access Oxbridge',
+        html: layout({
+            title: 'Application approved',
+            preheader: 'You have been approved as an Access Oxbridge mentor. Complete training to get started.',
+            paragraphs: [
+                `Dear ${name},`,
+                `Good news: your mentor application has been approved.`,
+                `Please ${link('complete your training in the portal', MENTOR_TRAINING_URL)} before you start mentoring. That covers the questionnaire, contract, background check, payment setup, and profile.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+export function mentorApplicationReviewAdmin(mentorName: string): EmailTemplate {
+    const name = escapeHtml(mentorName || 'A mentor')
+    return {
+        subject: `New mentor application from ${mentorName} | Access Oxbridge`,
+        html: layout({
+            title: 'New mentor application',
+            preheader: `${mentorName} submitted a mentor application and is waiting for review.`,
+            paragraphs: [
+                `Hi team,`,
+                `<strong>${name}</strong> has submitted a mentor application and is waiting for review.`,
+                `${link('Open the approvals queue', MENTOR_APPROVALS_URL)}.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
         }),
     }
 }

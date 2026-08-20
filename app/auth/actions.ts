@@ -30,64 +30,11 @@ export async function login(formData: FormData) {
     redirect('/dashboard')
 }
 
-export async function signup(formData: FormData) {
-    const supabase = await createClient()
-
-    const origin = (await headers()).get('origin')
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const full_name = formData.get('full_name') as string
-    // Public signup is disabled and all accounts are created by admin/dev. If
-    // this action is ever reached, hard-force the least-privileged role so a
-    // client-supplied role can never mint an admin/mentor account. (The DB-level
-    // fix lands in Chunk 1 when handle_new_user() stops trusting client role.)
-    const role = 'student'
-    const member_code = formData.get('member_code') as string || null
-
-    const data = {
-        email,
-        password,
-        options: {
-            data: {
-                full_name,
-                role,
-                member_code,
-            },
-            emailRedirectTo: `${origin}/auth/callback`,
-        },
-    }
-
-    const result = await supabase.auth.signUp(data)
-    const { data: { user, session }, error } = result
-
-    if (error) {
-        console.error('Signup error:', error.message)
-        redirect(`/error?message=${encodeURIComponent(error.message)}`)
-    }
-
-    // Check if user already exists but isn't confirmed or tries to re-signup
-    // Supabase returns a user but empty identities if they already exist
-    if (user && (!user.identities || user.identities.length === 0)) {
-        console.log('User already exists, redirecting to login')
-        redirect('/login?error=' + encodeURIComponent('An account with this email already exists. Please log in instead.'))
-    }
-
-    // If we have a session, the user is already logged in (direct signup)
-    if (session) {
-        console.log('Direct signup successful, redirecting to dashboard')
-        revalidatePath('/', 'layout')
-        redirect('/dashboard')
-    }
-
-    // If we have a user but no session, it means email verification is required
-    if (user) {
-        console.log('Signup successful, verification email sent. Redirecting to verify-email')
-        redirect(`/verify-email?email=${encodeURIComponent(email)}`)
-    }
-
-    // This should theoretically not be reached if there's no error, but for robustness:
-    console.warn('Signup returned no error but also no user/session')
-    redirect('/dashboard')
+export async function signup(_formData: FormData) {
+    // Public student/generic signup stays closed. Mentor self-serve lives at
+    // /become-a-mentor and never goes through this action. If this is reached
+    // (dead SignupForm, old bookmark, bot POST), do not create an account.
+    redirect('/login')
 }
 
 export async function resendEmail(formData: FormData) {

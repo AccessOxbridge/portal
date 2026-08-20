@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { login } from '../../auth/actions'
 import { motion } from 'framer-motion'
 
-export function LoginForm() {
+export function LoginForm({ notice }: { notice?: string }) {
     const [isLoading, setIsLoading] = useState(false)
 
     return (
@@ -84,6 +84,12 @@ export function LoginForm() {
                         <p className="text-gray-500 font-medium">Please enter your details to sign in.</p>
                     </div>
 
+                    {notice && (
+                        <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-xl text-sm font-medium text-amber-800">
+                            {notice}
+                        </div>
+                    )}
+
                     <form className="space-y-6" onSubmit={() => setIsLoading(true)}>
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="email">
@@ -146,6 +152,15 @@ export function LoginForm() {
                             <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Privacy Policy</a>.
                         </p>
                     </form>
+
+                    <div className="mt-8 text-center">
+                        <p className="text-gray-600 font-medium">
+                            Want to become a mentor?{' '}
+                            <Link href="/become-a-mentor" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
+                                Apply here
+                            </Link>
+                        </p>
+                    </div>
                 </motion.div>
             </div>
         </div>

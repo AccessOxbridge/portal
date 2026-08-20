@@ -7,7 +7,7 @@ import { Suspense } from 'react'
 function ErrorContent() {
     const searchParams = useSearchParams()
     const message = searchParams.get('message')
-    const from = searchParams.get('from') || '/signup'
+    const from = searchParams.get('from') || '/login'
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">

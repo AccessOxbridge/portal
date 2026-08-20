@@ -55,7 +55,10 @@ export default function DashboardShell({
                     'flex-1 min-h-0 overflow-x-hidden overscroll-contain transition-[margin-left] duration-300 ease-in-out',
                     showSidebar
                         ? 'bg-[#F9FAFB] overflow-y-auto'
-                        : 'bg-white overflow-hidden',
+                        // Sidebar-less screens (mentor onboarding, Application
+                        // Pending) still need to scroll, or short viewports
+                        // strand content — e.g. Sign Out — below the fold.
+                        : 'bg-white overflow-y-auto',
                     // Sidebar is `hidden md:flex`, so the offset only applies from md up.
                     showSidebar && (collapsed ? 'md:ml-[4.5rem]' : 'md:ml-64')
                 )}

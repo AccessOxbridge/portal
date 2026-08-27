@@ -23,6 +23,7 @@ import {
     sessionReminderMentor,
     sessionReminderStudent,
     studentMatched,
+    studentWelcome,
 } from '../lib/email/templates'
 
 const RECIPIENT = process.argv[2] || 'rajvishwakarma303@gmail.com'
@@ -46,6 +47,14 @@ const previews: { key: string; template: EmailTemplate }[] = [
     { key: 'sessionInactivityMentor', template: sessionInactivityMentor(MENTOR, STUDENT) },
     { key: 'sessionReminderStudent', template: sessionReminderStudent(STUDENT, MENTOR, '14:00 BST') },
     { key: 'sessionReminderMentor', template: sessionReminderMentor(MENTOR, STUDENT, '14:00 BST') },
+    {
+        key: 'studentWelcome',
+        template: studentWelcome({
+            fullName: 'Alex Chen',
+            email: 'alex@example.com',
+            password: 'ExamplePass12',
+        }),
+    },
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))

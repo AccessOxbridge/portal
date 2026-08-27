@@ -1,10 +1,10 @@
 'use client'
 
-import { createClient } from '@/utils/supabase/client'
-import { MoreHorizontal, Mail, ExternalLink, CheckCircle2, Clock, XCircle, ShieldCheck, ShieldAlert } from 'lucide-react'
-import { useState } from 'react'
+import { MoreHorizontal, Mail, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { MentorMessageButton } from './MentorMessageButton'
+import { setMentorStatus } from '../actions'
 
 interface MentorActionsProps {
     mentorId: string
@@ -15,23 +15,18 @@ interface MentorActionsProps {
 }
 
 export function MentorActions({ mentorId, currentStatus, email, mentorName, photoUrl }: MentorActionsProps) {
-    const supabase = createClient()
     const router = useRouter()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [isUpdating, setIsUpdating] = useState(false)
+    const [isPending, startTransition] = useTransition()
 
-    const updateStatus = async (newStatus: string) => {
-        setIsUpdating(true)
-        const { error } = await supabase
-            .from('mentors')
-            .update({ status: newStatus as any })
-            .eq('id', mentorId)
-
-        if (!error) {
-            router.refresh()
-        }
-        setIsUpdating(false)
-        setIsMenuOpen(false)
+    const updateStatus = (newStatus: string) => {
+        startTransition(async () => {
+            const result = await setMentorStatus(mentorId, newStatus)
+            if (!result.error) {
+                router.refresh()
+            }
+            setIsMenuOpen(false)
+        })
     }
 
     return (
@@ -46,7 +41,7 @@ export function MentorActions({ mentorId, currentStatus, email, mentorName, phot
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={`p-2 transition-colors rounded-lg ${isMenuOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
                     >
-                        {isUpdating ? <Clock className="w-4 h-4 animate-spin" /> : <MoreHorizontal className="w-4 h-4" />}
+                        {isPending ? <Clock className="w-4 h-4 animate-spin" /> : <MoreHorizontal className="w-4 h-4" />}
                     </button>
 
                     {isMenuOpen && (

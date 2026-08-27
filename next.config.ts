@@ -18,6 +18,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    '/dashboard/admin/create-account': ['./lib/email/attachments/**/*'],
+  },
   async headers() {
     return [
       {

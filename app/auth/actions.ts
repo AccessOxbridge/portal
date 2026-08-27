@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
 import { recordLoginEvent } from '@/lib/login-events'
+import { sendStudentFirstLoginMessage } from '@/lib/claire-auto-messages'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -15,7 +17,22 @@ export async function login(formData: FormData) {
     }
 
     const result = await supabase.auth.signInWithPassword(data)
-    const { error } = result
+    const { error, data: authData } = result
+
+    let isFirstSuccessfulLogin = false
+    if (!error && authData.user) {
+        try {
+            const admin = createAdminClient()
+            const { count } = await admin
+                .from('login_events')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', authData.user.id)
+                .eq('status', 'success')
+            isFirstSuccessfulLogin = (count ?? 0) === 0
+        } catch (countError) {
+            console.error('First-login count failed:', countError)
+        }
+    }
 
     // Recorded before the redirect below: `redirect()` works by throwing, so
     // anything after it in this branch would never run.
@@ -24,6 +41,10 @@ export async function login(formData: FormData) {
     if (error) {
         console.error('Login error:', error.message)
         redirect(`/error?message=${encodeURIComponent(error.message)}&from=/login`)
+    }
+
+    if (isFirstSuccessfulLogin && authData.user) {
+        await sendStudentFirstLoginMessage(authData.user.id)
     }
 
     revalidatePath('/', 'layout')

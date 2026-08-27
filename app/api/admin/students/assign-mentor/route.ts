@@ -1,3 +1,4 @@
+import { sendMatchIntroMessage } from '@/lib/claire-auto-messages'
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
@@ -49,6 +50,12 @@ export async function POST(req: Request) {
             .maybeSingle()
 
         if (existingAssignment) {
+            // Heal a missed intro if the pair was assigned before this code ran,
+            // or if the request hit a deploy that created the assignment only.
+            await sendMatchIntroMessage({
+                studentId,
+                mentorId: newMentorId,
+            })
             return NextResponse.json(
                 { error: 'This student is already assigned to that mentor.' },
                 { status: 400 }
@@ -72,22 +79,11 @@ export async function POST(req: Request) {
             )
         }
 
-        // Ensure a mentor conversation exists so chat is preloaded immediately.
-        const { data: existingConv } = await adminSupabase
-            .from('conversations')
-            .select('id')
-            .eq('student_id', studentId)
-            .eq('mentor_id', newMentorId)
-            .eq('type', 'mentor')
-            .maybeSingle()
-
-        if (!existingConv) {
-            await adminSupabase.from('conversations').insert({
-                student_id: studentId,
-                mentor_id: newMentorId,
-                type: 'mentor',
-            })
-        }
+        // Chat intro first so a slow/failing match email cannot skip it.
+        await sendMatchIntroMessage({
+            studentId,
+            mentorId: newMentorId,
+        })
 
         // Notify student + new mentor.
         const ids = [studentId, newMentorId]

@@ -23,6 +23,7 @@ import {
     sessionReminderMentor,
     sessionReminderStudent,
     studentMatched,
+    mentorWelcome,
     studentWelcome,
 } from '../lib/email/templates'
 
@@ -52,6 +53,14 @@ const previews: { key: string; template: EmailTemplate }[] = [
         template: studentWelcome({
             fullName: 'Alex Chen',
             email: 'alex@example.com',
+            password: 'ExamplePass12',
+        }),
+    },
+    {
+        key: 'mentorWelcome',
+        template: mentorWelcome({
+            fullName: 'Sarah Bennett',
+            email: 'sarah@example.com',
             password: 'ExamplePass12',
         }),
     },

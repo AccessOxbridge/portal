@@ -825,7 +825,6 @@ export function studentWelcome(args: {
     email: string
     password: string
 }): EmailTemplate {
-    const displayName = escapeHtml(args.fullName || 'there')
     const firstName = firstNameFrom(args.fullName)
     return {
         subject: `Welcome to Access Oxbridge ${firstName} - Your Login Details Inside!`,
@@ -833,7 +832,7 @@ export function studentWelcome(args: {
             title: 'Welcome to Access Oxbridge',
             preheader: 'Welcome to Access Oxbridge. Here is how to get started on the portal.',
             paragraphs: [
-                `Hi ${displayName},`,
+                `Hi ${escapeHtml(firstName)},`,
                 `Welcome to Access Oxbridge! We're delighted to have you with us and can't wait to help you on your academic journey.`,
             ],
             list: {
@@ -853,6 +852,50 @@ export function studentWelcome(args: {
                 'For security, please log in and change your password as soon as you can.',
                 "If you have any trouble logging in, just reply to this email and we'll be happy to help.",
                 "Welcome aboard. We're looking forward to working with you.",
+            ],
+            signOff: ['Best wishes,', 'The Access Oxbridge Team'],
+        }),
+    }
+}
+
+/** Staff-provisioned mentor account: login details + onboarding next steps. */
+export function mentorWelcome(args: {
+    fullName: string
+    email: string
+    password: string
+}): EmailTemplate {
+    const firstName = firstNameFrom(args.fullName)
+    return {
+        subject: `Welcome to Access Oxbridge, ${firstName}!`,
+        html: layout({
+            title: 'Welcome to Access Oxbridge',
+            preheader: 'Welcome to Access Oxbridge. Here is how to get started on the portal.',
+            paragraphs: [
+                `Hi ${escapeHtml(firstName)},`,
+                'Welcome to Access Oxbridge! We are excited to have you on board and be working together.',
+                'Below is your onboarding instructions; please follow these carefully so that we can get you matched up with your first student as soon as possible.',
+            ],
+            list: {
+                heading: 'What to do next',
+                items: [
+                    { body: 'Log in to the portal using the details below.' },
+                    {
+                        body: 'Complete your profile and fill in all the required information.',
+                    },
+                    {
+                        body: 'Complete any remaining onboarding steps shown on the portal.',
+                    },
+                    {
+                        body: 'Please refer to the Mentor Onboarding Guide, attached to this email, for further guidance on the onboarding process and first steps to take once you have been matched to a student.',
+                    },
+                ],
+            },
+            closingParagraphs: [
+                "Once you've completed your profile and all required onboarding steps, our team will review your details. Once approved, you'll be ready to be matched up with students.",
+                `<strong>Your login details:</strong><br />${loginDetailsParagraph(args.email, args.password)}`,
+                'For security, please log in and change your password as soon as possible.',
+                "If you have any trouble logging in or completing your onboarding, simply reply to this email and we'll be happy to help.",
+                'Great to have you with us, and we look forward to working with you!',
             ],
             signOff: ['Best wishes,', 'The Access Oxbridge Team'],
         }),

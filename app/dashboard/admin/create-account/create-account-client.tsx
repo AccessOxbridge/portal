@@ -4,8 +4,10 @@ import { createClient } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 import {
     AlertCircle,
+    BookOpen,
     CheckCircle2,
     Clock,
+    GraduationCap,
     KeyRound,
     Loader2,
     Mail,
@@ -18,7 +20,9 @@ import {
     X,
 } from 'lucide-react'
 import { useEffect, useState, useTransition } from 'react'
-import { createStudentAccount } from './actions'
+import { createMentorAccount, createStudentAccount } from './actions'
+
+type AccountTab = 'student' | 'mentor'
 
 interface StudentAccount {
     id: string
@@ -28,10 +32,24 @@ interface StudentAccount {
     updated_at: string
 }
 
+interface MentorAccount {
+    id: string
+    full_name: string | null
+    email: string | null
+    updated_at: string
+    status: string
+}
+
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const LOWER = 'abcdefghijklmnopqrstuvwxyz'
 const DIGITS = '0123456789'
 const ALL = UPPER + LOWER + DIGITS
+
+const STATUS_COLORS: Record<string, string> = {
+    active: 'bg-green-50 text-green-700 border-green-100',
+    pending_approval: 'bg-amber-50 text-amber-700 border-amber-100',
+    details_required: 'bg-gray-50 text-gray-700 border-gray-100',
+}
 
 function randomChar(alphabet: string): string {
     const bytes = new Uint8Array(1)
@@ -54,25 +72,29 @@ function generatePassword(): string {
 }
 
 export function CreateAccountClient() {
-    const supabase = createClient()
+    const [tab, setTab] = useState<AccountTab>('student')
     const [students, setStudents] = useState<StudentAccount[]>([])
+    const [mentors, setMentors] = useState<MentorAccount[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null)
     const [password, setPassword] = useState('')
+    const [reloadToken, setReloadToken] = useState(0)
 
-    const fetchStudents = async () => {
-        setIsLoading(true)
+    useEffect(() => {
+        const client = createClient()
+        let cancelled = false
 
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('id, full_name, email, credits, updated_at')
-            .eq('role', 'student')
-            .order('updated_at', { ascending: false })
+        async function loadStudents() {
+            const { data, error } = await client
+                .from('profiles')
+                .select('id, full_name, email, credits, updated_at')
+                .eq('role', 'student')
+                .order('updated_at', { ascending: false })
 
-        if (!error && data) {
+            if (cancelled || error || !data) return
             let filtered = data as StudentAccount[]
             if (searchTerm) {
                 const term = searchTerm.toLowerCase()
@@ -84,12 +106,49 @@ export function CreateAccountClient() {
             }
             setStudents(filtered)
         }
-        setIsLoading(false)
-    }
 
-    useEffect(() => {
-        fetchStudents()
-    }, [searchTerm])
+        async function loadMentors() {
+            const { data, error } = await client
+                .from('mentors')
+                .select('id, status, updated_at, profile:profiles!left(full_name, email)')
+                .order('updated_at', { ascending: false })
+
+            if (cancelled || error || !data) return
+            let mapped = data.map((row) => {
+                const profile = Array.isArray(row.profile) ? row.profile[0] : row.profile
+                return {
+                    id: row.id,
+                    full_name: profile?.full_name ?? null,
+                    email: profile?.email ?? null,
+                    updated_at: row.updated_at,
+                    status: row.status || 'details_required',
+                }
+            })
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase()
+                mapped = mapped.filter(
+                    (mentor) =>
+                        mentor.full_name?.toLowerCase().includes(term) ||
+                        mentor.email?.toLowerCase().includes(term)
+                )
+            }
+            setMentors(mapped)
+        }
+
+        async function load() {
+            if (tab === 'student') {
+                await loadStudents()
+            } else {
+                await loadMentors()
+            }
+            if (!cancelled) setIsLoading(false)
+        }
+
+        void load()
+        return () => {
+            cancelled = true
+        }
+    }, [searchTerm, tab, reloadToken])
 
     const openModal = () => {
         setMessage(null)
@@ -109,17 +168,21 @@ export function CreateAccountClient() {
         setMessage(null)
         const formData = new FormData(e.currentTarget)
         formData.set('password', password)
+        const creatingMentor = tab === 'mentor'
 
         startTransition(async () => {
-            const result = await createStudentAccount(formData)
+            const result = creatingMentor
+                ? await createMentorAccount(formData)
+                : await createStudentAccount(formData)
             if ('success' in result && result.success) {
-                fetchStudents()
+                setReloadToken((token) => token + 1)
+                const roleLabel = creatingMentor ? 'Mentor' : 'Student'
                 const parts: string[] = []
                 if (result.emailSent) {
-                    parts.push('Student account created. Welcome email sent with login details.')
+                    parts.push(`${roleLabel} account created. Welcome email sent with login details.`)
                 } else {
                     parts.push(
-                        'Account created, but the welcome email failed. Copy the password now and send it to the student yourself.'
+                        `Account created, but the welcome email failed. Copy the password now and send it to the ${creatingMentor ? 'mentor' : 'student'} yourself.`
                     )
                 }
                 if (result.warning) {
@@ -145,21 +208,65 @@ export function CreateAccountClient() {
         })
     }
 
+    const isMentorTab = tab === 'mentor'
+    const empty = isMentorTab ? mentors.length === 0 : students.length === 0
+
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
             <header className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create Account</h1>
-                    <p className="text-gray-500 mt-1">Provision student portal accounts and send branded login details.</p>
+                    <p className="text-gray-500 mt-1">
+                        Provision student and mentor portal accounts and send branded login details.
+                    </p>
                 </div>
                 <button
                     onClick={openModal}
                     className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-2xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-accent/20"
                 >
                     <Plus className="w-5 h-5" />
-                    Create Account
+                    {isMentorTab ? 'Create Mentor' : 'Create Student'}
                 </button>
             </header>
+
+            <div className="flex gap-2 border-b border-gray-200">
+                <button
+                    onClick={() => {
+                        if (isPending) return
+                        setTab('student')
+                        setIsLoading(true)
+                        setIsModalOpen(false)
+                        setMessage(null)
+                        setPassword('')
+                    }}
+                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${
+                        tab === 'student'
+                            ? 'text-accent border-accent'
+                            : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
+                >
+                    <BookOpen className="w-4 h-4" />
+                    Students
+                </button>
+                <button
+                    onClick={() => {
+                        if (isPending) return
+                        setTab('mentor')
+                        setIsLoading(true)
+                        setIsModalOpen(false)
+                        setMessage(null)
+                        setPassword('')
+                    }}
+                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${
+                        tab === 'mentor'
+                            ? 'text-accent border-accent'
+                            : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
+                >
+                    <GraduationCap className="w-4 h-4" />
+                    Mentors
+                </button>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
                 <div className="relative w-full md:w-96">
@@ -173,25 +280,31 @@ export function CreateAccountClient() {
                     />
                 </div>
                 <div className="text-sm text-gray-400 font-medium">
-                    {students.length} {students.length === 1 ? 'Student' : 'Students'} found
+                    {isMentorTab
+                        ? `${mentors.length} ${mentors.length === 1 ? 'Mentor' : 'Mentors'} found`
+                        : `${students.length} ${students.length === 1 ? 'Student' : 'Students'} found`}
                 </div>
             </div>
 
             <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
-                {isLoading && students.length === 0 ? (
+                {isLoading && empty ? (
                     <div className="flex items-center justify-center py-24">
                         <Loader2 className="w-8 h-8 text-accent animate-spin" />
                     </div>
-                ) : students.length === 0 ? (
+                ) : empty ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
                         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                             <Users className="w-10 h-10 text-gray-300" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">No student accounts yet</h3>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">
+                            {isMentorTab ? 'No mentor accounts yet' : 'No student accounts yet'}
+                        </h3>
                         <p className="text-gray-500 max-w-sm">
                             {searchTerm
-                                ? `No students matching "${searchTerm}"`
-                                : 'Create the first student account to send login details and hours.'}
+                                ? `No ${isMentorTab ? 'mentors' : 'students'} matching "${searchTerm}"`
+                                : isMentorTab
+                                  ? 'Create the first mentor account to send login details and the onboarding guide.'
+                                  : 'Create the first student account to send login details and hours.'}
                         </p>
                         {!searchTerm && (
                             <button
@@ -201,6 +314,50 @@ export function CreateAccountClient() {
                                 Create your first account
                             </button>
                         )}
+                    </div>
+                ) : isMentorTab ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50/50 border-b border-gray-100">
+                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
+                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Last updated</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {mentors.map((mentor) => (
+                                    <tr key={mentor.id} className="hover:bg-gray-50/30 transition-colors group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                    {mentor.full_name?.[0] || 'M'}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="font-bold text-gray-900 truncate text-base">
+                                                        {mentor.full_name || 'Unnamed mentor'}
+                                                    </span>
+                                                    <span className="text-sm text-gray-400 truncate flex items-center gap-1.5">
+                                                        <Mail className="w-3.5 h-3.5" />
+                                                        {mentor.email}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${STATUS_COLORS[mentor.status] || STATUS_COLORS.details_required}`}
+                                            >
+                                                {mentor.status.replace('_', ' ')}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-5 text-sm text-gray-500 font-medium">
+                                            {format(new Date(mentor.updated_at), 'd MMM yyyy')}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -261,9 +418,13 @@ export function CreateAccountClient() {
                                 <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-6">
                                     <UserPlus className="w-7 h-7 text-accent" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900">Create student account</h2>
+                                <h2 className="text-2xl font-bold text-gray-900">
+                                    {isMentorTab ? 'Create mentor account' : 'Create student account'}
+                                </h2>
                                 <p className="text-gray-500 mt-2">
-                                    A welcome email with login details and the onboarding guide will be sent automatically.
+                                    {isMentorTab
+                                        ? 'A welcome email with login details and the mentor onboarding guide will be sent automatically.'
+                                        : 'A welcome email with login details and the onboarding guide will be sent automatically.'}
                                 </p>
                             </div>
 
@@ -337,25 +498,27 @@ export function CreateAccountClient() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="total_hours">
-                                        Total Hours
-                                    </label>
-                                    <div className="relative">
-                                        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                        <input
-                                            required
-                                            id="total_hours"
-                                            name="total_hours"
-                                            type="number"
-                                            min={0}
-                                            max={1000}
-                                            step={1}
-                                            defaultValue={0}
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
-                                        />
+                                {!isMentorTab && (
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="total_hours">
+                                            Total Hours
+                                        </label>
+                                        <div className="relative">
+                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                            <input
+                                                required
+                                                id="total_hours"
+                                                name="total_hours"
+                                                type="number"
+                                                min={0}
+                                                max={1000}
+                                                step={1}
+                                                defaultValue={0}
+                                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {message && (
                                     <div

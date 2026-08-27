@@ -59,7 +59,7 @@ function mentorWelcomeBody(firstName: string): string {
 function matchIntroBody(studentFirst: string, mentorFirst: string): string {
     return [
         `Hi ${studentFirst} and ${mentorFirst},`,
-        `I hope you're well. I'm Claire Marlowe, Senior Strategist at Access Oxbridge. Lovely to meet you both. This group chat is your dedicated space for the programme. Please use it to schedule and coordinate sessions, share anything useful ahead of meetings, and keep in touch between sessions. I'll be here in the background should anything come up that needs input from the team, but it is very much for you to use this between yourselves. Don't hesitate to reach out if you have any questions. Looking forward to seeing great work from you both!`,
+        `I hope you're well. I'm Claire, Senior Strategist at Access Oxbridge. Lovely to meet you both. This group chat is your dedicated space for the programme. Please use it to schedule and coordinate sessions, share anything useful ahead of meetings, and keep in touch between sessions. I'll be here in the background should anything come up that needs input from the team, but it is very much for you to use this between yourselves. Don't hesitate to reach out if you have any questions. Looking forward to seeing great work from you both!`,
     ].join('\n')
 }
 

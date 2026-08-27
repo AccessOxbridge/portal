@@ -4,9 +4,10 @@
  * Every template renders through the single canonical Access Oxbridge email
  * design (`layout`). The ONLY thing that varies between emails is the body
  * region: the preheader, the greeting, the body paragraphs, an optional
- * numbered list, and the sign-off. The <head>, <style>, dark header (logo +
- * wordmark) and the full footer are identical for every email — never edit
- * them here. To add a new email, add a function that calls `layout(...)`.
+ * numbered list, optional closing paragraphs, and the sign-off. The <head>,
+ * <style>, dark header (logo + wordmark) and the full footer are identical
+ * for every email — never edit them here. To add a new email, add a function
+ * that calls `layout(...)`.
  */
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.accessoxbridge.io').replace(/\/$/, '')
@@ -49,6 +50,8 @@ interface LayoutArgs {
     paragraphs: string[]
     /** Optional "What to expect next" style numbered list. */
     list?: { heading: string; items: ListItem[] }
+    /** Optional paragraphs after the list (login details, extra notes). */
+    closingParagraphs?: string[]
     /** Sign-off lines; index 1 (the name) is rendered bold. */
     signOff: string[]
 }
@@ -81,8 +84,8 @@ ${rows}
                                 </table>`
 }
 
-function layout({ title, preheader, paragraphs, list, signOff }: LayoutArgs): string {
-    const bodyParagraphs = paragraphs
+function renderParagraphs(items: string[]): string {
+    return items
         .map(
             (p) =>
                 `                                <p class="email-text" style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#0C1B2A;">
@@ -90,8 +93,16 @@ function layout({ title, preheader, paragraphs, list, signOff }: LayoutArgs): st
                                 </p>`
         )
         .join('\n')
+}
+
+function layout({ title, preheader, paragraphs, list, closingParagraphs, signOff }: LayoutArgs): string {
+    const bodyParagraphs = renderParagraphs(paragraphs)
 
     const listBlock = list ? `\n${renderList(list)}\n` : ''
+
+    const closingBlock = closingParagraphs && closingParagraphs.length > 0
+        ? `\n${renderParagraphs(closingParagraphs)}\n`
+        : ''
 
     const signOffHtml = signOff
         .map((line, i) => (i === 1 ? `<strong>${escapeHtml(line)}</strong>` : escapeHtml(line)))
@@ -165,7 +176,7 @@ function layout({ title, preheader, paragraphs, list, signOff }: LayoutArgs): st
                         <tr>
                             <td class="email-content" bgcolor="#FAF7F3" style="padding:46px 44px 20px;background-color:#FAF7F3;">
 ${bodyParagraphs}
-${listBlock}                                <p class="email-text" style="margin:0;font-size:16px;line-height:1.7;color:#0C1B2A;">
+${listBlock}${closingBlock}                                <p class="email-text" style="margin:0;font-size:16px;line-height:1.7;color:#0C1B2A;">
                                     ${signOffHtml}
                                 </p>
                             </td>
@@ -791,6 +802,59 @@ export function mentorApplicationReviewAdmin(mentorName: string): EmailTemplate 
                 `${link('Open the approvals queue', MENTOR_APPROVALS_URL)}.`,
             ],
             signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+function firstNameFrom(fullName: string): string {
+    const first = fullName.trim().split(/\s+/)[0]
+    return first || 'there'
+}
+
+function loginDetailsParagraph(email: string, password: string): string {
+    return [
+        `<strong>Portal:</strong> ${link(LOGIN_URL, LOGIN_URL)}`,
+        `<strong>Username:</strong> ${escapeHtml(email)}`,
+        `<strong>Password:</strong> ${escapeHtml(password)}`,
+    ].join('<br />')
+}
+
+/** Staff-provisioned student account: login details + onboarding next steps. */
+export function studentWelcome(args: {
+    fullName: string
+    email: string
+    password: string
+}): EmailTemplate {
+    const displayName = escapeHtml(args.fullName || 'there')
+    const firstName = firstNameFrom(args.fullName)
+    return {
+        subject: `Welcome to Access Oxbridge ${firstName} - Your Login Details Inside!`,
+        html: layout({
+            title: 'Welcome to Access Oxbridge',
+            preheader: 'Welcome to Access Oxbridge. Here is how to get started on the portal.',
+            paragraphs: [
+                `Hi ${displayName},`,
+                `Welcome to Access Oxbridge! We're delighted to have you with us and can't wait to help you on your academic journey.`,
+            ],
+            list: {
+                heading: 'What to do next',
+                items: [
+                    { body: 'Log in to the portal using the details below.' },
+                    {
+                        body: 'Complete your profile in full - the more detail you give us, the better we can match you.',
+                    },
+                    {
+                        body: 'Please refer to the onboarding guide, attached to this email and also available once you log in to the portal, for the full list of remaining steps we need from you before we can book your first session.',
+                    },
+                ],
+            },
+            closingParagraphs: [
+                `<strong>Your login details:</strong><br />${loginDetailsParagraph(args.email, args.password)}`,
+                'For security, please log in and change your password as soon as you can.',
+                "If you have any trouble logging in, just reply to this email and we'll be happy to help.",
+                "Welcome aboard. We're looking forward to working with you.",
+            ],
+            signOff: ['Best wishes,', 'The Access Oxbridge Team'],
         }),
     }
 }

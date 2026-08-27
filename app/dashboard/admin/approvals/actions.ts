@@ -1,5 +1,6 @@
 'use server'
 
+import { sendMentorApprovedMessage } from '@/lib/claire-auto-messages'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendMentorApprovalEmail } from '@/utils/email'
@@ -94,6 +95,8 @@ export async function handleApplication(userId: string, status: 'approved' | 'di
         if (userData?.email) {
             await sendMentorApprovalEmail(userData.email, userData.full_name || 'Mentor')
         }
+
+        await sendMentorApprovedMessage(userId)
     } else {
         // Dismissed -> back to details_required
         const { error: dismissError } = await supabase

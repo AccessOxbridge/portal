@@ -1,6 +1,9 @@
 'use server'
 
+import { sendMentorApprovedMessage } from '@/lib/claire-auto-messages'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 
 export interface Mentor {
     id: string
@@ -143,4 +146,50 @@ export async function fetchMentors(
         mentors: paginatedMentors,
         totalCount: enrichedMentors.length
     }
+}
+
+const MENTOR_STATUSES = ['active', 'pending_approval', 'details_required'] as const
+type MentorStatus = (typeof MENTOR_STATUSES)[number]
+
+export async function setMentorStatus(
+    mentorId: string,
+    newStatus: string
+): Promise<{ error?: string }> {
+    const authed = await createClient()
+    const {
+        data: { user },
+    } = await authed.auth.getUser()
+    if (!user) return { error: 'Not authenticated' }
+
+    const { data: caller } = await authed
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+    if (!caller || (caller.role !== 'admin' && caller.role !== 'admin-dev')) {
+        return { error: 'Not authorized' }
+    }
+
+    if (!MENTOR_STATUSES.includes(newStatus as MentorStatus)) {
+        return { error: 'Invalid status' }
+    }
+
+    const admin = createAdminClient()
+    const { error } = await admin
+        .from('mentors')
+        .update({ status: newStatus as MentorStatus, updated_at: new Date().toISOString() })
+        .eq('id', mentorId)
+
+    if (error) {
+        console.error('setMentorStatus failed:', error.message)
+        return { error: 'Failed to update mentor status' }
+    }
+
+    if (newStatus === 'active') {
+        await sendMentorApprovedMessage(mentorId)
+    }
+
+    revalidatePath('/dashboard/admin/mentors')
+    return {}
 }

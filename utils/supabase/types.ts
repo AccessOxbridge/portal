@@ -1090,6 +1090,35 @@ export type Database = {
           },
         ]
       }
+      student_session_milestones: {
+        Row: {
+          acknowledged_at: string
+          milestone: number
+          sessions_completed: number | null
+          student_id: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          milestone: number
+          sessions_completed?: number | null
+          student_id: string
+        }
+        Update: {
+          acknowledged_at?: string
+          milestone?: number
+          sessions_completed?: number | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_session_milestones_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_reports: {
         Row: {
           action_items: Json | null

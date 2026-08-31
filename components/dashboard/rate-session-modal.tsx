@@ -19,6 +19,13 @@ export interface RateableSession {
 
 interface RateSessionModalProps {
     session: RateableSession | null
+    /**
+     * Called once the popup is out of the way, whichever route the student
+     * took: submitted and pressed Done, pressed "Not now", or closed it. The
+     * provider uses this to release the milestone celebration, which queues
+     * behind this popup rather than stacking on top of it.
+     */
+    onClosed?: () => void
 }
 
 /**
@@ -29,9 +36,14 @@ interface RateSessionModalProps {
  * Mounted with `key={session.id}` by the provider, so a different session
  * arrives as a fresh component with fresh state — no reset effect needed.
  */
-export default function RateSessionModal({ session }: RateSessionModalProps) {
+export default function RateSessionModal({ session, onClosed }: RateSessionModalProps) {
     const [isOpen, setIsOpen] = useState(true)
     const supabase = createClient()
+
+    const close = () => {
+        setIsOpen(false)
+        onClosed?.()
+    }
 
     const overlayVisible = !!session && isOpen
 
@@ -62,7 +74,7 @@ export default function RateSessionModal({ session }: RateSessionModalProps) {
      * blocking the student behind a nudge would be worse than asking twice.
      */
     const handleDismiss = async () => {
-        setIsOpen(false)
+        close()
         try {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) return
@@ -102,7 +114,7 @@ export default function RateSessionModal({ session }: RateSessionModalProps) {
                     mentorPhotoUrl={session.mentorPhotoUrl}
                     scheduledAt={session.scheduledAt}
                     secondaryAction={{ label: 'Not now', onClick: handleDismiss }}
-                    successCta={{ label: 'Done', onClick: () => setIsOpen(false) }}
+                    successCta={{ label: 'Done', onClick: close }}
                 />
             </div>
         </div>

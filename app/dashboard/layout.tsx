@@ -8,6 +8,8 @@ import type { StudentBookingProfile } from '@/components/dashboard/book-session-
 import type { RateableSession } from '@/components/dashboard/rate-session-modal'
 import { feedbackPromptWindowStart } from '@/config/feedback.config'
 import { getMentorPhotoUrl } from '@/lib/mentor-photo'
+import { selectStudentMilestone } from '@/lib/student-milestones'
+import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
@@ -316,6 +318,17 @@ export default async function DashboardLayout({
         }
     }
 
+    // The session-count milestone (1st, 5th, 10th, 20th, 50th, 100th) this
+    // student has just reached and not yet been congratulated for. Independent
+    // of the feedback prompt above on purpose: a student who closes the tab
+    // without answering the rating popup still gets their moment, and the
+    // celebration is recorded separately so it happens exactly once. The popup
+    // itself queues behind the rating popup, in StudentCreditsProvider.
+    let milestone: StudentMilestone | null = null
+    if (isStudent) {
+        milestone = await selectStudentMilestone(supabase, user.id)
+    }
+
     const sidebarProps = {
         role: profile.role || 'student',
         userName:
@@ -356,6 +369,7 @@ export default async function DashboardLayout({
                 canBook={canBook}
                 mentors={bookingMentors}
                 rateableSession={rateableSession}
+                milestone={milestone}
             >
                 {dashboardShell}
             </StudentCreditsProvider>

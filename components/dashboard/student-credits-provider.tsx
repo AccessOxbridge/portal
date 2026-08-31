@@ -14,6 +14,7 @@ import CreditsRequestModal, { type CreditsRequestReason } from '@/components/das
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
 import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 import RateSessionModal, { type RateableSession } from '@/components/dashboard/rate-session-modal'
+import MilestoneModal, { type StudentMilestone } from '@/components/dashboard/milestone-modal'
 
 interface StudentCreditsContextValue {
     credits: number
@@ -52,6 +53,12 @@ interface StudentCreditsProviderProps {
      * any. Selected server-side so the popup can appear on any dashboard page.
      */
     rateableSession?: RateableSession | null
+    /**
+     * A session-count milestone this student has just reached and not yet been
+     * congratulated for, if any. Selected server-side alongside the feedback
+     * prompt so the celebration can fire on any dashboard page.
+     */
+    milestone?: StudentMilestone | null
 }
 
 export default function StudentCreditsProvider({
@@ -61,11 +68,16 @@ export default function StudentCreditsProvider({
     canBook = false,
     mentors = [],
     rateableSession = null,
+    milestone = null,
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalReason, setModalReason] = useState<CreditsRequestReason>('topup')
     const [bookingOpen, setBookingOpen] = useState(false)
+    // The milestone celebration queues behind the feedback popup: two modals on
+    // the same load would bury the confetti under a form. With no feedback
+    // popup to wait for, it is free to fire immediately.
+    const [feedbackClosed, setFeedbackClosed] = useState(!rateableSession)
     const supabase = useMemo(() => createClient(), [])
 
     useEffect(() => {
@@ -140,7 +152,16 @@ export default function StudentCreditsProvider({
                     mentors={mentors}
                 />
             )}
-            <RateSessionModal key={rateableSession?.id ?? 'none'} session={rateableSession} />
+            <RateSessionModal
+                key={rateableSession?.id ?? 'none'}
+                session={rateableSession}
+                onClosed={() => setFeedbackClosed(true)}
+            />
+            <MilestoneModal
+                key={milestone?.milestone ?? 'no-milestone'}
+                milestone={milestone}
+                ready={feedbackClosed}
+            />
         </StudentCreditsContext.Provider>
     )
 }

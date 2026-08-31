@@ -30,6 +30,11 @@ export function firstNameOf(fullName: string | null | undefined, fallback = 'the
     return first || fallback
 }
 
+function displayName(member: ChatGroupMember): string {
+    const name = (member.full_name || '').trim()
+    return name || (member.role === 'student' ? 'Student' : 'Mentor')
+}
+
 export function formatGroupTitle(
     members: ChatGroupMember[],
     currentUserId?: string
@@ -37,12 +42,9 @@ export function formatGroupTitle(
     const others = members.filter(
         (m) => m.role !== 'admin' && m.user_id !== currentUserId
     )
-    const names = others.map((m) =>
-        firstNameOf(m.full_name, m.role === 'student' ? 'Student' : 'Mentor')
-    )
+    const names = others.map(displayName)
     if (names.length === 0) return 'Group chat'
-    if (names.length <= 2) return names.join(', ')
-    return `${names[0]}, ${names[1]} + ${names.length - 2}`
+    return names.join(', ')
 }
 
 export function groupIntroBody(members: ChatGroupMember[]): string {

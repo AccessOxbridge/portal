@@ -441,7 +441,12 @@ export default function AdminMessagesContent({
                                 >
                                     <div className="flex items-start justify-between gap-2 mb-1.5">
                                         <div className="min-w-0">
-                                            <p className="font-semibold text-sm text-gray-900 truncate">
+                                            <p
+                                                className={cn(
+                                                    'font-semibold text-sm text-gray-900',
+                                                    conv.type === 'group' ? 'leading-snug' : 'truncate'
+                                                )}
+                                            >
                                                 {conv.type === 'group'
                                                     ? formatGroupTitle(conv.members || [])
                                                     : conv.student.full_name}
@@ -482,7 +487,12 @@ export default function AdminMessagesContent({
                     <>
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                             <div className="min-w-0">
-                                <h3 className="font-semibold text-gray-900 truncate">
+                                <h3
+                                    className={cn(
+                                        'font-semibold text-gray-900',
+                                        isGroup ? 'leading-snug' : 'truncate'
+                                    )}
+                                >
                                     {isGroup
                                         ? formatGroupTitle(selectedConversation.members || [])
                                         : `${selectedConversation.student.full_name} ↔ ${

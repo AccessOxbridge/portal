@@ -488,7 +488,7 @@ export default function ChatWindow({
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">
+                    <h3 className={cn('font-semibold text-gray-900', isGroup ? 'leading-snug' : 'truncate')}>
                         {isGroup
                             ? formatGroupTitle(members || [], currentUserId)
                             : otherUser.full_name || 'Mentor'}

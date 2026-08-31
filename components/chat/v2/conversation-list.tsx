@@ -113,7 +113,8 @@ export default function ConversationList({
                             <div className="flex items-baseline justify-between gap-2">
                                 <span
                                     className={cn(
-                                        'text-sm truncate',
+                                        'text-sm',
+                                        conversation.type === 'group' ? 'leading-snug' : 'truncate',
                                         hasUnread ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'
                                     )}
                                 >

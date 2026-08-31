@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { LifeBuoy, X, Send, CheckCircle2 } from 'lucide-react'
 
@@ -11,6 +11,17 @@ export default function HelpSupportButton() {
     const [isSending, setIsSending] = useState(false)
     const [isSent, setIsSent] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    // Other parts of the student dashboard open this same panel rather than
+    // building their own support form — the post-session feedback page does, so
+    // "Contact support" there lands in Claire's thread like every other route.
+    // Mirrors the `open-book-session` event the sidebar CTA uses.
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const handler = () => setIsOpen(true)
+        window.addEventListener('open-help-support', handler)
+        return () => window.removeEventListener('open-help-support', handler)
+    }, [])
 
     const close = () => {
         setIsOpen(false)
@@ -119,7 +130,7 @@ export default function HelpSupportButton() {
                             ) : (
                                 <>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        Hi! I&apos;m here to help with anything you need — whether it&apos;s
+                                        Hi! I&apos;m here to help with anything you need, whether it&apos;s
                                         navigating the portal, questions about your application, or general
                                         support. Send me a message and I&apos;ll get back to you shortly.
                                     </p>

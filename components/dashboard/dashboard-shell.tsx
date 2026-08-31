@@ -15,6 +15,13 @@ interface DashboardShellProps {
     sidebarProps: SidebarProps
     children: ReactNode
     footer?: ReactNode
+    /**
+     * Inline content pinned above the page heading on every dashboard page —
+     * currently the student satisfaction check-in banner. Deliberately not a
+     * floating element: it has to push the page down rather than cover it, or
+     * it would sit over the "Student Dashboard" heading on every route.
+     */
+    topSlot?: ReactNode
 }
 
 export default function DashboardShell({
@@ -22,6 +29,7 @@ export default function DashboardShell({
     sidebarProps,
     children,
     footer,
+    topSlot,
 }: DashboardShellProps) {
     const [collapsed, setCollapsed] = useState(false)
 
@@ -73,6 +81,7 @@ export default function DashboardShell({
                             'pb-24 md:pb-10'
                         )}
                     >
+                        {topSlot}
                         {children}
                     </div>
                 ) : (

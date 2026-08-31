@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import StudentSessionsContent from './student-sessions-content'
 import JourneyTimeline from './journey-timeline'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 
 interface StudentSessionsPageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -63,7 +64,8 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             responses,
             reschedule_of_session_id,
             mentor:profiles!mentorship_requests_mentor_id_fkey (
-                full_name
+                full_name,
+                photo_url:mentors(photo_url)
             )
         `)
         .eq('student_id', user.id)
@@ -122,7 +124,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
         zoom_meeting_status: session.zoom_meeting_status,
         recording_available: !!session.recording_available,
         mentor_full_name: session.mentor?.full_name || 'Mentor',
-        mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
+        mentor_photo_url: getMentorPhotoUrl(session.mentor),
         has_feedback: feedbackSet.has(session.id),
         has_report: reportSet.has(session.id)
     }))
@@ -135,6 +137,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
             id: req.id,
             created_at: req.created_at,
             mentor_full_name: req.mentor?.full_name || 'Mentor',
+            mentor_photo_url: getMentorPhotoUrl(req.mentor),
             initiated_by: (req.initiated_by || 'student') as 'student' | 'mentor',
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,

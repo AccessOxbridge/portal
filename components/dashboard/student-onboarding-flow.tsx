@@ -272,18 +272,18 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
     const stepMeta = useMemo(() => {
         if (stepId === 'basic') {
             return {
-                title: 'Part 1 — Basic Info',
+                title: 'Part 1: Basic Info',
                 description: 'Tell us about your school, curriculum, and predicted grades.'
             }
         }
         if (stepId === 'targets') {
             return {
-                title: 'Part 2 — Target Universities',
+                title: 'Part 2: Target Universities',
                 description: 'Add up to 5 universities you’re targeting.'
             }
         }
         return {
-            title: 'Part 3 — Additional Information',
+            title: 'Part 3: Additional Information',
             description: 'Share your availability, timezone, academic interests, and extracurriculars.'
         }
     }, [stepId])

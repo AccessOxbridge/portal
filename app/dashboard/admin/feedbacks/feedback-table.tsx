@@ -53,23 +53,6 @@ export default function FeedbackTable({ feedbacks }: Props) {
 
     return (
         <div className="space-y-6">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Total Feedbacks</p>
-                    <p className="text-3xl font-black text-accent">{feedbacks.length}</p>
-                </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Average Rating</p>
-                    <p className="text-3xl font-black text-amber-500">
-                        {feedbacks.length > 0
-                            ? (feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length).toFixed(1)
-                            : '-'}
-                        <span className="text-lg text-gray-400 ml-1">/ 5</span>
-                    </p>
-                </div>
-            </div>
-
             {/* Search */}
             <div className="relative max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

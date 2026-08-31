@@ -19,6 +19,9 @@ import {
     School,
     FileText
 } from 'lucide-react'
+import { sortBySubjectPriority } from '@/lib/subject-priority'
+import MentorRatings, { type MentorRating } from './mentor-ratings'
+import { fetchMentorSessionStats } from '../actions'
 
 interface MentorProfile {
     id: string
@@ -57,6 +60,7 @@ export default function MentorProfilePage() {
     const supabase = createClient()
 
     const [mentor, setMentor] = useState<MentorProfile | null>(null)
+    const [ratings, setRatings] = useState<MentorRating[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
@@ -80,40 +84,16 @@ export default function MentorProfilePage() {
                 return
             }
 
-            // Fetch session count
-            const { count: sessionCount } = await supabase
-                .from('sessions')
-                .select('*', { count: 'exact', head: true })
-                .eq('mentor_id', mentorId)
-                .eq('status', 'completed')
-
-            // Fetch average rating
-            const { data: sessionsData } = await supabase
-                .from('sessions')
-                .select('id')
-                .eq('mentor_id', mentorId)
-
-            const sessionIds = sessionsData?.map(s => s.id) || []
-
-            let avgRating: number | null = null
-            if (sessionIds.length > 0) {
-                const { data: feedbackData } = await supabase
-                    .from('form_responses')
-                    .select('rating')
-                    .eq('form_type', 'student_feedback')
-                    .in('session_id', sessionIds)
-                    .not('rating', 'is', null)
-
-                if (feedbackData && feedbackData.length > 0) {
-                    const ratings = feedbackData.map(fb => fb.rating as number)
-                    avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length
-                }
-            }
+            // Session counts and ratings come from a server action: this is a
+            // client component, and `sessions` has no admin SELECT policy, so
+            // querying it from the browser as an admin returns nothing.
+            const stats = await fetchMentorSessionStats(mentorId)
+            setRatings(stats.ratings)
 
             setMentor({
                 ...mentorData,
-                sessions_completed: sessionCount || 0,
-                avg_rating: avgRating
+                sessions_completed: stats.sessionsCompleted,
+                avg_rating: stats.avgRating
             } as MentorProfile)
             setIsLoading(false)
         }
@@ -238,6 +218,9 @@ export default function MentorProfilePage() {
                 </div>
             </div>
 
+            {/* Student feedback — admin-only */}
+            <MentorRatings ratings={ratings} sessionsCompleted={mentor.sessions_completed} />
+
             {/* Bio Section */}
             {mentor.bio && (
                 <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
@@ -251,7 +234,7 @@ export default function MentorProfilePage() {
                 <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
-                        {mentor.expertise.map((exp) => (
+                        {sortBySubjectPriority(mentor.expertise).map((exp) => (
                             <span key={exp} className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg text-sm font-medium">
                                 {exp}
                             </span>

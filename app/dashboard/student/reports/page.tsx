@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import ReportsContent from './reports-content'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 
 export default async function StudentReportsPage() {
     const supabase = await createClient()
@@ -68,7 +69,7 @@ export default async function StudentReportsPage() {
                 scheduled_at: session.scheduled_at,
                 mentor_id: session.mentor_id,
                 mentor_full_name: session.mentor?.full_name || 'Mentor',
-                mentor_photo_url: session.mentor?.photo_url?.[0]?.photo_url || null,
+                mentor_photo_url: getMentorPhotoUrl(session.mentor),
                 report: {
                     id: item.id,
                     summary: item.summary,

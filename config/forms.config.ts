@@ -61,28 +61,10 @@ export const MENTOR_REPORT_FORM: { title: string; fields: FormField[] } = {
     ],
 }
 
-export const STUDENT_FEEDBACK_FORM: { title: string; fields: FormField[] } = {
-    title: "Session Feedback (Optional)",
-    fields: [
-        {
-            id: "mentor_rating",
-            type: "rating",
-            label: "How would you rate your mentor?",
-            required: true,
-        },
-        {
-            id: "session_helpful",
-            type: "select",
-            label: "Was this session helpful?",
-            required: true,
-            options: ["Not at all", "Somewhat", "Very helpful", "Extremely helpful"],
-        },
-        {
-            id: "experience",
-            type: "textarea",
-            label: "Tell us about your experience",
-            description: "What did you enjoy? What could be improved?",
-            required: false,
-        },
-    ],
-}
+/**
+ * The student's post-session feedback is no longer config-driven: it is a
+ * single shared card (components/feedback/session-rating-card.tsx) used by both
+ * the dashboard popup and the feedback page, with one star rating, optional
+ * reasons on a low score, and an optional comment. STUDENT_FEEDBACK_FORM was
+ * removed with the multi-step wizard that read it.
+ */

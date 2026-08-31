@@ -5,6 +5,13 @@ import DashboardShell from '@/components/dashboard/dashboard-shell'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
 import type { StudentBookingProfile } from '@/components/dashboard/book-session-modal'
+import type { RateableSession } from '@/components/dashboard/rate-session-modal'
+import { feedbackPromptWindowStart } from '@/config/feedback.config'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
+import { selectStudentMilestone } from '@/lib/student-milestones'
+import { selectDueSatisfactionSurvey, type DueSatisfactionSurvey } from '@/lib/student-satisfaction'
+import SatisfactionBanner from '@/components/dashboard/satisfaction-banner'
+import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
@@ -258,6 +265,82 @@ export default async function DashboardLayout({
         }
     }
 
+    // The one recently-completed session this student should be asked to rate,
+    // for the popup mounted in StudentCreditsProvider. Newest first: the
+    // freshest session is the one they can actually remember. We ask about at
+    // most one at a time — a student with several unrated sessions gets the
+    // most recent, and the rest are simply never volunteered.
+    //
+    // `feedbackPromptWindowStart()` is the later of "7 days ago" and the
+    // go-live cutoff, which is what keeps the pre-existing backlog (one student
+    // had 22 unrated sessions) from ambushing anyone.
+    let rateableSession: RateableSession | null = null
+    if (isStudent) {
+        const { data: recentSessions } = await supabase
+            .from('sessions')
+            .select('id, scheduled_at, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
+            .eq('student_id', user.id)
+            .eq('status', 'completed')
+            .gte('scheduled_at', feedbackPromptWindowStart())
+            .lte('scheduled_at', new Date().toISOString())
+            .order('scheduled_at', { ascending: false })
+            .limit(10)
+
+        const candidateIds = (recentSessions || []).map((s) => s.id)
+
+        if (candidateIds.length > 0) {
+            // Exclude anything already rated or already dismissed. Two small
+            // lookups rather than a join: the candidate set is capped at 10.
+            const [{ data: rated }, { data: dismissed }] = await Promise.all([
+                supabase
+                    .from('form_responses')
+                    .select('session_id')
+                    .eq('form_type', 'student_feedback')
+                    .in('session_id', candidateIds),
+                supabase
+                    .from('session_feedback_prompts')
+                    .select('session_id')
+                    .in('session_id', candidateIds),
+            ])
+
+            const handled = new Set([
+                ...(rated || []).map((r) => r.session_id),
+                ...(dismissed || []).map((d) => d.session_id),
+            ])
+
+            const next = (recentSessions || []).find((s) => !handled.has(s.id))
+            if (next) {
+                rateableSession = {
+                    id: next.id,
+                    mentorName: (next as any).mentor?.full_name || 'your mentor',
+                    mentorPhotoUrl: getMentorPhotoUrl((next as any).mentor),
+                    scheduledAt: next.scheduled_at,
+                }
+            }
+        }
+    }
+
+    // The session-count milestone (1st, 5th, 10th, 20th, 50th, 100th) this
+    // student has just reached and not yet been congratulated for. Independent
+    // of the feedback prompt above on purpose: a student who closes the tab
+    // without answering the rating popup still gets their moment, and the
+    // celebration is recorded separately so it happens exactly once. The popup
+    // itself queues behind the rating popup, in StudentCreditsProvider.
+    let milestone: StudentMilestone | null = null
+    if (isStudent) {
+        milestone = await selectStudentMilestone(supabase, user.id)
+    }
+
+    // The every-4-sessions satisfaction check-in, if this student owes one.
+    // Unlike the two popups above, this one never opens by itself: it surfaces
+    // as a banner pinned to the top of every dashboard page (topSlot below),
+    // and the banner is what persists until the survey is actually filled in.
+    // No go-live cutoff here on purpose — see config/satisfaction.config.ts.
+    let satisfactionSurvey: DueSatisfactionSurvey | null = null
+    if (isStudent) {
+        satisfactionSurvey = await selectDueSatisfactionSurvey(supabase, user.id)
+    }
+
     const sidebarProps = {
         role: profile.role || 'student',
         userName:
@@ -285,6 +368,7 @@ export default async function DashboardLayout({
             showSidebar={showSidebar}
             sidebarProps={sidebarProps}
             footer={isStudent ? <HelpSupportButton /> : undefined}
+            topSlot={isStudent ? <SatisfactionBanner /> : undefined}
         >
             {children}
         </DashboardShell>
@@ -297,6 +381,9 @@ export default async function DashboardLayout({
                 bookingProfile={canBook ? bookingProfile : null}
                 canBook={canBook}
                 mentors={bookingMentors}
+                rateableSession={rateableSession}
+                milestone={milestone}
+                satisfactionSurvey={satisfactionSurvey}
             >
                 {dashboardShell}
             </StudentCreditsProvider>

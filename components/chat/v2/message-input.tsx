@@ -256,7 +256,7 @@ export default function MessageInput({
                     aria-label="Attach a photo or file"
                     // The standing hint line under the composer is gone; keep
                     // paste/drag discoverable here instead.
-                    title="Attach a photo or file — you can also paste or drag one in"
+                    title="Attach a photo or file. You can also paste or drag one in"
                     className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/[0.06] transition-colors disabled:opacity-40"
                 >
                     <Paperclip className="w-[18px] h-[18px]" />

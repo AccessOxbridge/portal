@@ -1057,6 +1057,109 @@ export type Database = {
         }
         Relationships: []
       }
+      session_feedback_prompts: {
+        Row: {
+          dismissed_at: string
+          session_id: string
+          student_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          session_id: string
+          student_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          session_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_feedback_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_feedback_prompts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_satisfaction_surveys: {
+        Row: {
+          comment: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed: number | null
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          comment?: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed?: number | null
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          comment?: string | null
+          mentoring_rating?: number
+          portal_rating?: number
+          progress_rating?: number
+          session_count?: number
+          sessions_completed?: number | null
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_satisfaction_surveys_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_session_milestones: {
+        Row: {
+          acknowledged_at: string
+          milestone: number
+          sessions_completed: number | null
+          student_id: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          milestone: number
+          sessions_completed?: number | null
+          student_id: string
+        }
+        Update: {
+          acknowledged_at?: string
+          milestone?: number
+          sessions_completed?: number | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_session_milestones_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_reports: {
         Row: {
           action_items: Json | null

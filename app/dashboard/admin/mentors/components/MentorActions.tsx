@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreHorizontal, Mail, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { MoreHorizontal, CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { MentorMessageButton } from './MentorMessageButton'
@@ -9,12 +9,11 @@ import { setMentorStatus } from '../actions'
 interface MentorActionsProps {
     mentorId: string
     currentStatus: string
-    email: string
     mentorName: string
     photoUrl?: string | null
 }
 
-export function MentorActions({ mentorId, currentStatus, email, mentorName, photoUrl }: MentorActionsProps) {
+export function MentorActions({ mentorId, currentStatus, mentorName, photoUrl }: MentorActionsProps) {
     const router = useRouter()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isPending, startTransition] = useTransition()
@@ -30,11 +29,8 @@ export function MentorActions({ mentorId, currentStatus, email, mentorName, phot
     }
 
     return (
-        <div className="relative">
+        <div className="relative" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-end gap-2">
-                <a className="p-2 text-gray-400 hover:text-accent transition-colors" title="Email Mentor" href={`mailto:${email}`}>
-                    <Mail className="w-4 h-4" />
-                </a>
                 <MentorMessageButton mentorId={mentorId} mentorName={mentorName} photoUrl={photoUrl} />
                 <div className="relative">
                     <button

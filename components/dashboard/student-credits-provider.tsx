@@ -13,11 +13,22 @@ import { createClient } from '@/utils/supabase/client'
 import CreditsRequestModal, { type CreditsRequestReason } from '@/components/dashboard/credits-request-modal'
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
 import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
+import RateSessionModal, { type RateableSession } from '@/components/dashboard/rate-session-modal'
+import MilestoneModal, { type StudentMilestone } from '@/components/dashboard/milestone-modal'
+import SatisfactionSurveyModal from '@/components/dashboard/satisfaction-survey-modal'
+import type { DueSatisfactionSurvey } from '@/lib/student-satisfaction'
 
 interface StudentCreditsContextValue {
     credits: number
     openCreditsRequest: (reason?: CreditsRequestReason) => void
     tryOpenBookSession: () => void
+    /**
+     * Whether the every-4-sessions check-in is still outstanding. Starts from
+     * the server-selected value and flips to false the moment the survey is
+     * submitted, so the banner retires without a router refresh.
+     */
+    satisfactionSurveyDue: boolean
+    openSatisfactionSurvey: () => void
 }
 
 const StudentCreditsContext = createContext<StudentCreditsContextValue | null>(null)
@@ -46,6 +57,22 @@ interface StudentCreditsProviderProps {
     canBook?: boolean
     /** The student's currently assigned mentors, for the booking modal's mentor picker. */
     mentors?: { id: string; name: string }[]
+    /**
+     * A recently completed session this student hasn't rated or dismissed, if
+     * any. Selected server-side so the popup can appear on any dashboard page.
+     */
+    rateableSession?: RateableSession | null
+    /**
+     * A session-count milestone this student has just reached and not yet been
+     * congratulated for, if any. Selected server-side alongside the feedback
+     * prompt so the celebration can fire on any dashboard page.
+     */
+    milestone?: StudentMilestone | null
+    /**
+     * The every-4-sessions satisfaction check-in this student owes, if any.
+     * Selected server-side so the banner shows on any dashboard page.
+     */
+    satisfactionSurvey?: DueSatisfactionSurvey | null
 }
 
 export default function StudentCreditsProvider({
@@ -54,11 +81,22 @@ export default function StudentCreditsProvider({
     bookingProfile = null,
     canBook = false,
     mentors = [],
+    rateableSession = null,
+    milestone = null,
+    satisfactionSurvey = null,
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalReason, setModalReason] = useState<CreditsRequestReason>('topup')
     const [bookingOpen, setBookingOpen] = useState(false)
+    // The milestone celebration queues behind the feedback popup: two modals on
+    // the same load would bury the confetti under a form. With no feedback
+    // popup to wait for, it is free to fire immediately.
+    const [feedbackClosed, setFeedbackClosed] = useState(!rateableSession)
+    // The check-in never opens by itself — the banner opens it. Unlike the two
+    // popups above it is not an interruption, so it waits to be asked for.
+    const [satisfactionOpen, setSatisfactionOpen] = useState(false)
+    const [satisfactionDone, setSatisfactionDone] = useState(false)
     const supabase = useMemo(() => createClient(), [])
 
     useEffect(() => {
@@ -110,9 +148,25 @@ export default function StudentCreditsProvider({
         return () => window.removeEventListener('open-book-session', handler)
     }, [tryOpenBookSession])
 
+    const openSatisfactionSurvey = useCallback(() => setSatisfactionOpen(true), [])
+
+    const satisfactionSurveyDue = !!satisfactionSurvey && !satisfactionDone
+
     const value = useMemo(
-        () => ({ credits, openCreditsRequest, tryOpenBookSession }),
-        [credits, openCreditsRequest, tryOpenBookSession]
+        () => ({
+            credits,
+            openCreditsRequest,
+            tryOpenBookSession,
+            satisfactionSurveyDue,
+            openSatisfactionSurvey,
+        }),
+        [
+            credits,
+            openCreditsRequest,
+            tryOpenBookSession,
+            satisfactionSurveyDue,
+            openSatisfactionSurvey,
+        ]
     )
 
     return (
@@ -133,6 +187,22 @@ export default function StudentCreditsProvider({
                     mentors={mentors}
                 />
             )}
+            <RateSessionModal
+                key={rateableSession?.id ?? 'none'}
+                session={rateableSession}
+                onClosed={() => setFeedbackClosed(true)}
+            />
+            <MilestoneModal
+                key={milestone?.milestone ?? 'no-milestone'}
+                milestone={milestone}
+                ready={feedbackClosed}
+            />
+            <SatisfactionSurveyModal
+                isOpen={satisfactionOpen}
+                onClose={() => setSatisfactionOpen(false)}
+                survey={satisfactionSurvey}
+                onSubmitted={() => setSatisfactionDone(true)}
+            />
         </StudentCreditsContext.Provider>
     )
 }

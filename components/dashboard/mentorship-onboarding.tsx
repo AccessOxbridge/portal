@@ -164,17 +164,17 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
 
     const steps = [
         {
-            title: "Part 1 — Basic Info",
+            title: "Part 1: Basic Info",
             description: "Tell us about your school, curriculum, and predicted grades.",
             type: "basic"
         },
         {
-            title: "Part 2 — Target Universities",
+            title: "Part 2: Target Universities",
             description: "Add up to 5 universities you’re targeting.",
             type: "targets"
         },
         {
-            title: "Part 3 — Additional Information",
+            title: "Part 3: Additional Information",
             description: "Share your availability, timezone, academic interests, and extracurriculars.",
             type: "additional"
         }

@@ -5,13 +5,14 @@ import { MessageSquare } from 'lucide-react'
 import { cn } from '@/utils/lib'
 import { attachmentPreviewLabel } from '@/lib/chat-attachments'
 import { stripFormatting } from '@/lib/chat-format'
+import { formatGroupTitle, type ChatGroupMember } from '@/lib/chat-groups'
 
 export interface ConversationSummary {
     id: string
     student_id: string | null
     mentor_id: string | null
     admin_id?: string | null
-    type?: 'mentor' | 'support' | 'mentor_support'
+    type?: 'mentor' | 'support' | 'mentor_support' | 'group'
     last_message_at: string
     other_user: {
         id: string
@@ -20,6 +21,7 @@ export interface ConversationSummary {
         role_label?: string | null
     }
     admin_user?: { id: string; full_name: string } | null
+    members?: ChatGroupMember[]
     last_message?: {
         content: string
         sender_id: string
@@ -83,7 +85,12 @@ export default function ConversationList({
                         )}
                     >
                         <div className="relative shrink-0">
-                            {conversation.other_user.photo_url ? (
+                            {conversation.type === 'group' ? (
+                                <GroupAvatars
+                                    members={conversation.members || []}
+                                    currentUserId={currentUserId}
+                                />
+                            ) : conversation.other_user.photo_url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={conversation.other_user.photo_url}
@@ -110,7 +117,9 @@ export default function ConversationList({
                                         hasUnread ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'
                                     )}
                                 >
-                                    {conversation.other_user.full_name || 'User'}
+                                    {conversation.type === 'group'
+                                        ? formatGroupTitle(conversation.members || [], currentUserId)
+                                        : conversation.other_user.full_name || 'User'}
                                 </span>
                                 <span className="text-[10px] text-gray-400 shrink-0">
                                     {formatDistanceToNow(new Date(conversation.last_message_at), {
@@ -119,11 +128,15 @@ export default function ConversationList({
                                 </span>
                             </div>
 
-                            {conversation.other_user.role_label && (
+                            {conversation.type === 'group' ? (
+                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
+                                    Group
+                                </span>
+                            ) : conversation.other_user.role_label ? (
                                 <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
                                     {conversation.other_user.role_label}
                                 </span>
-                            )}
+                            ) : null}
 
                             <p
                                 className={cn(
@@ -147,6 +160,52 @@ export default function ConversationList({
                     ? 'Your other conversations will appear here as they start.'
                     : `${conversations.length} conversations`}
             </p>
+        </div>
+    )
+}
+
+function GroupAvatars({
+    members,
+    currentUserId,
+}: {
+    members: ChatGroupMember[]
+    currentUserId: string
+}) {
+    const others = members.filter((m) => m.role !== 'admin' && m.user_id !== currentUserId)
+    const shown = others.slice(0, 2)
+
+    if (shown.length === 0) {
+        return (
+            <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center text-white font-semibold">
+                G
+            </div>
+        )
+    }
+
+    return (
+        <div className="relative w-11 h-11">
+            {shown.map((member, index) => (
+                <div
+                    key={member.user_id}
+                    className={cn(
+                        'absolute w-7 h-7 rounded-full overflow-hidden ring-2 ring-white',
+                        index === 0 ? 'left-0 top-0 z-10' : 'right-0 bottom-0 z-0'
+                    )}
+                >
+                    {member.photo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={member.photo_url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                            {member.full_name?.[0]?.toUpperCase() || 'U'}
+                        </div>
+                    )}
+                </div>
+            ))}
         </div>
     )
 }

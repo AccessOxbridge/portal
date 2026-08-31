@@ -7,7 +7,8 @@ import { Search, MessageCircle, Users, X, AlertTriangle, ArrowDown } from 'lucid
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import ComposeDialog, { ComposeButton } from './compose-dialog'
-import type { ClaireThread, MessageRecipient } from './actions'
+import type { ClaireThread, GroupThread, MessageRecipient } from './actions'
+import { formatGroupTitle, type ChatGroupMember } from '@/lib/chat-groups'
 import CollapsibleText from '@/components/chat/v2/collapsible-text'
 import { stripFormatting } from '@/lib/chat-format'
 import AttachmentGrid from '@/components/chat/v2/attachment-grid'
@@ -46,11 +47,12 @@ interface Conversation {
     id: string
     student_id: string | null
     mentor_id: string | null
-    type?: 'mentor' | 'support' | 'mentor_support'
+    type?: 'mentor' | 'support' | 'mentor_support' | 'group'
     last_message_at: string
     created_at: string
     student: { id: string; full_name: string; email: string }
     mentor: { id: string; full_name: string; email: string }
+    members?: ChatGroupMember[]
     message_count: number
     last_message?: {
         content: string
@@ -99,11 +101,17 @@ export default function AdminMessagesContent({
 
     const filteredConversations = conversations.filter((conv) => {
         const term = searchTerm.toLowerCase()
+        if (!term) return true
+        const memberHaystack = (conv.members || [])
+            .map((m) => `${m.full_name || ''} ${m.email || ''}`)
+            .join(' ')
+            .toLowerCase()
         return (
             (conv.student.full_name?.toLowerCase() || '').includes(term) ||
             (conv.mentor.full_name?.toLowerCase() || '').includes(term) ||
             (conv.student.email?.toLowerCase() || '').includes(term) ||
-            (conv.mentor.email?.toLowerCase() || '').includes(term)
+            (conv.mentor.email?.toLowerCase() || '').includes(term) ||
+            memberHaystack.includes(term)
         )
     })
 
@@ -198,8 +206,9 @@ export default function AdminMessagesContent({
 
     const isSupport = selectedConversation?.type === 'support'
     const isMentorSupport = selectedConversation?.type === 'mentor_support'
+    const isGroup = selectedConversation?.type === 'group'
     // Direct threads (student↔help desk, admin↔mentor as "Claire") are a plain
-    // 2-way chat; mentor↔student threads get a flagged "[ADMIN]" intervention.
+    // 2-way chat; mentor↔student threads and groups get a flagged "[ADMIN]" intervention.
     const isDirect = isSupport || isMentorSupport
 
     const handleSend = async (text: string, attachments: PendingAttachment[]) => {
@@ -321,8 +330,49 @@ export default function AdminMessagesContent({
         router.refresh()
     }
 
+    const openGroupThread = (thread: GroupThread) => {
+        const existing = conversations.find((c) => c.id === thread.conversationId)
+        if (existing) {
+            setSelectedConversation(existing)
+            return
+        }
+
+        const title = formatGroupTitle(thread.members)
+        const now = thread.createdAt
+        const row: Conversation = {
+            id: thread.conversationId,
+            student_id: null,
+            mentor_id: null,
+            type: 'group',
+            last_message_at: now,
+            created_at: now,
+            student: { id: 'group', full_name: title, email: '' },
+            mentor: { id: 'group', full_name: 'Group chat', email: '' },
+            members: thread.members,
+            message_count: 1,
+            last_message: null,
+        }
+
+        setSeededConversations((prev) =>
+            prev.some((c) => c.id === row.id) ? prev : [row, ...prev]
+        )
+        setSelectedConversation(row)
+        router.refresh()
+    }
+
     const senderInfo = (senderId: string): { name: string; role: string } => {
         if (!selectedConversation) return { name: 'Unknown', role: '' }
+        if (selectedConversation.type === 'group' && selectedConversation.members) {
+            const member = selectedConversation.members.find((m) => m.user_id === senderId)
+            if (member) {
+                if (member.role === 'admin') return { name: 'Access Oxbridge', role: 'admin' }
+                return {
+                    name: member.full_name || (member.role === 'student' ? 'Student' : 'Mentor'),
+                    role: member.role,
+                }
+            }
+            return { name: 'Access Oxbridge', role: 'admin' }
+        }
         if (senderId === selectedConversation.student_id)
             return { name: selectedConversation.student.full_name || 'Student', role: 'student' }
         if (senderId === selectedConversation.mentor_id)
@@ -392,17 +442,21 @@ export default function AdminMessagesContent({
                                     <div className="flex items-start justify-between gap-2 mb-1.5">
                                         <div className="min-w-0">
                                             <p className="font-semibold text-sm text-gray-900 truncate">
-                                                {conv.student.full_name}
+                                                {conv.type === 'group'
+                                                    ? formatGroupTitle(conv.members || [])
+                                                    : conv.student.full_name}
                                             </p>
                                             <p
                                                 className={cn(
                                                     'text-xs truncate',
-                                                    conv.type === 'support'
+                                                    conv.type === 'support' || conv.type === 'group'
                                                         ? 'text-amber-600 font-medium'
                                                         : 'text-gray-500'
                                                 )}
                                             >
-                                                ↔ {conv.type === 'support' ? 'Help & Support' : conv.mentor.full_name}
+                                                {conv.type === 'group'
+                                                    ? 'Group chat · Access Oxbridge team'
+                                                    : `↔ ${conv.type === 'support' ? 'Help & Support' : conv.mentor.full_name}`}
                                             </p>
                                         </div>
                                         <span className="shrink-0 text-[10px] text-gray-400">
@@ -429,11 +483,18 @@ export default function AdminMessagesContent({
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                             <div className="min-w-0">
                                 <h3 className="font-semibold text-gray-900 truncate">
-                                    {selectedConversation.student.full_name} ↔{' '}
-                                    {isSupport ? 'Help & Support' : selectedConversation.mentor.full_name}
+                                    {isGroup
+                                        ? formatGroupTitle(selectedConversation.members || [])
+                                        : `${selectedConversation.student.full_name} ↔ ${
+                                              isSupport ? 'Help & Support' : selectedConversation.mentor.full_name
+                                          }`}
                                 </h3>
                                 <p className="text-xs text-gray-400 mt-0.5">
-                                    {isSupport ? 'Help & Support request · ' : ''}
+                                    {isGroup
+                                        ? 'Group chat · Access Oxbridge team · '
+                                        : isSupport
+                                          ? 'Help & Support request · '
+                                          : ''}
                                     Started {format(new Date(selectedConversation.created_at), 'MMM d, yyyy')}
                                 </p>
                             </div>
@@ -637,6 +698,7 @@ export default function AdminMessagesContent({
                     onClose={() => setIsComposeOpen(false)}
                     conversations={conversations}
                     onOpened={openComposedThread}
+                    onGroupOpened={openGroupThread}
                 />
             )}
         </div>

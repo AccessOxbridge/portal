@@ -149,6 +149,8 @@ export default function MessagesContent({
                                 mentor_id: selectedConversation.mentor_id,
                                 admin_id: selectedConversation.admin_id || undefined,
                             }}
+                            members={selectedConversation.members}
+                            isGroup={selectedConversation.type === 'group'}
                             onBack={() => setMobilePane('list')}
                         />
                     ) : (

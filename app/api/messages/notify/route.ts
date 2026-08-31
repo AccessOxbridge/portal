@@ -7,6 +7,8 @@ import {
     newMessageToMentor,
     newMessageFromClaireToStudent,
     newMessageFromClaireToMentor,
+    newMessageInGroupChat,
+    newMessageFromClaireInGroupChat,
 } from '@/lib/email/templates'
 
 /**
@@ -106,6 +108,91 @@ async function notifyRecipient(
     return { id: target.id, sent: result.ok, error: result.error }
 }
 
+type GroupMemberTarget = {
+    user_id: string
+    role: string
+    last_read_at: string | null
+    last_notified_at: string | null
+}
+
+async function notifyGroupMember(
+    admin: ReturnType<typeof createAdminClient>,
+    conversationId: string,
+    target: GroupMemberTarget,
+    fromClaire: boolean,
+    options?: { skipCooldown?: boolean },
+): Promise<{ id: string; sent?: boolean; skipped?: string; error?: string }> {
+    if (
+        !options?.skipCooldown &&
+        target.last_notified_at &&
+        Date.now() - new Date(target.last_notified_at).getTime() < COOLDOWN_MS
+    ) {
+        return { id: target.user_id, skipped: 'within cooldown window' }
+    }
+
+    let unreadQuery = admin
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('conversation_id', conversationId)
+        .neq('sender_id', target.user_id)
+
+    if (target.last_read_at) {
+        unreadQuery = unreadQuery.gt('created_at', target.last_read_at)
+    }
+
+    const { count: unreadCount } = await unreadQuery
+    if (!unreadCount || unreadCount < 1) {
+        return { id: target.user_id, skipped: 'no unread messages for recipient' }
+    }
+
+    const { data: recipient } = await admin
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', target.user_id)
+        .single()
+
+    if (!recipient?.email) {
+        return { id: target.user_id, skipped: 'recipient has no email' }
+    }
+
+    const isStudent = target.role === 'student'
+    const tpl = fromClaire
+        ? newMessageFromClaireInGroupChat(recipient.full_name || '', isStudent)
+        : newMessageInGroupChat(recipient.full_name || '', isStudent)
+
+    const result = await sendEmail({
+        from: fromClaire ? EMAIL_SENDER_CLAIRE : EMAIL_SENDER_TEAM,
+        to: recipient.email,
+        subject: tpl.subject,
+        html: tpl.html,
+    })
+
+    if (result.ok) {
+        await admin
+            .from('conversation_participants')
+            .update({ last_notified_at: new Date().toISOString() })
+            .eq('conversation_id', conversationId)
+            .eq('user_id', target.user_id)
+    }
+
+    return { id: target.user_id, sent: result.ok, error: result.error }
+}
+
+async function loadGroupNotifyTargets(
+    admin: ReturnType<typeof createAdminClient>,
+    conversationId: string,
+    senderId: string,
+): Promise<GroupMemberTarget[]> {
+    const { data: rows } = await admin
+        .from('conversation_participants')
+        .select('user_id, role, last_read_at, last_notified_at')
+        .eq('conversation_id', conversationId)
+        .neq('user_id', senderId)
+        .in('role', ['student', 'mentor'])
+
+    return (rows || []) as GroupMemberTarget[]
+}
+
 function adminRecipients(conv: ConversationRow): RecipientTarget[] {
     const targets: RecipientTarget[] = []
 
@@ -178,6 +265,25 @@ export async function POST(req: Request) {
             !!senderProfile &&
             (['admin', 'admin-dev'].includes(senderProfile.role) ||
                 (conv.admin_id != null && user.id === conv.admin_id))
+
+        if (conv.type === 'group') {
+            const targets = await loadGroupNotifyTargets(admin, conv.id, user.id)
+            if (targets.length === 0) {
+                return NextResponse.json({ skipped: 'no group recipients' })
+            }
+
+            const results = []
+            for (const target of targets) {
+                results.push(
+                    await notifyGroupMember(admin, conv.id, target, isAdminSender, {
+                        skipCooldown: isAdminSender,
+                    })
+                )
+            }
+
+            console.log('[messages/notify] group results', { conversationId, results })
+            return NextResponse.json({ results })
+        }
 
         // Claire / admin message → email the relevant participant(s).
         if (isAdminSender) {

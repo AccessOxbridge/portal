@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminMessagesContent from './admin-messages-content-v2'
+import { formatGroupTitle, loadGroupMembers } from '@/lib/chat-groups'
 
 export default async function AdminMessagesPage() {
     const supabase = await createClient()
@@ -46,6 +47,11 @@ export default async function AdminMessagesPage() {
         `)
         .order('last_message_at', { ascending: false })
 
+    const groupIds = (conversations || [])
+        .filter((conv: { type?: string | null }) => conv.type === 'group')
+        .map((conv: { id: string }) => conv.id)
+    const membersByConversation = await loadGroupMembers(supabase, groupIds)
+
     // Get message counts and last message for each conversation
     const processedConversations = await Promise.all(
         (conversations || []).map(async (conv: any) => {
@@ -66,24 +72,36 @@ export default async function AdminMessagesPage() {
 
             const isSupport = conv.type === 'support'
             const isMentorSupport = conv.type === 'mentor_support'
+            const isGroup = conv.type === 'group'
+            const members = isGroup ? membersByConversation.get(conv.id) || [] : undefined
+            const groupTitle = isGroup ? formatGroupTitle(members || []) : null
 
             return {
                 id: conv.id,
                 student_id: conv.student_id,
                 mentor_id: conv.mentor_id,
-                type: (conv.type || 'mentor') as 'mentor' | 'support' | 'mentor_support',
+                type: (conv.type || 'mentor') as 'mentor' | 'support' | 'mentor_support' | 'group',
                 last_message_at: conv.last_message_at || conv.created_at || new Date().toISOString(),
                 created_at: conv.created_at || new Date().toISOString(),
                 student: {
-                    id: conv.student?.id || conv.student_id || 'support',
-                    full_name: isMentorSupport ? 'Access Oxbridge (Claire)' : (conv.student?.full_name || 'Unknown Student'),
-                    email: conv.student?.email || ''
+                    id: conv.student?.id || conv.student_id || (isGroup ? 'group' : 'support'),
+                    full_name: isGroup
+                        ? groupTitle || 'Group chat'
+                        : isMentorSupport
+                          ? 'Access Oxbridge (Claire)'
+                          : (conv.student?.full_name || 'Unknown Student'),
+                    email: conv.student?.email || '',
                 },
                 mentor: {
-                    id: conv.mentor?.id || conv.mentor_id || 'support',
-                    full_name: isSupport ? 'Help & Support' : (conv.mentor?.full_name || 'Unknown Mentor'),
-                    email: conv.mentor?.email || ''
+                    id: conv.mentor?.id || conv.mentor_id || (isGroup ? 'group' : 'support'),
+                    full_name: isGroup
+                        ? 'Group chat'
+                        : isSupport
+                          ? 'Help & Support'
+                          : (conv.mentor?.full_name || 'Unknown Mentor'),
+                    email: conv.mentor?.email || '',
                 },
+                members,
                 message_count: messageCount || 0,
                 last_message: lastMessage ? {
                     ...lastMessage,

@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MessagesContent from '@/components/chat/v2/messages-content'
+import {
+    countUnreadSince,
+    loadGroupMembers,
+    toGroupSummary,
+} from '@/lib/chat-groups'
 
 export default async function MentorMessagesPage() {
     const supabase = await createClient()
@@ -45,6 +50,30 @@ export default async function MentorMessagesPage() {
         `)
         .eq('mentor_id', user.id)
         .order('last_message_at', { ascending: false })
+
+    const { data: memberships } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id, last_read_at')
+        .eq('user_id', user.id)
+
+    const groupIds = [...new Set((memberships || []).map((row) => row.conversation_id))]
+    const lastReadByConversation = new Map(
+        (memberships || []).map((row) => [row.conversation_id, row.last_read_at as string | null])
+    )
+
+    const { data: groupConversations } =
+        groupIds.length > 0
+            ? await supabase
+                  .from('conversations')
+                  .select('id, student_id, mentor_id, admin_id, type, last_message_at')
+                  .in('id', groupIds)
+                  .eq('type', 'group')
+            : { data: [] }
+
+    const membersByConversation = await loadGroupMembers(
+        supabase,
+        (groupConversations || []).map((c) => c.id)
+    )
 
     // Fetch all connected students (those with active/completed sessions)
     const { data: connectedStudents } = await supabase
@@ -132,6 +161,38 @@ export default async function MentorMessagesPage() {
         })
     )
 
+    const processedGroups = await Promise.all(
+        (groupConversations || []).map(async (conv) => {
+            const { data: lastMessage } = await supabase
+                .from('messages')
+                .select('content, sender_id, attachments')
+                .eq('conversation_id', conv.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+
+            const unreadCount = await countUnreadSince(
+                supabase,
+                conv.id,
+                user.id,
+                lastReadByConversation.get(conv.id) ?? null
+            )
+
+            return toGroupSummary(
+                conv,
+                membersByConversation.get(conv.id) || [],
+                user.id,
+                lastMessage,
+                unreadCount
+            )
+        })
+    )
+
+    const allConversations = [...processedConversations, ...processedGroups].sort(
+        (a, b) =>
+            new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
+    )
+
     return (
         // See the student page for the full-bleed geometry and why the mobile
         // bottom padding survives while the desktop one does not.
@@ -143,7 +204,7 @@ export default async function MentorMessagesPage() {
             </header>
 
             <MessagesContent
-                conversations={processedConversations}
+                conversations={allConversations}
                 currentUserId={user.id}
                 connectedUsers={connectedUsers}
                 userRole="mentor"

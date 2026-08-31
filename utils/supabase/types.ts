@@ -81,6 +81,7 @@ export type Database = {
           student_notified_at: string | null
           type: string
           updated_at: string | null
+          participant_set_key: string | null
         }
         Insert: {
           admin_id?: string | null
@@ -94,6 +95,7 @@ export type Database = {
           student_notified_at?: string | null
           type?: string
           updated_at?: string | null
+          participant_set_key?: string | null
         }
         Update: {
           admin_id?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           student_notified_at?: string | null
           type?: string
           updated_at?: string | null
+          participant_set_key?: string | null
         }
         Relationships: [
           {
@@ -133,6 +136,48 @@ export type Database = {
           {
             foreignKeyName: "conversations_student_id_fkey"
             columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          last_notified_at: string | null
+          last_read_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          last_notified_at?: string | null
+          last_read_at?: string | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          last_notified_at?: string | null
+          last_read_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

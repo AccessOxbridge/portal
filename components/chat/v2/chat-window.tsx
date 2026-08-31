@@ -16,6 +16,7 @@ import {
     type ChatAttachment,
     type PendingAttachment,
 } from '@/lib/chat-attachments'
+import { formatGroupTitle, type ChatGroupMember } from '@/lib/chat-groups'
 
 interface Message {
     id: string
@@ -44,6 +45,8 @@ interface ChatWindowProps {
         mentor_id: string | null
         admin_id?: string
     }
+    members?: ChatGroupMember[]
+    isGroup?: boolean
     onBack?: () => void
 }
 
@@ -53,6 +56,8 @@ export default function ChatWindow({
     otherUser,
     adminUser,
     allParticipants,
+    members,
+    isGroup = false,
     onBack,
 }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([])
@@ -64,6 +69,9 @@ export default function ChatWindow({
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const scrollRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
+    const groupOthers = (members || []).filter(
+        (m) => m.role !== 'admin' && m.user_id !== currentUserId
+    )
 
     // Drives the jump-to-latest button, and decides whether an arriving message
     // is allowed to move the view at all.
@@ -108,11 +116,39 @@ export default function ChatWindow({
 
     const isInterventionMessage = (message: Message) => {
         if (message.content.startsWith('[ADMIN] ')) return true
+        if (isGroup) {
+            const sender = members?.find((m) => m.user_id === message.sender_id)
+            return sender?.role === 'admin' || !sender
+        }
         if (!allParticipants?.mentor_id || !allParticipants?.student_id) return false
         return (
             message.sender_id !== allParticipants.student_id &&
             message.sender_id !== allParticipants.mentor_id
         )
+    }
+
+    const markGroupRead = useCallback(() => {
+        if (!isGroup) return
+        supabase
+            .from('conversation_participants')
+            .update({ last_read_at: new Date().toISOString() })
+            .eq('conversation_id', conversationId)
+            .eq('user_id', currentUserId)
+            .then()
+    }, [isGroup, supabase, conversationId, currentUserId])
+
+    const senderFor = (senderId: string) => {
+        if (!isGroup) {
+            return { name: otherUser.full_name || 'User', photo: otherUser.photo_url }
+        }
+        const member = members?.find((m) => m.user_id === senderId)
+        if (!member || member.role === 'admin') {
+            return { name: 'Claire Marlowe', photo: '/logo.png' }
+        }
+        return {
+            name: member.full_name || (member.role === 'student' ? 'Student' : 'Mentor'),
+            photo: member.photo_url,
+        }
     }
 
     // Presence
@@ -172,13 +208,17 @@ export default function ChatWindow({
 
         fetchMessages()
 
-        supabase
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .neq('sender_id', currentUserId)
-            .eq('is_read', false)
-            .then()
+        if (isGroup) {
+            markGroupRead()
+        } else {
+            supabase
+                .from('messages')
+                .update({ is_read: true })
+                .eq('conversation_id', conversationId)
+                .neq('sender_id', currentUserId)
+                .eq('is_read', false)
+                .then()
+        }
 
         return () => {
             cancelled = true
@@ -186,7 +226,7 @@ export default function ChatWindow({
         // ensureSignedUrls intentionally omitted: it changes identity whenever a
         // URL is cached, which would re-run the fetch on every signed batch.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [conversationId, currentUserId])
+    }, [conversationId, currentUserId, isGroup])
 
     // Realtime inserts
     useEffect(() => {
@@ -215,7 +255,11 @@ export default function ChatWindow({
                     )
                     ensureSignedUrls([incoming])
 
-                    supabase.from('messages').update({ is_read: true }).eq('id', incoming.id).then()
+                    if (isGroup) {
+                        markGroupRead()
+                    } else {
+                        supabase.from('messages').update({ is_read: true }).eq('id', incoming.id).then()
+                    }
                 }
             )
             .on(
@@ -402,7 +446,31 @@ export default function ChatWindow({
                 )}
 
                 <div className="relative shrink-0">
-                    {otherUser.photo_url ? (
+                    {isGroup ? (
+                        <div className="relative w-10 h-10">
+                            {groupOthers.slice(0, 2).map((member, index) => (
+                                <div
+                                    key={member.user_id}
+                                    className={`absolute w-6 h-6 rounded-full overflow-hidden ring-2 ring-white ${
+                                        index === 0 ? 'left-0 top-0 z-10' : 'right-0 bottom-0'
+                                    }`}
+                                >
+                                    {member.photo_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={member.photo_url}
+                                            alt=""
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                                            {member.full_name?.[0]?.toUpperCase() || 'U'}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : otherUser.photo_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={otherUser.photo_url}
@@ -414,16 +482,18 @@ export default function ChatWindow({
                             {otherUser.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                     )}
-                    {isOtherUserOnline && (
+                    {!isGroup && isOtherUserOnline && (
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                     )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">
-                        {otherUser.full_name || 'Mentor'}
+                        {isGroup
+                            ? formatGroupTitle(members || [], currentUserId)
+                            : otherUser.full_name || 'Mentor'}
                     </h3>
-                    {adminUser ? (
+                    {isGroup || adminUser ? (
                         <p className="text-xs text-gray-400">Group chat · Access Oxbridge team</p>
                     ) : otherUser.role_label ? (
                         <p className="text-xs font-medium text-accent">{otherUser.role_label}</p>
@@ -494,6 +564,7 @@ export default function ChatWindow({
                             }
 
                             const isSent = message.sender_id === currentUserId
+                            const sender = senderFor(message.sender_id)
 
                             return (
                                 <div key={message.id} className="contents">
@@ -504,9 +575,9 @@ export default function ChatWindow({
                                             attachments={message.attachments}
                                             isSent={isSent}
                                             timestamp={timestamp}
-                                            isRead={message.is_read ?? false}
-                                            senderName={isSent ? undefined : otherUser.full_name || 'User'}
-                                            avatarUrl={otherUser.photo_url}
+                                            isRead={isGroup ? false : message.is_read ?? false}
+                                            senderName={isSent ? undefined : sender.name}
+                                            avatarUrl={sender.photo}
                                             isFirstInGroup={isFirstInGroup}
                                             isLastInGroup={isLastInGroup}
                                             status={message.status}

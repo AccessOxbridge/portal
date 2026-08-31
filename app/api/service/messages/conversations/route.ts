@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { verifyServiceToken } from '@/lib/service-auth'
+import { loadGroupMembers, type ChatGroupMember } from '@/lib/chat-groups'
 
 /**
  * GET /api/service/messages/conversations
  *
  * Read-only conversation index for the CRM's "Portal Messages" view. Returns
- * every conversation an admin can see — student↔mentor, student↔support and
- * mentor↔support alike.
+ * every conversation an admin can see — student↔mentor, student↔support,
+ * mentor↔support and admin-created groups alike.
  *
  * READ-ONLY BY CONSTRUCTION. This file issues SELECTs and nothing else. There
  * is deliberately no POST/PATCH/DELETE export, so Next answers those with 405.
- * In particular it never touches messages.is_read: viewing a thread from the
- * CRM must not clear a student's unread badge in the portal.
+ * In particular it never touches messages.is_read or
+ * conversation_participants.last_read_at: viewing a thread from the CRM must
+ * not clear a student's unread badge in the portal.
  *
  * Query params:
  *   limit  1-200, default 50
  *   offset >= 0, default 0
- *   type   mentor | support | mentor_support   (optional filter)
+ *   type   mentor | support | mentor_support | group   (optional filter)
  *   q      free text matched against participant name/email (optional)
  *
  * Auth: Authorization: Bearer <PORTAL_SERVICE_TOKEN>
@@ -29,7 +31,7 @@ export const revalidate = 0
 const DEFAULT_LIMIT = 50
 const MAX_LIMIT = 200
 const PREVIEW_CHARS = 140
-const CONVERSATION_TYPES = ['mentor', 'support', 'mentor_support'] as const
+const CONVERSATION_TYPES = ['mentor', 'support', 'mentor_support', 'group'] as const
 
 type ConversationType = (typeof CONVERSATION_TYPES)[number]
 
@@ -38,6 +40,17 @@ function readInt(raw: string | null, fallback: number, min: number, max: number)
     const parsed = Number.parseInt(raw ?? '', 10)
     if (!Number.isFinite(parsed)) return fallback
     return Math.min(Math.max(parsed, min), max)
+}
+
+function crmParticipants(members: ChatGroupMember[]) {
+    return members
+        .filter((m) => m.role !== 'admin')
+        .map((m) => ({
+            id: m.user_id,
+            full_name: m.full_name,
+            email: m.email,
+            role: m.role,
+        }))
 }
 
 /** PostgREST `.or()` values are comma-separated, so a comma in `q` would inject. */
@@ -113,7 +126,16 @@ export async function GET(req: Request) {
     if (rawType) query = query.eq('type', rawType)
     if (matchedProfileIds) {
         const list = `(${matchedProfileIds.join(',')})`
-        query = query.or(`student_id.in.${list},mentor_id.in.${list}`)
+        const { data: memberRows } = await supabase
+            .from('conversation_participants')
+            .select('conversation_id')
+            .in('user_id', matchedProfileIds)
+        const groupIds = [...new Set((memberRows ?? []).map((row) => row.conversation_id))]
+        const clauses = [`student_id.in.${list}`, `mentor_id.in.${list}`]
+        if (groupIds.length > 0) {
+            clauses.push(`id.in.(${groupIds.join(',')})`)
+        }
+        query = query.or(clauses.join(','))
     }
 
     // Explicit .range() rather than relying on PostgREST's default max-rows.
@@ -130,6 +152,10 @@ export async function GET(req: Request) {
     }
 
     const rows = data ?? []
+    const groupIds = rows
+        .filter((row) => (row as { type?: string }).type === 'group')
+        .map((row) => (row as { id: string }).id)
+    const membersByConversation = await loadGroupMembers(supabase, groupIds)
 
     // Per-conversation message count and last message, for this page only.
     // Bounded by `limit` (max 200), so this never fans out with the table.
@@ -153,10 +179,15 @@ export async function GET(req: Request) {
             const last = lastRows?.[0] ?? null
             const student = row.student as Record<string, unknown> | null
             const mentor = row.mentor as Record<string, unknown> | null
+            const type = (row.type as ConversationType) ?? 'mentor'
+            const participants =
+                type === 'group'
+                    ? crmParticipants(membersByConversation.get(id) || [])
+                    : undefined
 
             return {
                 id,
-                type: (row.type as ConversationType) ?? 'mentor',
+                type,
                 student_id: row.student_id ?? null,
                 mentor_id: row.mentor_id ?? null,
                 student: student
@@ -165,6 +196,7 @@ export async function GET(req: Request) {
                 mentor: mentor
                     ? { id: mentor.id, full_name: mentor.full_name, email: mentor.email }
                     : null,
+                participants,
                 message_count: messageCount ?? 0,
                 created_at: row.created_at,
                 last_message_at: row.last_message_at ?? row.created_at,

@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MessagesContent from '@/components/chat/v2/messages-content'
+import {
+    countUnreadSince,
+    loadGroupMembers,
+    toGroupSummary,
+} from '@/lib/chat-groups'
 
 export default async function StudentMessagesPage({
     searchParams
@@ -84,7 +89,7 @@ export default async function StudentMessagesPage({
         }
     }
 
-    // 4. Load the (now-ensured) conversations.
+    // 4. Load pair/support conversations, then any groups this student is in.
     const { data: conversations } = await supabase
         .from('conversations')
         .select(`
@@ -101,6 +106,30 @@ export default async function StudentMessagesPage({
         `)
         .eq('student_id', user.id)
         .order('last_message_at', { ascending: false })
+
+    const { data: memberships } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id, last_read_at')
+        .eq('user_id', user.id)
+
+    const groupIds = [...new Set((memberships || []).map((row) => row.conversation_id))]
+    const lastReadByConversation = new Map(
+        (memberships || []).map((row) => [row.conversation_id, row.last_read_at as string | null])
+    )
+
+    const { data: groupConversations } =
+        groupIds.length > 0
+            ? await supabase
+                  .from('conversations')
+                  .select('id, student_id, mentor_id, admin_id, type, last_message_at')
+                  .in('id', groupIds)
+                  .eq('type', 'group')
+            : { data: [] }
+
+    const membersByConversation = await loadGroupMembers(
+        supabase,
+        (groupConversations || []).map((c) => c.id)
+    )
 
     // Mentor photos live on the `mentors` table (keyed by the profile id).
     const mentorIds = [
@@ -167,10 +196,44 @@ export default async function StudentMessagesPage({
         })
     )
 
-    // Support chats first, then mentor.
+    // Support chats first, then mentor / group by recency.
     processedConversations.sort((a, b) => {
-        if (a.type === b.type) return 0
-        return a.type === 'support' ? -1 : 1
+        if (a.type === 'support' && b.type !== 'support') return -1
+        if (b.type === 'support' && a.type !== 'support') return 1
+        return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
+    })
+
+    const processedGroups = await Promise.all(
+        (groupConversations || []).map(async (conv) => {
+            const { data: lastMessage } = await supabase
+                .from('messages')
+                .select('content, sender_id, attachments')
+                .eq('conversation_id', conv.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+
+            const unreadCount = await countUnreadSince(
+                supabase,
+                conv.id,
+                user.id,
+                lastReadByConversation.get(conv.id) ?? null
+            )
+
+            return toGroupSummary(
+                conv,
+                membersByConversation.get(conv.id) || [],
+                user.id,
+                lastMessage,
+                unreadCount
+            )
+        })
+    )
+
+    const allConversations = [...processedConversations, ...processedGroups].sort((a, b) => {
+        if (a.type === 'support' && b.type !== 'support') return -1
+        if (b.type === 'support' && a.type !== 'support') return 1
+        return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
     })
 
     return (
@@ -193,7 +256,7 @@ export default async function StudentMessagesPage({
             </header>
 
             <MessagesContent
-                conversations={processedConversations}
+                conversations={allConversations}
                 currentUserId={user.id}
                 connectedUsers={[]}
                 userRole="student"

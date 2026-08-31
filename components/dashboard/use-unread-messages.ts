@@ -46,22 +46,42 @@ function start(key: string, entry: Entry, userId: string, role: string) {
                 .from('conversations')
                 .select('id')
                 .eq(role === 'student' ? 'student_id' : 'mentor_id', userId)
+                .neq('type', 'group')
 
-            const conversationIds = (conversations || []).map((c) => c.id)
-            if (conversationIds.length === 0) {
-                if (active) emit(entry, 0)
-                return
+            const { data: memberships } = await supabase
+                .from('conversation_participants')
+                .select('conversation_id, last_read_at')
+                .eq('user_id', userId)
+
+            const pairIds = (conversations || []).map((c) => c.id)
+            const groupRows = memberships || []
+
+            let total = 0
+
+            if (pairIds.length > 0) {
+                const { count } = await supabase
+                    .from('messages')
+                    .select('*', { count: 'exact', head: true })
+                    .in('conversation_id', pairIds)
+                    .eq('is_read', false)
+                    .neq('sender_id', userId)
+                total += count || 0
             }
 
-            // 2) Count unread messages not sent by the current user
-            const { count } = await supabase
-                .from('messages')
-                .select('*', { count: 'exact', head: true })
-                .in('conversation_id', conversationIds)
-                .eq('is_read', false)
-                .neq('sender_id', userId)
+            for (const row of groupRows) {
+                let query = supabase
+                    .from('messages')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('conversation_id', row.conversation_id)
+                    .neq('sender_id', userId)
+                if (row.last_read_at) {
+                    query = query.gt('created_at', row.last_read_at)
+                }
+                const { count } = await query
+                total += count || 0
+            }
 
-            if (active) emit(entry, count || 0)
+            if (active) emit(entry, total)
         } catch (err) {
             console.error('[useUnreadMessages] Failed to fetch unread messages count:', err)
         }

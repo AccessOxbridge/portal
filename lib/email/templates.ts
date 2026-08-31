@@ -297,6 +297,42 @@ export function newMessageFromClaireToMentor(mentorName: string): EmailTemplate 
     }
 }
 
+/** New message in a group chat → student or mentor. */
+export function newMessageInGroupChat(name: string, isStudent: boolean): EmailTemplate {
+    const display = escapeHtml(name || 'there')
+    const url = isStudent ? STUDENT_MESSAGES_URL : MENTOR_MESSAGES_URL
+    return {
+        subject: 'New message in your group chat | Access Oxbridge',
+        html: layout({
+            title: 'New message in your group chat',
+            preheader: 'You have a new message in a group chat on the Access Oxbridge portal.',
+            paragraphs: [
+                `Dear ${display},`,
+                `You’ve received a new message in a group chat on the Access Oxbridge portal. ${link('Log in to view it and reply', url)}.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}
+
+/** Claire message in a group chat → student or mentor. */
+export function newMessageFromClaireInGroupChat(name: string, isStudent: boolean): EmailTemplate {
+    const display = escapeHtml(name || 'there')
+    const url = isStudent ? STUDENT_MESSAGES_URL : MENTOR_MESSAGES_URL
+    return {
+        subject: 'New Message from Claire | Access Oxbridge',
+        html: layout({
+            title: 'New Message from Claire',
+            preheader: 'Claire posted in a group chat on the Access Oxbridge portal.',
+            paragraphs: [
+                `Dear ${display},`,
+                `Claire posted in a group chat on the Access Oxbridge portal. ${link('Log in to view it and reply', url)}.`,
+            ],
+            signOff: CLAIRE_SIGN_OFF,
+        }),
+    }
+}
+
 /** #3 — Student matched with mentor (from Claire). */
 export function studentMatched(studentName: string, mentorName: string): EmailTemplate {
     const sName = escapeHtml(studentName || 'there')

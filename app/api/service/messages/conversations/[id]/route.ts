@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { verifyServiceToken } from '@/lib/service-auth'
 import { CHAT_BUCKET, toChatAttachments } from '@/lib/chat-attachments'
+import { loadGroupMembers, type ChatGroupMember } from '@/lib/chat-groups'
 
 /**
  * GET /api/service/messages/conversations/[id]
@@ -9,9 +10,9 @@ import { CHAT_BUCKET, toChatAttachments } from '@/lib/chat-attachments'
  * One full thread, oldest message first, for the CRM's read-only view.
  *
  * READ-ONLY BY CONSTRUCTION — SELECTs plus short-lived storage signing, no
- * mutations of any kind. Critically it does NOT write messages.is_read, so an
- * admin reading a thread from the CRM leaves the portal's unread state exactly
- * as it found it.
+ * mutations of any kind. Critically it does NOT write messages.is_read or
+ * conversation_participants.last_read_at, so an admin reading a thread from
+ * the CRM leaves the portal's unread state exactly as it found it.
  *
  * Paging is backwards through history: the newest window is returned first,
  * and `next_before` walks towards older messages.
@@ -124,12 +125,21 @@ export async function GET(
     const mentorId = conversation.mentor_id as string | null
     const student = conversation.student as { full_name?: string | null } | null
     const mentor = conversation.mentor as { full_name?: string | null } | null
+    const isGroup = conversation.type === 'group'
+
+    const groupMembers = isGroup
+        ? (await loadGroupMembers(supabase, [id])).get(id) || []
+        : []
+    const memberById = new Map(groupMembers.map((m) => [m.user_id, m]))
 
     const otherSenderIds = [
         ...new Set(
             ordered
                 .map((m) => m.sender_id as string)
-                .filter((senderId) => senderId !== studentId && senderId !== mentorId)
+                .filter((senderId) => {
+                    if (isGroup) return !memberById.has(senderId)
+                    return senderId !== studentId && senderId !== mentorId
+                })
         ),
     ]
 
@@ -145,6 +155,18 @@ export async function GET(
     }
 
     function senderFor(senderId: string): { name: string; role: 'student' | 'mentor' | 'admin' } {
+        if (isGroup) {
+            const member = memberById.get(senderId)
+            if (member && member.role !== 'admin') {
+                return {
+                    name:
+                        member.full_name ||
+                        (member.role === 'student' ? 'Student' : 'Mentor'),
+                    role: member.role,
+                }
+            }
+            return { name: adminNames.get(senderId) || 'Access Oxbridge', role: 'admin' }
+        }
         if (senderId && senderId === studentId) {
             return { name: student?.full_name || 'Student', role: 'student' }
         }
@@ -209,6 +231,16 @@ export async function GET(
                 mentor_id: mentorId,
                 student: conversation.student ?? null,
                 mentor: conversation.mentor ?? null,
+                participants: isGroup
+                    ? groupMembers
+                          .filter((m: ChatGroupMember) => m.role !== 'admin')
+                          .map((m: ChatGroupMember) => ({
+                              id: m.user_id,
+                              full_name: m.full_name,
+                              email: m.email,
+                              role: m.role,
+                          }))
+                    : undefined,
                 created_at: conversation.created_at,
                 last_message_at: conversation.last_message_at ?? conversation.created_at,
             },

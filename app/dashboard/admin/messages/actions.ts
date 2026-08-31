@@ -1,5 +1,11 @@
 'use server'
 
+import {
+    groupIntroBody,
+    loadGroupMembers,
+    participantSetKey,
+    type ChatGroupMember,
+} from '@/lib/chat-groups'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
 
@@ -23,6 +29,14 @@ export interface MessageRecipient {
     email: string | null
     photo_url: string | null
     role: 'student' | 'mentor'
+}
+
+export interface GroupThread {
+    conversationId: string
+    adminId: string
+    type: 'group'
+    createdAt: string
+    members: ChatGroupMember[]
 }
 
 type AuthedAdmin = {
@@ -277,4 +291,199 @@ export async function searchMessageRecipients(query: string): Promise<MessageRec
             profile.role === 'mentor' ? photoMap.get(profile.id) : null
         )
     )
+}
+
+async function membersForGroup(
+    supabase: ReturnType<typeof createAdminClient>,
+    conversationId: string
+): Promise<ChatGroupMember[]> {
+    const map = await loadGroupMembers(supabase, [conversationId])
+    return map.get(conversationId) || []
+}
+
+/**
+ * Current mentors assigned to a student. Used in group compose to offer
+ * "Add their mentors" when the student has two or more.
+ */
+export async function getAssignedMentorsForStudent(
+    studentId: string
+): Promise<MessageRecipient[]> {
+    const { supabase } = await requireAdmin()
+
+    const { data: assignments, error } = await supabase
+        .from('student_mentor_assignments')
+        .select('mentor_id')
+        .eq('student_id', studentId)
+        .eq('is_current', true)
+
+    if (error) {
+        throw new Error(error.message || 'Failed to load assigned mentors')
+    }
+
+    const mentorIds = [...new Set((assignments || []).map((row) => row.mentor_id))]
+    if (mentorIds.length === 0) return []
+
+    const [{ data: profiles }, { data: mentorPhotos }] = await Promise.all([
+        supabase.from('profiles').select('id, full_name, email, photo_url').in('id', mentorIds),
+        supabase.from('mentors').select('id, photo_url').in('id', mentorIds),
+    ])
+
+    const photoMap = new Map((mentorPhotos || []).map((m) => [m.id, m.photo_url]))
+
+    return (profiles || []).map((profile) =>
+        asRecipient(profile.id, profile, 'mentor', photoMap.get(profile.id))
+    )
+}
+
+/**
+ * Find or create a group conversation for the given students and mentors.
+ * Claire (the creating admin) is always added. The same non-admin set reopens
+ * the existing room instead of creating a duplicate.
+ */
+export async function createGroupThread(participantIds: string[]): Promise<GroupThread> {
+    const { userId, supabase } = await requireAdmin()
+
+    const uniqueIds = [...new Set(participantIds.filter(Boolean))]
+    if (uniqueIds.length < 2) {
+        throw new Error('Pick at least two people for a group chat')
+    }
+
+    const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, role, full_name')
+        .in('id', uniqueIds)
+
+    if (profileError) {
+        throw new Error(profileError.message || 'Failed to load people')
+    }
+
+    const byId = new Map((profiles || []).map((p) => [p.id, p]))
+    if (byId.size !== uniqueIds.length) {
+        throw new Error('One of the selected people could not be found')
+    }
+
+    const students: string[] = []
+    const mentors: string[] = []
+    for (const id of uniqueIds) {
+        const role = byId.get(id)?.role
+        if (role === 'student') students.push(id)
+        else if (role === 'mentor') mentors.push(id)
+        else throw new Error('Groups can only include students and mentors')
+    }
+
+    if (students.length < 1 || mentors.length < 1) {
+        throw new Error('A group needs at least one student and one mentor')
+    }
+
+    if (students.length === 1 && mentors.length === 1) {
+        throw new Error(
+            "That's already a pair chat — assign the mentor on the Students page."
+        )
+    }
+
+    if (students.length + mentors.length < 3) {
+        throw new Error('A group needs at least three people besides Claire')
+    }
+
+    const setKey = participantSetKey([...students, ...mentors])
+
+    const { data: existing } = await supabase
+        .from('conversations')
+        .select('id, created_at')
+        .eq('type', 'group')
+        .eq('participant_set_key', setKey)
+        .maybeSingle()
+
+    if (existing) {
+        return {
+            conversationId: existing.id,
+            adminId: userId,
+            type: 'group',
+            createdAt: existing.created_at || new Date().toISOString(),
+            members: await membersForGroup(supabase, existing.id),
+        }
+    }
+
+    const { data: created, error: createError } = await supabase
+        .from('conversations')
+        .insert({
+            student_id: null,
+            mentor_id: null,
+            admin_id: userId,
+            type: 'group',
+            participant_set_key: setKey,
+        })
+        .select('id, created_at')
+        .single()
+
+    if (isUniqueViolation(createError)) {
+        const { data: raced } = await supabase
+            .from('conversations')
+            .select('id, created_at')
+            .eq('type', 'group')
+            .eq('participant_set_key', setKey)
+            .maybeSingle()
+
+        if (raced) {
+            return {
+                conversationId: raced.id,
+                adminId: userId,
+                type: 'group',
+                createdAt: raced.created_at || new Date().toISOString(),
+                members: await membersForGroup(supabase, raced.id),
+            }
+        }
+    }
+
+    if (!created) {
+        throw new Error(createError?.message || 'Failed to create group')
+    }
+
+    const participantRows = [
+        ...students.map((id) => ({
+            conversation_id: created.id,
+            user_id: id,
+            role: 'student' as const,
+        })),
+        ...mentors.map((id) => ({
+            conversation_id: created.id,
+            user_id: id,
+            role: 'mentor' as const,
+        })),
+        {
+            conversation_id: created.id,
+            user_id: userId,
+            role: 'admin' as const,
+        },
+    ]
+
+    const { error: memberError } = await supabase
+        .from('conversation_participants')
+        .insert(participantRows)
+
+    if (memberError) {
+        throw new Error(memberError.message || 'Failed to add people to the group')
+    }
+
+    const members = await membersForGroup(supabase, created.id)
+    const intro = `[ADMIN] ${groupIntroBody(members)}`
+
+    await supabase.from('messages').insert({
+        conversation_id: created.id,
+        sender_id: userId,
+        content: intro,
+    })
+
+    await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', created.id)
+
+    return {
+        conversationId: created.id,
+        adminId: userId,
+        type: 'group',
+        createdAt: created.created_at || new Date().toISOString(),
+        members,
+    }
 }

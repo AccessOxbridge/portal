@@ -171,7 +171,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                                 <BookOpen className="w-8 h-8 text-gray-300" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-700">No articles yet</h3>
-                            <p className="text-gray-400 text-sm">Check back soon — more content is on its way.</p>
+                            <p className="text-gray-400 text-sm">Check back soon. More content is on its way.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-5">

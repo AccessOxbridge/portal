@@ -130,7 +130,7 @@ export default function HelpSupportButton() {
                             ) : (
                                 <>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        Hi! I&apos;m here to help with anything you need — whether it&apos;s
+                                        Hi! I&apos;m here to help with anything you need, whether it&apos;s
                                         navigating the portal, questions about your application, or general
                                         support. Send me a message and I&apos;ll get back to you shortly.
                                     </p>

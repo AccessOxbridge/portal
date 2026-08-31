@@ -149,7 +149,7 @@ export default function SatisfactionSurveyModal({
                         <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
                             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                             <p className="text-sm text-emerald-800">
-                                Thanks — that goes straight to the Access Oxbridge team and
+                                Thanks! That goes straight to the Access Oxbridge team and
                                 genuinely shapes what we build next.
                             </p>
                         </div>
@@ -172,7 +172,7 @@ export default function SatisfactionSurveyModal({
                                     Quick check-in
                                 </h2>
                                 <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">
-                                    You&apos;re {survey.tier} sessions in — three questions, about
+                                    You&apos;re {survey.tier} sessions in. Three questions, about
                                     thirty seconds.
                                 </p>
                             </div>

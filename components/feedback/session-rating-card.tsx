@@ -135,7 +135,7 @@ export default function SessionRatingCard({
                 <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <p className="text-sm text-emerald-800">
-                        Thanks — your feedback has been shared with the Access Oxbridge team.
+                        Thanks! Your feedback has been shared with the Access Oxbridge team.
                     </p>
                 </div>
                 <button
@@ -190,7 +190,7 @@ export default function SessionRatingCard({
                                 type="button"
                                 role="radio"
                                 aria-checked={rating === value}
-                                aria-label={`${value} star${value > 1 ? 's' : ''} — ${RATING_LABELS[value]}`}
+                                aria-label={`${value} star${value > 1 ? 's' : ''}, ${RATING_LABELS[value]}`}
                                 onClick={() => {
                                     setRating(value)
                                     setError(null)

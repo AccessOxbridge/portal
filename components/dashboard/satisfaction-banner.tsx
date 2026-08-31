@@ -46,7 +46,7 @@ export default function SatisfactionBanner() {
 
             <div className="min-w-0 flex-1">
                 <p className="text-accent font-bold text-[15px] leading-snug">
-                    Quick check-in — how are we doing?
+                    Quick check-in: how are we doing?
                 </p>
                 <p className="text-accent/60 text-[13px] leading-snug mt-0.5">
                     Three questions, about thirty seconds.

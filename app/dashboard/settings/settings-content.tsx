@@ -210,7 +210,7 @@ export default function SettingsContent({
                 <div className="p-6 space-y-4">
                     <p className="text-sm text-gray-600 leading-relaxed">
                         We'll email a password reset link to <span className="font-semibold text-gray-900">{email}</span>.
-                        Open it and choose a new password — the link expires for your security.
+                        Open it and choose a new password. The link expires for your security.
                     </p>
 
                     {pwFeedback && (

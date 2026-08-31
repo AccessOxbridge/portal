@@ -27,9 +27,17 @@ export interface Mentor {
     university: string | null
 }
 
+export interface MentorStatusCounts {
+    all: number
+    active: number
+    pending_approval: number
+    details_required: number
+}
+
 export interface FetchMentorsResult {
     mentors: Mentor[]
     totalCount: number
+    statusCounts: MentorStatusCounts
 }
 
 export async function fetchMentors(
@@ -56,7 +64,7 @@ export async function fetchMentors(
 
     if (error || !mentorsData) {
         console.error('Error fetching mentors:', error)
-        return { mentors: [], totalCount: 0 }
+        return { mentors: [], totalCount: 0, statusCounts: EMPTY_STATUS_COUNTS }
     }
 
     // Fetch session counts (completed sessions per mentor)
@@ -112,11 +120,6 @@ export async function fetchMentors(
         avg_rating: avgRatingMap[m.id] || null
     })) as unknown as Mentor[]
 
-    // Apply status filter
-    if (statusFilter !== 'all') {
-        enrichedMentors = enrichedMentors.filter(m => m.status === statusFilter)
-    }
-
     // Apply university filter
     if (universityFilter && universityFilter !== 'all') {
         enrichedMentors = enrichedMentors.filter(m =>
@@ -141,14 +144,43 @@ export async function fetchMentors(
         })
     }
 
+    // Status counts are taken *before* the status filter but *after* every other
+    // filter, so the header tiles read as "within what you're currently looking
+    // at, this many are pending" rather than ignoring the search box.
+    const statusCounts: MentorStatusCounts = {
+        all: enrichedMentors.length,
+        active: 0,
+        pending_approval: 0,
+        details_required: 0
+    }
+    enrichedMentors.forEach(m => {
+        const status = (m.status || 'details_required') as keyof MentorStatusCounts
+        if (status in statusCounts && status !== 'all') statusCounts[status] += 1
+    })
+
+    // Apply status filter
+    if (statusFilter !== 'all') {
+        enrichedMentors = enrichedMentors.filter(
+            m => (m.status || 'details_required') === statusFilter
+        )
+    }
+
     // Paginate
     const offset = (page - 1) * limit
     const paginatedMentors = enrichedMentors.slice(offset, offset + limit)
 
     return {
         mentors: paginatedMentors,
-        totalCount: enrichedMentors.length
+        totalCount: enrichedMentors.length,
+        statusCounts
     }
+}
+
+const EMPTY_STATUS_COUNTS: MentorStatusCounts = {
+    all: 0,
+    active: 0,
+    pending_approval: 0,
+    details_required: 0
 }
 
 const MENTOR_STATUSES = ['active', 'pending_approval', 'details_required'] as const

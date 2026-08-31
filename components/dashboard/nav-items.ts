@@ -23,6 +23,7 @@ import {
     CalendarRange,
     BookOpen,
     Film,
+    Gauge,
 } from 'lucide-react'
 
 export interface NavItem {
@@ -64,6 +65,7 @@ const adminNav: NavItem[] = [
     { name: 'Session Payouts', href: '/dashboard/admin/session-payouts', icon: Banknote },
     { name: 'Session Recordings', href: '/dashboard/admin/recordings', icon: Film },
     { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
+    { name: 'Satisfaction', href: '/dashboard/admin/satisfaction', icon: Gauge },
     { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
     { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
     { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },

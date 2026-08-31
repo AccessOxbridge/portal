@@ -1090,6 +1090,47 @@ export type Database = {
           },
         ]
       }
+      student_satisfaction_surveys: {
+        Row: {
+          comment: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed: number | null
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          comment?: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed?: number | null
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          comment?: string | null
+          mentoring_rating?: number
+          portal_rating?: number
+          progress_rating?: number
+          session_count?: number
+          sessions_completed?: number | null
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_satisfaction_surveys_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_session_milestones: {
         Row: {
           acknowledged_at: string

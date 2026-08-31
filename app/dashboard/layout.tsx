@@ -9,6 +9,8 @@ import type { RateableSession } from '@/components/dashboard/rate-session-modal'
 import { feedbackPromptWindowStart } from '@/config/feedback.config'
 import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 import { selectStudentMilestone } from '@/lib/student-milestones'
+import { selectDueSatisfactionSurvey, type DueSatisfactionSurvey } from '@/lib/student-satisfaction'
+import SatisfactionBanner from '@/components/dashboard/satisfaction-banner'
 import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
 
@@ -329,6 +331,16 @@ export default async function DashboardLayout({
         milestone = await selectStudentMilestone(supabase, user.id)
     }
 
+    // The every-4-sessions satisfaction check-in, if this student owes one.
+    // Unlike the two popups above, this one never opens by itself: it surfaces
+    // as a banner pinned to the top of every dashboard page (topSlot below),
+    // and the banner is what persists until the survey is actually filled in.
+    // No go-live cutoff here on purpose — see config/satisfaction.config.ts.
+    let satisfactionSurvey: DueSatisfactionSurvey | null = null
+    if (isStudent) {
+        satisfactionSurvey = await selectDueSatisfactionSurvey(supabase, user.id)
+    }
+
     const sidebarProps = {
         role: profile.role || 'student',
         userName:
@@ -356,6 +368,7 @@ export default async function DashboardLayout({
             showSidebar={showSidebar}
             sidebarProps={sidebarProps}
             footer={isStudent ? <HelpSupportButton /> : undefined}
+            topSlot={isStudent ? <SatisfactionBanner /> : undefined}
         >
             {children}
         </DashboardShell>
@@ -370,6 +383,7 @@ export default async function DashboardLayout({
                 mentors={bookingMentors}
                 rateableSession={rateableSession}
                 milestone={milestone}
+                satisfactionSurvey={satisfactionSurvey}
             >
                 {dashboardShell}
             </StudentCreditsProvider>

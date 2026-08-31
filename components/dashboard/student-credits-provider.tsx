@@ -15,11 +15,20 @@ import CreditsFloatingButton from '@/components/dashboard/credits-floating-butto
 import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 import RateSessionModal, { type RateableSession } from '@/components/dashboard/rate-session-modal'
 import MilestoneModal, { type StudentMilestone } from '@/components/dashboard/milestone-modal'
+import SatisfactionSurveyModal from '@/components/dashboard/satisfaction-survey-modal'
+import type { DueSatisfactionSurvey } from '@/lib/student-satisfaction'
 
 interface StudentCreditsContextValue {
     credits: number
     openCreditsRequest: (reason?: CreditsRequestReason) => void
     tryOpenBookSession: () => void
+    /**
+     * Whether the every-4-sessions check-in is still outstanding. Starts from
+     * the server-selected value and flips to false the moment the survey is
+     * submitted, so the banner retires without a router refresh.
+     */
+    satisfactionSurveyDue: boolean
+    openSatisfactionSurvey: () => void
 }
 
 const StudentCreditsContext = createContext<StudentCreditsContextValue | null>(null)
@@ -59,6 +68,11 @@ interface StudentCreditsProviderProps {
      * prompt so the celebration can fire on any dashboard page.
      */
     milestone?: StudentMilestone | null
+    /**
+     * The every-4-sessions satisfaction check-in this student owes, if any.
+     * Selected server-side so the banner shows on any dashboard page.
+     */
+    satisfactionSurvey?: DueSatisfactionSurvey | null
 }
 
 export default function StudentCreditsProvider({
@@ -69,6 +83,7 @@ export default function StudentCreditsProvider({
     mentors = [],
     rateableSession = null,
     milestone = null,
+    satisfactionSurvey = null,
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
@@ -78,6 +93,10 @@ export default function StudentCreditsProvider({
     // the same load would bury the confetti under a form. With no feedback
     // popup to wait for, it is free to fire immediately.
     const [feedbackClosed, setFeedbackClosed] = useState(!rateableSession)
+    // The check-in never opens by itself — the banner opens it. Unlike the two
+    // popups above it is not an interruption, so it waits to be asked for.
+    const [satisfactionOpen, setSatisfactionOpen] = useState(false)
+    const [satisfactionDone, setSatisfactionDone] = useState(false)
     const supabase = useMemo(() => createClient(), [])
 
     useEffect(() => {
@@ -129,9 +148,25 @@ export default function StudentCreditsProvider({
         return () => window.removeEventListener('open-book-session', handler)
     }, [tryOpenBookSession])
 
+    const openSatisfactionSurvey = useCallback(() => setSatisfactionOpen(true), [])
+
+    const satisfactionSurveyDue = !!satisfactionSurvey && !satisfactionDone
+
     const value = useMemo(
-        () => ({ credits, openCreditsRequest, tryOpenBookSession }),
-        [credits, openCreditsRequest, tryOpenBookSession]
+        () => ({
+            credits,
+            openCreditsRequest,
+            tryOpenBookSession,
+            satisfactionSurveyDue,
+            openSatisfactionSurvey,
+        }),
+        [
+            credits,
+            openCreditsRequest,
+            tryOpenBookSession,
+            satisfactionSurveyDue,
+            openSatisfactionSurvey,
+        ]
     )
 
     return (
@@ -161,6 +196,12 @@ export default function StudentCreditsProvider({
                 key={milestone?.milestone ?? 'no-milestone'}
                 milestone={milestone}
                 ready={feedbackClosed}
+            />
+            <SatisfactionSurveyModal
+                isOpen={satisfactionOpen}
+                onClose={() => setSatisfactionOpen(false)}
+                survey={satisfactionSurvey}
+                onSubmitted={() => setSatisfactionDone(true)}
             />
         </StudentCreditsContext.Provider>
     )

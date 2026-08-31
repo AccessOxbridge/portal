@@ -4,9 +4,6 @@
  * 1:1 threads (mentor / support / mentor_support) do not use this module.
  */
 
-export const GROUP_INTRO_SNIPPET =
-    'This group chat is a shared space for you to coordinate'
-
 export type ChatGroupMember = {
     user_id: string
     role: 'student' | 'mentor' | 'admin'
@@ -48,13 +45,12 @@ export function formatGroupTitle(
 }
 
 export function groupIntroBody(members: ChatGroupMember[]): string {
-    const names = members
-        .filter((m) => m.role !== 'admin')
-        .map((m) => firstNameOf(m.full_name, m.role === 'student' ? 'there' : 'there'))
-    const greeting = names.length > 0 ? `Hi ${names.join(', ')},` : 'Hi all,'
+    const student = members.find((m) => m.role === 'student')
+    const studentFirst = firstNameOf(student?.full_name, 'the student')
     return [
-        greeting,
-        `${GROUP_INTRO_SNIPPET} together. Please use it to schedule sessions, share anything useful ahead of meetings, and keep in touch. I'll be here in the background should anything come up that needs input from the team.`,
+        'Hi everyone,',
+        `Given that ${studentFirst} has more than one mentor on his programme, this group chat is a shared space for you to coordinate together. Please use it to get everyone up to date on session progression, share anything useful ahead of meetings, and keep in touch. You should still use your individual chats with one another for regular communication, however this should be used for information that would be useful for all parties to know! I'll be here in the background should anything come up that needs input from the team.`,
+        '',
         'Claire',
     ].join('\n')
 }

@@ -18,6 +18,7 @@ import {
 import { MentorActions } from './components/MentorActions'
 import { fetchMentors, Mentor } from './actions'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
+import { sortBySubjectPriority } from '@/lib/subject-priority'
 
 // Flatten subjects for filter
 const ALL_SUBJECTS = Array.from(new Set(Object.values(SUBJECT_OPTIONS).flat())).sort()
@@ -49,6 +50,56 @@ const statusIcons: Record<string, any> = {
     active: CheckCircle2,
     pending_approval: Clock,
     details_required: XCircle
+}
+
+// Subject column: degree subjects first, collapsed to two chips. Expands in
+// place when subjects are hidden or a visible chip is too long to fit.
+const CHIP_TRUNCATES_AT = 14
+
+function MentorSubjects({ expertise }: { expertise: string[] | null }) {
+    const [expanded, setExpanded] = useState(false)
+    const subjects = sortBySubjectPriority(expertise)
+
+    if (subjects.length === 0) {
+        return <span className="text-xs text-gray-400">-</span>
+    }
+
+    const visible = expanded ? subjects : subjects.slice(0, 2)
+    const hidden = subjects.length - visible.length
+    const isClipped = !expanded && visible.some(exp => exp.length > CHIP_TRUNCATES_AT)
+
+    return (
+        <div className="flex flex-wrap gap-1 max-w-[220px]">
+            {visible.map((exp, i) => (
+                <span
+                    key={i}
+                    title={exp}
+                    className={`px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs ${expanded ? '' : 'truncate max-w-[100px]'}`}
+                >
+                    {exp}
+                </span>
+            ))}
+            {(hidden > 0 || isClipped) && (
+                <button
+                    type="button"
+                    onClick={() => setExpanded(true)}
+                    title={subjects.join(', ')}
+                    className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs font-medium hover:bg-gray-200 hover:text-gray-700 transition-colors"
+                >
+                    {hidden > 0 ? `+${hidden} more` : 'View all'}
+                </button>
+            )}
+            {expanded && (
+                <button
+                    type="button"
+                    onClick={() => setExpanded(false)}
+                    className="px-2 py-0.5 text-xs font-medium text-accent hover:underline"
+                >
+                    Show less
+                </button>
+            )}
+        </div>
+    )
 }
 
 export default function AdminMentorsPage() {
@@ -249,21 +300,7 @@ export default function AdminMentorsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {mentor.expertise?.slice(0, 2).map((exp, i) => (
-                                                            <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs truncate max-w-[100px]">
-                                                                {exp}
-                                                            </span>
-                                                        ))}
-                                                        {mentor.expertise && mentor.expertise.length > 2 && (
-                                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">
-                                                                +{mentor.expertise.length - 2}
-                                                            </span>
-                                                        )}
-                                                        {(!mentor.expertise || mentor.expertise.length === 0) && (
-                                                            <span className="text-xs text-gray-400">-</span>
-                                                        )}
-                                                    </div>
+                                                    <MentorSubjects expertise={mentor.expertise} />
                                                 </td>
                                                 <td className="px-5 py-4">
                                                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[currentStatus]}`}>

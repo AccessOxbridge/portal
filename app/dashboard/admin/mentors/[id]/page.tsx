@@ -19,6 +19,7 @@ import {
     School,
     FileText
 } from 'lucide-react'
+import { sortBySubjectPriority } from '@/lib/subject-priority'
 
 interface MentorProfile {
     id: string
@@ -251,7 +252,7 @@ export default function MentorProfilePage() {
                 <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
-                        {mentor.expertise.map((exp) => (
+                        {sortBySubjectPriority(mentor.expertise).map((exp) => (
                             <span key={exp} className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg text-sm font-medium">
                                 {exp}
                             </span>

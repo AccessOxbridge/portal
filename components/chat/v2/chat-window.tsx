@@ -17,6 +17,7 @@ import {
     type PendingAttachment,
 } from '@/lib/chat-attachments'
 import { formatGroupTitle, type ChatGroupMember } from '@/lib/chat-groups'
+import { cn } from '@/utils/lib'
 
 interface Message {
     id: string

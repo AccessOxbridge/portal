@@ -48,28 +48,10 @@ export default async function MentorProfilePage() {
         .eq('mentor_id', user.id)
         .eq('is_current', true)
 
-    // Average rating from student feedback across this mentor's sessions
-    const { data: sessionRows } = await supabase
-        .from('sessions')
-        .select('id')
-        .eq('mentor_id', user.id)
-
-    const sessionIds = (sessionRows || []).map((s) => s.id)
-
-    let avgRating: number | null = null
-    if (sessionIds.length > 0) {
-        const { data: feedback } = await supabase
-            .from('form_responses')
-            .select('rating')
-            .eq('form_type', 'student_feedback')
-            .in('session_id', sessionIds)
-            .not('rating', 'is', null)
-
-        if (feedback && feedback.length > 0) {
-            const ratings = feedback.map((f) => f.rating as number)
-            avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length
-        }
-    }
+    // Student ratings are deliberately not surfaced here. Feedback about a
+    // mentor is admin-only: the mentor pool is small enough that a single low
+    // score is identifying, and showing mentors their own average changes how
+    // students' comments get handled. Admins see it on the mentor detail page.
 
     return (
         <div className="max-w-3xl mx-auto">
@@ -87,7 +69,6 @@ export default async function MentorProfilePage() {
                 stats={{
                     sessionsCompleted: sessionsCompleted || 0,
                     activeStudents: activeStudents || 0,
-                    avgRating,
                 }}
             />
         </div>

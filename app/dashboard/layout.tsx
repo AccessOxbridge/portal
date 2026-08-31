@@ -5,6 +5,9 @@ import DashboardShell from '@/components/dashboard/dashboard-shell'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
 import type { StudentBookingProfile } from '@/components/dashboard/book-session-modal'
+import type { RateableSession } from '@/components/dashboard/rate-session-modal'
+import { feedbackPromptWindowStart } from '@/config/feedback.config'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 import { headers } from 'next/headers'
 
 export default async function DashboardLayout({
@@ -258,6 +261,61 @@ export default async function DashboardLayout({
         }
     }
 
+    // The one recently-completed session this student should be asked to rate,
+    // for the popup mounted in StudentCreditsProvider. Newest first: the
+    // freshest session is the one they can actually remember. We ask about at
+    // most one at a time — a student with several unrated sessions gets the
+    // most recent, and the rest are simply never volunteered.
+    //
+    // `feedbackPromptWindowStart()` is the later of "7 days ago" and the
+    // go-live cutoff, which is what keeps the pre-existing backlog (one student
+    // had 22 unrated sessions) from ambushing anyone.
+    let rateableSession: RateableSession | null = null
+    if (isStudent) {
+        const { data: recentSessions } = await supabase
+            .from('sessions')
+            .select('id, scheduled_at, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
+            .eq('student_id', user.id)
+            .eq('status', 'completed')
+            .gte('scheduled_at', feedbackPromptWindowStart())
+            .lte('scheduled_at', new Date().toISOString())
+            .order('scheduled_at', { ascending: false })
+            .limit(10)
+
+        const candidateIds = (recentSessions || []).map((s) => s.id)
+
+        if (candidateIds.length > 0) {
+            // Exclude anything already rated or already dismissed. Two small
+            // lookups rather than a join: the candidate set is capped at 10.
+            const [{ data: rated }, { data: dismissed }] = await Promise.all([
+                supabase
+                    .from('form_responses')
+                    .select('session_id')
+                    .eq('form_type', 'student_feedback')
+                    .in('session_id', candidateIds),
+                supabase
+                    .from('session_feedback_prompts')
+                    .select('session_id')
+                    .in('session_id', candidateIds),
+            ])
+
+            const handled = new Set([
+                ...(rated || []).map((r) => r.session_id),
+                ...(dismissed || []).map((d) => d.session_id),
+            ])
+
+            const next = (recentSessions || []).find((s) => !handled.has(s.id))
+            if (next) {
+                rateableSession = {
+                    id: next.id,
+                    mentorName: (next as any).mentor?.full_name || 'your mentor',
+                    mentorPhotoUrl: getMentorPhotoUrl((next as any).mentor),
+                    scheduledAt: next.scheduled_at,
+                }
+            }
+        }
+    }
+
     const sidebarProps = {
         role: profile.role || 'student',
         userName:
@@ -297,6 +355,7 @@ export default async function DashboardLayout({
                 bookingProfile={canBook ? bookingProfile : null}
                 canBook={canBook}
                 mentors={bookingMentors}
+                rateableSession={rateableSession}
             >
                 {dashboardShell}
             </StudentCreditsProvider>

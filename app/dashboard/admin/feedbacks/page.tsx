@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
 import FeedbackTable from './feedback-table'
+import FeedbackOverview, { type MentorRatingSummary } from './feedback-overview'
 
 export default async function AdminFeedbacksPage() {
     const supabase = await createClient()
@@ -21,21 +23,29 @@ export default async function AdminFeedbacksPage() {
         redirect('/dashboard')
     }
 
+    // The caller is a confirmed admin, so the rest of this page reads through
+    // the service-role client. `sessions` has no admin SELECT policy — its only
+    // policy is `auth.uid() = student_id OR auth.uid() = mentor_id` — so under
+    // RLS an admin reads zero session rows, which left every mentor and student
+    // on this page showing "Unknown" and the response-rate denominator at 0.
+    // Reads only; nothing here writes. Same pattern as fetchMentors() in
+    // ../mentors/actions.ts.
+    const db = createAdminClient()
+
     // Fetch all student feedback
-    const { data: feedbacks, error: feedbackError } = await supabase
+    const { data: feedbacks } = await db
         .from('form_responses')
-        .select('id, responses, created_at, session_id')
+        .select('id, responses, rating, created_at, session_id')
         .eq('form_type', 'student_feedback')
         .order('created_at', { ascending: false })
 
-    console.log('[FEEDBACKS DEBUG] Query result:', { feedbacks, feedbackError, count: feedbacks?.length })
 
     // If we have feedbacks, fetch the related sessions
     const sessionIds = feedbacks?.map(f => f.session_id).filter(Boolean) || []
 
     let sessionMap = new Map<string, { mentor_id: string | null; student_id: string | null; scheduled_at: string | null; transcript_url: string | null }>()
     if (sessionIds.length > 0) {
-        const { data: sessions } = await supabase
+        const { data: sessions } = await db
             .from('sessions')
             .select('id, scheduled_at, mentor_id, student_id, transcript_url')
             .in('id', sessionIds)
@@ -46,7 +56,7 @@ export default async function AdminFeedbacksPage() {
     // Fetch session reports for transcripts
     let reportMap = new Map<string, { raw_transcript: string | null; summary: string | null }>()
     if (sessionIds.length > 0) {
-        const { data: reports } = await supabase
+        const { data: reports } = await db
             .from('session_reports')
             .select('session_id, raw_transcript, summary')
             .in('session_id', sessionIds)
@@ -58,27 +68,24 @@ export default async function AdminFeedbacksPage() {
     const mentorIds = [...new Set(Array.from(sessionMap.values()).map(s => s.mentor_id).filter(Boolean))] as string[]
     const studentIds = [...new Set(Array.from(sessionMap.values()).map(s => s.student_id).filter(Boolean))] as string[]
 
-    console.log('[FEEDBACKS DEBUG] IDs:', { mentorIds, studentIds })
 
     // Fetch mentor and student profiles
     let mentorMap = new Map<string, string | null>()
     let studentMap = new Map<string, string | null>()
 
     if (mentorIds.length > 0) {
-        const { data: mentors, error: mentorError } = await supabase
+        const { data: mentors } = await db
             .from('profiles')
             .select('id, full_name')
             .in('id', mentorIds)
-        console.log('[FEEDBACKS DEBUG] Mentors:', { mentors, mentorError })
         mentorMap = new Map(mentors?.map(m => [m.id, m.full_name]) || [])
     }
 
     if (studentIds.length > 0) {
-        const { data: students, error: studentError } = await supabase
+        const { data: students } = await db
             .from('profiles')
             .select('id, full_name')
             .in('id', studentIds)
-        console.log('[FEEDBACKS DEBUG] Students:', { students, studentError })
         studentMap = new Map(students?.map(s => [s.id, s.full_name]) || [])
     }
 
@@ -93,7 +100,7 @@ export default async function AdminFeedbacksPage() {
             studentName: session?.student_id ? studentMap.get(session.student_id) || 'Unknown' : 'Unknown',
             mentorName: session?.mentor_id ? mentorMap.get(session.mentor_id) || 'Unknown' : 'Unknown',
             mentorId: session?.mentor_id || '',
-            rating: responses?.mentor_rating || 0,
+            rating: f.rating ?? (Number(responses?.mentor_rating) || 0),
             helpful: responses?.session_helpful || 'N/A',
             experience: responses?.experience || '',
             sessionDate: session?.scheduled_at || null,
@@ -103,6 +110,37 @@ export default async function AdminFeedbacksPage() {
             summary: report?.summary || null
         }
     }) || []
+
+    // Per-mentor aggregates for the overview charts. Built from the same rows
+    // the table renders, so the numbers can never disagree with it.
+    const perMentor = new Map<string, { name: string; ratings: number[] }>()
+    tableData.forEach(row => {
+        if (!row.mentorId || !row.rating) return
+        const entry = perMentor.get(row.mentorId) || { name: row.mentorName, ratings: [] }
+        entry.ratings.push(row.rating)
+        perMentor.set(row.mentorId, entry)
+    })
+
+    const mentorSummaries: MentorRatingSummary[] = Array.from(perMentor.entries()).map(
+        ([mentorId, { name, ratings }]) => ({
+            mentorId,
+            mentorName: name,
+            average: ratings.reduce((a, b) => a + b, 0) / ratings.length,
+            count: ratings.length,
+        })
+    )
+
+    const allRatings = tableData.map(r => r.rating).filter(r => r > 0)
+    const overallAverage =
+        allRatings.length > 0
+            ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length
+            : null
+
+    // Denominator for the response rate.
+    const { count: completedSessions } = await db
+        .from('sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed')
 
     return (
         <div className="max-w-6xl mx-auto">
@@ -114,6 +152,13 @@ export default async function AdminFeedbacksPage() {
                     Review feedback from students about their mentorship sessions
                 </p>
             </header>
+
+            <FeedbackOverview
+                totalResponses={allRatings.length}
+                overallAverage={overallAverage}
+                completedSessions={completedSessions || 0}
+                mentors={mentorSummaries}
+            />
 
             <FeedbackTable feedbacks={tableData} />
         </div>

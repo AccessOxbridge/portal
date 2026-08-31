@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Calendar, CheckCircle2, XCircle } from 'lucide-react'
 import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import MentorAvatar from '@/components/dashboard/mentor-avatar'
 
 interface Props {
     request: {
         id: string
         mentor_full_name: string
+        mentor_photo_url?: string | null
         proposed_start: string | null
         note: string | null
         is_reschedule?: boolean
@@ -61,9 +63,11 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
         <div className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all">
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
-                        {request.mentor_full_name?.[0] || 'M'}
-                    </div>
+                    <MentorAvatar
+                        name={request.mentor_full_name}
+                        photoUrl={request.mentor_photo_url}
+                        fallbackClassName="bg-amber-100 text-amber-600"
+                    />
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 mb-1">
                             {request.is_reschedule

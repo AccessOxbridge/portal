@@ -8,6 +8,7 @@ import { useStudentCredits } from '@/components/dashboard/student-credits-provid
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import { MentorSessionRequestCard } from './mentor-session-request-card'
+import MentorAvatar from '@/components/dashboard/mentor-avatar'
 import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
 
 interface Session {
@@ -28,6 +29,7 @@ interface PendingRequest {
     id: string
     created_at: string
     mentor_full_name: string
+    mentor_photo_url?: string | null
     initiated_by?: 'student' | 'mentor'
     proposed_start?: string | null
     proposed_end?: string | null
@@ -443,6 +445,7 @@ export default function StudentSessionsContent({
                                     request={{
                                         id: request.id,
                                         mentor_full_name: request.mentor_full_name,
+                                        mentor_photo_url: request.mentor_photo_url ?? null,
                                         proposed_start: request.proposed_start ?? null,
                                         note: request.note ?? null,
                                         is_reschedule: !!request.reschedule_of_session_id,
@@ -457,9 +460,11 @@ export default function StudentSessionsContent({
                                 >
                                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
-                                                {request.mentor_full_name?.[0] || 'M'}
-                                            </div>
+                                            <MentorAvatar
+                                                name={request.mentor_full_name}
+                                                photoUrl={request.mentor_photo_url}
+                                                fallbackClassName="bg-amber-100 text-amber-600"
+                                            />
                                             <div>
                                                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                                                     {request.reschedule_of_session_id
@@ -557,10 +562,10 @@ export default function StudentSessionsContent({
                             >
                                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                     <div className="flex items-start gap-4">
-                                        {/* Mentor Avatar */}
-                                        <div className="w-14 h-14 rounded-2xl bg-accent text-white flex items-center justify-center text-lg font-bold shrink-0">
-                                            {session.mentor_full_name?.[0] || 'M'}
-                                        </div>
+                                        <MentorAvatar
+                                            name={session.mentor_full_name}
+                                            photoUrl={session.mentor_photo_url}
+                                        />
 
                                         <div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-1">

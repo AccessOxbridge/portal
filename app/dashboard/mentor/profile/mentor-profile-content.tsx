@@ -10,7 +10,6 @@ import {
     School,
     Clock,
     Sparkles,
-    Star,
     Users,
     CalendarCheck,
     Camera,
@@ -37,7 +36,6 @@ interface Props {
     stats: {
         sessionsCompleted: number
         activeStudents: number
-        avgRating: number | null
     }
 }
 
@@ -120,7 +118,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
     return (
         <form action={formAction} className="space-y-8">
             {/* Stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
                     <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
                         <CalendarCheck className="w-5 h-5 text-blue-600" />
@@ -137,17 +135,6 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                     <div>
                         <p className="text-2xl font-bold text-gray-900 leading-none">{stats.activeStudents}</p>
                         <p className="text-sm text-gray-500 mt-1">Active students</p>
-                    </div>
-                </div>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                        <Star className="w-5 h-5 text-amber-500" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-gray-900 leading-none">
-                            {stats.avgRating ? `${stats.avgRating.toFixed(1)}` : '—'}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">Average rating</p>
                     </div>
                 </div>
             </section>

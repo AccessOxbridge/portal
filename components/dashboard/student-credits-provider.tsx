@@ -13,6 +13,7 @@ import { createClient } from '@/utils/supabase/client'
 import CreditsRequestModal, { type CreditsRequestReason } from '@/components/dashboard/credits-request-modal'
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
 import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
+import RateSessionModal, { type RateableSession } from '@/components/dashboard/rate-session-modal'
 
 interface StudentCreditsContextValue {
     credits: number
@@ -46,6 +47,11 @@ interface StudentCreditsProviderProps {
     canBook?: boolean
     /** The student's currently assigned mentors, for the booking modal's mentor picker. */
     mentors?: { id: string; name: string }[]
+    /**
+     * A recently completed session this student hasn't rated or dismissed, if
+     * any. Selected server-side so the popup can appear on any dashboard page.
+     */
+    rateableSession?: RateableSession | null
 }
 
 export default function StudentCreditsProvider({
@@ -54,6 +60,7 @@ export default function StudentCreditsProvider({
     bookingProfile = null,
     canBook = false,
     mentors = [],
+    rateableSession = null,
 }: StudentCreditsProviderProps) {
     const [credits, setCredits] = useState(initialCredits)
     const [modalOpen, setModalOpen] = useState(false)
@@ -133,6 +140,7 @@ export default function StudentCreditsProvider({
                     mentors={mentors}
                 />
             )}
+            <RateSessionModal key={rateableSession?.id ?? 'none'} session={rateableSession} />
         </StudentCreditsContext.Provider>
     )
 }

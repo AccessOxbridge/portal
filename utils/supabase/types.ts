@@ -1057,6 +1057,39 @@ export type Database = {
         }
         Relationships: []
       }
+      session_feedback_prompts: {
+        Row: {
+          dismissed_at: string
+          session_id: string
+          student_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          session_id: string
+          student_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          session_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_feedback_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_feedback_prompts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_reports: {
         Row: {
           action_items: Json | null

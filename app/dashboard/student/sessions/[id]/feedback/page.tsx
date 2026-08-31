@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import StudentFeedbackForm from '@/components/forms/student-feedback-form'
+import FeedbackContent from './feedback-content'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 
 export default async function StudentFeedbackPage({
     params
@@ -16,7 +17,14 @@ export default async function StudentFeedbackPage({
 
     const { data: session } = await supabase
         .from('sessions')
-        .select('student_id')
+        .select(`
+            student_id,
+            scheduled_at,
+            mentor:profiles!sessions_mentor_id_fkey (
+                full_name,
+                photo_url:mentors(photo_url)
+            )
+        `)
         .eq('id', sessionId)
         .single()
 
@@ -33,8 +41,17 @@ export default async function StudentFeedbackPage({
         .single()
 
     if (existing) {
-        redirect('/dashboard/student?message=Feedback already submitted')
+        redirect('/dashboard/student/sessions?message=Feedback already submitted')
     }
 
-    return <StudentFeedbackForm sessionId={sessionId} />
+    const mentor = session.mentor as any
+
+    return (
+        <FeedbackContent
+            sessionId={sessionId}
+            mentorName={mentor?.full_name || 'your mentor'}
+            mentorPhotoUrl={getMentorPhotoUrl(mentor)}
+            scheduledAt={session.scheduled_at}
+        />
+    )
 }

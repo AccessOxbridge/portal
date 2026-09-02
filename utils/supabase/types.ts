@@ -692,6 +692,48 @@ export type Database = {
           },
         ]
       }
+      mentor_session_checkins: {
+        Row: {
+          created_at: string
+          dismissed: boolean
+          homework_given: boolean | null
+          mentor_id: string
+          next_session_booked: boolean | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          dismissed?: boolean
+          homework_given?: boolean | null
+          mentor_id: string
+          next_session_booked?: boolean | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          dismissed?: boolean
+          homework_given?: boolean | null
+          mentor_id?: string
+          next_session_booked?: boolean | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_session_checkins_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_session_checkins_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_payout_items: {
         Row: {
           amount_cents: number

@@ -18,6 +18,12 @@ interface MentorRequestSessionModalProps {
     students: MentorRequestStudentOption[]
     preselectedStudentId?: string
     mentorTimezone?: string | null
+    /**
+     * Fired only when a request was actually sent, just before `onClose`.
+     * `onClose` alone cannot tell "sent" from "cancelled", and the post-session
+     * check-in popup needs the difference to mark the booking question answered.
+     */
+    onSubmitted?: () => void
 }
 
 export default function MentorRequestSessionModal({
@@ -25,7 +31,8 @@ export default function MentorRequestSessionModal({
     onClose,
     students,
     preselectedStudentId,
-    mentorTimezone
+    mentorTimezone,
+    onSubmitted
 }: MentorRequestSessionModalProps) {
     const router = useRouter()
     const tz = resolveTz(mentorTimezone)
@@ -141,6 +148,7 @@ export default function MentorRequestSessionModal({
             }
 
             router.refresh()
+            onSubmitted?.()
             onClose()
         } catch (err: any) {
             setError(err.message || 'An unexpected error occurred. Please try again.')

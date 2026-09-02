@@ -11,6 +11,9 @@ import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 import { selectStudentMilestone } from '@/lib/student-milestones'
 import { selectDueSatisfactionSurvey, type DueSatisfactionSurvey } from '@/lib/student-satisfaction'
 import SatisfactionBanner from '@/components/dashboard/satisfaction-banner'
+import { selectMentorSessionCheckin, type MentorSessionCheckin } from '@/lib/mentor-session-checkin'
+import MentorSessionCheckinModal from '@/components/dashboard/mentor-session-checkin-modal'
+import type { MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
 
@@ -202,6 +205,36 @@ export default async function DashboardLayout({
         pendingRequestsCount = requestsCount ?? 0
     }
 
+    // The one recently-completed session this mentor should check in about, for
+    // the popup mounted below. Newest first and one at a time, exactly as the
+    // student rating prompt works — see lib/mentor-session-checkin.ts. The
+    // student list comes along for the ride so the popup's "Request a session"
+    // button can open the existing modal without a second round trip.
+    let mentorCheckin: MentorSessionCheckin | null = null
+    let mentorCheckinStudents: MentorRequestStudentOption[] = []
+    let mentorTimezone: string | null = null
+    if (isMentor && showSidebar) {
+        mentorCheckin = await selectMentorSessionCheckin(supabase, user.id)
+
+        if (mentorCheckin) {
+            const [{ data: mentorRow }, { data: assignments }] = await Promise.all([
+                supabase.from('mentors').select('timezone').eq('id', user.id).maybeSingle(),
+                supabase
+                    .from('student_mentor_assignments')
+                    .select('student_id, student:profiles!student_mentor_assignments_student_id_fkey (full_name)')
+                    .eq('mentor_id', user.id)
+                    .eq('is_current', true),
+            ])
+
+            mentorTimezone = (mentorRow as { timezone?: string | null } | null)?.timezone ?? null
+            type AssignmentRow = { student_id: string; student?: { full_name?: string | null } | null }
+            mentorCheckinStudents = ((assignments || []) as unknown as AssignmentRow[]).map((a) => ({
+                id: a.student_id,
+                full_name: a.student?.full_name || 'Student',
+            }))
+        }
+    }
+
     // Calculate student help count for admins
     let studentHelpCount = 0
     const isAdmin = profile.role === 'admin' || profile.role === 'admin-dev'
@@ -387,6 +420,20 @@ export default async function DashboardLayout({
             >
                 {dashboardShell}
             </StudentCreditsProvider>
+        )
+    }
+
+    if (isMentor && mentorCheckin) {
+        return (
+            <>
+                {dashboardShell}
+                <MentorSessionCheckinModal
+                    key={mentorCheckin.sessionId}
+                    checkin={mentorCheckin}
+                    students={mentorCheckinStudents}
+                    mentorTimezone={mentorTimezone}
+                />
+            </>
         )
     }
 

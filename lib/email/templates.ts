@@ -937,3 +937,54 @@ export function mentorWelcome(args: {
         }),
     }
 }
+
+const ADMIN_ISSUES_URL = `${APP_URL}/dashboard/admin/issues`
+
+export interface NewIssueAdminDetails {
+    /** Who raised it, e.g. "Jane Doe (student)". */
+    reporterLabel: string
+    /** user_issues.issue_type — payment, session, technical, other, student_help. */
+    issueType: string
+    subject: string
+    description: string
+    /** user_issues.priority. */
+    priority: string
+    /** Where the admin should go to action it (defaults to the issues queue). */
+    issuesUrl?: string
+}
+
+/**
+ * A user (mentor or student) raised a new issue → admins.
+ * Sent for every row written to user_issues, from whichever route created it.
+ */
+export function newIssueAdmin(details: NewIssueAdminDetails): EmailTemplate {
+    const reporter = escapeHtml(details.reporterLabel || 'A user')
+    const type = escapeHtml(details.issueType || 'other')
+    const subject = escapeHtml(details.subject || 'New issue')
+    const priority = escapeHtml(details.priority || 'normal')
+    const url = details.issuesUrl || ADMIN_ISSUES_URL
+
+    // Keep the email readable: quote the first part of the report, preserving
+    // the author's line breaks, and point at the portal for the rest.
+    const raw = details.description || ''
+    const trimmed = raw.length > 1200 ? `${raw.slice(0, 1200)}…` : raw
+    const body = escapeHtml(trimmed).replace(/\n/g, '<br />')
+
+    const isUrgent = priority === 'high' || priority === 'urgent'
+
+    return {
+        subject: `${isUrgent ? '[Urgent] ' : ''}New issue reported: ${details.subject} | Access Oxbridge`,
+        html: layout({
+            title: 'New issue reported',
+            preheader: `${details.reporterLabel} reported a ${details.issueType} issue: ${details.subject}`,
+            paragraphs: [
+                'Hi team,',
+                `<strong>${reporter}</strong> has reported a new issue on the portal.`,
+                `<strong>Subject:</strong> ${subject}<br /><strong>Type:</strong> ${type}<br /><strong>Priority:</strong> ${priority}`,
+                body ? `<strong>What they said:</strong><br />${body}` : '',
+                `${link('Open it in the admin issues queue', url)}.`,
+            ].filter(Boolean),
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}

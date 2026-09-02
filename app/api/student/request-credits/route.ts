@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { notifyAdminsOfNewIssue } from '@/lib/admin-issue-notify'
 
 /**
  * POST /api/student/request-credits
- * Student requests more session hours. Notifies all admins (in-app + email via Edge Function).
+ * Student requests more session hours. Notifies all admins (branded email + in-app).
  */
 export async function POST(req: Request) {
     try {
@@ -71,22 +72,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Failed to submit your request' }, { status: 500 })
         }
 
-        const { data: adminProfiles } = await admin
-            .from('profiles')
-            .select('id, email')
-            .in('role', ['admin', 'admin-dev'])
-
-        if (adminProfiles && adminProfiles.length > 0) {
-            const adminNotifications = adminProfiles.map((p) => ({
-                recipient_id: p.id,
-                recipient_email: p.email || '',
-                type: 'system_alert' as const,
-                title: 'Session credits request',
-                message: `${studentName} (${credits}h remaining) requested credits: "${message.slice(0, 140)}${message.length > 140 ? '…' : ''}"`,
-                data: { issue_id: issue.id, action: 'view_issue', kind: 'credits_request' },
-            }))
-            await admin.from('notifications').insert(adminNotifications)
-        }
+        await notifyAdminsOfNewIssue(admin, {
+            issueId: issue.id,
+            issueType: 'payment',
+            subject,
+            description,
+            priority: credits <= 0 ? 'high' : 'normal',
+            reporterName: studentName,
+            reporterType: 'student',
+            title: 'Session credits request',
+            message: `${studentName} (${credits}h remaining) requested credits: "${message.slice(0, 140)}${message.length > 140 ? '…' : ''}"`,
+            kind: 'credits_request',
+        })
 
         return NextResponse.json({ success: true, issue_id: issue.id })
     } catch (e) {

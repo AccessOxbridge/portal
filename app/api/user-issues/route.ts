@@ -1,4 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
+import { notifyAdminsOfNewIssue } from '@/lib/admin-issue-notify'
 import { NextRequest, NextResponse } from 'next/server'
 
 // POST: Create a new issue
@@ -14,7 +16,7 @@ export async function POST(request: NextRequest) {
         // Get user's role
         const { data: profile } = await supabase
             .from('profiles')
-            .select('role')
+            .select('role, full_name')
             .eq('id', user.id)
             .single()
 
@@ -52,6 +54,19 @@ export async function POST(request: NextRequest) {
             console.error('Error creating issue:', error)
             return NextResponse.json({ error: error.message }, { status: 500 })
         }
+
+        // Notify admins (branded email + in-app). Best-effort: the issue is
+        // already saved, so a mail failure must not fail the request.
+        await notifyAdminsOfNewIssue(createAdminClient(), {
+            issueId: data.id,
+            issueType: data.issue_type,
+            subject: data.subject,
+            description: data.description,
+            priority: data.priority,
+            reporterName: profile.full_name,
+            reporterType: reporterType,
+            data: { payout_id: data.payout_id, session_id: data.session_id },
+        })
 
         return NextResponse.json({ success: true, issue: data })
     } catch (error) {

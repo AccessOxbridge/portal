@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { notifyAdminsOfNewIssue } from '@/lib/admin-issue-notify'
 
 /**
  * POST /api/student/report-mentor-absent
  * Student reports that the mentor is absent (has not joined the session).
  * - Stores the report in user_issues (issue_type: session, subject: Mentor absent).
- * - Notifies all admins (in-app notification).
+ * - Notifies all admins (branded email + in-app notification).
  * - Notifies the mentor with an urgent message: "{Student name} is waiting in the meeting!"
  */
 export async function POST(req: Request) {
@@ -94,22 +95,19 @@ export async function POST(req: Request) {
 
         const studentName = profile.full_name || 'A student'
 
-        const { data: adminProfiles } = await admin
-            .from('profiles')
-            .select('id, email')
-            .in('role', ['admin', 'admin-dev'])
-
-        if (adminProfiles && adminProfiles.length > 0) {
-            const adminNotifications = adminProfiles.map((p) => ({
-                recipient_id: p.id,
-                recipient_email: p.email || '',
-                type: 'system_alert' as const,
-                title: 'Student reported: Mentor absent',
-                message: `${studentName} has reported that their mentor did not join the session. Please check the session and follow up.`,
-                data: { session_id: sessionId, issue_id: issue.id, action: 'view_issue', kind: 'mentor_absent_report' }
-            }))
-            await admin.from('notifications').insert(adminNotifications)
-        }
+        await notifyAdminsOfNewIssue(admin, {
+            issueId: issue.id,
+            issueType: 'session',
+            subject: 'Mentor absent - student reported',
+            description: `Student reported that the mentor did not join the session. Session ID: ${sessionId}.`,
+            priority: 'high',
+            reporterName: studentName,
+            reporterType: 'student',
+            title: 'Student reported: Mentor absent',
+            message: `${studentName} has reported that their mentor did not join the session. Please check the session and follow up.`,
+            data: { session_id: sessionId },
+            kind: 'mentor_absent_report',
+        })
 
         await admin.from('notifications').insert({
             recipient_id: session.mentor_id,

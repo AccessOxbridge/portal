@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState, useTransition } from 'react'
 import { createMentorAccount, createStudentAccount } from './actions'
+import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
 
 type AccountTab = 'student' | 'mentor'
 
@@ -388,8 +389,13 @@ export function CreateAccountClient() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5 text-sm font-semibold text-gray-700">
-                                            {student.credits ?? 0}
+                                        <td className="px-8 py-5">
+                                            <AdjustCreditsCell
+                                                studentId={student.id}
+                                                studentName={student.full_name || 'Student'}
+                                                studentEmail={student.email}
+                                                credits={student.credits ?? 0}
+                                            />
                                         </td>
                                         <td className="px-8 py-5 text-sm text-gray-500 font-medium">
                                             {format(new Date(student.updated_at), 'd MMM yyyy')}

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { StudentActions } from './components/StudentActions'
 import { MentorAssignCell } from './components/MentorAssignCell'
+import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
 
 interface Student {
     id: string
@@ -23,6 +24,7 @@ interface Student {
     profile: {
         full_name: string | null
         email: string | null
+        credits: number | null
     } | null
 }
 
@@ -80,7 +82,8 @@ export default function AdminStudentsPage() {
                 *,
                 profile:profiles!student_profiles_id_fkey (
                     full_name,
-                    email
+                    email,
+                    credits
                 )
             `)
             .order('created_at', { ascending: false })
@@ -174,6 +177,7 @@ export default function AdminStudentsPage() {
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">School</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Target</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Hours</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
                                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
                                     </tr>
@@ -210,6 +214,14 @@ export default function AdminStudentsPage() {
                                                     currentMentorIds={assignments[student.id] || []}
                                                     mentors={mentors}
                                                     onSaved={() => fetchMentorsAndAssignments()}
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <AdjustCreditsCell
+                                                    studentId={student.id}
+                                                    studentName={student.profile?.full_name || 'Student'}
+                                                    studentEmail={student.profile?.email}
+                                                    credits={student.profile?.credits ?? 0}
                                                 />
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 font-medium">

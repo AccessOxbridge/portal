@@ -318,36 +318,49 @@ export type Database = {
       }
       credit_transactions: {
         Row: {
+          admin_id: string | null
           amount: number
           balance_after: number
           created_at: string | null
           description: string | null
           id: string
+          ip: string | null
           reference_id: string | null
           type: string
           user_id: string
         }
         Insert: {
+          admin_id?: string | null
           amount: number
           balance_after: number
           created_at?: string | null
           description?: string | null
           id?: string
+          ip?: string | null
           reference_id?: string | null
           type: string
           user_id: string
         }
         Update: {
+          admin_id?: string | null
           amount?: number
           balance_after?: number
           created_at?: string | null
           description?: string | null
           id?: string
+          ip?: string | null
           reference_id?: string | null
           type?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "credit_transactions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "credit_transactions_user_id_fkey"
             columns: ["user_id"]
@@ -1658,6 +1671,20 @@ export type Database = {
       }
     }
     Functions: {
+      admin_adjust_credits: {
+        Args: {
+          p_admin_id: string
+          p_delta: number
+          p_ip?: string | null
+          p_reason: string
+          p_student_id: string
+        }
+        Returns: {
+          balance_after: number
+          balance_before: number
+          transaction_id: string
+        }[]
+      }
       can_access_conversation_folder: {
         Args: { object_name: string }
         Returns: boolean

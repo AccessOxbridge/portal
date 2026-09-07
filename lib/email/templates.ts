@@ -988,3 +988,49 @@ export function newIssueAdmin(details: NewIssueAdminDetails): EmailTemplate {
         }),
     }
 }
+
+const ADMIN_STUDENTS_URL = `${APP_URL}/dashboard/admin/students`
+
+export interface CreditAdjustmentAdminDetails {
+    /** Admin who made the change, e.g. "Raj Vishwakarma". */
+    adminLabel: string
+    /** Student whose balance moved. */
+    studentLabel: string
+    /** Effective delta after the floor at zero. Signed. */
+    delta: number
+    balanceBefore: number
+    balanceAfter: number
+    reason: string
+}
+
+/**
+ * An admin adjusted a student's credit balance → every admin.
+ *
+ * Sent on EVERY adjustment, deliberately: credits convert straight into paid
+ * tutoring hours, so an unauthorised or mistaken grant needs to be visible to
+ * the whole team within minutes rather than found later in a reconciliation.
+ */
+export function creditAdjustmentAdmin(details: CreditAdjustmentAdminDetails): EmailTemplate {
+    const admin = escapeHtml(details.adminLabel || 'An admin')
+    const student = escapeHtml(details.studentLabel || 'a student')
+    const reason = escapeHtml(details.reason || '').replace(/\n/g, '<br />')
+    const sign = details.delta > 0 ? '+' : ''
+    const movement = `${sign}${details.delta} ${Math.abs(details.delta) === 1 ? 'hour' : 'hours'}`
+
+    return {
+        subject: `Credits adjusted: ${movement} for ${details.studentLabel} | Access Oxbridge`,
+        html: layout({
+            title: 'Student credits adjusted',
+            preheader: `${details.adminLabel} adjusted ${details.studentLabel}'s balance by ${movement}.`,
+            paragraphs: [
+                'Hi team,',
+                `<strong>${admin}</strong> adjusted a student's hours on the portal.`,
+                `<strong>Student:</strong> ${student}<br /><strong>Change:</strong> ${movement}<br /><strong>Balance:</strong> ${details.balanceBefore} → ${details.balanceAfter}`,
+                reason ? `<strong>Reason given:</strong><br />${reason}` : '',
+                'If this was not expected, review it now — credits convert directly into paid tutoring hours.',
+                `${link('Open the admin students page', ADMIN_STUDENTS_URL)}.`,
+            ].filter(Boolean),
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}

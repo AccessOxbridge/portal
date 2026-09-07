@@ -13,7 +13,7 @@ export type LoginStatus = 'success' | 'failed'
  * `::ffff:172.31.45.0`, or `::1` in local dev, and the column looks
  * authoritative while telling you nothing.
  */
-function clientIp(h: Headers): string | null {
+export function clientIp(h: Headers): string | null {
     const forwarded = h.get('x-forwarded-for')
     if (forwarded) {
         const first = forwarded.split(',')[0]?.trim()

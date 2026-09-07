@@ -5,6 +5,7 @@ import { createZoomMeeting } from '@/utils/zoom'
 import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
 import { sessionConfirmedStudent, sessionConfirmedMentor } from '@/lib/email/templates'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import { notifyAdminsOfSessionClash } from '@/lib/session-clash-notify'
 
 interface TimeSlot {
     date: string
@@ -224,6 +225,17 @@ export async function POST(req: Request) {
             }
         } catch (emailError) {
             console.error('Session confirmation email error:', emailError)
+        }
+
+        // Alert admins if this session lands on top of an unrelated one.
+        if (createdSession?.id) {
+            await notifyAdminsOfSessionClash(adminSupabase, {
+                sessionId: createdSession.id,
+                studentId,
+                mentorId,
+                scheduledAt: scheduledAt.toISOString(),
+                durationMinutes: durationMinutes > 0 ? durationMinutes : 60,
+            })
         }
 
         return NextResponse.json({ success: true })

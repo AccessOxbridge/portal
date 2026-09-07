@@ -13,6 +13,7 @@ import {
 } from '@/lib/email/templates'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import { notifyRescheduleDeclined } from '@/lib/session-reschedule'
+import { notifyAdminsOfSessionClash } from '@/lib/session-clash-notify'
 
 interface TimeSlot {
     date: string      // "2025-01-15"
@@ -368,6 +369,17 @@ export async function handleMentorshipRequest(
             } catch (emailError) {
                 console.error('Session confirmation email error:', emailError)
             }
+        }
+
+        // Alert admins if this session lands on top of an unrelated one.
+        if (createdSession?.id) {
+            await notifyAdminsOfSessionClash(admin, {
+                sessionId: createdSession.id,
+                studentId: request.student_id,
+                mentorId: request.mentor_id,
+                scheduledAt: scheduledAt.toISOString(),
+                durationMinutes: durationMinutes > 0 ? durationMinutes : 60,
+            })
         }
     }
 

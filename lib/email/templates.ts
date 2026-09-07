@@ -1034,3 +1034,75 @@ export function creditAdjustmentAdmin(details: CreditAdjustmentAdminDetails): Em
         }),
     }
 }
+
+const ADMIN_MANAGE_SESSIONS_URL = `${APP_URL}/dashboard/admin/manage-sessions`
+
+/** One side of a clash: who is meeting whom, and when (in London time). */
+export interface ClashParty {
+    studentLabel: string
+    mentorLabel: string
+    /** Pre-formatted, e.g. "Mon, 16 Jun 2026, 15:00 BST". */
+    when: string
+}
+
+export interface SessionClashAdminDetails {
+    /** The booking that was just made. */
+    booked: ClashParty
+    /** Already-scheduled sessions its time collides with. Never empty. */
+    clashes: (ClashParty & {
+        /** True when both sessions share a mentor — that mentor cannot do both. */
+        sameMentor: boolean
+    })[]
+}
+
+/**
+ * A newly booked session overlaps one or more sessions already on the
+ * calendar → every admin.
+ *
+ * These are usually two unrelated pairs landing on the same slot, which is
+ * allowed but means the team cannot sit in on both. A shared mentor is the
+ * serious case and is called out explicitly.
+ */
+export function sessionClashAdmin(details: SessionClashAdminDetails): EmailTemplate {
+    const booked = details.booked
+    const student = escapeHtml(booked.studentLabel)
+    const mentor = escapeHtml(booked.mentorLabel)
+    const when = escapeHtml(booked.when)
+
+    const doubleBooked = details.clashes.filter((c) => c.sameMentor)
+    const count = details.clashes.length
+
+    return {
+        subject: `Session clash: ${booked.studentLabel} overlaps ${
+            count === 1 ? `${details.clashes[0].studentLabel}'s session` : `${count} other sessions`
+        } | Access Oxbridge`,
+        html: layout({
+            title: 'Overlapping sessions booked',
+            preheader: `${booked.studentLabel} booked ${booked.when}, which overlaps ${
+                count === 1 ? 'another session' : `${count} other sessions`
+            }.`,
+            paragraphs: [
+                'Hi team,',
+                `<strong>${student}</strong> has just booked a session with <strong>${mentor}</strong> for <strong>${when}</strong>, and it overlaps ${
+                    count === 1 ? 'a session that was already scheduled' : `${count} sessions that were already scheduled`
+                }.`,
+            ],
+            list: {
+                heading: count === 1 ? 'It clashes with' : 'It clashes with',
+                items: details.clashes.map((c) => ({
+                    title: c.when,
+                    body: `${escapeHtml(c.studentLabel)} with ${escapeHtml(c.mentorLabel)}${
+                        c.sameMentor ? ' — <strong>same mentor as the new booking</strong>' : ''
+                    }`,
+                })),
+            },
+            closingParagraphs: [
+                doubleBooked.length > 0
+                    ? 'A mentor is booked into two sessions at once and cannot attend both — this needs moving.'
+                    : 'Both sessions can go ahead, but no one from the team can sit in on both.',
+                `${link('Open the admin sessions page', ADMIN_MANAGE_SESSIONS_URL)}.`,
+            ],
+            signOff: TEAM_SIGN_OFF,
+        }),
+    }
+}

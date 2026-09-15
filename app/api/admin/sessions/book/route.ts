@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
-import { createZoomMeeting } from '@/utils/zoom'
+import { createZoomMeeting, deleteZoomMeeting } from '@/utils/zoom'
 import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
 import { sessionConfirmedStudent, sessionConfirmedMentor } from '@/lib/email/templates'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
@@ -115,7 +115,12 @@ export async function POST(req: Request) {
             .maybeSingle()
         const mentorTz = (mentorTzRow as { timezone?: string | null } | null)?.timezone ?? null
 
-        let zoomMeeting: { id: string; joinUrl: string; startUrl: string } | null = null
+        // A session without a Zoom meeting is not a session: the student's Join
+        // button leads nowhere and the mentor's Start Session returns 409. We
+        // used to book anyway and log the failure, which meant nobody found out
+        // until both parties were sitting there at the appointed time. Refuse
+        // the booking instead, so the failure is visible now and recoverable.
+        let zoomMeeting: { id: string; joinUrl: string; startUrl: string }
         try {
             zoomMeeting = await createZoomMeeting({
                 topic: `Mentorship Session: ${studentProfile?.full_name || 'Student'} & ${mentorProfile?.full_name || 'Mentor'}`,
@@ -123,8 +128,14 @@ export async function POST(req: Request) {
                 duration: durationMinutes > 0 ? durationMinutes : 60,
             })
         } catch (zoomError) {
-            console.error('Failed to create Zoom meeting:', zoomError)
-            // Continue without Zoom if it fails - can be added manually later.
+            console.error('[book] Zoom meeting creation failed; session NOT booked:', zoomError)
+            return NextResponse.json(
+                {
+                    error:
+                        'We could not set up the video call for this session, so it has not been booked. Please try again in a moment.',
+                },
+                { status: 502 }
+            )
         }
 
         const { data: createdSession, error: sessionError } = await adminSupabase
@@ -137,14 +148,18 @@ export async function POST(req: Request) {
                 scheduled_at: scheduledAt.toISOString(),
                 duration_minutes: durationMinutes > 0 ? durationMinutes : 60,
                 selected_slot: JSON.parse(JSON.stringify(timeSlot)),
-                zoom_meeting_id: zoomMeeting?.id || null,
-                zoom_join_url: zoomMeeting?.joinUrl || null,
-                zoom_start_url: zoomMeeting?.startUrl || null,
+                zoom_meeting_id: zoomMeeting.id,
+                zoom_join_url: zoomMeeting.joinUrl,
+                zoom_start_url: zoomMeeting.startUrl,
             })
             .select('id')
             .single()
 
-        if (sessionError) throw sessionError
+        if (sessionError) {
+            // The meeting we just created now has no session to belong to.
+            await deleteZoomMeeting(zoomMeeting.id)
+            throw sessionError
+        }
 
         // Clear out any stale pending requests for this student so nothing
         // contradicts the now-confirmed session.

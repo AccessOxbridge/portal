@@ -134,51 +134,14 @@ export async function handleMentorshipRequest(
             .maybeSingle()
         const mentorTz = (mentorTzRow as { timezone?: string | null } | null)?.timezone ?? null
 
-        if (isReschedule && request.reschedule_of_session_id) {
-            const admin = createAdminClient()
-            const { data: originalSession, error: originalError } = await admin
-                .from('sessions')
-                .select('id, status, scheduled_at, zoom_meeting_id, zoom_meeting_status')
-                .eq('id', request.reschedule_of_session_id)
-                .single()
-
-            if (originalError || !originalSession) {
-                throw new Error('Original session not found')
-            }
-
-            const stillUpcoming =
-                originalSession.status === 'active' &&
-                originalSession.scheduled_at &&
-                new Date(originalSession.scheduled_at).getTime() > Date.now() &&
-                originalSession.zoom_meeting_status !== 'started'
-
-            if (!stillUpcoming) {
-                await supabase
-                    .from('mentorship_requests')
-                    .update({ status: 'rejected' })
-                    .eq('id', requestId)
-
-                throw new Error(
-                    'The original session is no longer upcoming, so this reschedule cannot be accepted.'
-                )
-            }
-
-            const nowIso = new Date().toISOString()
-            await admin
-                .from('sessions')
-                .update({ status: 'cancelled', updated_at: nowIso })
-                .eq('id', originalSession.id)
-
-            if (originalSession.zoom_meeting_id) {
-                try {
-                    await deleteZoomMeeting(originalSession.zoom_meeting_id)
-                } catch (zoomDeleteError) {
-                    console.error('Failed to delete original Zoom meeting:', zoomDeleteError)
-                }
-            }
-        }
-
-        let zoomMeeting: { id: string; joinUrl: string; startUrl: string } | null = null
+        // Provision the replacement meeting BEFORE touching the original.
+        //
+        // A reschedule cancels the original session and deletes its Zoom
+        // meeting, and deleting a Zoom meeting cannot be undone. Creating the
+        // new meeting first means a Zoom outage leaves the original session
+        // completely intact instead of destroying a working booking and
+        // replacing it with one that has no meeting attached.
+        let zoomMeeting: { id: string; joinUrl: string; startUrl: string }
         try {
             zoomMeeting = await createZoomMeeting({
                 topic: `Mentorship Session: ${studentProfile?.full_name || 'Student'} & ${mentorProfile?.full_name || 'Mentor'}`,
@@ -186,7 +149,62 @@ export async function handleMentorshipRequest(
                 duration: durationMinutes > 0 ? durationMinutes : 60,
             })
         } catch (zoomError) {
-            console.error('Failed to create Zoom meeting:', zoomError)
+            console.error('[mentorship-request] Zoom meeting creation failed; nothing was changed:', zoomError)
+            throw new Error(
+                'We could not set up the video call for this session, so it has not been booked. Please try again in a moment.'
+            )
+        }
+
+        if (isReschedule && request.reschedule_of_session_id) {
+            try {
+                const admin = createAdminClient()
+                const { data: originalSession, error: originalError } = await admin
+                    .from('sessions')
+                    .select('id, status, scheduled_at, zoom_meeting_id, zoom_meeting_status')
+                    .eq('id', request.reschedule_of_session_id)
+                    .single()
+
+                if (originalError || !originalSession) {
+                    throw new Error('Original session not found')
+                }
+
+                const stillUpcoming =
+                    originalSession.status === 'active' &&
+                    originalSession.scheduled_at &&
+                    new Date(originalSession.scheduled_at).getTime() > Date.now() &&
+                    originalSession.zoom_meeting_status !== 'started'
+
+                if (!stillUpcoming) {
+                    await supabase
+                        .from('mentorship_requests')
+                        .update({ status: 'rejected' })
+                        .eq('id', requestId)
+
+                    throw new Error(
+                        'The original session is no longer upcoming, so this reschedule cannot be accepted.'
+                    )
+                }
+
+                const nowIso = new Date().toISOString()
+                await admin
+                    .from('sessions')
+                    .update({ status: 'cancelled', updated_at: nowIso })
+                    .eq('id', originalSession.id)
+
+                if (originalSession.zoom_meeting_id) {
+                    try {
+                        await deleteZoomMeeting(originalSession.zoom_meeting_id)
+                    } catch (zoomDeleteError) {
+                        console.error('Failed to delete original Zoom meeting:', zoomDeleteError)
+                    }
+                }
+            } catch (rescheduleError) {
+                // We created a replacement meeting a moment ago and are now
+                // bailing out, so clean it up rather than leaving an orphaned
+                // meeting nobody will ever join.
+                await deleteZoomMeeting(zoomMeeting.id)
+                throw rescheduleError
+            }
         }
 
         const admin = createAdminClient()
@@ -200,14 +218,18 @@ export async function handleMentorshipRequest(
                 scheduled_at: scheduledAt.toISOString(),
                 duration_minutes: durationMinutes > 0 ? durationMinutes : 60,
                 selected_slot: JSON.parse(JSON.stringify(effectiveSlot)),
-                zoom_meeting_id: zoomMeeting?.id || null,
-                zoom_join_url: zoomMeeting?.joinUrl || null,
-                zoom_start_url: zoomMeeting?.startUrl || null,
+                zoom_meeting_id: zoomMeeting.id,
+                zoom_join_url: zoomMeeting.joinUrl,
+                zoom_start_url: zoomMeeting.startUrl,
             })
             .select('id')
             .single()
 
-        if (sessionError) throw sessionError
+        if (sessionError) {
+            // The meeting we just created now has no session to belong to.
+            await deleteZoomMeeting(zoomMeeting.id)
+            throw sessionError
+        }
 
         await supabase
             .from('mentorship_requests')

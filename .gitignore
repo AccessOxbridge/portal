@@ -51,3 +51,5 @@ supabase\.temp
 /FOUNDERS_HANDBOOK.docx
 
 /temp
+# Local-only: request doc for Workspace admin, not for the repo
+/ZOOM_WORKSPACE_REQUEST.md

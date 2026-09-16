@@ -53,3 +53,10 @@ supabase\.temp
 /temp
 # Local-only: request doc for Workspace admin, not for the repo
 /ZOOM_WORKSPACE_REQUEST.md
+
+# Local-only working notes for the Zoom host pool work — not for the repo.
+# (docs/ itself is tracked; only these three are local.)
+/docs/zoom-host-pool-implementation.md
+/docs/zoom-host-pool-rollback.md
+/docs/zoom-phase0-local-test.md
+/docs/credit-double-charge-report.md

@@ -23,6 +23,12 @@ interface CreateMeetingParams {
     startTime: Date
     duration?: number // in minutes, default 60
     timezone?: string
+    /**
+     * Zoom user id to host this meeting. Omit to use `users/me`, which
+     * resolves to office@accessoxbridge.io — the behaviour before the host
+     * pool existed, and what the kill switch falls back to.
+     */
+    hostUserId?: string
 }
 
 export interface ZoomRecordingFile {
@@ -83,9 +89,18 @@ export async function getZoomAccessToken(): Promise<string> {
 }
 
 /**
- * Ensure audio transcription is enabled for the Zoom user's cloud recordings.
- * This is a prerequisite for Zoom to generate transcript (VTT) files automatically.
- * Called once during meeting creation; safe to call repeatedly (idempotent PATCH).
+ * Ensure audio transcription is enabled for a Zoom user's cloud recordings.
+ *
+ * NO LONGER CALLED during meeting creation. Verified 2026-09-15 by diffing all
+ * 236 settings of a freshly created user against office@: both already had
+ * `recording_audio_transcript: true` with no intervention, which means it is an
+ * ACCOUNT-LEVEL DEFAULT that every new host inherits. This function was
+ * PATCHing `users/me/settings` on every single booking to set a value that was
+ * already true.
+ *
+ * Kept — not deleted — because it is the right tool if that account default is
+ * ever changed, or to repair a host whose settings have drifted. Check with:
+ *   GET /users/{id}/settings -> recording.recording_audio_transcript
  */
 export async function ensureAudioTranscriptionEnabled(): Promise<void> {
     try {
@@ -121,14 +136,15 @@ export async function createZoomMeeting(params: CreateMeetingParams): Promise<{
     joinUrl: string
     startUrl: string
 }> {
-    const { topic, startTime, duration = 60, timezone = 'UTC' } = params
-
-    // Best-effort: ensure the user has audio transcription enabled
-    await ensureAudioTranscriptionEnabled()
+    const { topic, startTime, duration = 60, timezone = 'UTC', hostUserId } = params
 
     const accessToken = await getZoomAccessToken()
 
-    const response = await fetch('https://api.zoom.us/v2/users/me/meetings', {
+    // `users/me` resolves to office@accessoxbridge.io. A hostUserId routes the
+    // meeting to a specific pool host instead.
+    const hostPath = hostUserId ? encodeURIComponent(hostUserId) : 'me'
+
+    const response = await fetch(`https://api.zoom.us/v2/users/${hostPath}/meetings`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${accessToken}`,

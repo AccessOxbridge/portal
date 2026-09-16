@@ -1331,6 +1331,7 @@ export type Database = {
           transcript_url: string | null
           updated_at: string | null
           zoom_join_url: string | null
+          zoom_host_user_id: string | null
           zoom_meeting_id: string | null
           zoom_meeting_status: string | null
           zoom_start_url: string | null
@@ -1358,6 +1359,7 @@ export type Database = {
           transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null
+          zoom_host_user_id?: string | null
           zoom_meeting_id?: string | null
           zoom_meeting_status?: string | null
           zoom_start_url?: string | null
@@ -1385,6 +1387,7 @@ export type Database = {
           transcript_url?: string | null
           updated_at?: string | null
           zoom_join_url?: string | null
+          zoom_host_user_id?: string | null
           zoom_meeting_id?: string | null
           zoom_meeting_status?: string | null
           zoom_start_url?: string | null

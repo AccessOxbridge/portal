@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { createZoomMeeting, deleteZoomMeeting } from '@/utils/zoom'
+import { resolveBookingHost } from '@/utils/zoom-host-allocator'
 import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
 import {
     sessionConfirmedStudent,
@@ -141,12 +142,23 @@ export async function handleMentorshipRequest(
         // new meeting first means a Zoom outage leaves the original session
         // completely intact instead of destroying a working booking and
         // replacing it with one that has no meeting attached.
+        // Which Zoom host should carry this meeting. While the pool is in
+        // shadow mode this logs a decision and returns no host, so the meeting
+        // is created on users/me exactly as before. Never throws.
+        const { hostUserId } = await resolveBookingHost(
+            createAdminClient(),
+            scheduledAt,
+            durationMinutes > 0 ? durationMinutes : 60,
+            isReschedule ? 'reschedule-accept' : 'request-accept'
+        )
+
         let zoomMeeting: { id: string; joinUrl: string; startUrl: string }
         try {
             zoomMeeting = await createZoomMeeting({
                 topic: `Mentorship Session: ${studentProfile?.full_name || 'Student'} & ${mentorProfile?.full_name || 'Mentor'}`,
                 startTime: scheduledAt,
                 duration: durationMinutes > 0 ? durationMinutes : 60,
+                hostUserId,
             })
         } catch (zoomError) {
             console.error('[mentorship-request] Zoom meeting creation failed; nothing was changed:', zoomError)
@@ -228,6 +240,9 @@ export async function handleMentorshipRequest(
                 zoom_meeting_id: zoomMeeting.id,
                 zoom_join_url: zoomMeeting.joinUrl,
                 zoom_start_url: zoomMeeting.startUrl,
+                // NULL while in shadow mode, which the allocator reads as
+                // office@ — see THE NULL RULE in zoom-host-allocator.ts.
+                zoom_host_user_id: hostUserId ?? null,
             })
             .select('id')
             .single()

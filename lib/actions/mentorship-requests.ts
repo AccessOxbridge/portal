@@ -155,24 +155,40 @@ export async function handleMentorshipRequest(
             )
         }
 
+        // Reschedule, part 1 of 2: VALIDATE ONLY. Nothing is destroyed here.
+        //
+        // The original session is cancelled and its Zoom meeting deleted only
+        // AFTER the replacement row exists (part 2, below). Deleting a Zoom
+        // meeting cannot be undone, so it must be the last thing that happens,
+        // never something that has already happened when a later step fails.
+        //
+        // On 2026-09-15 the old ordering — cancel and delete, THEN insert —
+        // destroyed a live student session when the insert was rejected. The
+        // original was gone, the replacement never existed, and the student's
+        // join link returned "This meeting link is invalid (3,001)".
+        let originalSession: {
+            id: string
+            zoom_meeting_id: string | null
+        } | null = null
+
         if (isReschedule && request.reschedule_of_session_id) {
             try {
                 const admin = createAdminClient()
-                const { data: originalSession, error: originalError } = await admin
+                const { data: original, error: originalError } = await admin
                     .from('sessions')
                     .select('id, status, scheduled_at, zoom_meeting_id, zoom_meeting_status')
                     .eq('id', request.reschedule_of_session_id)
                     .single()
 
-                if (originalError || !originalSession) {
+                if (originalError || !original) {
                     throw new Error('Original session not found')
                 }
 
                 const stillUpcoming =
-                    originalSession.status === 'active' &&
-                    originalSession.scheduled_at &&
-                    new Date(originalSession.scheduled_at).getTime() > Date.now() &&
-                    originalSession.zoom_meeting_status !== 'started'
+                    original.status === 'active' &&
+                    original.scheduled_at &&
+                    new Date(original.scheduled_at).getTime() > Date.now() &&
+                    original.zoom_meeting_status !== 'started'
 
                 if (!stillUpcoming) {
                     await supabase
@@ -185,23 +201,14 @@ export async function handleMentorshipRequest(
                     )
                 }
 
-                const nowIso = new Date().toISOString()
-                await admin
-                    .from('sessions')
-                    .update({ status: 'cancelled', updated_at: nowIso })
-                    .eq('id', originalSession.id)
-
-                if (originalSession.zoom_meeting_id) {
-                    try {
-                        await deleteZoomMeeting(originalSession.zoom_meeting_id)
-                    } catch (zoomDeleteError) {
-                        console.error('Failed to delete original Zoom meeting:', zoomDeleteError)
-                    }
+                originalSession = {
+                    id: original.id,
+                    zoom_meeting_id: original.zoom_meeting_id,
                 }
             } catch (rescheduleError) {
-                // We created a replacement meeting a moment ago and are now
-                // bailing out, so clean it up rather than leaving an orphaned
-                // meeting nobody will ever join.
+                // Validation failed, so the replacement meeting we created a
+                // moment ago is orphaned. Remove it. The original session is
+                // untouched — the student's existing link still works.
                 await deleteZoomMeeting(zoomMeeting.id)
                 throw rescheduleError
             }
@@ -227,8 +234,36 @@ export async function handleMentorshipRequest(
 
         if (sessionError) {
             // The meeting we just created now has no session to belong to.
+            // For a reschedule this is the critical case: the original session
+            // is still active and still has its Zoom meeting, because we have
+            // not touched it yet. The student keeps a working booking.
             await deleteZoomMeeting(zoomMeeting.id)
             throw sessionError
+        }
+
+        // Reschedule, part 2 of 2: the replacement exists, so it is now safe to
+        // retire the original. Anything failing from here leaves two sessions
+        // rather than none — recoverable, unlike the reverse.
+        if (originalSession) {
+            const nowIso = new Date().toISOString()
+            const { error: cancelError } = await admin
+                .from('sessions')
+                .update({ status: 'cancelled', updated_at: nowIso })
+                .eq('id', originalSession.id)
+
+            if (cancelError) {
+                // Loud: the student now has two active sessions for one slot.
+                // Safe, but an admin needs to cancel one by hand.
+                console.error(
+                    `[mentorship-request] Replacement ${createdSession?.id} created but could ` +
+                        `not cancel original ${originalSession.id}. Both are now active:`,
+                    cancelError
+                )
+            } else if (originalSession.zoom_meeting_id) {
+                // Only delete the old meeting once the row is actually
+                // cancelled — otherwise an active session loses its link.
+                await deleteZoomMeeting(originalSession.zoom_meeting_id)
+            }
         }
 
         await supabase

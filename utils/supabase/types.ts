@@ -1731,7 +1731,7 @@ export type Database = {
         Args: {
           p_admin_id: string
           p_delta: number
-          p_ip?: string
+          p_ip?: string | null
           p_reason: string
           p_student_id: string
         }

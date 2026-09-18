@@ -19,6 +19,7 @@ interface AcademicProfile {
     target_university: string | null
     target_course: string | null
     application_year: number | null
+    entrance_exam_date: string | null
     subjects: { name: string; predicted_grade: string }[] | null
     school_name: string | null
     school_country: string | null
@@ -236,7 +237,10 @@ export default function StudentDashboardContent({
                 </header>
 
                 {/* Application Timeline */}
-                <ApplicationTimeline applicationYear={academicProfile?.application_year} />
+                <ApplicationTimeline
+                    applicationYear={academicProfile?.application_year}
+                    entranceExamDate={academicProfile?.entrance_exam_date}
+                />
 
                 {/* Weekly Calendar */}
                 <div className="mb-10">

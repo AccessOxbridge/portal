@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -68,80 +68,6 @@ export type Database = {
         }
         Relationships: []
       }
-      conversations: {
-        Row: {
-          admin_id: string | null
-          created_at: string | null
-          id: string
-          last_message_at: string | null
-          mentor_id: string | null
-          mentor_notified_at: string | null
-          session_id: string | null
-          student_id: string | null
-          student_notified_at: string | null
-          type: string
-          updated_at: string | null
-          participant_set_key: string | null
-        }
-        Insert: {
-          admin_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_message_at?: string | null
-          mentor_id?: string | null
-          mentor_notified_at?: string | null
-          session_id?: string | null
-          student_id?: string | null
-          student_notified_at?: string | null
-          type?: string
-          updated_at?: string | null
-          participant_set_key?: string | null
-        }
-        Update: {
-          admin_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_message_at?: string | null
-          mentor_id?: string | null
-          mentor_notified_at?: string | null
-          session_id?: string | null
-          student_id?: string | null
-          student_notified_at?: string | null
-          type?: string
-          updated_at?: string | null
-          participant_set_key?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       conversation_participants: {
         Row: {
           conversation_id: string
@@ -178,6 +104,80 @@ export type Database = {
           {
             foreignKeyName: "conversation_participants_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          id: string
+          last_message_at: string | null
+          mentor_id: string | null
+          mentor_notified_at: string | null
+          participant_set_key: string | null
+          session_id: string | null
+          student_id: string | null
+          student_notified_at: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          mentor_id?: string | null
+          mentor_notified_at?: string | null
+          participant_set_key?: string | null
+          session_id?: string | null
+          student_id?: string | null
+          student_notified_at?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          mentor_id?: string | null
+          mentor_notified_at?: string | null
+          participant_set_key?: string | null
+          session_id?: string | null
+          student_id?: string | null
+          student_notified_at?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -705,48 +705,6 @@ export type Database = {
           },
         ]
       }
-      mentor_session_checkins: {
-        Row: {
-          created_at: string
-          dismissed: boolean
-          homework_given: boolean | null
-          mentor_id: string
-          next_session_booked: boolean | null
-          session_id: string
-        }
-        Insert: {
-          created_at?: string
-          dismissed?: boolean
-          homework_given?: boolean | null
-          mentor_id: string
-          next_session_booked?: boolean | null
-          session_id: string
-        }
-        Update: {
-          created_at?: string
-          dismissed?: boolean
-          homework_given?: boolean | null
-          mentor_id?: string
-          next_session_booked?: boolean | null
-          session_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mentor_session_checkins_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_session_checkins_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: true
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       mentor_payout_items: {
         Row: {
           amount_cents: number
@@ -863,6 +821,48 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_session_checkins: {
+        Row: {
+          created_at: string
+          dismissed: boolean
+          homework_given: boolean | null
+          mentor_id: string
+          next_session_booked: boolean | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          dismissed?: boolean
+          homework_given?: boolean | null
+          mentor_id: string
+          next_session_booked?: boolean | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          dismissed?: boolean
+          homework_given?: boolean | null
+          mentor_id?: string
+          next_session_booked?: boolean | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_session_checkins_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_session_checkins_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -1190,76 +1190,6 @@ export type Database = {
           },
         ]
       }
-      student_satisfaction_surveys: {
-        Row: {
-          comment: string | null
-          mentoring_rating: number
-          portal_rating: number
-          progress_rating: number
-          session_count: number
-          sessions_completed: number | null
-          student_id: string
-          submitted_at: string
-        }
-        Insert: {
-          comment?: string | null
-          mentoring_rating: number
-          portal_rating: number
-          progress_rating: number
-          session_count: number
-          sessions_completed?: number | null
-          student_id: string
-          submitted_at?: string
-        }
-        Update: {
-          comment?: string | null
-          mentoring_rating?: number
-          portal_rating?: number
-          progress_rating?: number
-          session_count?: number
-          sessions_completed?: number | null
-          student_id?: string
-          submitted_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_satisfaction_surveys_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      student_session_milestones: {
-        Row: {
-          acknowledged_at: string
-          milestone: number
-          sessions_completed: number | null
-          student_id: string
-        }
-        Insert: {
-          acknowledged_at?: string
-          milestone: number
-          sessions_completed?: number | null
-          student_id: string
-        }
-        Update: {
-          acknowledged_at?: string
-          milestone?: number
-          sessions_completed?: number | null
-          student_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_session_milestones_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       session_reports: {
         Row: {
           action_items: Json | null
@@ -1330,8 +1260,8 @@ export type Database = {
           transcript_download_token: string | null
           transcript_url: string | null
           updated_at: string | null
-          zoom_join_url: string | null
           zoom_host_user_id: string | null
+          zoom_join_url: string | null
           zoom_meeting_id: string | null
           zoom_meeting_status: string | null
           zoom_start_url: string | null
@@ -1358,8 +1288,8 @@ export type Database = {
           transcript_download_token?: string | null
           transcript_url?: string | null
           updated_at?: string | null
-          zoom_join_url?: string | null
           zoom_host_user_id?: string | null
+          zoom_join_url?: string | null
           zoom_meeting_id?: string | null
           zoom_meeting_status?: string | null
           zoom_start_url?: string | null
@@ -1386,8 +1316,8 @@ export type Database = {
           transcript_download_token?: string | null
           transcript_url?: string | null
           updated_at?: string | null
-          zoom_join_url?: string | null
           zoom_host_user_id?: string | null
+          zoom_join_url?: string | null
           zoom_meeting_id?: string | null
           zoom_meeting_status?: string | null
           zoom_start_url?: string | null
@@ -1499,6 +1429,7 @@ export type Database = {
           created_at: string | null
           curriculum: string | null
           curriculum_other: string | null
+          entrance_exam_date: string | null
           extracurriculars: string | null
           gcse_results: Json | null
           id: string
@@ -1520,6 +1451,7 @@ export type Database = {
           created_at?: string | null
           curriculum?: string | null
           curriculum_other?: string | null
+          entrance_exam_date?: string | null
           extracurriculars?: string | null
           gcse_results?: Json | null
           id: string
@@ -1541,6 +1473,7 @@ export type Database = {
           created_at?: string | null
           curriculum?: string | null
           curriculum_other?: string | null
+          entrance_exam_date?: string | null
           extracurriculars?: string | null
           gcse_results?: Json | null
           id?: string
@@ -1561,6 +1494,76 @@ export type Database = {
             foreignKeyName: "student_profiles_id_fkey"
             columns: ["id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_satisfaction_surveys: {
+        Row: {
+          comment: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed: number | null
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          comment?: string | null
+          mentoring_rating: number
+          portal_rating: number
+          progress_rating: number
+          session_count: number
+          sessions_completed?: number | null
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          comment?: string | null
+          mentoring_rating?: number
+          portal_rating?: number
+          progress_rating?: number
+          session_count?: number
+          sessions_completed?: number | null
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_satisfaction_surveys_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_session_milestones: {
+        Row: {
+          acknowledged_at: string
+          milestone: number
+          sessions_completed: number | null
+          student_id: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          milestone: number
+          sessions_completed?: number | null
+          student_id: string
+        }
+        Update: {
+          acknowledged_at?: string
+          milestone?: number
+          sessions_completed?: number | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_session_milestones_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1649,6 +1652,56 @@ export type Database = {
           },
         ]
       }
+      whats_new_entries: {
+        Row: {
+          attachments: Json | null
+          audiences: string[]
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_published: boolean
+          published_at: string | null
+          title: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          audiences?: string[]
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          title: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          audiences?: string[]
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          title?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whats_new_entries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       mentors_directory: {
@@ -1678,7 +1731,7 @@ export type Database = {
         Args: {
           p_admin_id: string
           p_delta: number
-          p_ip?: string | null
+          p_ip?: string
           p_reason: string
           p_student_id: string
         }
@@ -1692,6 +1745,8 @@ export type Database = {
         Args: { object_name: string }
         Returns: boolean
       }
+      is_portal_admin: { Args: never; Returns: boolean }
+      is_privileged_profile_actor: { Args: never; Returns: boolean }
       match_mentors: {
         Args: {
           match_count: number
@@ -1709,6 +1764,10 @@ export type Database = {
       }
       next_mentor_invoice_number: { Args: never; Returns: string }
       prune_login_events: { Args: never; Returns: undefined }
+      session_time_span: {
+        Args: { duration_minutes: number; scheduled_at: string }
+        Returns: unknown
+      }
     }
     Enums: {
       blog_category:
@@ -1751,12 +1810,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1780,11 +1839,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1805,11 +1864,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1830,11 +1889,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1847,11 +1906,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

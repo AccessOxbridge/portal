@@ -4,11 +4,18 @@ import { FileText, PenTool, Users, Calendar } from 'lucide-react'
 
 interface ApplicationTimelineProps {
     applicationYear?: number | null
+    entranceExamDate?: string | null
 }
 
-export default function ApplicationTimeline({ applicationYear }: ApplicationTimelineProps) {
+export default function ApplicationTimeline({ applicationYear, entranceExamDate }: ApplicationTimelineProps) {
     const now = new Date()
     const currentYear = applicationYear || now.getFullYear()
+
+    // Use the student's own entrance exam date if they've set one; otherwise
+    // fall back to the generic October 20 placeholder milestone.
+    const entranceExamMilestoneDate = entranceExamDate
+        ? new Date(entranceExamDate)
+        : new Date(currentYear, 9, 20) // October 20
 
     // Define key milestones with dates
     const milestones = [
@@ -29,7 +36,7 @@ export default function ApplicationTimeline({ applicationYear }: ApplicationTime
         {
             id: 'entrance_exam',
             label: 'Entrance Exam',
-            date: new Date(currentYear, 9, 20), // October 20
+            date: entranceExamMilestoneDate,
             icon: PenTool,
             description: 'UCAT/BMAT/MAT/etc'
         },

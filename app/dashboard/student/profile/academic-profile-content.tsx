@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { Save, School, Target, BookOpen, Trophy, Sparkles, Globe, Clock } from 'lucide-react'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
+import DatePicker from '@/components/dashboard/date-picker'
 
 interface Subject {
     name: string
@@ -24,6 +25,7 @@ interface AcademicProfile {
     subjects: Subject[]
     gcse_results: Record<string, string>
     application_year: number | null
+    entrance_exam_date: string | null
     interests: string | null
     extracurriculars: string | null
     timezone: string | null
@@ -36,6 +38,13 @@ interface Props {
     userId: string
     userName: string
     existingProfile: AcademicProfile | null
+}
+
+// Same generic placeholder date used by the dashboard's Application Timeline
+// widget when a student hasn't set their own entrance exam date yet.
+const defaultEntranceExamDate = (applicationYear: number) => {
+    const date = new Date(applicationYear, 9, 20) // October 20
+    return date.toISOString().slice(0, 10) // YYYY-MM-DD for <input type="date">
 }
 
 const YEAR_GROUPS = ['Year 11', 'Year 12', 'Year 13', 'Gap Year', 'University']
@@ -66,6 +75,8 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
         target_course: existingProfile?.target_course || '',
         subjects: existingProfile?.subjects || [] as Subject[],
         application_year: existingProfile?.application_year || new Date().getFullYear() + 1,
+        entrance_exam_date: existingProfile?.entrance_exam_date
+            || defaultEntranceExamDate(existingProfile?.application_year || new Date().getFullYear() + 1),
         interests: existingProfile?.interests || '',
         extracurriculars: existingProfile?.extracurriculars || '',
         timezone: existingProfile?.timezone || '',
@@ -333,6 +344,16 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             max={new Date().getFullYear() + 5}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                         />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Entrance Exam Date</label>
+                        <DatePicker
+                            value={formData.entrance_exam_date}
+                            onChange={(value) => setFormData({ ...formData, entrance_exam_date: value })}
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                            Shown on your dashboard timeline. Defaults to a general date — change it if you know your actual exam date (e.g. UCAT/BMAT/MAT).
+                        </p>
                     </div>
                 </div>
             </section>

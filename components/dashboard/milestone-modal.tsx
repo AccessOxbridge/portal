@@ -32,7 +32,7 @@ interface MilestoneModalProps {
 }
 
 /** Access Oxbridge navy, light navy and the two rich accents from globals.css. */
-const CONFETTI_COLORS = ['#092c68', '#595a81', '#ffb81d', '#4f868e', '#ebf3f3']
+const CONFETTI_COLORS = ['#13275a', '#595a81', '#ffb81d', '#4f868e', '#ebf3f3']
 
 /**
  * Congratulations popup for a session-count milestone.

@@ -149,6 +149,17 @@ const base = collect(baseFiles, (f) => git('show', `${BASE}:${f}`))
 const head = collect(headFiles, (f) => readFileSync(f, 'utf8'))
 
 const infoCats = new Set(INFO.map((r) => r.cat))
+// Approved, explained differences (docs/ui-revamp-allowed.json): an item is
+// excused only for the extra copies that live in the listed files.
+const ALLOWED = existsSync('docs/ui-revamp-allowed.json')
+    ? JSON.parse(readFileSync('docs/ui-revamp-allowed.json', 'utf8')).allowed
+    : []
+const excused = (cat, item, bf, hf) => {
+    const rule = ALLOWED.find((a) => a.category === cat && a.item === item)
+    if (!rule) return false
+    const extra = hf.filter((f) => !bf.includes(f))
+    return hf.length > bf.length && extra.every((f) => rule.files.includes(f))
+}
 const contractLines = []
 let contractFailures = 0
 for (const cat of [...new Set([...base.keys(), ...head.keys()])].sort()) {
@@ -159,6 +170,7 @@ for (const cat of [...new Set([...base.keys(), ...head.keys()])].sort()) {
         const bf = b.get(it) ?? []
         const hf = h.get(it) ?? []
         if (bf.length === hf.length) continue
+        if (excused(cat, it, bf, hf)) continue
         const sign = hf.length > bf.length ? '+' : '-'
         const files = (list) => [...new Set(list)].join(', ') || 'none'
         diffs.push(`  ${sign} ${it}   [${bf.length} > ${hf.length}]  base: ${files(bf)}  now: ${files(hf)}`)

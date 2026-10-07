@@ -1,0 +1,30 @@
+{
+    "_about": "Behaviour-contract differences that are explained and approved. Each entry: category, item exactly as the check prints it, and why. Anything not listed still fails G2.",
+    "allowed": [
+        {
+            "category": "redirect",
+            "item": "notFound()",
+            "files": [
+                "app/dashboard/ui-preview/page.tsx"
+            ],
+            "why": "Dev-only revamp preview page; notFound() keeps it off the production build."
+        },
+        {
+            "category": "form field name",
+            "item": "{name}",
+            "files": [
+                "components/ui/select.tsx"
+            ],
+            "why": "SelectField's hidden input. It carries the same name the replaced native <select> had, so form submissions are unchanged."
+        },
+        {
+            "category": "form field name",
+            "item": "{userName || 'User'}",
+            "files": [
+                "components/dashboard/mobile-more-sheet.tsx",
+                "components/dashboard/sidebar.tsx"
+            ],
+            "why": "The Avatar component's name prop (picks the initials and tint). Not a form field; the check matches any name= attribute."
+        }
+    ]
+}

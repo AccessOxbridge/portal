@@ -31,7 +31,7 @@ interface SatisfactionOverviewProps {
 }
 
 const METRICS = [
-    { key: 'portal', label: 'Portal', colour: '#092c68' },
+    { key: 'portal', label: 'Portal', colour: '#13275a' },
     { key: 'mentoring', label: 'Mentoring', colour: '#4f868e' },
     { key: 'progress', label: 'Progress', colour: '#ffb81d' },
 ] as const

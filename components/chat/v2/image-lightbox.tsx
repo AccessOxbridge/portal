@@ -44,7 +44,7 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
             // Above the notification bell (z-999) as a second line of defence,
             // so the viewer is never buried even if some chrome lacks the
             // [data-floating-ui] marker.
-            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex flex-col animate-in fade-in duration-150"
+            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex flex-col duration-150"
         >
             <div
                 className="flex items-center justify-between gap-4 px-4 py-3 text-white/90"

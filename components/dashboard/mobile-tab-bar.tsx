@@ -96,13 +96,28 @@ export default function MobileTabBar({
     // More tab itself, so a phone user isn't blind to it.
     const moreNeedsAttention = overflow.some((item) => badgeFor(item.name) !== null)
 
+    // Active tab: the Phosphor fill icon on a soft blue pill, the label in the
+    // primary navy. Labels always show; 56px tall rows clear 44px touch targets.
+    const tabClass = (active: boolean) =>
+        cn(
+            'relative flex min-h-[56px] min-w-0 flex-1 flex-col items-center justify-center gap-1 py-1.5 outline-none',
+            '[-webkit-tap-highlight-color:transparent] focus-visible:bg-muted',
+            active ? 'text-primary' : 'text-muted-foreground',
+        )
+    const iconPill = (active: boolean) =>
+        cn(
+            'relative grid h-8 w-14 place-items-center rounded-full transition-[background-color] duration-150 ease-out',
+            active ? 'bg-tint-blue' : 'bg-transparent',
+        )
+    const countPill = 'absolute -top-1 left-1/2 ml-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold tabular-nums text-white ring-2 ring-card'
+
     return (
         <>
             <nav
                 aria-label="Primary"
-                className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_12px_rgba(0,0,0,0.06)]"
+                className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-[backdrop-filter]:bg-card/85"
             >
-                <div className="flex items-stretch">
+                <div className="flex items-stretch px-1">
                     {tabs.map((item) => {
                         const isActive = pathname === item.href
                         const badge = badgeFor(item.name)
@@ -111,33 +126,21 @@ export default function MobileTabBar({
                                 key={item.href}
                                 href={item.href}
                                 aria-current={isActive ? 'page' : undefined}
-                                className={cn(
-                                    'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors',
-                                    isActive ? 'text-legacy-accent' : 'text-gray-400 active:text-gray-600'
-                                )}
+                                className={tabClass(isActive)}
                             >
-                                <span className="relative">
-                                    <item.icon
-                                        className={cn('w-6 h-6', isActive && 'stroke-[2.25]')}
-                                    />
-                                    {badge !== null && (
-                                        <span
-                                            className={cn(
-                                                'absolute -top-1.5 -right-2 rounded-full bg-red-500 text-white font-bold flex items-center justify-center',
-                                                badge === 'dot'
-                                                    ? 'w-2.5 h-2.5'
-                                                    : 'min-w-[18px] h-[18px] px-1 text-[10px]'
-                                            )}
-                                        >
-                                            {badge !== 'dot' &&
-                                                (badge > 9 ? '9+' : badge)}
-                                        </span>
-                                    )}
+                                <span className={iconPill(isActive)}>
+                                    <item.icon weight={isActive ? 'fill' : 'regular'} className="size-6" />
+                                    {badge !== null &&
+                                        (badge === 'dot' ? (
+                                            <span className="absolute top-0 left-1/2 ml-2.5 size-2.5 rounded-full bg-destructive ring-2 ring-card" />
+                                        ) : (
+                                            <span className={countPill}>{badge > 9 ? '9+' : badge}</span>
+                                        ))}
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-[10px] leading-none font-semibold truncate max-w-full px-0.5',
-                                        isActive ? 'text-legacy-accent' : 'text-gray-500'
+                                        'max-w-full truncate px-0.5 text-[11px] leading-none',
+                                        isActive ? 'font-semibold' : 'font-medium'
                                     )}
                                 >
                                     {MOBILE_TAB_LABELS[item.name] ?? item.name}
@@ -151,25 +154,15 @@ export default function MobileTabBar({
                         onClick={() => setMoreOpen(true)}
                         aria-label="More navigation"
                         aria-expanded={moreOpen}
-                        className={cn(
-                            'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors',
-                            moreOpen ? 'text-legacy-accent' : 'text-gray-400 active:text-gray-600'
-                        )}
+                        className={tabClass(moreOpen)}
                     >
-                        <span className="relative">
-                            <MoreHorizontal className="w-6 h-6" />
+                        <span className={iconPill(moreOpen)}>
+                            <MoreHorizontal weight="bold" className="size-6" />
                             {moreNeedsAttention && (
-                                <span className="absolute -top-1 -right-1.5 w-2.5 h-2.5 rounded-full bg-red-500" />
+                                <span className="absolute top-0 left-1/2 ml-2.5 size-2.5 rounded-full bg-destructive ring-2 ring-card" />
                             )}
                         </span>
-                        <span
-                            className={cn(
-                                'text-[10px] leading-none font-semibold',
-                                moreOpen ? 'text-legacy-accent' : 'text-gray-500'
-                            )}
-                        >
-                            More
-                        </span>
+                        <span className={cn('text-[11px] leading-none', moreOpen ? 'font-semibold' : 'font-medium')}>More</span>
                     </button>
                 </div>
             </nav>

@@ -173,10 +173,10 @@ export default function StudentCreditsProvider({
     return (
         <StudentCreditsContext.Provider value={value}>
             {children}
-            {/* right-[4.75rem] = 76px: the bell is 52px wide sitting at right-4
-                (16px), so the cluster lands with a consistent 8px gap beside it
-                at every breakpoint. Items flow leftward from there. */}
-            <div data-floating-ui className="fixed top-5 right-[4.75rem] z-100 flex items-center gap-2">
+            {/* The bell is 44px wide at right-3 (12px) on phones and right-4
+                (16px) from md, so right-16 / right-[4.25rem] leave a consistent
+                8px gap beside it. Items flow leftward from there. */}
+            <div data-floating-ui className="fixed top-2.5 right-16 md:top-5 md:right-[4.25rem] z-100 flex items-center gap-2">
                 {satisfactionSurveyDue && <SatisfactionChip onClick={openSatisfactionSurvey} />}
                 <CreditsFloatingButton credits={credits} onClick={() => openCreditsRequest('topup')} />
             </div>

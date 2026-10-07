@@ -9,12 +9,12 @@ import Image from 'next/image'
  * Deliberately navy and left-weighted: the logo mark uses
  * `mix-blend-mode: screen`, which renders invisible on a white background, and
  * the right-hand side is reserved for `NotificationBell` and
- * `CreditsFloatingButton` — both `position: fixed` at `top-5`, so they land
- * inside this bar's band without needing to be moved.
+ * `CreditsFloatingButton`, both `position: fixed` at `top-2.5` on phones, so
+ * their 44px chips sit centred in this 64px band.
  */
 export default function MobileTopBar() {
     return (
-        <header className="md:hidden sticky top-0 z-30 h-16 bg-legacy-accent border-b border-white/10">
+        <header className="md:hidden sticky top-0 z-30 h-16 bg-sidebar border-b border-sidebar-border">
             <div className="h-full flex items-center px-4">
                 <Link
                     href="/dashboard"
@@ -29,8 +29,8 @@ export default function MobileTopBar() {
                         className="shrink-0 [mix-blend-mode:screen]"
                     />
                     {/* Wordmark only once there's room beside the floating
-                        credits pill, which is ~200px wide and sits at right-20. */}
-                    <span className="hidden sm:inline text-base font-extrabold tracking-tight text-white whitespace-nowrap">
+                        credits pill, which sits beside the bell. */}
+                    <span className="hidden sm:inline text-base font-semibold tracking-tight text-sidebar-primary whitespace-nowrap">
                         Access Oxbridge
                     </span>
                 </Link>

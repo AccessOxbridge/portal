@@ -206,7 +206,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-[32px] w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="bg-white rounded-[32px] w-full max-w-xl overflow-hidden shadow-2xl duration-300">
                 <div className="p-8 sm:p-12">
                     <div className="flex justify-between items-center mb-8">
                         <div>

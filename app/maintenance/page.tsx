@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MaintenancePage() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center bg-[#092c68] px-6 py-16 text-center text-white">
+        <main className="flex min-h-screen flex-col items-center justify-center bg-[#13275a] px-6 py-16 text-center text-white">
             <div className="w-full max-w-md">
                 <Image
                     src="/logo.webp"

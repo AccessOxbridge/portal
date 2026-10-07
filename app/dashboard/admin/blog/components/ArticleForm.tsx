@@ -95,7 +95,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
     return (
         <form onSubmit={handleSubmit} className="space-y-10 max-w-5xl mx-auto pb-8">
             {errors.general && (
-                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3   ">
                     <XCircle className="w-5 h-5 text-red-500" />
                     <p className="text-red-700 text-sm font-medium">{errors.general}</p>
                 </div>

@@ -1,22 +1,24 @@
 /* Updated: 2025-12-15T05:46:41.316Z */
 /* @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap'); */
 @import "tailwindcss";
-/* tw-animate-css is installed but stays off until phase 1: 17 existing
-   animate-in / fade-in classes have never run (the library was never loaded),
-   and turning it on now would start animations nobody has seen. Phase 1
-   removes or replaces them, then enables this import. */
-/* @import "tw-animate-css"; */
+/* Animation utilities for the revamp's dialogs, sheets and popovers. The 17
+   old animate-in classes that never ran were removed in phase 1 first, so
+   switching this on starts nothing unexpected. */
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
 
-  /* Inter everywhere: sans + serif both resolve to Inter, and Tailwind v4
-     uses --font-sans as the document default font. */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Geist everywhere (UI revamp, phase 1): sans and serif both resolve to it,
+     and Tailwind v4 uses --font-sans as the document default font. */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-legacy-accent: #092c68;
+  /* The old navy (#092c68) moves to the revamp's deep navy (blue 2), so pages
+     not yet restyled already match the new sidebar. */
+  --color-legacy-accent: #13275a;
   --color-legacy-accent-light: #595a81;
   --color-legacy-accent-foreground: #15196b;
   --color-rich-green-accent: #4f868e;
@@ -222,7 +224,7 @@
 
 @layer base {
   :root {
-    --brand-color: #092c68
+    --brand-color: #13275a
   }
 }
 @layer utilities {

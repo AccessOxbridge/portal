@@ -302,7 +302,7 @@ export default function StudentOnboardingFlow({ stepId }: { stepId: StepId }) {
                 </div>
 
                 {error && (
-                    <div className="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-4 duration-300">
                         <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0 text-red-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

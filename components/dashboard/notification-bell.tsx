@@ -171,24 +171,23 @@ export default function NotificationBell() {
     if (isAuthPage) return null
 
     return (
-        // Shares its shape language with CreditsFloatingButton so the two read
-        // as one deliberate control cluster rather than two unrelated things:
-        // same 52px height (p-2 + a 36px hit area), same rounded-2xl, same
-        // translucent blur, border and shadow. The credits pill is offset to
-        // sit immediately left of this with a consistent 8px gap.
+        // Shares its shape with CreditsFloatingButton so the two read as one
+        // control cluster: same 44px height, white chip and ring, 8px apart.
+        // On phones it sits centred in MobileTopBar's 64px band.
         <div
             data-floating-ui
-            className="fixed top-5 right-4 z-999 p-2 rounded-2xl bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl shadow-black/5 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            className="fixed top-2.5 right-3 md:top-5 md:right-4 z-999"
             ref={dropdownRef}
         >
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notifications"
-                className="relative p-2 rounded-xl transition-all group"
+                aria-expanded={isOpen}
+                className="relative grid size-11 place-items-center rounded-full border border-transparent bg-card text-primary shadow-border outline-none transition-[box-shadow,scale] duration-150 ease-out hover:shadow-border-hover active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40"
             >
-                <Bell weight="fill" className="w-5 h-5 fill-legacy-accent" />
+                <Bell weight={unreadCount > 0 ? 'fill' : 'regular'} className="size-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white">
+                    <span className="absolute -top-0.5 -right-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold tabular-nums text-white ring-2 ring-card">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
@@ -197,22 +196,25 @@ export default function NotificationBell() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.1 }}
-                        className="absolute left-auto right-0 w-[min(20rem,calc(100vw-2rem))] md:left-[-20rem] md:right-auto md:w-80 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-100"
+                        // Grows out of the bell (top right) from 0.96 on the strong
+                        // ease-out; the exit is quicker than the entrance.
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.1 } }}
+                        transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                        style={{ transformOrigin: 'top right' }}
+                        className="absolute right-0 mt-2 w-[min(22rem,calc(100vw-1.5rem))] overflow-hidden rounded-card border border-transparent bg-popover text-popover-foreground shadow-overlay z-100"
                     >
-                        <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
-                            <h3 className="font-semibold text-gray-900">Notifications</h3>
+                        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+                            <h3 className="text-base font-semibold text-foreground">Notifications</h3>
                             <div className="flex items-center gap-3">
                                 {unreadCount > 0 && (
                                     <button
                                         type="button"
                                         onClick={() => markAllAsRead()}
-                                        className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center gap-1"
+                                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-brand transition-colors duration-150 hover:bg-tint-blue"
                                     >
-                                        <CheckCircle2 className="w-3 h-3" />
+                                        <CheckCircle2 className="size-3.5" />
                                         Mark all as read
                                     </button>
                                 )}
@@ -220,7 +222,7 @@ export default function NotificationBell() {
                                     <button
                                         type="button"
                                         onClick={() => clearAll()}
-                                        className="text-xs text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                                        className="rounded-full px-2 py-1 text-xs font-medium text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground"
                                     >
                                         Clear all
                                     </button>
@@ -230,26 +232,26 @@ export default function NotificationBell() {
 
                         <div
                             ref={listRef}
-                            className="max-h-[400px] overflow-y-auto overscroll-contain"
+                            className="max-h-[min(400px,60dvh)] overflow-y-auto overscroll-contain"
                             onWheel={stopScrollBleed}
                         >
                             {visibleNotifications.length > 0 ? (
-                                <div className="divide-y divide-gray-50">
+                                <div className="divide-y divide-border">
                                     {visibleNotifications.map((notification) => (
                                         <div
                                             key={notification.id}
-                                            className={`p-4 transition-colors ${!notification.viewed ? 'bg-blue-50/30' : 'hover:bg-gray-50'
+                                            className={`px-4 py-3 transition-colors duration-150 ${!notification.viewed ? 'bg-tint-blue/60' : 'hover:bg-muted/60'
                                                 }`}
                                         >
                                             <div className="flex justify-between items-start gap-3">
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-semibold text-gray-900">
+                                                    <p className="text-sm font-medium text-foreground">
                                                         {notification.title}
                                                     </p>
-                                                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                                                    <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground text-pretty">
                                                         {notification.message}
                                                     </p>
-                                                    <p className="text-[10px] text-gray-400 mt-2">
+                                                    <p className="mt-1.5 text-xs text-muted-foreground">
                                                         {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                                                     </p>
                                                 </div>
@@ -257,10 +259,11 @@ export default function NotificationBell() {
                                                     <button
                                                         type="button"
                                                         onClick={() => markAsRead(notification.id)}
-                                                        className="p-1 rounded-md text-blue-600 hover:bg-blue-100 transition-colors shrink-0"
+                                                        className="grid size-8 shrink-0 place-items-center rounded-full text-brand transition-colors duration-150 hover:bg-tint-blue"
                                                         title="Mark as read"
+                                                        aria-label="Mark as read"
                                                     >
-                                                        <Check className="w-4 h-4" />
+                                                        <Check weight="bold" className="size-4" />
                                                     </button>
                                                 )}
                                             </div>
@@ -268,19 +271,19 @@ export default function NotificationBell() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 text-center bg-white">
-                                    <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <Bell className="w-6 h-6 text-gray-300" />
+                                <div className="px-6 py-10 text-center">
+                                    <div className="mx-auto mb-3 grid size-12 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                                        <Bell weight="duotone" className="size-6" />
                                     </div>
-                                    <p className="text-gray-500 text-sm font-medium">No notifications yet</p>
-                                    <p className="text-gray-400 text-xs mt-1">We'll alert you when something happens.</p>
+                                    <p className="text-sm font-medium text-foreground">No notifications yet</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">We'll alert you when something happens.</p>
                                 </div>
                             )}
                         </div>
 
-                        <div className="p-3 border-t border-gray-50 bg-gray-50/30 text-center">
-                            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
-                                Private & Secure
+                        <div className="border-t border-border px-4 py-2.5 text-center">
+                            <span className="text-xs text-muted-foreground">
+                                Private & secure
                             </span>
                         </div>
                     </motion.div>

@@ -25,22 +25,21 @@ export default function SatisfactionChip({ onClick }: { onClick: () => void }) {
             type="button"
             onClick={onClick}
             aria-label="Quick check-in: how are we doing? Three questions, about thirty seconds."
-            className="group flex items-center gap-3 px-2 2xl:pl-2 2xl:pr-4 py-2 rounded-2xl bg-white/70 backdrop-blur-md border border-white/40
-            shadow-2xl shadow-black/5 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            // Same 44px white chip as the hours pill and the bell beside it.
+            className="group flex h-11 items-center gap-2 rounded-full border border-transparent bg-card ps-1.5 pe-1.5 text-foreground shadow-border outline-none
+            transition-[box-shadow,scale] duration-150 ease-out hover:shadow-border-hover active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 2xl:pe-4"
         >
-            <div className="relative flex items-center justify-center p-2 rounded-xl bg-rich-beige-accent text-legacy-accent">
-                <MessageSquareHeart className="w-5 h-5" />
+            <span className="relative grid size-8 place-items-center rounded-full bg-tint-rose text-tint-rose-foreground">
+                <MessageSquareHeart weight="fill" className="size-4" />
                 {/* It lost the full-width strip's prominence; the dot is what
                     still says "this wants something from you". */}
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-            </div>
+                <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-destructive ring-2 ring-card" />
+            </span>
 
-            <div className="hidden 2xl:flex flex-col text-left">
-                <span className="text-sm font-bold text-legacy-accent leading-tight">Quick check-in</span>
-                <span className="text-[9px] font-semibold tracking-wide text-gray-400 uppercase">
-                    30 seconds
-                </span>
-            </div>
+            <span className="hidden 2xl:flex flex-col text-left leading-tight">
+                <span className="text-sm font-medium text-foreground">Quick check-in</span>
+                <span className="text-xs text-muted-foreground">30 seconds</span>
+            </span>
         </button>
     )
 }

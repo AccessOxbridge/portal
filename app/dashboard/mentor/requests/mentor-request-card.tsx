@@ -345,10 +345,10 @@ export function MentorRequestCard({ request }: { request: Request }) {
             {showRejectDialog && (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
                     <div
-                        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+                        className="absolute inset-0 bg-black/40 backdrop-blur-sm duration-300"
                         onClick={() => !loading && setShowRejectDialog(false)}
                     />
-                    <div className="relative bg-white shadow-2xl w-full max-w-sm max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-10 animate-in zoom-in slide-in-from-bottom-4 duration-300">
+                    <div className="relative bg-white shadow-2xl w-full max-w-sm max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-10 duration-300">
                         <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center text-red-600 mb-8 mx-auto shadow-inner">
                             <AlertTriangle className="w-10 h-10" />
                         </div>

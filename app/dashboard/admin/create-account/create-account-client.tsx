@@ -419,8 +419,8 @@ export function CreateAccountClient() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 relative border border-white/20 max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm duration-200">
+                    <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden duration-200 relative border border-white/20 max-h-[90vh] overflow-y-auto">
                         <button
                             onClick={closeModal}
                             disabled={isPending}
@@ -567,7 +567,7 @@ export function CreateAccountClient() {
 
                                 {message && (
                                     <div
-                                        className={`flex items-start gap-3 p-4 rounded-2xl animate-in slide-in-from-top-2 ${
+                                        className={`flex items-start gap-3 p-4 rounded-2xl   ${
                                             message.type === 'success'
                                                 ? 'bg-green-50 text-green-700 border border-green-100'
                                                 : message.type === 'warning'

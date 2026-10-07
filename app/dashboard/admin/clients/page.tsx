@@ -189,8 +189,8 @@ export default function AdminClientsPage() {
 
             {/* Registration Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 relative border border-white/20">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm duration-200">
+                    <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden duration-200 relative border border-white/20">
                         <button
                             onClick={() => setIsModalOpen(false)}
                             className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
@@ -256,7 +256,7 @@ export default function AdminClientsPage() {
                                 </div>
 
                                 {message && (
-                                    <div className={`flex items-start gap-3 p-4 rounded-2xl ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'} animate-in slide-in-from-top-2`}>
+                                    <div className={`flex items-start gap-3 p-4 rounded-2xl ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'}  `}>
                                         {message.type === 'success' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
                                         <span className="text-sm font-medium">{message.text}</span>
                                     </div>

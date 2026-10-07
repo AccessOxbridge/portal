@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { isSameDay } from 'date-fns'
-import { ChevronLeft, MessageSquare, ArrowDown } from 'lucide-react'
+import { ChevronLeft, MessageSquare } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble, { type MessageStatus } from './message-bubble'
 import MessageInput from './message-input'
@@ -18,6 +18,15 @@ import {
 } from '@/lib/chat-attachments'
 import { formatGroupTitle, type ChatGroupMember } from '@/lib/chat-groups'
 import { cn } from '@/utils/lib'
+import {
+    findUnread,
+    JumpToLatestButton,
+    NO_UNREAD,
+    notifyChatRead,
+    UnreadDivider,
+    useThreadScroll,
+    type UnreadMarker,
+} from './unread'
 
 interface Message {
     id: string
@@ -67,35 +76,24 @@ export default function ChatWindow({
     const [signedUrls, setSignedUrls] = useState<Map<string, string>>(new Map())
     const [lightbox, setLightbox] = useState<ChatAttachment | null>(null)
 
-    const messagesEndRef = useRef<HTMLDivElement>(null)
-    const scrollRef = useRef<HTMLDivElement>(null)
+    // Snapshot of what was unread when the thread opened; drives the divider.
+    const [unread, setUnread] = useState<UnreadMarker>(NO_UNREAD)
     const supabase = createClient()
     const groupOthers = (members || []).filter(
         (m) => m.role !== 'admin' && m.user_id !== currentUserId
     )
 
-    // Drives the jump-to-latest button, and decides whether an arriving message
-    // is allowed to move the view at all.
-    const [isAtBottom, setIsAtBottom] = useState(true)
+    const { scrollRef, endRef, dividerRef, isAtBottom, unseen, handleScroll, noteArrival, jumpToLatest } =
+        useThreadScroll({
+            threadKey: conversationId,
+            isReady: !isLoading,
+            messages,
+            initialUnread: unread.count,
+        })
 
     // Files for messages that failed to send, kept so Retry can re-upload
     // without asking the user to pick them again.
     const failedPayloads = useRef<Map<string, { content: string; attachments: PendingAttachment[] }>>(new Map())
-
-    const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-        messagesEndRef.current?.scrollIntoView({ behavior })
-    }, [])
-
-    /**
-     * "Near" rather than exactly at the bottom: a fractional scroll height, an
-     * image finishing its load, or a browser's own rounding all leave a couple
-     * of pixels behind, and none of them mean the reader has scrolled away.
-     */
-    const handleScroll = useCallback(() => {
-        const el = scrollRef.current
-        if (!el) return
-        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 80)
-    }, [])
 
     /** Sign any attachment paths we don't already have a URL for. */
     const ensureSignedUrls = useCallback(
@@ -128,14 +126,13 @@ export default function ChatWindow({
         )
     }
 
-    const markGroupRead = useCallback(() => {
+    const markGroupRead = useCallback(async () => {
         if (!isGroup) return
-        supabase
+        await supabase
             .from('conversation_participants')
             .update({ last_read_at: new Date().toISOString() })
             .eq('conversation_id', conversationId)
             .eq('user_id', currentUserId)
-            .then()
     }, [isGroup, supabase, conversationId, currentUserId])
 
     const senderFor = (senderId: string) => {
@@ -182,12 +179,27 @@ export default function ChatWindow({
         }
     }, [conversationId, currentUserId, otherUser.id])
 
-    // Load thread
+    // Load thread. Order matters: read state is captured *before* the thread
+    // is marked read, otherwise the mark can win the race and the divider
+    // would never have anything to show.
     useEffect(() => {
         let cancelled = false
 
         const fetchMessages = async () => {
             setIsLoading(true)
+
+            // Groups track "read up to" per member; 1:1 threads use is_read.
+            let groupReadAt: string | null = null
+            if (isGroup) {
+                const { data: membership } = await supabase
+                    .from('conversation_participants')
+                    .select('last_read_at')
+                    .eq('conversation_id', conversationId)
+                    .eq('user_id', currentUserId)
+                    .maybeSingle()
+                groupReadAt = membership?.last_read_at ?? null
+            }
+
             const { data, error } = await supabase
                 .from('messages')
                 .select('*')
@@ -202,24 +214,32 @@ export default function ChatWindow({
                     attachments: toChatAttachments(row.attachments),
                 }))
                 setMessages(rows)
+                setUnread(
+                    findUnread(rows, currentUserId, (m) =>
+                        isGroup
+                            ? !groupReadAt ||
+                              new Date(m.created_at ?? 0).getTime() > new Date(groupReadAt).getTime()
+                            : !m.is_read
+                    )
+                )
                 ensureSignedUrls(rows)
             }
             setIsLoading(false)
+
+            if (isGroup) {
+                await markGroupRead()
+            } else {
+                await supabase
+                    .from('messages')
+                    .update({ is_read: true })
+                    .eq('conversation_id', conversationId)
+                    .neq('sender_id', currentUserId)
+                    .eq('is_read', false)
+            }
+            notifyChatRead()
         }
 
         fetchMessages()
-
-        if (isGroup) {
-            markGroupRead()
-        } else {
-            supabase
-                .from('messages')
-                .update({ is_read: true })
-                .eq('conversation_id', conversationId)
-                .neq('sender_id', currentUserId)
-                .eq('is_read', false)
-                .then()
-        }
 
         return () => {
             cancelled = true
@@ -255,6 +275,7 @@ export default function ChatWindow({
                         prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]
                     )
                     ensureSignedUrls([incoming])
+                    noteArrival()
 
                     if (isGroup) {
                         markGroupRead()
@@ -290,17 +311,6 @@ export default function ChatWindow({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId, currentUserId])
-
-    // Following the conversation keeps you pinned to the newest message; having
-    // scrolled up to read something does not, because yanking the view back
-    // down mid-sentence is the worst thing a chat pane can do. The button
-    // below is how you get back.
-    useEffect(() => {
-        if (isAtBottom) scrollToBottom()
-        // `isAtBottom` is deliberately not a dependency — this should fire when
-        // messages arrive, not when the reader's scroll position changes.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messages, scrollToBottom])
 
     const deliver = useCallback(
         async (messageId: string, content: string, attachments: PendingAttachment[]) => {
@@ -386,8 +396,7 @@ export default function ChatWindow({
 
         setMessages((prev) => [...prev, optimistic])
         // Sending is an explicit act of joining the end of the conversation.
-        setIsAtBottom(true)
-        scrollToBottom()
+        jumpToLatest()
 
         try {
             const saved = await deliver(messageId, content, attachments)
@@ -534,15 +543,26 @@ export default function ChatWindow({
                                 !previous ||
                                 !isSameDay(new Date(previous.created_at || timestamp), new Date(timestamp))
 
-                            // A day break also breaks the run, so the sender is
-                            // re-introduced with avatar and name after a separator.
+                            // A day break or the unread divider also breaks the run,
+                            // so the sender is re-introduced with avatar and name.
                             const isFirstInGroup =
-                                showDate || !previous || previous.sender_id !== message.sender_id
-                            const isLastInGroup = !next || next.sender_id !== message.sender_id
+                                showDate ||
+                                !previous ||
+                                previous.sender_id !== message.sender_id ||
+                                message.id === unread.firstUnreadId
+                            const isLastInGroup =
+                                !next ||
+                                next.sender_id !== message.sender_id ||
+                                next.id === unread.firstUnreadId
 
                             const separator = showDate ? (
                                 <DateSeparator key={`sep-${message.id}`} timestamp={timestamp} />
                             ) : null
+
+                            const divider =
+                                message.id === unread.firstUnreadId ? (
+                                    <UnreadDivider ref={dividerRef} count={unread.count} />
+                                ) : null
 
                             const spacing = cnGroupSpacing(isFirstInGroup, showDate)
 
@@ -550,6 +570,7 @@ export default function ChatWindow({
                                 return (
                                     <div key={message.id} className="contents">
                                         {separator}
+                                        {divider}
                                         <div className={spacing}>
                                             <InterventionBubble
                                                 content={message.content.replace(/^\[ADMIN\]\s*/, '')}
@@ -570,6 +591,7 @@ export default function ChatWindow({
                             return (
                                 <div key={message.id} className="contents">
                                     {separator}
+                                    {divider}
                                     <div className={spacing}>
                                         <MessageBubble
                                             content={message.content}
@@ -590,22 +612,13 @@ export default function ChatWindow({
                                 </div>
                             )
                         })}
-                        <div ref={messagesEndRef} />
+                        <div ref={endRef} />
                     </div>
                 )}
               </div>
             </div>
 
-            {!isAtBottom && (
-                <button
-                    type="button"
-                    onClick={() => scrollToBottom()}
-                    aria-label="Jump to latest message"
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-accent hover:border-accent/30 transition-colors"
-                >
-                    <ArrowDown className="w-4 h-4" />
-                </button>
-            )}
+            {!isAtBottom && <JumpToLatestButton unseen={unseen} onClick={jumpToLatest} />}
             </div>
 
             <MessageInput onSend={handleSend} />

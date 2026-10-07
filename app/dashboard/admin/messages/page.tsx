@@ -52,6 +52,14 @@ export default async function AdminMessagesPage() {
         .map((conv: { id: string }) => conv.id)
     const membersByConversation = await loadGroupMembers(supabase, groupIds)
 
+    // This admin's own unread state (per admin, never messages.is_read). Until
+    // the conversation_reads migration is applied the RPC does not exist; the
+    // list then simply shows no unread counts.
+    const { data: unreadRows } = await supabase.rpc('admin_unread_counts')
+    const unreadByConversation = new Map(
+        (unreadRows || []).map((row) => [row.conversation_id, row])
+    )
+
     // Get message counts and last message for each conversation
     const processedConversations = await Promise.all(
         (conversations || []).map(async (conv: any) => {
@@ -103,6 +111,8 @@ export default async function AdminMessagesPage() {
                 },
                 members,
                 message_count: messageCount || 0,
+                unread_count: unreadByConversation.get(conv.id)?.unread_count ?? 0,
+                last_read_at: unreadByConversation.get(conv.id)?.last_read_at ?? null,
                 last_message: lastMessage ? {
                     ...lastMessage,
                     created_at: lastMessage.created_at || new Date().toISOString()

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format, isSameDay } from 'date-fns'
-import { Search, MessageCircle, Users, X, AlertTriangle, ArrowDown } from 'lucide-react'
+import { Search, MessageCircle, Users, X, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import ComposeDialog, { ComposeButton } from './compose-dialog'
@@ -16,6 +16,15 @@ import DateSeparator from '@/components/chat/v2/date-separator'
 import ImageLightbox from '@/components/chat/v2/image-lightbox'
 import MessageInput from '@/components/chat/v2/message-input'
 import { useLiveConversations } from '@/components/chat/v2/use-live-conversations'
+import {
+    findUnread,
+    JumpToLatestButton,
+    NO_UNREAD,
+    notifyChatRead,
+    UnreadDivider,
+    useThreadScroll,
+    type UnreadMarker,
+} from '@/components/chat/v2/unread'
 import {
     signAttachmentUrls,
     uploadAttachment,
@@ -54,6 +63,10 @@ interface Conversation {
     mentor: { id: string; full_name: string; email: string }
     members?: ChatGroupMember[]
     message_count: number
+    /** This admin's own unread count (conversation_reads), not messages.is_read. */
+    unread_count?: number
+    /** This admin's "read up to" pointer; null until the migration exists. */
+    last_read_at?: string | null
     last_message?: {
         content: string
         sender_id: string
@@ -82,7 +95,7 @@ export default function AdminMessagesContent({
     // ordering update as messages land, with no refresh. Support threads are
     // not pinned here — they are most of what an admin sees, so pinning them
     // would bury the recently active mentor threads.
-    const { conversations } = useLiveConversations(
+    const { conversations, markRead } = useLiveConversations(
         [...seededConversations, ...initialConversations],
         currentUserId,
         selectedConversation?.id ?? null,
@@ -94,10 +107,60 @@ export default function AdminMessagesContent({
     const [signedUrls, setSignedUrls] = useState<Map<string, string>>(new Map())
     const [lightbox, setLightbox] = useState<ChatAttachment | null>(null)
 
-    const messagesEndRef = useRef<HTMLDivElement>(null)
-    const scrollRef = useRef<HTMLDivElement>(null)
-    const [isAtBottom, setIsAtBottom] = useState(true)
+    // Which conversation `messages` currently belongs to. The pane is reused
+    // across selections, so "not loading" alone does not mean "ready".
+    const [loadedFor, setLoadedFor] = useState<string | null>(null)
+    const [unread, setUnread] = useState<UnreadMarker>(NO_UNREAD)
     const supabase = createClient()
+
+    const { scrollRef, endRef, dividerRef, isAtBottom, unseen, handleScroll, noteArrival, jumpToLatest } =
+        useThreadScroll({
+            threadKey: selectedConversation?.id ?? null,
+            isReady: !!selectedConversation && loadedFor === selectedConversation.id && !isLoadingMessages,
+            messages,
+            initialUnread: unread.count,
+        })
+
+    // This admin's "read up to" per conversation. Seeded from the server and
+    // advanced locally, so reopening a thread in the same visit is accurate.
+    const readPointers = useRef<Map<string, string>>(
+        new Map(
+            initialConversations
+                .filter((c) => c.last_read_at)
+                .map((c) => [c.id, c.last_read_at as string])
+        )
+    )
+
+    /**
+     * Move this admin's pointer forward to `readUpTo` (a message's own
+     * created_at, so client clock skew cannot misplace it). Writes only
+     * conversation_reads — never messages.is_read, which belongs to the
+     * student and mentor.
+     */
+    const advanceReadPointer = useCallback(
+        async (conversationId: string, readUpTo: string) => {
+            const current = readPointers.current.get(conversationId)
+            if (current && new Date(current).getTime() >= new Date(readUpTo).getTime()) return
+            readPointers.current.set(conversationId, readUpTo)
+
+            const { error } = await supabase.from('conversation_reads').upsert(
+                {
+                    conversation_id: conversationId,
+                    user_id: currentUserId,
+                    last_read_at: readUpTo,
+                    updated_at: new Date().toISOString(),
+                },
+                { onConflict: 'conversation_id,user_id' }
+            )
+            if (!error) notifyChatRead()
+        },
+        [supabase, currentUserId]
+    )
+
+    // Opening a thread clears its pill in the list.
+    useEffect(() => {
+        if (selectedConversation) markRead(selectedConversation.id)
+    }, [selectedConversation, markRead])
 
     const filteredConversations = conversations.filter((conv) => {
         const term = searchTerm.toLowerCase()
@@ -132,8 +195,11 @@ export default function AdminMessagesContent({
     useEffect(() => {
         if (!selectedConversation) return
 
+        const conversationId = selectedConversation.id
+
         const loadMessages = async () => {
             setIsLoadingMessages(true)
+            setUnread(NO_UNREAD)
             const { data, error } = await supabase
                 .from('messages')
                 .select('*')
@@ -148,7 +214,24 @@ export default function AdminMessagesContent({
                     attachments: toChatAttachments(m.attachments),
                 }))
                 setMessages(rows)
+                setLoadedFor(conversationId)
+
+                // No pointer (migration not applied yet) means no divider,
+                // rather than the whole history marked unread.
+                const readAt = readPointers.current.get(conversationId)
+                setUnread(
+                    readAt
+                        ? findUnread(
+                              rows,
+                              currentUserId,
+                              (m) => new Date(m.created_at).getTime() > new Date(readAt).getTime()
+                          )
+                        : NO_UNREAD
+                )
                 ensureSignedUrls(rows)
+
+                const newest = rows[rows.length - 1]
+                if (newest) advanceReadPointer(conversationId, newest.created_at)
             }
             setIsLoadingMessages(false)
         }
@@ -177,6 +260,12 @@ export default function AdminMessagesContent({
                         prev.some((m) => m.id === formatted.id) ? prev : [...prev, formatted]
                     )
                     ensureSignedUrls([formatted])
+
+                    // The thread is open, so what arrives in it is read.
+                    if (formatted.sender_id !== currentUserId) {
+                        noteArrival()
+                        advanceReadPointer(conversationId, formatted.created_at)
+                    }
                 }
             )
             .subscribe()
@@ -186,23 +275,6 @@ export default function AdminMessagesContent({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedConversation])
-
-    const scrollToBottom = useCallback(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [])
-
-    /** "Near" the bottom — see the same guard in chat-window. */
-    const handleScroll = useCallback(() => {
-        const el = scrollRef.current
-        if (!el) return
-        setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 80)
-    }, [])
-
-    // Only follow the thread when the reader is already at the end of it.
-    useEffect(() => {
-        if (isAtBottom) scrollToBottom()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messages, scrollToBottom])
 
     const isSupport = selectedConversation?.type === 'support'
     const isMentorSupport = selectedConversation?.type === 'mentor_support'
@@ -219,6 +291,11 @@ export default function AdminMessagesContent({
         // intervention styling off it.
         const content = isDirect || !trimmed ? trimmed : `[ADMIN] ${trimmed}`
         const messageId = crypto.randomUUID()
+
+        // Sending is an explicit act of joining the end of the conversation.
+        // Set before the insert so whichever lands first — the realtime echo or
+        // the insert's own result — is followed down.
+        jumpToLatest()
 
         const uploaded: ChatAttachment[] = []
         for (const item of attachments) {
@@ -427,6 +504,7 @@ export default function AdminMessagesContent({
                             const text = rawPreview ? stripFormatting(rawPreview) : ''
                             const preview =
                                 text || attachmentPreviewLabel(conv.last_message?.attachments) || null
+                            const hasUnread = (conv.unread_count ?? 0) > 0
 
                             return (
                                 <button
@@ -468,11 +546,28 @@ export default function AdminMessagesContent({
                                             {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
                                         </span>
                                     </div>
-                                    {preview && <p className="text-xs text-gray-400 truncate">{preview}</p>}
-                                    <div className="mt-2">
+                                    {preview && (
+                                        <p
+                                            className={cn(
+                                                'text-xs truncate',
+                                                hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'
+                                            )}
+                                        >
+                                            {preview}
+                                        </p>
+                                    )}
+                                    <div className="mt-2 flex items-center justify-between">
                                         <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">
                                             {conv.message_count} msg{conv.message_count !== 1 ? 's' : ''}
                                         </span>
+                                        {hasUnread && (
+                                            <span
+                                                aria-label={`${conv.unread_count} unread`}
+                                                className="min-w-[20px] h-[20px] px-1.5 bg-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold tabular-nums"
+                                            >
+                                                {(conv.unread_count ?? 0) > 99 ? '99+' : conv.unread_count}
+                                            </span>
+                                        )}
                                     </div>
                                 </button>
                             )
@@ -552,6 +647,9 @@ export default function AdminMessagesContent({
                                         return (
                                             <div key={message.id} className="contents">
                                                 {showDate && <DateSeparator timestamp={message.created_at} />}
+                                                {message.id === unread.firstUnreadId && (
+                                                    <UnreadDivider ref={dividerRef} count={unread.count} />
+                                                )}
 
                                                 <div
                                                     className={cn(
@@ -632,21 +730,12 @@ export default function AdminMessagesContent({
                                             </div>
                                         )
                                     })}
-                                    <div ref={messagesEndRef} />
+                                    <div ref={endRef} />
                                 </div>
                             )}
                         </div>
 
-                        {!isAtBottom && (
-                            <button
-                                type="button"
-                                onClick={scrollToBottom}
-                                aria-label="Jump to latest message"
-                                className="absolute bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-accent hover:border-accent/30 transition-colors"
-                            >
-                                <ArrowDown className="w-4 h-4" />
-                            </button>
-                        )}
+                        {!isAtBottom && <JumpToLatestButton unseen={unseen} onClick={jumpToLatest} />}
                         </div>
 
                         <div className={isDirect ? 'bg-white' : 'bg-amber-50/60'}>

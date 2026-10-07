@@ -10,7 +10,6 @@ import { feedbackPromptWindowStart } from '@/config/feedback.config'
 import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 import { selectStudentMilestone } from '@/lib/student-milestones'
 import { selectDueSatisfactionSurvey, type DueSatisfactionSurvey } from '@/lib/student-satisfaction'
-import SatisfactionBanner from '@/components/dashboard/satisfaction-banner'
 import { selectMentorSessionCheckin, type MentorSessionCheckin } from '@/lib/mentor-session-checkin'
 import MentorSessionCheckinModal from '@/components/dashboard/mentor-session-checkin-modal'
 import type { MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
@@ -366,8 +365,9 @@ export default async function DashboardLayout({
 
     // The every-4-sessions satisfaction check-in, if this student owes one.
     // Unlike the two popups above, this one never opens by itself: it surfaces
-    // as a banner pinned to the top of every dashboard page (topSlot below),
-    // and the banner is what persists until the survey is actually filled in.
+    // as a chip in the floating top-right cluster on every dashboard page
+    // (SatisfactionChip, via StudentCreditsProvider), and the chip is what
+    // persists until the survey is actually filled in.
     // No go-live cutoff here on purpose — see config/satisfaction.config.ts.
     let satisfactionSurvey: DueSatisfactionSurvey | null = null
     if (isStudent) {
@@ -401,7 +401,6 @@ export default async function DashboardLayout({
             showSidebar={showSidebar}
             sidebarProps={sidebarProps}
             footer={isStudent ? <HelpSupportButton /> : undefined}
-            topSlot={isStudent ? <SatisfactionBanner /> : undefined}
         >
             {children}
         </DashboardShell>

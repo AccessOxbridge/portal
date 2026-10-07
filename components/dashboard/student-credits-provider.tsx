@@ -12,6 +12,7 @@ import {
 import { createClient } from '@/utils/supabase/client'
 import CreditsRequestModal, { type CreditsRequestReason } from '@/components/dashboard/credits-request-modal'
 import CreditsFloatingButton from '@/components/dashboard/credits-floating-button'
+import SatisfactionChip from '@/components/dashboard/satisfaction-chip'
 import BookSessionModal, { type StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 import RateSessionModal, { type RateableSession } from '@/components/dashboard/rate-session-modal'
 import MilestoneModal, { type StudentMilestone } from '@/components/dashboard/milestone-modal'
@@ -25,7 +26,7 @@ interface StudentCreditsContextValue {
     /**
      * Whether the every-4-sessions check-in is still outstanding. Starts from
      * the server-selected value and flips to false the moment the survey is
-     * submitted, so the banner retires without a router refresh.
+     * submitted, so the chip retires without a router refresh.
      */
     satisfactionSurveyDue: boolean
     openSatisfactionSurvey: () => void
@@ -70,7 +71,7 @@ interface StudentCreditsProviderProps {
     milestone?: StudentMilestone | null
     /**
      * The every-4-sessions satisfaction check-in this student owes, if any.
-     * Selected server-side so the banner shows on any dashboard page.
+     * Selected server-side so the chip shows on any dashboard page.
      */
     satisfactionSurvey?: DueSatisfactionSurvey | null
 }
@@ -93,7 +94,7 @@ export default function StudentCreditsProvider({
     // the same load would bury the confetti under a form. With no feedback
     // popup to wait for, it is free to fire immediately.
     const [feedbackClosed, setFeedbackClosed] = useState(!rateableSession)
-    // The check-in never opens by itself — the banner opens it. Unlike the two
+    // The check-in never opens by itself — the chip opens it. Unlike the two
     // popups above it is not an interruption, so it waits to be asked for.
     const [satisfactionOpen, setSatisfactionOpen] = useState(false)
     const [satisfactionDone, setSatisfactionDone] = useState(false)
@@ -172,7 +173,13 @@ export default function StudentCreditsProvider({
     return (
         <StudentCreditsContext.Provider value={value}>
             {children}
-            <CreditsFloatingButton credits={credits} onClick={() => openCreditsRequest('topup')} />
+            {/* right-[4.75rem] = 76px: the bell is 52px wide sitting at right-4
+                (16px), so the cluster lands with a consistent 8px gap beside it
+                at every breakpoint. Items flow leftward from there. */}
+            <div data-floating-ui className="fixed top-5 right-[4.75rem] z-100 flex items-center gap-2">
+                {satisfactionSurveyDue && <SatisfactionChip onClick={openSatisfactionSurvey} />}
+                <CreditsFloatingButton credits={credits} onClick={() => openCreditsRequest('topup')} />
+            </div>
             <CreditsRequestModal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}

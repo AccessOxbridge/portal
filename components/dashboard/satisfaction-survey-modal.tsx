@@ -16,7 +16,7 @@ interface SatisfactionSurveyModalProps {
     /** The tier being answered for. Null means nothing is due and nothing renders. */
     survey: DueSatisfactionSurvey | null
     /**
-     * Called once the answers are saved, so the banner can retire itself
+     * Called once the answers are saved, so the chip can retire itself
      * without waiting for a router refresh.
      */
     onSubmitted?: () => void
@@ -25,9 +25,9 @@ interface SatisfactionSurveyModalProps {
 /**
  * The every-4-sessions satisfaction check-in.
  *
- * Opened from the dashboard banner rather than firing on load: the student is
+ * Opened from the check-in chip rather than firing on load: the student is
  * usually mid-task, and an unclosable popup ambushing them is a worse way to
- * ask how they are finding the portal than a banner that waits. The banner is
+ * ask how they are finding the portal than a prompt that waits. The chip is
  * what "persists until filled" — it never dismisses — so this modal is free to
  * have an ordinary close button.
  *

@@ -295,7 +295,10 @@ export default function Sidebar({
                     const showStudentHelpBadge = item.name === 'Student Help' && (effectiveRole === 'admin' || effectiveRole === 'admin-dev') && studentHelpCount > 0
                     const showMessagesUnreadBadge =
                         item.name === 'Messages' &&
-                        (effectiveRole === 'student' || effectiveRole === 'mentor') &&
+                        (effectiveRole === 'student' ||
+                            effectiveRole === 'mentor' ||
+                            effectiveRole === 'admin' ||
+                            effectiveRole === 'admin-dev') &&
                         unreadMessagesCount > 0
                     const hasBadge =
                         showReportsBadge ||

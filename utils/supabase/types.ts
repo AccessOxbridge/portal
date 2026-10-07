@@ -1605,6 +1605,57 @@ export type Database = {
           },
         ]
       }
+      student_session_targets: {
+        Row: {
+          created_at: string
+          note: string | null
+          plan_type: string
+          sessions: number
+          set_by: string | null
+          start_date: string
+          student_id: string
+          updated_at: string
+          weeks: number
+        }
+        Insert: {
+          created_at?: string
+          note?: string | null
+          plan_type: string
+          sessions: number
+          set_by?: string | null
+          start_date: string
+          student_id: string
+          updated_at?: string
+          weeks: number
+        }
+        Update: {
+          created_at?: string
+          note?: string | null
+          plan_type?: string
+          sessions?: number
+          set_by?: string | null
+          start_date?: string
+          student_id?: string
+          updated_at?: string
+          weeks?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_session_targets_set_by_fkey"
+            columns: ["set_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_session_targets_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_issues: {
         Row: {
           admin_notes: string | null

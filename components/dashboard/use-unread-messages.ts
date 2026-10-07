@@ -2,10 +2,14 @@
 
 import { useCallback, useSyncExternalStore } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { CHAT_READ_EVENT } from '@/components/chat/v2/unread'
 
 /**
- * Unread message count for the current user, kept fresh via realtime inserts
- * plus a 60s poll as a safety net. Returns 0 for roles without conversations.
+ * Unread message count for the current user, kept fresh via realtime inserts,
+ * an immediate refetch whenever a thread is marked read (CHAT_READ_EVENT), and
+ * a 60s poll as a safety net. Admins count their own per-admin read state
+ * across every conversation (admin_unread_counts); students and mentors use
+ * messages.is_read and group last_read_at.
  *
  * The sidebar and the mobile tab bar are both mounted at once (each is hidden
  * at the other's breakpoint), so the subscription is shared and reference
@@ -22,6 +26,8 @@ interface Entry {
 }
 
 const entries = new Map<string, Entry>()
+
+const ADMIN_ROLES = new Set(['admin', 'admin-dev'])
 
 // Channel names are never reused. A quick unmount/remount (React StrictMode in
 // dev does exactly this) would otherwise race `removeChannel` against the next
@@ -41,6 +47,15 @@ function start(key: string, entry: Entry, userId: string, role: string) {
     const fetchUnreadCount = async () => {
         if (!active) return
         try {
+            if (ADMIN_ROLES.has(role)) {
+                // Absent until the conversation_reads migration is applied;
+                // the badge then stays at 0.
+                const { data } = await supabase.rpc('admin_unread_counts')
+                const total = (data || []).reduce((sum, row) => sum + row.unread_count, 0)
+                if (active) emit(entry, total)
+                return
+            }
+
             // 1) Get all conversations for this user (as student or mentor)
             const { data: conversations } = await supabase
                 .from('conversations')
@@ -101,18 +116,22 @@ function start(key: string, entry: Entry, userId: string, role: string) {
         )
         .subscribe()
 
+    // A thread was just marked read in this tab
+    window.addEventListener(CHAT_READ_EVENT, fetchUnreadCount)
+
     // Light polling as a safety net (every 60s)
     const interval = setInterval(fetchUnreadCount, 60_000)
 
     entry.teardown = () => {
         active = false
+        window.removeEventListener(CHAT_READ_EVENT, fetchUnreadCount)
         clearInterval(interval)
         supabase.removeChannel(channel)
     }
 }
 
 export function useUnreadMessages(userId: string | undefined, role: string) {
-    const enabled = Boolean(userId) && (role === 'student' || role === 'mentor')
+    const enabled = Boolean(userId) && (role === 'student' || role === 'mentor' || ADMIN_ROLES.has(role))
     const key = enabled ? `${userId}:${role}` : ''
 
     const subscribe = useCallback(

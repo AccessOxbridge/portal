@@ -24,6 +24,7 @@ import {
     BookOpen,
     Film,
     Gauge,
+    Activity,
 } from 'lucide-react'
 
 export interface NavItem {
@@ -66,6 +67,7 @@ const adminNav: NavItem[] = [
     { name: 'Session Recordings', href: '/dashboard/admin/recordings', icon: Film },
     { name: 'Feedback', href: '/dashboard/admin/feedbacks', icon: MessageSquare },
     { name: 'Satisfaction', href: '/dashboard/admin/satisfaction', icon: Gauge },
+    { name: 'Performance', href: '/dashboard/admin/performance', icon: Activity },
     { name: 'Messages', href: '/dashboard/admin/messages', icon: MessageCircle },
     { name: 'Blog', href: '/dashboard/admin/blog', icon: PenBoxIcon },
     { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },

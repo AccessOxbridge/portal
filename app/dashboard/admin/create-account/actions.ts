@@ -6,6 +6,7 @@ import { loadOnboardingGuideAttachment } from '@/lib/email/onboarding-guide'
 import { mentorWelcome, studentWelcome } from '@/lib/email/templates'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
+import { validateTargetInput, type SessionTarget } from '@/lib/session-frequency'
 
 const STUDENT_ROLE = 'student' as const
 const MENTOR_ROLE = 'mentor' as const
@@ -28,7 +29,7 @@ function isStrongPassword(password: string): boolean {
 }
 
 async function requireStaff(): Promise<
-    { error: string } | { ok: true; admin: ReturnType<typeof createAdminClient> }
+    { error: string } | { ok: true; admin: ReturnType<typeof createAdminClient>; userId: string }
 > {
     const authClient = await createClient()
     const {
@@ -48,7 +49,7 @@ async function requireStaff(): Promise<
         return { error: 'Not authorized' }
     }
 
-    return { ok: true, admin: createAdminClient() }
+    return { ok: true, admin: createAdminClient(), userId: user.id }
 }
 
 function parseIdentity(formData: FormData):
@@ -86,6 +87,23 @@ export async function createStudentAccount(formData: FormData): Promise<CreateAc
     const hours = Number.parseInt(hoursRaw, 10)
     if (hours < 0 || hours > MAX_HOURS) {
         return { error: `Total hours must be between 0 and ${MAX_HOURS}` }
+    }
+
+    // Optional session plan. Blank weeks means "no target"; anything else must
+    // validate before the account exists, so a typo never leaves a half-set-up
+    // student behind.
+    let sessionTarget: { target: SessionTarget; note: string | null } | null = null
+    if (String(formData.get('target_weeks') ?? '').trim() !== '') {
+        const parsed = validateTargetInput({
+            planType: formData.get('target_plan_type'),
+            sessions: formData.get('target_sessions'),
+            weeks: formData.get('target_weeks'),
+            startDate: formData.get('target_start_date'),
+        })
+        if ('error' in parsed) {
+            return { error: `Session plan: ${parsed.error}` }
+        }
+        sessionTarget = parsed
     }
 
     const guide = await loadOnboardingGuideAttachment('student')
@@ -162,6 +180,24 @@ export async function createStudentAccount(formData: FormData): Promise<CreateAc
         }
     }
 
+    let targetWarning: string | undefined
+    if (sessionTarget) {
+        const { error: targetError } = await admin.from('student_session_targets').insert({
+            student_id: userId,
+            plan_type: sessionTarget.target.planType,
+            sessions: sessionTarget.target.sessions,
+            weeks: sessionTarget.target.weeks,
+            start_date: sessionTarget.target.startDate,
+            note: sessionTarget.note,
+            set_by: staff.userId,
+        })
+        if (targetError) {
+            console.error('createStudentAccount session target insert failed:', targetError.message)
+            targetWarning =
+                'Account was created but the session plan could not be saved. Set it from the Performance page.'
+        }
+    }
+
     const template = studentWelcome({
         fullName,
         email,
@@ -184,7 +220,7 @@ export async function createStudentAccount(formData: FormData): Promise<CreateAc
     return {
         success: true,
         emailSent: sendResult.ok,
-        warning: hoursWarning,
+        warning: [hoursWarning, targetWarning].filter(Boolean).join(' ') || undefined,
     }
 }
 

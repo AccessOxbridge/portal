@@ -22,6 +22,7 @@ import {
 import { useEffect, useState, useTransition } from 'react'
 import { createMentorAccount, createStudentAccount } from './actions'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
+import { SessionTargetFields, todayIso, type TargetDraft } from '@/components/admin/session-target-fields'
 
 type AccountTab = 'student' | 'mentor'
 
@@ -83,6 +84,13 @@ export function CreateAccountClient() {
     const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null)
     const [password, setPassword] = useState('')
     const [reloadToken, setReloadToken] = useState(0)
+    const [hours, setHours] = useState('0')
+    const [target, setTarget] = useState<TargetDraft>(() => ({
+        planType: 'package',
+        sessions: '',
+        weeks: '',
+        startDate: todayIso(),
+    }))
 
     useEffect(() => {
         const client = createClient()
@@ -154,6 +162,8 @@ export function CreateAccountClient() {
     const openModal = () => {
         setMessage(null)
         setPassword('')
+        setHours('0')
+        setTarget({ planType: 'package', sessions: '', weeks: '', startDate: todayIso() })
         setIsModalOpen(true)
     }
 
@@ -519,10 +529,39 @@ export function CreateAccountClient() {
                                                 min={0}
                                                 max={1000}
                                                 step={1}
-                                                defaultValue={0}
+                                                value={hours}
+                                                onChange={(e) => setHours(e.target.value)}
                                                 className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
                                             />
                                         </div>
+                                    </div>
+                                )}
+
+                                {!isMentorTab && (
+                                    <div className="space-y-3 pt-2 border-t border-gray-100">
+                                        <div className="ml-1 pt-4">
+                                            <p className="text-sm font-bold text-gray-700">Session plan</p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Optional. Used to flag the student on the Performance page if they
+                                                fall behind. Leave weeks blank to skip.
+                                            </p>
+                                        </div>
+                                        <SessionTargetFields
+                                            value={{
+                                                ...target,
+                                                // A package is the hours bought; ongoing is set by hand.
+                                                sessions: target.planType === 'package' ? hours : target.sessions,
+                                            }}
+                                            onChange={(next) =>
+                                                setTarget(
+                                                    next.planType !== target.planType
+                                                        ? { ...next, sessions: '' }
+                                                        : next
+                                                )
+                                            }
+                                            sessionsLocked
+                                            weeksRequired={false}
+                                        />
                                     </div>
                                 )}
 

@@ -1,0 +1,10 @@
+# Playwright browser profiles hold live sign-in sessions. Never commit them.
+profile/
+profile-mentor/
+node_modules/
+package.json
+package-lock.json
+# Raw captures; only the processed JPEGs are tracked.
+shots/*.png
+shots-mentor/*.png
+pdfpages/

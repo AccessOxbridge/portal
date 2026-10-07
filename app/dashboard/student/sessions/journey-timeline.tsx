@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle2, Circle, Clock } from 'lucide-react'
+import { CheckCircle as CheckCircle2, Circle, Clock } from '@phosphor-icons/react/ssr'
 
 interface JourneyTimelineProps {
     hasProfile: boolean

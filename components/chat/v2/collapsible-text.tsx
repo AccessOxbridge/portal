@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import RichText from './rich-text'
 

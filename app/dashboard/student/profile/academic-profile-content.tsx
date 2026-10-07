@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
-import { Save, School, Target, BookOpen, Trophy, Sparkles, Globe, Clock } from 'lucide-react'
+import { FloppyDisk as Save, Buildings as School, Target, BookOpen, Trophy, Sparkle as Sparkles, Globe, Clock } from '@phosphor-icons/react/ssr'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'

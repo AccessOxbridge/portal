@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, LogOut, Settings, User, X } from 'lucide-react'
+import { CalendarBlank as Calendar, SignOut as LogOut, Gear as Settings, User, X } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import type { NavItem } from './nav-items'

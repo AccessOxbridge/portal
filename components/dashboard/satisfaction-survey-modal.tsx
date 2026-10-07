@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Send, CheckCircle2, MessageSquareHeart } from 'lucide-react'
+import { X, PaperPlaneRight as Send, CheckCircle as CheckCircle2, ChatTeardropText as MessageSquareHeart } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import {
     SURVEY_QUESTIONS,

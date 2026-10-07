@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, Loader2, Trash2 } from 'lucide-react'
+import { Camera, CircleNotch as Loader2, Trash as Trash2 } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import {
     PHOTO_ACCEPT_ATTR,

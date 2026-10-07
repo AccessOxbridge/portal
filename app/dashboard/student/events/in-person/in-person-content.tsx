@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Calendar, Clock, Users, Navigation, ExternalLink, Loader2 } from 'lucide-react'
+import { MapPin, CalendarBlank as Calendar, Clock, Users, NavigationArrow as Navigation, ArrowSquareOut as ExternalLink, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 
 interface InPersonEvent {
     id: string

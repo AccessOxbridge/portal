@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldCheck, Monitor } from 'lucide-react'
+import { ShieldCheck, Monitor } from '@phosphor-icons/react/ssr'
 
 export interface LoginEvent {
     id: string

@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText, Download, ImageOff } from 'lucide-react'
+import { FileText, DownloadSimple as Download, ImageBroken as ImageOff } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import { formatBytes, type ChatAttachment } from '@/lib/chat-attachments'
 

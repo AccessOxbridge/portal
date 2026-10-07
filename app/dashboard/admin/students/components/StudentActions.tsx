@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, MoreHorizontal, Pencil, X } from 'lucide-react'
+import { Envelope as Mail, DotsThree as MoreHorizontal, PencilSimple as Pencil, X } from '@phosphor-icons/react/ssr'
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 

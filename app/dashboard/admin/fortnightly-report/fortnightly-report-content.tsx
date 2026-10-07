@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CalendarRange, Mail, User, Send, Loader2, CheckCircle2, XCircle, Eye, FileText, ExternalLink } from 'lucide-react'
+import { CalendarBlank as CalendarRange, Envelope as Mail, User, PaperPlaneRight as Send, CircleNotch as Loader2, CheckCircle as CheckCircle2, XCircle, Eye, FileText, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react/ssr'
 
 interface StudentRow {
     id: string

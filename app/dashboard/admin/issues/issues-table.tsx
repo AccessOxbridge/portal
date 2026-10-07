@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertCircle, CheckCircle, Clock, MessageSquare, User, Mail, Loader2 } from 'lucide-react'
+import { WarningCircle as AlertCircle, CheckCircle, Clock, ChatCentered as MessageSquare, User, Envelope as Mail, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 
 export interface Issue {
     id: string

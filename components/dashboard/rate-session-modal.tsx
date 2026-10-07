@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
+import { X } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import SessionRatingCard from '@/components/feedback/session-rating-card'
 

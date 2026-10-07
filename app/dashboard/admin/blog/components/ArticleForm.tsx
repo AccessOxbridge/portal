@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import '@uiw/react-md-editor/markdown-editor.css'
-import { XCircle, ShieldAlert, Clock, ShieldCheck } from 'lucide-react'
+import { XCircle, ShieldWarning as ShieldAlert, Clock, ShieldCheck } from '@phosphor-icons/react/ssr'
 
 type Article = Database['public']['Tables']['articles']['Row']
 

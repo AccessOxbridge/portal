@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Calendar, Clock, CalendarPlus } from 'lucide-react'
+import { X, CalendarBlank as Calendar, Clock, CalendarPlus } from '@phosphor-icons/react/ssr'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 
 export interface AssignedPair {

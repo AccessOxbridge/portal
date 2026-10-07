@@ -4,15 +4,15 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
     FileText,
-    Calendar,
+    CalendarBlank as Calendar,
     User,
-    ChevronDown,
-    ChevronUp,
-    Search,
+    CaretDown as ChevronDown,
+    CaretUp as ChevronUp,
+    MagnifyingGlass as Search,
     Lightbulb,
-    CheckCircle2,
-    Mail
-} from 'lucide-react'
+    CheckCircle as CheckCircle2,
+    Envelope as Mail,
+} from '@phosphor-icons/react/ssr'
 
 interface ReportData {
     id: string

@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, CircleDashed, CheckCircle2, Flag, TrendingDown } from 'lucide-react'
+import { Warning as AlertTriangle, CircleDashed, CheckCircle as CheckCircle2, Flag, TrendDown as TrendingDown } from '@phosphor-icons/react/ssr'
 import { MENTOR_FLAG_THRESHOLD, MENTOR_RECENT_DAYS, ONGOING_WINDOW_WEEKS } from '@/lib/session-frequency'
 import { loadPerformanceData } from './data'
 import StudentPaceTable from './student-pace-table'

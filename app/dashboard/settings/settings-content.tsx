@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { User, Mail, Shield, CalendarDays, Globe, KeyRound, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 import { updateTimezone, sendPasswordResetLink } from './actions'
 import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 import LoginHistory, { type LoginEvent } from './login-history'

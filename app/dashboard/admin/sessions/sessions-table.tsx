@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, FileText, ExternalLink } from 'lucide-react'
+import { MagnifyingGlass as Search, FileText, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react/ssr'
 
 interface SessionRow {
     id: string

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect, useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Check, ChevronDown, FileText, GraduationCap, Paperclip, Search, Upload, UserRound, X } from "lucide-react";
+import { Check, CaretDown as ChevronDown, FileText, GraduationCap, Paperclip, MagnifyingGlass as Search, UploadSimple as Upload, User as UserRound, X } from '@phosphor-icons/react/ssr';
 import { MENTOR_ONBOARDING_QUESTIONS, SUBJECT_OPTIONS, type OnboardingQuestion } from '@/config/mentor-onboarding.config'
 import { COUNTRIES } from '@/config/countries'
 import { submitOnboarding } from './actions'

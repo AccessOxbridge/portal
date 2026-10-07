@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight } from '@phosphor-icons/react/ssr'
 import { formatPrice } from '@/utils/stripe'
 
 interface Purchase {

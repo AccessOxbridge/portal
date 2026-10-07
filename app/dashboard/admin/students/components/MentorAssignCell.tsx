@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, Loader2, AlertCircle, X } from 'lucide-react'
+import { CaretDown as ChevronDown, CircleNotch as Loader2, WarningCircle as AlertCircle, X } from '@phosphor-icons/react/ssr'
 
 interface MentorOption {
     id: string

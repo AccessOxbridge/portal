@@ -4,10 +4,10 @@ import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import {
-    Search,
+    MagnifyingGlass as Search,
     Users,
-    Loader2
-} from 'lucide-react'
+    CircleNotch as Loader2,
+} from '@phosphor-icons/react/ssr'
 import { StudentActions } from './components/StudentActions'
 import { MentorAssignCell } from './components/MentorAssignCell'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'

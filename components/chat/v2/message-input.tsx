@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, Paperclip, X, FileText, Loader2 } from 'lucide-react'
+import { PaperPlaneRight as Send, Paperclip, X, FileText, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import FormatToolbar, { applyCommand, commandForEvent, type FormatCommand } from './format-toolbar'
 import RichComposer, { serializeEditor } from './rich-composer'

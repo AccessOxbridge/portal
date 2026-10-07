@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText, PenTool, Users, Calendar } from 'lucide-react'
+import { FileText, PenNib as PenTool, Users, CalendarBlank as Calendar } from '@phosphor-icons/react/ssr'
 
 interface ApplicationTimelineProps {
     applicationYear?: number | null

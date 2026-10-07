@@ -1,4 +1,4 @@
-import { Flag, Star } from 'lucide-react'
+import { Flag, Star } from '@phosphor-icons/react/ssr'
 import { format } from 'date-fns'
 import type { MentorRatingRow } from './data'
 
@@ -65,7 +65,7 @@ export default function MentorRatingsTable({ rows }: { rows: MentorRatingRow[] }
                                         <span
                                             className={`inline-flex items-center gap-1 font-bold tabular-nums ${averageColor(rating.average)}`}
                                         >
-                                            <Star className="w-4 h-4 fill-current" />
+                                            <Star weight="fill" className="w-4 h-4 fill-current" />
                                             {rating.average.toFixed(1)}
                                         </span>
                                     )}

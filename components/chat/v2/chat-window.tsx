@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { isSameDay } from 'date-fns'
-import { ChevronLeft, MessageSquare } from 'lucide-react'
+import { CaretLeft as ChevronLeft, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble, { type MessageStatus } from './message-bubble'
 import MessageInput from './message-input'

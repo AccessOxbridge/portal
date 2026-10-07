@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ArrowDownRight, ArrowRight, ArrowUpRight, MessageSquareHeart } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, ChatTeardropText as MessageSquareHeart } from '@phosphor-icons/react/ssr'
 import {
     CartesianGrid,
     Legend,

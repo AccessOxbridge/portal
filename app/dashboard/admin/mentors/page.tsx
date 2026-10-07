@@ -4,14 +4,14 @@ import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-    Search,
-    CheckCircle2,
+    MagnifyingGlass as Search,
+    CheckCircle as CheckCircle2,
     Clock,
     XCircle,
     Users,
-    Loader2,
-    ChevronRight
-} from 'lucide-react'
+    CircleNotch as Loader2,
+    CaretRight as ChevronRight,
+} from '@phosphor-icons/react/ssr'
 import { MentorActions } from './components/MentorActions'
 import { fetchMentors, Mentor, MentorStatusCounts } from './actions'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'

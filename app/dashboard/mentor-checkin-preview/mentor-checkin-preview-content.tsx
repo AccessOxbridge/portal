@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BookOpen } from 'lucide-react'
+import { BookOpen } from '@phosphor-icons/react/ssr'
 import MentorSessionCheckinModal from '@/components/dashboard/mentor-session-checkin-modal'
 import type { MentorSessionCheckin, NextSessionState } from '@/lib/mentor-session-checkin'
 

@@ -3,18 +3,18 @@
 import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState, useTransition } from 'react'
 import {
-    Search,
+    MagnifyingGlass as Search,
     Users,
-    Loader2,
+    CircleNotch as Loader2,
     Plus,
     X,
     UserPlus,
-    Mail,
+    Envelope as Mail,
     User,
-    CheckCircle2,
-    AlertCircle,
-    Shield
-} from 'lucide-react'
+    CheckCircle as CheckCircle2,
+    WarningCircle as AlertCircle,
+    Shield,
+} from '@phosphor-icons/react/ssr'
 import { registerPremiumClient } from './actions'
 
 interface PremiumClient {

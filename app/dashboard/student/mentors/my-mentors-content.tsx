@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Users, Calendar, Briefcase, MessageCircle, UserCircle } from 'lucide-react'
+import { Users, CalendarBlank as Calendar, Briefcase, ChatCircle as MessageCircle, UserCircle } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 
 interface Mentor {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X, Download } from 'lucide-react'
+import { X, DownloadSimple as Download } from '@phosphor-icons/react/ssr'
 import { formatBytes, type ChatAttachment } from '@/lib/chat-attachments'
 
 interface ImageLightboxProps {

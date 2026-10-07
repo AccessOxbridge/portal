@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Clock, Send, CheckCircle2 } from 'lucide-react'
+import { X, Clock, PaperPlaneRight as Send, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
 
 export type CreditsRequestReason = 'booking' | 'topup'
 

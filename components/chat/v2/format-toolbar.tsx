@@ -2,14 +2,14 @@
 
 import { Fragment } from 'react'
 import {
-    Bold,
-    Italic,
-    Underline,
-    Strikethrough,
+    TextB as Bold,
+    TextItalic as Italic,
+    TextUnderline as Underline,
+    TextStrikethrough as Strikethrough,
     Code,
-    List,
-    ListOrdered,
-} from 'lucide-react'
+    ListBullets as List,
+    ListNumbers as ListOrdered,
+} from '@phosphor-icons/react/ssr'
 
 /**
  * The formatting controls inside the composer.

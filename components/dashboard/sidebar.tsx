@@ -4,17 +4,17 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-    Calendar,
-    Settings,
-    LogOut,
-    Search,
+    CalendarBlank as Calendar,
+    Gear as Settings,
+    SignOut as LogOut,
+    MagnifyingGlass as Search,
     CheckCircle,
-    ChevronDown,
-    ChevronLeft,
-    ChevronUp,
-    AlertCircle,
+    CaretDown as ChevronDown,
+    CaretLeft as ChevronLeft,
+    CaretUp as ChevronUp,
+    WarningCircle as AlertCircle,
     User,
-} from 'lucide-react'
+} from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import { Logo } from '../logo'

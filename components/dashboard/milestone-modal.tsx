@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { X, Trophy } from 'lucide-react'
+import { X, Trophy } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { MILESTONE_COPY, type Milestone } from '@/config/milestones.config'
 

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MoreHorizontal } from 'lucide-react'
+import { DotsThree as MoreHorizontal } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import { navigation, MOBILE_TAB_NAMES, MOBILE_TAB_LABELS, type NavItem } from './nav-items'
 import { useUnreadMessages } from './use-unread-messages'

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { format } from 'date-fns'
-import { Star, MessageSquare } from 'lucide-react'
+import { Star, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import {
     Bar,
     BarChart,
@@ -98,7 +98,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
                     <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <Star weight="fill" className="w-5 h-5 text-amber-400 fill-amber-400" />
                         <span className="text-3xl font-bold text-gray-900">
                             {average!.toFixed(1)}
                         </span>
@@ -223,6 +223,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
                                                 key={star}
+                                                weight="fill"
                                                 className={`w-3.5 h-3.5 ${
                                                     star <= c.rating
                                                         ? 'text-amber-400 fill-amber-400'

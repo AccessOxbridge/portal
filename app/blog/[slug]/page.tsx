@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Clock } from 'lucide-react'
+import { ArrowLeft, Clock } from '@phosphor-icons/react/ssr'
 import { ArticleMarkdown } from '@/components/blog/article-markdown'
 import type { Metadata } from 'next'
 

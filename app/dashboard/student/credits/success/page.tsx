@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { CheckCircle2, AlertCircle, ArrowRight, LayoutDashboard } from 'lucide-react'
+import { CheckCircle as CheckCircle2, WarningCircle as AlertCircle, ArrowRight, SquaresFour as LayoutDashboard } from '@phosphor-icons/react/ssr'
 
 export default async function SuccessPage({
     searchParams,

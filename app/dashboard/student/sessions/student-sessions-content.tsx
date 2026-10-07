@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Calendar, Video, FileText, MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X, CalendarClock } from 'lucide-react'
+import { CalendarBlank as Calendar, VideoCamera as Video, FileText, ChatCentered as MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X, CalendarDots as CalendarClock } from '@phosphor-icons/react/ssr'
 import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
-import { Info, AlertTriangle } from 'lucide-react'
+import { Info, Warning as AlertTriangle } from '@phosphor-icons/react/ssr'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface TimeSlot {

@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarDays, Hash, Repeat } from 'lucide-react'
+import { CalendarDots as CalendarDays, Hash, Repeat } from '@phosphor-icons/react/ssr'
 import {
     describeTarget,
     MAX_TARGET_SESSIONS,

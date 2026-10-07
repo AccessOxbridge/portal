@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2, Minus, Plus, X } from 'lucide-react'
+import { CircleNotch as Loader2, Minus, Plus, X } from '@phosphor-icons/react/ssr'
 import { format } from 'date-fns'
 
 const MAX_DELTA = 100

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
+import { WarningCircle as AlertCircle, CheckCircle, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 
 interface ReportIssueFormProps {
     mentorId: string

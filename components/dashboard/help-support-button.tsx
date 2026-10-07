@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { LifeBuoy, X, Send, CheckCircle2 } from 'lucide-react'
+import { Lifebuoy as LifeBuoy, X, PaperPlaneRight as Send, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
 
 export default function HelpSupportButton() {
     const pathname = usePathname()

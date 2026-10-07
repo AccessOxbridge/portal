@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { format, formatDistanceToNowStrict } from 'date-fns'
-import { Pencil, Plus, Search } from 'lucide-react'
+import { PencilSimple as Pencil, Plus, MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
 import { PACE_STATUS_LABEL, type PaceStatus } from '@/lib/session-frequency'
 import TargetModal from './target-modal'
 import type { StudentPaceRow } from './data'

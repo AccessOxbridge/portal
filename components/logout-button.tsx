@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import { LogOut } from 'lucide-react'
+import { SignOut as LogOut } from '@phosphor-icons/react/ssr'
 import { useRouter } from 'next/navigation'
 
 export function LogoutButton({ className = "" }: { className?: string }) {

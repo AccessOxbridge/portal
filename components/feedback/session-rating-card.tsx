@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Send, CheckCircle2 } from 'lucide-react'
+import { Star, PaperPlaneRight as Send, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { LOW_RATING_TAGS, LOW_RATING_THRESHOLD } from '@/config/feedback.config'
 
@@ -201,6 +201,7 @@ export default function SessionRatingCard({
                                 className="p-1 rounded-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-legacy-accent/40"
                             >
                                 <Star
+                                    weight="fill"
                                     className={`w-10 h-10 transition-colors ${
                                         value <= activeRating
                                             ? 'text-amber-400 fill-amber-400'

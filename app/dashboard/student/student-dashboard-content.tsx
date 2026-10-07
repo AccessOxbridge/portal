@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
+import { CalendarBlank as Calendar, Clock, VideoCamera as Video, ArrowRight } from '@phosphor-icons/react/ssr'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 import ApplicationTimeline from '@/components/dashboard/application-timeline'

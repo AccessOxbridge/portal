@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown } from 'lucide-react'
+import { CaretDown as ChevronDown } from '@phosphor-icons/react/ssr'
 
 export interface SelectMenuOption {
     value: string

@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreHorizontal, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { DotsThree as MoreHorizontal, CheckCircle as CheckCircle2, Clock, XCircle } from '@phosphor-icons/react/ssr'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { MentorMessageButton } from './MentorMessageButton'

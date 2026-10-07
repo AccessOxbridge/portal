@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, X, Loader2 } from 'lucide-react'
+import { ChatCentered as MessageSquare, X, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 import ChatWindow from '@/components/chat/v2/chat-window'
 import { ensureMentorSupportThread } from '../../messages/actions'
 

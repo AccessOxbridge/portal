@@ -6,13 +6,13 @@ import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import {
     ArrowLeft,
-    Calendar,
-    School,
+    CalendarBlank as Calendar,
+    Buildings as School,
     FileText,
-    MessageCircle,
+    ChatCircle as MessageCircle,
     Briefcase,
     Clock,
-} from 'lucide-react'
+} from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 
 interface MentorDetail {

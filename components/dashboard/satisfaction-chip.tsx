@@ -1,6 +1,6 @@
 'use client'
 
-import { MessageSquareHeart } from 'lucide-react'
+import { ChatTeardropText as MessageSquareHeart } from '@phosphor-icons/react/ssr'
 
 /**
  * The satisfaction check-in prompt, as a chip in the floating top-right

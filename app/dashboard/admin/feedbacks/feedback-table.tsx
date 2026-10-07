@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, Search, ChevronDown, ChevronUp, FileText } from 'lucide-react'
+import { Star, MagnifyingGlass as Search, CaretDown as ChevronDown, CaretUp as ChevronUp, FileText } from '@phosphor-icons/react/ssr'
 
 interface Feedback {
     id: string
@@ -91,6 +91,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <Star
                                                     key={star}
+                                                    weight={star <= feedback.rating ? 'fill' : 'regular'}
                                                     className={`w-4 h-4 ${star <= feedback.rating
                                                         ? 'text-amber-400 fill-amber-400'
                                                         : 'text-gray-200'

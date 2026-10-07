@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { GraduationCap, AlertCircle, ChevronRight } from 'lucide-react'
+import { GraduationCap, WarningCircle as AlertCircle, CaretRight as ChevronRight } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 
 interface StudentProfile {

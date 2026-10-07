@@ -1,7 +1,7 @@
 'use client'
 
 import { format, isToday, isYesterday } from 'date-fns'
-import { Check, CheckCheck, AlertCircle, RotateCw } from 'lucide-react'
+import { Check, Checks as CheckCheck, WarningCircle as AlertCircle, ArrowClockwise as RotateCw } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import CollapsibleText from './collapsible-text'
 import AttachmentGrid from './attachment-grid'

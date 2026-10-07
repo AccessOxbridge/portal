@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Loader2, Target, X } from 'lucide-react'
+import { WarningCircle as AlertCircle, CircleNotch as Loader2, Target, X } from '@phosphor-icons/react/ssr'
 import { SessionTargetFields, todayIso, type TargetDraft } from '@/components/admin/session-target-fields'
 import { MAX_TARGET_NOTE } from '@/lib/session-frequency'
 import { removeStudentTarget, saveStudentTarget } from './actions'

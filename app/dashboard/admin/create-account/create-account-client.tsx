@@ -3,22 +3,22 @@
 import { createClient } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 import {
-    AlertCircle,
+    WarningCircle as AlertCircle,
     BookOpen,
-    CheckCircle2,
+    CheckCircle as CheckCircle2,
     Clock,
     GraduationCap,
-    KeyRound,
-    Loader2,
-    Mail,
+    Key as KeyRound,
+    CircleNotch as Loader2,
+    Envelope as Mail,
     Plus,
-    RefreshCw,
-    Search,
+    ArrowClockwise as RefreshCw,
+    MagnifyingGlass as Search,
     User,
     UserPlus,
     Users,
     X,
-} from 'lucide-react'
+} from '@phosphor-icons/react/ssr'
 import { useEffect, useState, useTransition } from 'react'
 import { createMentorAccount, createStudentAccount } from './actions'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'

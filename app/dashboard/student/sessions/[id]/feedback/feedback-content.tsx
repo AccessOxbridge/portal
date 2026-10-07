@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@phosphor-icons/react/ssr'
 import SessionRatingCard from '@/components/feedback/session-rating-card'
 
 interface FeedbackContentProps {

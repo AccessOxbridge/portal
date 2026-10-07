@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, MessageCircle, Search, Users } from 'lucide-react'
+import { X, ChatCircle as MessageCircle, MagnifyingGlass as Search, Users } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 

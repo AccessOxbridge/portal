@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Video, MapPin, ArrowRight, CalendarDays } from 'lucide-react'
+import { VideoCamera as Video, MapPin, ArrowRight, CalendarDots as CalendarDays } from '@phosphor-icons/react/ssr'
 
 export default function EventsPage() {
     return (

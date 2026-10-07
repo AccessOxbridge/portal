@@ -1,6 +1,6 @@
 'use client'
 
-import { Clock, Plus } from 'lucide-react'
+import { Clock, Plus } from '@phosphor-icons/react/ssr'
 
 interface Props {
     credits: number

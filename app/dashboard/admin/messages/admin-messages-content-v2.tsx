@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format, isSameDay } from 'date-fns'
-import { Search, MessageCircle, Users, X, AlertTriangle } from 'lucide-react'
+import { MagnifyingGlass as Search, ChatCircle as MessageCircle, Users, X, Warning as AlertTriangle } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import ComposeDialog, { ComposeButton } from './compose-dialog'

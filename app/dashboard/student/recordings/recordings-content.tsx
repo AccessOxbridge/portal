@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { PlayCircle, X, Film, Clock } from 'lucide-react'
+import { PlayCircle, X, FilmStrip as Film, Clock } from '@phosphor-icons/react/ssr'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface Recording {

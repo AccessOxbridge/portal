@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Calendar, RefreshCcw, Save, Video, AlertCircle, CheckCircle2, Search } from 'lucide-react'
+import { CalendarBlank as Calendar, ArrowCounterClockwise as RefreshCcw, FloppyDisk as Save, VideoCamera as Video, WarningCircle as AlertCircle, CheckCircle as CheckCircle2, MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
 
 interface SessionRow {
     id: string

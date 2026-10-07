@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Video, Clock, Calendar as CalendarIcon, ExternalLink } from 'lucide-react'
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, VideoCamera as Video, Clock, CalendarBlank as CalendarIcon, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react/ssr'
 import { formatTimeInTz } from '@/lib/timezone'
 
 interface Session {

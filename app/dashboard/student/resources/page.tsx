@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, Clock, ArrowLeft, ChevronRight } from 'lucide-react'
+import { BookOpen, Clock, ArrowLeft, CaretRight as ChevronRight } from '@phosphor-icons/react/ssr'
 import { getBlogPostUrl } from '@/utils/blog'
 
 const CATEGORY_MAP: Record<string, string> = {

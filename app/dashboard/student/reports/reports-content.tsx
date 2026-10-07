@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Calendar, User, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
+import { FileText, CalendarBlank as Calendar, User, CaretDown as ChevronDown, CaretUp as ChevronUp, ChatCircle as MessageCircle } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { sanitizeReportContent, normalizeReportMarkdown } from '@/lib/report-utils'
 

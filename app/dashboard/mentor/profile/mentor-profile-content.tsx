@@ -3,18 +3,18 @@
 import { useState, useMemo, useRef, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import {
-    Save,
+    FloppyDisk as Save,
     User,
-    Mail,
+    Envelope as Mail,
     Phone,
-    School,
+    Buildings as School,
     Clock,
-    Sparkles,
+    Sparkle as Sparkles,
     Users,
     CalendarCheck,
     Camera,
-    CheckCircle2,
-} from 'lucide-react'
+    CheckCircle as CheckCircle2,
+} from '@phosphor-icons/react/ssr'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
 import { updateMentorProfile } from './actions'

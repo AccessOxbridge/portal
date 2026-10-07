@@ -3,19 +3,19 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
-    Search,
+    MagnifyingGlass as Search,
     Users,
     CalendarCheck,
-    CalendarClock,
-    FileWarning,
+    CalendarDots as CalendarClock,
+    FileX as FileWarning,
     GraduationCap,
     Target,
-    Mail,
-    MessageCircle,
+    Envelope as Mail,
+    ChatCircle as MessageCircle,
     CalendarPlus,
-    CheckCircle2,
-    AlertCircle,
-} from 'lucide-react'
+    CheckCircle as CheckCircle2,
+    WarningCircle as AlertCircle,
+} from '@phosphor-icons/react/ssr'
 import { formatDateInTz } from '@/lib/timezone'
 import MentorRequestSessionModal from '@/components/dashboard/mentor-request-session-modal'
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, BookOpen, CalendarCheck, CalendarPlus, CheckCircle2, Clock } from 'lucide-react'
+import { X, BookOpen, CalendarCheck, CalendarPlus, CheckCircle as CheckCircle2, Clock } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import MentorRequestSessionModal, {
     type MentorRequestStudentOption,

@@ -7,18 +7,18 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import {
     ArrowLeft,
-    Mail,
+    Envelope as Mail,
     Phone,
-    Calendar,
+    CalendarBlank as Calendar,
     Star,
-    CheckCircle2,
+    CheckCircle as CheckCircle2,
     Clock,
     XCircle,
-    Loader2,
+    CircleNotch as Loader2,
     Users,
-    School,
-    FileText
-} from 'lucide-react'
+    Buildings as School,
+    FileText,
+} from '@phosphor-icons/react/ssr'
 import { sortBySubjectPriority } from '@/lib/subject-priority'
 import MentorRatings, { type MentorRating } from './mentor-ratings'
 import { fetchMentorSessionStats } from '../actions'
@@ -205,7 +205,7 @@ export default function MentorProfilePage() {
                             <div className="flex items-center gap-2">
                                 {mentor.avg_rating ? (
                                     <>
-                                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                                        <Star weight="fill" className="w-5 h-5 text-amber-400 fill-amber-400" />
                                         <span className="text-2xl font-bold text-gray-900">{mentor.avg_rating.toFixed(1)}</span>
                                         <span className="text-sm text-gray-500">/5 Rating</span>
                                     </>

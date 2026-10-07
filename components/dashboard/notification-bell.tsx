@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Bell, Check, CheckCircle2 } from 'lucide-react'
+import { Bell, Check, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { formatDistanceToNow } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -186,7 +186,7 @@ export default function NotificationBell() {
                 aria-label="Notifications"
                 className="relative p-2 rounded-xl transition-all group"
             >
-                <Bell className="w-5 h-5 fill-legacy-accent" />
+                <Bell weight="fill" className="w-5 h-5 fill-legacy-accent" />
                 {unreadCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white">
                         {unreadCount > 9 ? '9+' : unreadCount}

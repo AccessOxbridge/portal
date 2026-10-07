@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, Calendar, User, CheckCircle2, Clock, AlertCircle } from 'lucide-react'
+import { FileText, CalendarBlank as Calendar, User, CheckCircle as CheckCircle2, Clock, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
 
 interface SessionReport {
     id: string

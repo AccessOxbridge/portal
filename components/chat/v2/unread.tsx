@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ArrowDown } from 'lucide-react'
+import { ArrowDown } from '@phosphor-icons/react/ssr'
 
 /**
  * WhatsApp-style unread handling shared by the participant thread

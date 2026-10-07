@@ -16,7 +16,7 @@ import {
     startOfWeek,
     subMonths,
 } from 'date-fns'
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CalendarBlank as Calendar, CaretLeft as ChevronLeft, CaretRight as ChevronRight } from '@phosphor-icons/react/ssr'
 
 interface DatePickerProps {
     /** Selected date as YYYY-MM-DD */

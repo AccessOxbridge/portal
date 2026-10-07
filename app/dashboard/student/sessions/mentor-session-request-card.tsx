@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, CheckCircle2, XCircle } from 'lucide-react'
+import { CalendarBlank as Calendar, CheckCircle as CheckCircle2, XCircle } from '@phosphor-icons/react/ssr'
 import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorAvatar from '@/components/dashboard/mentor-avatar'

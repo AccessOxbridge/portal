@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Star, TrendingUp } from 'lucide-react'
+import { Star, TrendUp as TrendingUp } from '@phosphor-icons/react/ssr'
 import {
     Bar,
     BarChart,
@@ -164,7 +164,7 @@ export default function FeedbackOverview({
                         {ranked.slice(0, 3).map((m, i) => (
                             <span key={m.mentorId} className="flex items-center gap-1.5">
                                 <span className="font-bold text-gray-400">#{i + 1}</span>
-                                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                <Star weight="fill" className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                                 <span className="font-semibold text-gray-700">
                                     {m.mentorName}
                                 </span>

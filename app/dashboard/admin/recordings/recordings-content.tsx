@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search, Film, PlayCircle, X, Clock, VideoOff } from 'lucide-react'
+import { MagnifyingGlass as Search, FilmStrip as Film, PlayCircle, X, Clock, VideoCameraSlash as VideoOff } from '@phosphor-icons/react/ssr'
 
 export interface BatchSession {
     id: string

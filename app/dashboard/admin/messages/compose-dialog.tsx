@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Check, Loader2, MessageCircle, Search, SquarePen, Users, X } from 'lucide-react'
+import { Check, CircleNotch as Loader2, ChatCircle as MessageCircle, MagnifyingGlass as Search, NotePencil as SquarePen, Users, X } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import {
     createGroupThread,

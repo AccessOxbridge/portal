@@ -8,13 +8,13 @@ import {
     CreditCard,
     User,
     Check,
-    ChevronRight,
-    Loader2,
-    Upload,
-    Download,
-    ClipboardList,
-    AlertCircle
-} from 'lucide-react'
+    CaretRight as ChevronRight,
+    CircleNotch as Loader2,
+    UploadSimple as Upload,
+    DownloadSimple as Download,
+    ClipboardText as ClipboardList,
+    WarningCircle as AlertCircle,
+} from '@phosphor-icons/react/ssr'
 import { completeQuestionnaire, signContract, submitBackgroundCheck, completeProfile } from './actions'
 import { StripeOnboardingButton } from '@/components/dashboard/stripe-onboarding-button'
 import { COUNTRIES } from '@/config/countries'

@@ -1,7 +1,7 @@
 'use client'
 
 import { formatDistanceToNow } from 'date-fns'
-import { MessageSquare } from 'lucide-react'
+import { ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import { attachmentPreviewLabel } from '@/lib/chat-attachments'
 import { stripFormatting } from '@/lib/chat-format'

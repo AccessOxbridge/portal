@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Video, Calendar, Clock, Users, ExternalLink, Loader2 } from 'lucide-react'
+import { VideoCamera as Video, CalendarBlank as Calendar, Clock, Users, ArrowSquareOut as ExternalLink, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 
 interface Webinar {
     id: string

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Clock, Plus } from 'lucide-react'
+import { X, Clock, Plus } from '@phosphor-icons/react/ssr'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'
 import SelectMenu from '@/components/dashboard/select-menu'

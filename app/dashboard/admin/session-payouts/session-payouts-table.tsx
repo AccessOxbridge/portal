@@ -2,15 +2,15 @@
 
 import { useMemo, useState } from 'react'
 import {
-    AlertCircle,
-    CheckCircle2,
+    WarningCircle as AlertCircle,
+    CheckCircle as CheckCircle2,
     Copy,
     Lock,
-    RefreshCcw,
-    Save,
-    Search,
-    Video,
-} from 'lucide-react'
+    ArrowCounterClockwise as RefreshCcw,
+    FloppyDisk as Save,
+    MagnifyingGlass as Search,
+    VideoCamera as Video,
+} from '@phosphor-icons/react/ssr'
 
 export interface SessionPayoutRow {
     id: string

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Trophy } from 'lucide-react'
+import { Trophy } from '@phosphor-icons/react/ssr'
 import MilestoneModal from '@/components/dashboard/milestone-modal'
 import { MILESTONES, MILESTONE_COPY, type Milestone } from '@/config/milestones.config'
 

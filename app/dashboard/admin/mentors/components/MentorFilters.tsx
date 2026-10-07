@@ -1,6 +1,6 @@
 'use client'
 
-import { Search } from 'lucide-react'
+import { MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useTransition, useEffect, useState } from 'react'
 

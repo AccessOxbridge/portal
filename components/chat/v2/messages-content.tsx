@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, MessageSquare } from 'lucide-react'
+import { Plus, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import ConversationList, { type ConversationSummary } from './conversation-list'
 import ChatWindow from './chat-window'

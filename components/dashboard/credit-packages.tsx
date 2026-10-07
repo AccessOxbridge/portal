@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { CreditPackage } from '@/utils/stripe'
-import { GraduationCap, ArrowRight, CheckCircle2, Star, Phone } from 'lucide-react'
+import { GraduationCap, ArrowRight, CheckCircle as CheckCircle2, Star, Phone } from '@phosphor-icons/react/ssr'
 
 interface CreditPackagesProps {
     packages: CreditPackage[]
@@ -143,7 +143,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                     <div className="flex-1 space-y-6">
                         <div className="flex justify-between items-start">
                             <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
-                                <Star className="w-7 h-7 text-legacy-accent fill-legacy-accent" />
+                                <Star weight="fill" className="w-7 h-7 text-legacy-accent fill-legacy-accent" />
                             </div>
                             <div className="text-xs font-medium text-amber-600 bg-amber-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-amber-100 animate-pulse">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>

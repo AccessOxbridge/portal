@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Trash2, Plus, X, Check, Star } from 'lucide-react'
+import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, Star } from '@phosphor-icons/react/ssr'
 
 interface CreditPackage {
     id: string
@@ -329,7 +329,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                     <div className="flex items-center gap-2">
                                         <span className="font-bold text-gray-900">{pkg.name}</span>
                                         {pkg.is_popular && (
-                                            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                            <Star weight="fill" className="w-4 h-4 text-amber-500 fill-amber-500" />
                                         )}
                                     </div>
                                     {pkg.description && (

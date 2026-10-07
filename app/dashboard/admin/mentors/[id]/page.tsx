@@ -104,7 +104,7 @@ export default function MentorProfilePage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-24">
-                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                <Loader2 className="w-8 h-8 text-legacy-accent animate-spin" />
             </div>
         )
     }
@@ -116,7 +116,7 @@ export default function MentorProfilePage() {
                     <Users className="w-8 h-8 text-gray-300" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Mentor not found</h3>
-                <Link href="/dashboard/admin/mentors" className="text-accent hover:underline mt-4">
+                <Link href="/dashboard/admin/mentors" className="text-legacy-accent hover:underline mt-4">
                     ← Back to Mentors
                 </Link>
             </div>
@@ -140,7 +140,7 @@ export default function MentorProfilePage() {
             {/* Header Card */}
             <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                 <div className="flex items-start gap-6">
-                    <div className="w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden">
+                    <div className="w-20 h-20 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden">
                         {mentor.photo_url ? (
                             <img src={mentor.photo_url} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -167,13 +167,13 @@ export default function MentorProfilePage() {
                         {/* Contact Info */}
                         <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
                             {mentor.profile?.email && (
-                                <a href={`mailto:${mentor.profile.email}`} className="flex items-center gap-1.5 hover:text-accent transition-colors">
+                                <a href={`mailto:${mentor.profile.email}`} className="flex items-center gap-1.5 hover:text-legacy-accent transition-colors">
                                     <Mail className="w-4 h-4" />
                                     {mentor.profile.email}
                                 </a>
                             )}
                             {mentor.phone && (
-                                <a href={`tel:${mentor.phone}`} className="flex items-center gap-1.5 hover:text-accent transition-colors">
+                                <a href={`tel:${mentor.phone}`} className="flex items-center gap-1.5 hover:text-legacy-accent transition-colors">
                                     <Phone className="w-4 h-4" />
                                     {mentor.phone}
                                 </a>
@@ -235,7 +235,7 @@ export default function MentorProfilePage() {
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
                         {sortBySubjectPriority(mentor.expertise).map((exp) => (
-                            <span key={exp} className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg text-sm font-medium">
+                            <span key={exp} className="px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent rounded-lg text-sm font-medium">
                                 {exp}
                             </span>
                         ))}

@@ -160,7 +160,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
         <div className="space-y-8">
             {/* Welcome Banner for new users */}
             {isNew && (
-                <div className="p-6 bg-linear-to-r from-accent to-blue-600 rounded-2xl text-white">
+                <div className="p-6 bg-linear-to-r from-legacy-accent to-blue-600 rounded-2xl text-white">
                     <div className="flex items-start gap-4">
                         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                             <Sparkles className="w-6 h-6" />
@@ -196,7 +196,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                                 value={formData.school_name}
                                 onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
                                 placeholder="e.g., Westminster School"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                         </div>
                         <div>
@@ -206,7 +206,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                                 value={formData.school_country}
                                 onChange={(e) => setFormData({ ...formData, school_country: e.target.value })}
                                 placeholder="e.g., United Kingdom"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -217,7 +217,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                                 <select
                                     value={formData.year_group}
                                     onChange={(e) => setFormData({ ...formData, year_group: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all"
                                 >
                                     <option value="">Select year group</option>
                                     {YEAR_GROUPS.map(year => (
@@ -237,7 +237,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                                 <select
                                     value={formData.curriculum}
                                     onChange={(e) => setFormData({ ...formData, curriculum: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all"
                                 >
                                     <option value="">Select curriculum</option>
                                     {CURRICULUM_OPTIONS.map(curr => (
@@ -260,7 +260,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                                 value={formData.curriculum_other}
                                 onChange={(e) => setFormData({ ...formData, curriculum_other: e.target.value })}
                                 placeholder="e.g., AP, National Curriculum..."
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                         </div>
                     )}
@@ -284,7 +284,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                         value={formData.timezone}
                         onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
                         placeholder="e.g., Europe/London"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                     />
                     <p className="text-xs text-gray-500 mt-2">
                         Tip: use an IANA timezone like <span className="font-semibold">Europe/London</span>, <span className="font-semibold">America/New_York</span>, <span className="font-semibold">Asia/Dubai</span>.
@@ -310,7 +310,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             <select
                                 value={formData.target_university}
                                 onChange={(e) => setFormData({ ...formData, target_university: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all"
                             >
                                 <option value="">Select target</option>
                                 {TARGET_UNIVERSITIES.map(uni => (
@@ -331,7 +331,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={formData.target_course}
                             onChange={(e) => setFormData({ ...formData, target_course: e.target.value })}
                             placeholder="e.g., Medicine, Law, Computer Science"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                         />
                     </div>
                     <div>
@@ -342,7 +342,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             onChange={(e) => setFormData({ ...formData, application_year: parseInt(e.target.value) || new Date().getFullYear() + 1 })}
                             min={new Date().getFullYear()}
                             max={new Date().getFullYear() + 5}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                         />
                     </div>
                     <div>
@@ -403,7 +403,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={newSubject.name}
                             onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
                             placeholder="Subject name"
-                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                         />
                         <datalist id="subject-options">
                             {ALL_SUBJECTS.map((s) => (
@@ -414,7 +414,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             <select
                                 value={newSubject.predicted_grade}
                                 onChange={(e) => setNewSubject({ ...newSubject, predicted_grade: e.target.value })}
-                                className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
+                                className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
                             >
                                 <option value="">Grade</option>
                                 {GRADE_OPTIONS.map(grade => (
@@ -456,7 +456,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={formData.interests}
                             onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
                             placeholder="Topics you're curious about, areas you want to explore, books/papers you've read..."
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
                     </div>
                     <div>
@@ -465,7 +465,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={formData.extracurriculars}
                             onChange={(e) => setFormData({ ...formData, extracurriculars: e.target.value })}
                             placeholder="Clubs, competitions, leadership, volunteering, work experience, sports, music, projects..."
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
                     </div>
                     <div>
@@ -474,7 +474,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={formData.additional_notes}
                             onChange={(e) => setFormData({ ...formData, additional_notes: e.target.value })}
                             placeholder="Any constraints, preferred mentor style, deadlines, or context we should know..."
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-none h-24"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all resize-none h-24"
                         />
                     </div>
                     <div>
@@ -484,7 +484,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                             value={formData.parent_email}
                             onChange={(e) => setFormData({ ...formData, parent_email: e.target.value.trim() })}
                             placeholder="e.g., parent@example.com"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                         />
                         <p className="mt-1 text-xs text-gray-500">Fortnightly progress reports can be sent to this address.</p>
                     </div>
@@ -505,7 +505,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
                     disabled={saving}
                     className={`inline-flex items-center gap-2 px-6 py-3 font-bold rounded-xl transition-all ${saved
                         ? 'bg-green-500 text-white'
-                        : 'bg-accent text-white hover:scale-[1.02] shadow-lg shadow-accent/20'
+                        : 'bg-legacy-accent text-white hover:scale-[1.02] shadow-lg shadow-legacy-accent/20'
                         } disabled:opacity-50`}
                 >
                     {saving ? (

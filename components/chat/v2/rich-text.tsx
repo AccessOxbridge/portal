@@ -59,7 +59,7 @@ function renderInline(nodes: InlineNode[], onDark: boolean): ReactNode {
                             'underline underline-offset-2 font-medium transition-colors',
                             onDark
                                 ? 'decoration-white/40 hover:decoration-white'
-                                : 'text-accent decoration-accent/30 hover:decoration-accent'
+                                : 'text-legacy-accent decoration-legacy-accent/30 hover:decoration-legacy-accent'
                         )}
                     >
                         {displayText(node.raw)}

@@ -99,7 +99,7 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
                                 onClick={() => setScope(value)}
                                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                                     scope === value
-                                        ? 'bg-white text-accent shadow-sm'
+                                        ? 'bg-white text-legacy-accent shadow-sm'
                                         : 'text-gray-500 hover:text-gray-700'
                                 }`}
                             >

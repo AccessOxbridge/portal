@@ -79,11 +79,11 @@ export default function MentorCheckinPreviewContent() {
                         key={variant.state}
                         type="button"
                         onClick={() => launch(variant.state)}
-                        className="text-left p-5 rounded-2xl border border-gray-200 bg-white hover:border-accent hover:shadow-md transition-all"
+                        className="text-left p-5 rounded-2xl border border-gray-200 bg-white hover:border-legacy-accent hover:shadow-md transition-all"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-                                <BookOpen className="w-5 h-5 text-accent" />
+                            <div className="w-10 h-10 rounded-xl bg-legacy-accent/10 flex items-center justify-center shrink-0">
+                                <BookOpen className="w-5 h-5 text-legacy-accent" />
                             </div>
                             <div>
                                 <p className="text-xs font-bold uppercase tracking-wide text-gray-400">

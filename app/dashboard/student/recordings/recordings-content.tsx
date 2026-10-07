@@ -60,7 +60,7 @@ function RecordingCard({
             onClick={onOpen}
             onMouseEnter={handleEnter}
             onMouseLeave={handleLeave}
-            className="group text-left bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/30 transition-all overflow-hidden"
+            className="group text-left bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-legacy-accent/30 transition-all overflow-hidden"
         >
             <div className="relative aspect-video bg-black overflow-hidden">
                 <video

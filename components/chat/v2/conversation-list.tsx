@@ -80,7 +80,7 @@ export default function ConversationList({
                         className={cn(
                             'w-full flex items-center gap-3 px-3 py-3 text-left transition-colors border-l-2',
                             isSelected
-                                ? 'bg-accent/[0.06] border-accent'
+                                ? 'bg-legacy-accent/[0.06] border-legacy-accent'
                                 : 'border-transparent hover:bg-gray-50'
                         )}
                     >
@@ -98,12 +98,12 @@ export default function ConversationList({
                                     className="w-11 h-11 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center text-white font-semibold">
+                                <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold">
                                     {conversation.other_user.full_name?.[0]?.toUpperCase() || 'U'}
                                 </div>
                             )}
                             {hasUnread && (
-                                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white">
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-legacy-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white">
                                     {conversation.unread_count}
                                 </span>
                             )}
@@ -130,11 +130,11 @@ export default function ConversationList({
                             </div>
 
                             {conversation.type === 'group' ? (
-                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
+                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-legacy-accent/10 text-[10px] font-semibold text-legacy-accent">
                                     Group
                                 </span>
                             ) : conversation.other_user.role_label ? (
-                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
+                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-legacy-accent/10 text-[10px] font-semibold text-legacy-accent">
                                     {conversation.other_user.role_label}
                                 </span>
                             ) : null}
@@ -177,7 +177,7 @@ function GroupAvatars({
 
     if (shown.length === 0) {
         return (
-            <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center text-white font-semibold">
+            <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold">
                 G
             </div>
         )
@@ -201,7 +201,7 @@ function GroupAvatars({
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full bg-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                        <div className="w-full h-full bg-legacy-accent flex items-center justify-center text-white text-[10px] font-semibold">
                             {member.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                     )}

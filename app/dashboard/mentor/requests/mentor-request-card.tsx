@@ -100,7 +100,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             <div className="bg-white rounded-[32px] border border-amber-200 shadow-xl shadow-amber-100/40 overflow-hidden p-6 sm:p-10">
                 <div className="flex items-start justify-between gap-6 flex-wrap">
                     <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner shrink-0">
+                        <div className="w-16 h-16 bg-legacy-accent/10 rounded-2xl flex items-center justify-center text-legacy-accent font-black text-2xl shadow-inner shrink-0">
                             {request.student?.full_name?.charAt(0) || 'S'}
                         </div>
                         <div>
@@ -181,12 +181,12 @@ export function MentorRequestCard({ request }: { request: Request }) {
         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
             <div className="p-6 sm:p-10 flex-1">
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner">
+                    <div className="w-16 h-16 bg-legacy-accent/10 rounded-2xl flex items-center justify-center text-legacy-accent font-black text-2xl shadow-inner">
                         {request.student?.full_name?.charAt(0) || 'S'}
                     </div>
                     <div>
                         <h3 className="text-2xl font-black text-gray-900">{request.student?.full_name}</h3>
-                        <span className="text-xs font-bold text-accent uppercase tracking-widest bg-accent/5 px-3 py-1 rounded-full">New Request</span>
+                        <span className="text-xs font-bold text-legacy-accent uppercase tracking-widest bg-legacy-accent/5 px-3 py-1 rounded-full">New Request</span>
                     </div>
                 </div>
 
@@ -226,7 +226,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                             <h4 className="text-sm font-bold text-gray-400 uppercase tracking-tight">Target Universities</h4>
                             <div className="flex flex-wrap gap-2">
                                 {responses.targetUniversities.map((uni, idx) => (
-                                    <span key={idx} className="bg-accent/10 text-accent px-3 py-1 rounded-lg text-sm font-medium">{uni}</span>
+                                    <span key={idx} className="bg-legacy-accent/10 text-legacy-accent px-3 py-1 rounded-lg text-sm font-medium">{uni}</span>
                                 ))}
                             </div>
                         </div>
@@ -255,7 +255,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                                 timeSlots.map((slot, index) => (
                                     <span
                                         key={index}
-                                        className="bg-accent/10 text-accent px-3 py-1.5 rounded-lg text-sm font-medium"
+                                        className="bg-legacy-accent/10 text-legacy-accent px-3 py-1.5 rounded-lg text-sm font-medium"
                                     >
                                         {formatSlotDisplay(slot)}
                                     </span>
@@ -287,7 +287,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                         <button
                             onClick={() => setShowSlotPicker(true)}
                             disabled={timeSlots.length === 0}
-                            className="w-full py-5 bg-accent text-white font-black rounded-2xl shadow-[0_8px_30px_rgb(67,56,202,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all text-lg disabled:opacity-50"
+                            className="w-full py-5 bg-legacy-accent text-white font-black rounded-2xl shadow-[0_8px_30px_rgb(67,56,202,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all text-lg disabled:opacity-50"
                         >
                             Select a Time Slot
                         </button>
@@ -308,7 +308,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                                     key={index}
                                     onClick={() => setSelectedSlot(slot)}
                                     className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all ${selectedSlot === slot
-                                        ? 'border-accent bg-accent/10 text-accent'
+                                        ? 'border-legacy-accent bg-legacy-accent/10 text-legacy-accent'
                                         : 'border-gray-200 hover:border-gray-300'
                                         }`}
                                 >

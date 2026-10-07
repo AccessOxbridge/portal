@@ -182,7 +182,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
             {!isCreating && !editingId && (
                 <button
                     onClick={() => { setIsCreating(true); resetForm(); }}
-                    className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors"
+                    className="flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:bg-legacy-accent/90 transition-colors"
                 >
                     <Plus className="w-5 h-5" />
                     Add New Package
@@ -202,7 +202,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                 placeholder="e.g., Starter"
                             />
                         </div>
@@ -213,7 +213,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                 min="1"
                                 value={formData.credits}
                                 onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                             />
                         </div>
                         <div>
@@ -223,7 +223,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                 min="0"
                                 value={formData.price_cents}
                                 onChange={(e) => setFormData({ ...formData, price_cents: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                 placeholder="4900 = £49.00"
                             />
                             <p className="text-xs text-gray-500 mt-1">
@@ -236,7 +236,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                 <select
                                     value={formData.currency}
                                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
                                 >
                                     <option value="gbp">GBP (£)</option>
                                     <option value="usd">USD ($)</option>
@@ -256,7 +256,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                 min="0"
                                 value={formData.sort_order}
                                 onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                             />
                         </div>
                         <div className="flex items-center gap-6 pt-6">
@@ -265,7 +265,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                     type="checkbox"
                                     checked={formData.is_popular}
                                     onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="w-5 h-5 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                                 />
                                 <span className="text-sm font-medium text-gray-700">Popular</span>
                             </label>
@@ -274,7 +274,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                     type="checkbox"
                                     checked={formData.is_active}
                                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="w-5 h-5 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                                 />
                                 <span className="text-sm font-medium text-gray-700">Active</span>
                             </label>
@@ -284,7 +284,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none resize-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none resize-none"
                                 rows={2}
                                 placeholder="Brief description shown to students"
                             />
@@ -294,7 +294,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                         <button
                             onClick={isCreating ? handleCreate : handleUpdate}
                             disabled={loading || !formData.name || formData.credits < 1}
-                            className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:bg-legacy-accent/90 transition-colors disabled:opacity-50"
                         >
                             <Check className="w-5 h-5" />
                             {loading ? 'Saving...' : (isCreating ? 'Create Package' : 'Save Changes')}
@@ -337,7 +337,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                     )}
                                 </td>
                                 <td className="px-6 py-4 font-medium text-gray-700">{pkg.credits} hrs</td>
-                                <td className="px-6 py-4 font-bold text-accent">{formatPrice(pkg.price_cents, pkg.currency)}</td>
+                                <td className="px-6 py-4 font-bold text-legacy-accent">{formatPrice(pkg.price_cents, pkg.currency)}</td>
                                 <td className="px-6 py-4">
                                     <button
                                         onClick={() => toggleActive(pkg)}
@@ -356,7 +356,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                         <button
                                             onClick={() => startEdit(pkg)}
                                             disabled={loading || isCreating || !!editingId}
-                                            className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50"
+                                            className="p-2 text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/10 rounded-lg transition-colors disabled:opacity-50"
                                         >
                                             <Pencil className="w-4 h-4" />
                                         </button>

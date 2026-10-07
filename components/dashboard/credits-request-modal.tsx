@@ -125,7 +125,7 @@ export default function CreditsRequestModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                            className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
                         >
                             Done
                         </button>
@@ -143,7 +143,7 @@ export default function CreditsRequestModal({
                                 placeholder="e.g. I would like to purchase 5 more session hours for this term."
                                 rows={4}
                                 maxLength={2000}
-                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-accent/30 focus:border-legacy-accent resize-none"
                             />
                         </div>
                         {error && (
@@ -154,7 +154,7 @@ export default function CreditsRequestModal({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                            className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
                         >
                             <Send className="w-4 h-4" />
                             {loading ? 'Sending…' : 'Send to admins'}

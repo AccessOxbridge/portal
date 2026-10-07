@@ -72,7 +72,7 @@ export default function HelpSupportButton() {
                 aria-label="Help & Support"
                 data-floating-ui
                 className="fixed bottom-24 md:bottom-6 right-6 z-100 group flex items-center gap-2 px-5 py-3 rounded-2xl
-                bg-accent text-white shadow-2xl shadow-accent/30 transition-all duration-300
+                bg-legacy-accent text-white shadow-2xl shadow-legacy-accent/30 transition-all duration-300
                 hover:scale-[1.03] active:scale-[0.97]"
             >
                 <LifeBuoy className="w-5 h-5" />
@@ -90,7 +90,7 @@ export default function HelpSupportButton() {
                     {/* Modal */}
                     <div className="relative bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-md sm:mx-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
                         {/* Header */}
-                        <div className="relative bg-gradient-to-br from-accent to-blue-600 px-6 pt-6 pb-8 text-white">
+                        <div className="relative bg-gradient-to-br from-legacy-accent to-blue-600 px-6 pt-6 pb-8 text-white">
                             <button
                                 onClick={close}
                                 aria-label="Close"
@@ -162,7 +162,7 @@ export default function HelpSupportButton() {
                                             onClick={handleSend}
                                             disabled={!message.trim() || isSending}
                                             className="mt-3 flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl
-                                            bg-accent text-white text-sm font-semibold transition-colors hover:bg-accent/90
+                                            bg-legacy-accent text-white text-sm font-semibold transition-colors hover:bg-legacy-accent/90
                                             disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {isSending ? (

@@ -21,7 +21,7 @@ export default function MentorAvatar({
     name,
     photoUrl = null,
     sizeClassName = 'w-14 h-14',
-    fallbackClassName = 'bg-accent text-white',
+    fallbackClassName = 'bg-legacy-accent text-white',
 }: MentorAvatarProps) {
     if (photoUrl) {
         return (

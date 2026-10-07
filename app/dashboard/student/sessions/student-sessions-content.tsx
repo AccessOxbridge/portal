@@ -322,7 +322,7 @@ export default function StudentSessionsContent({
                     <button
                         type="button"
                         onClick={() => openCreditsRequest('topup')}
-                        className="px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20 whitespace-nowrap"
+                        className="px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-legacy-accent/20 whitespace-nowrap"
                     >
                         Request credits
                     </button>
@@ -348,13 +348,13 @@ export default function StudentSessionsContent({
                     <button
                         onClick={() => setActiveTab('upcoming')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         Upcoming
                         {upcomingSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-legacy-accent/10 text-legacy-accent rounded-full text-xs">
                                 {upcomingSessions.length}
                             </span>
                         )}
@@ -362,7 +362,7 @@ export default function StudentSessionsContent({
                     <button
                         onClick={() => setActiveTab('current')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
@@ -376,7 +376,7 @@ export default function StudentSessionsContent({
                     <button
                         onClick={() => setActiveTab('past')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
@@ -417,7 +417,7 @@ export default function StudentSessionsContent({
                         {bookingReady ? (
                             <button
                                 onClick={tryOpenBookSession}
-                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                             >
                                 Book a Session
                                 <ArrowRight className="w-4 h-4" />
@@ -425,7 +425,7 @@ export default function StudentSessionsContent({
                         ) : !canBook ? (
                             <Link
                                 href="/dashboard/student/profile"
-                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                             >
                                 Complete profile to book
                                 <ArrowRight className="w-4 h-4" />
@@ -533,7 +533,7 @@ export default function StudentSessionsContent({
                             bookingReady ? (
                                 <button
                                     onClick={tryOpenBookSession}
-                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                                 >
                                     Book a Session
                                     <ArrowRight className="w-4 h-4" />
@@ -541,7 +541,7 @@ export default function StudentSessionsContent({
                             ) : !canBook ? (
                                 <Link
                                     href="/dashboard/student/profile"
-                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                                 >
                                     Complete profile to book
                                     <ArrowRight className="w-4 h-4" />
@@ -606,7 +606,7 @@ export default function StudentSessionsContent({
                                                             rel="noopener noreferrer"
                                                             className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
                                                                 ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                                : 'bg-accent text-white hover:scale-[1.02]'
+                                                                : 'bg-legacy-accent text-white hover:scale-[1.02]'
                                                                 }`}
                                                         >
                                                             <Video className="w-4 h-4" />
@@ -616,7 +616,7 @@ export default function StudentSessionsContent({
                                                         <button
                                                             type="button"
                                                             onClick={() => openCreditsRequest('booking')}
-                                                            className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl bg-accent text-white hover:scale-[1.02] transition-all"
+                                                            className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl bg-legacy-accent text-white hover:scale-[1.02] transition-all"
                                                         >
                                                             <Coins className="w-4 h-4" />
                                                             Request credits to join
@@ -663,7 +663,7 @@ export default function StudentSessionsContent({
                                                 {session.has_report && (
                                                     <Link
                                                         href={`/dashboard/student/sessions/${session.id}/report`}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors"
+                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors"
                                                     >
                                                         <FileText className="w-4 h-4" />
                                                         View Report

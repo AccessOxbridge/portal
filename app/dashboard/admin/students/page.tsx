@@ -140,13 +140,13 @@ export default function AdminStudentsPage() {
             {/* Search */}
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-legacy-accent animate-pulse' : 'text-gray-400'}`} />
                     <input
                         type="text"
                         placeholder="Search by name or target university..."
                         value={debouncedSearch}
                         onChange={(e) => setDebouncedSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all shadow-inner"
                     />
                 </div>
             </div>
@@ -155,7 +155,7 @@ export default function AdminStudentsPage() {
             <div className="bg-white border border-gray-100 rounded-[32px] shadow-sm">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                        <Loader2 className="w-8 h-8 text-legacy-accent animate-spin" />
                     </div>
                 ) : students.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">

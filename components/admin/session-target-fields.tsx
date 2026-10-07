@@ -25,7 +25,7 @@ export function todayIso(): string {
 }
 
 const INPUT_CLASS =
-    'w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all'
+    'w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all'
 const LABEL_CLASS = 'text-sm font-bold text-gray-700 ml-1'
 
 const PLAN_COPY: Record<PlanType, { label: string; hint: string }> = {
@@ -80,7 +80,7 @@ export function SessionTargetFields({
                         }
                         className={`py-2 rounded-xl text-sm font-semibold transition-all ${
                             value.planType === type
-                                ? 'bg-white text-accent shadow-sm border border-gray-100'
+                                ? 'bg-white text-legacy-accent shadow-sm border border-gray-100'
                                 : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -156,8 +156,8 @@ export function SessionTargetFields({
             </div>
 
             {valid && (
-                <div className="rounded-2xl bg-accent/5 border border-accent/10 px-4 py-3 text-sm text-gray-700">
-                    <span className="font-semibold text-accent">
+                <div className="rounded-2xl bg-legacy-accent/5 border border-legacy-accent/10 px-4 py-3 text-sm text-gray-700">
+                    <span className="font-semibold text-legacy-accent">
                         {describeTarget({ planType: value.planType, sessions, weeks })}
                     </span>
                     {end && (

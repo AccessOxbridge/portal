@@ -14,7 +14,7 @@ import Image from 'next/image'
  */
 export default function MobileTopBar() {
     return (
-        <header className="md:hidden sticky top-0 z-30 h-16 bg-accent border-b border-white/10">
+        <header className="md:hidden sticky top-0 z-30 h-16 bg-legacy-accent border-b border-white/10">
             <div className="h-full flex items-center px-4">
                 <Link
                     href="/dashboard"

@@ -81,7 +81,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                         generateCode()
                         setIsAddModalOpen(true)
                     }}
-                    className="px-4 py-2 bg-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-accent/10 flex items-center gap-2"
+                    className="px-4 py-2 bg-legacy-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/10 flex items-center gap-2"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -94,7 +94,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                 {creators.map((creator) => (
                     <div key={creator.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-gray-200 transition-colors">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-blue-50 flex items-center justify-center text-lg font-bold text-accent">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-blue-50 flex items-center justify-center text-lg font-bold text-legacy-accent">
                                 {creator.name.charAt(0)}
                             </div>
                             <div>
@@ -155,7 +155,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                         type="text"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent"
                                         placeholder="e.g. Sarah Smith"
                                     />
                                 </div>
@@ -166,7 +166,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                         type="email"
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent"
                                         placeholder="sarah@example.com"
                                     />
                                 </div>
@@ -175,7 +175,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                     <textarea
                                         value={formData.bio}
                                         onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent h-24 resize-none"
+                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent h-24 resize-none"
                                         placeholder="Short description..."
                                     />
                                 </div>
@@ -187,7 +187,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                             type="text"
                                             value={formData.tracking_code}
                                             onChange={e => setFormData({ ...formData, tracking_code: e.target.value.toUpperCase() })}
-                                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent font-mono uppercase"
+                                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent font-mono uppercase"
                                         />
                                         <button
                                             type="button"
@@ -211,7 +211,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="flex-1 px-4 py-2.5 bg-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg shadow-accent/10 disabled:opacity-50"
+                                        className="flex-1 px-4 py-2.5 bg-legacy-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg shadow-legacy-accent/10 disabled:opacity-50"
                                     >
                                         {isLoading ? 'Creating...' : 'Create Creator'}
                                     </button>

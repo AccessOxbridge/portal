@@ -203,10 +203,10 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                             className={[
                                 'h-11 sm:h-9 w-full rounded-lg text-sm font-medium transition-colors',
                                 !inMonth && !isSelected ? 'text-gray-300' : '',
-                                inMonth && !isSelected && !disabled ? 'text-gray-800 hover:bg-accent/10' : '',
+                                inMonth && !isSelected && !disabled ? 'text-gray-800 hover:bg-legacy-accent/10' : '',
                                 disabled ? 'text-gray-200 cursor-not-allowed' : '',
-                                isSelected ? 'bg-accent text-white hover:bg-accent' : '',
-                                !isSelected && isToday && inMonth ? 'ring-1 ring-inset ring-accent/40' : '',
+                                isSelected ? 'bg-legacy-accent text-white hover:bg-legacy-accent' : '',
+                                !isSelected && isToday && inMonth ? 'ring-1 ring-inset ring-legacy-accent/40' : '',
                             ].filter(Boolean).join(' ')}
                         >
                             {format(day, 'd')}
@@ -225,7 +225,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                 onClick={() => setOpen((v) => !v)}
                 aria-haspopup="dialog"
                 aria-expanded={open}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm text-left hover:border-gray-300"
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm text-left hover:border-gray-300"
             >
                 <span className={selected ? 'text-gray-900 font-medium' : 'text-gray-400'}>
                     {displayLabel}

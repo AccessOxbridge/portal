@@ -554,7 +554,7 @@ export default function TrainingContent({
         <div className="space-y-8">
             {/* Header */}
             <header className="text-center">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
                     Training & Onboarding
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
@@ -582,7 +582,7 @@ export default function TrainingContent({
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isCompleted
                                     ? 'bg-green-500 text-white z-10'
                                     : isCurrent
-                                        ? 'bg-accent text-white blink-slow ring-2 ring-accent/40 z-10'
+                                        ? 'bg-legacy-accent text-white blink-slow ring-2 ring-legacy-accent/40 z-10'
                                         : 'bg-gray-100 text-gray-400'
                                     }`}>
                                     {isCompleted ? (
@@ -591,7 +591,7 @@ export default function TrainingContent({
                                         <Icon className="w-5 h-5" />
                                     )}
                                 </div>
-                                <span className={`text-xs font-medium ${isCurrent ? 'text-accent' : isCompleted ? 'text-green-600' : 'text-gray-400'
+                                <span className={`text-xs font-medium ${isCurrent ? 'text-legacy-accent' : isCompleted ? 'text-green-600' : 'text-gray-400'
                                     }`}>
                                     {step.title}
                                 </span>
@@ -635,13 +635,13 @@ export default function TrainingContent({
                 {/* Step 0: Welcome */}
                 {currentStep === 0 && (
                     <div className="space-y-6 text-center max-w-2xl mx-auto">
-                        <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
-                            <GraduationCap className="w-10 h-10 text-accent" />
+                        <div className="w-20 h-20 bg-legacy-accent/10 rounded-full flex items-center justify-center mx-auto">
+                            <GraduationCap className="w-10 h-10 text-legacy-accent" />
                         </div>
                         <h2 className="text-3xl font-bold text-gray-900">
                             Welcome to the Access Oxbridge Team
                         </h2>
-                        <p className="text-xl text-accent font-medium">
+                        <p className="text-xl text-legacy-accent font-medium">
                             We are so glad to have you, {mentorName}! 🎉
                         </p>
                         <div className="bg-rich-beige-accent/50 rounded-2xl p-6 text-left space-y-4">
@@ -649,13 +649,13 @@ export default function TrainingContent({
                                 At accessoxbridge we will do everything we possibly can to ensure the success of our students.
                                 We require all of our team members to complete this short onboarding.
                             </p>
-                            <p className="text-accent font-semibold">
+                            <p className="text-legacy-accent font-semibold">
                                 As soon as these few steps are done, you can start receiving allocations immediately!
                             </p>
                         </div>
                         <button
                             onClick={() => setCurrentStep(1)}
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                         >
                             Let's Get Started
                             <ChevronRight className="w-5 h-5" />
@@ -667,8 +667,8 @@ export default function TrainingContent({
                 {currentStep === 1 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center">
-                                <ClipboardList className="w-7 h-7 text-accent" />
+                            <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
+                                <ClipboardList className="w-7 h-7 text-legacy-accent" />
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900">Getting to Know You</h2>
@@ -682,7 +682,7 @@ export default function TrainingContent({
                                 <p className="text-green-700 font-semibold">Questionnaire Completed!</p>
                                 <button
                                     onClick={() => setCurrentStep(2)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Contract
                                     <ChevronRight className="w-5 h-5" />
@@ -702,7 +702,7 @@ export default function TrainingContent({
                                                 value={questionnaireAnswers[q.id]}
                                                 onChange={(e) => setQuestionnaireAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                                 placeholder={q.placeholder}
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none bg-white"
+                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all resize-none bg-white"
                                             />
                                         </div>
                                     ))}
@@ -712,7 +712,7 @@ export default function TrainingContent({
                                     <button
                                         onClick={handleSubmitQuestionnaire}
                                         disabled={isPending}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
                                     >
                                         {isPending ? (
                                             <>
@@ -762,7 +762,7 @@ export default function TrainingContent({
                                     </button>
                                     <button
                                         onClick={() => setCurrentStep(3)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                     >
                                         Continue to Background Checks
                                         <ChevronRight className="w-5 h-5" />
@@ -826,7 +826,7 @@ export default function TrainingContent({
                                             value={signature}
                                             onChange={(e) => setSignature(e.target.value)}
                                             placeholder="Your full name"
-                                            className="mt-2 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all font-serif text-lg"
+                                            className="mt-2 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all font-serif text-lg"
                                         />
                                     </label>
                                     <p className="text-sm text-gray-500">
@@ -838,7 +838,7 @@ export default function TrainingContent({
                                     <button
                                         onClick={handleSignContract}
                                         disabled={isPending || !signature.trim()}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
                                     >
                                         {isPending ? (
                                             <>
@@ -890,7 +890,7 @@ export default function TrainingContent({
                                 )}
                                 <button
                                     onClick={() => setCurrentStep(4)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Payment Setup
                                     <ChevronRight className="w-5 h-5" />
@@ -943,7 +943,7 @@ export default function TrainingContent({
                                 </p>
                                 <button
                                     onClick={() => setCurrentStep(5)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Continue to Profile
                                     <ChevronRight className="w-5 h-5" />
@@ -986,8 +986,8 @@ export default function TrainingContent({
                 {currentStep === 5 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center">
-                                <User className="w-7 h-7 text-accent" />
+                            <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
+                                <User className="w-7 h-7 text-legacy-accent" />
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900">Complete Your Profile</h2>
@@ -1004,7 +1004,7 @@ export default function TrainingContent({
                                 </p>
                                 <a
                                     href="/dashboard/mentor"
-                                    className="mt-6 inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="mt-6 inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                                 >
                                     Go to Dashboard
                                     <ChevronRight className="w-5 h-5" />
@@ -1032,7 +1032,7 @@ export default function TrainingContent({
                                             type="file"
                                             name="photo"
                                             accept={PHOTO_ACCEPT_ATTR}
-                                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20"
+                                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-legacy-accent/10 file:text-legacy-accent hover:file:bg-legacy-accent/20"
                                         />
                                     </div>
                                 </div>
@@ -1046,7 +1046,7 @@ export default function TrainingContent({
                                         rows={4}
                                         defaultValue={existingData.bio || ''}
                                         placeholder="Tell students about yourself, your background, and what makes you a great mentor..."
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all resize-none"
                                     />
                                 </div>
 
@@ -1060,7 +1060,7 @@ export default function TrainingContent({
                                             name="university"
                                             defaultValue={existingData.university || ''}
                                             placeholder="e.g., University of Oxford"
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all"
                                         />
                                     </div>
                                     <div>
@@ -1095,7 +1095,7 @@ export default function TrainingContent({
                                     <button
                                         type="submit"
                                         disabled={isPending}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
                                     >
                                         {isPending ? (
                                             <>
@@ -1183,7 +1183,7 @@ function BackgroundUploadForm({
             {isUploading ? (
                 <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div className="flex items-center gap-3">
-                        <Loader2 className="w-5 h-5 animate-spin text-accent" />
+                        <Loader2 className="w-5 h-5 animate-spin text-legacy-accent" />
                         <div>
                             {/* If there is a file, show uploading progress. If user only submitted confirmation (no file),
                                 show an indeterminate submitting state without the progress bar. */}
@@ -1194,7 +1194,7 @@ function BackgroundUploadForm({
                             {(file || lastSelectedFile) && (
                                 <>
                                     <div className="w-48 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                                        <div className="h-2 bg-accent transition-all" style={{ width: `${uploadProgress}%` }} />
+                                        <div className="h-2 bg-legacy-accent transition-all" style={{ width: `${uploadProgress}%` }} />
                                     </div>
                                     <p className="text-xs text-gray-500 mt-1">{uploadProgress}%</p>
                                 </>
@@ -1272,13 +1272,13 @@ function BackgroundUploadForm({
 
                         {uploadError && <p className="text-sm text-red-500">Upload failed — {uploadError}. Try again or cancel.</p>}
 
-                        <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-accent/30 transition-colors cursor-pointer">
+                        <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-legacy-accent/30 transition-colors cursor-pointer">
                             <input
                                 type="checkbox"
                                 name="background_check_confirm"
                                 checked={backgroundCheckConfirmed}
                                 onChange={(e) => setBackgroundCheckConfirmed(e.target.checked)}
-                                className="mt-1 w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                className="mt-1 w-5 h-5 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                                 required
                             />
                             <span className="text-gray-700">
@@ -1290,7 +1290,7 @@ function BackgroundUploadForm({
                             <button
                                 type="submit"
                                 disabled={isUploading || !backgroundCheckConfirmed}
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Confirm & Continue
                                 <ChevronRight className="w-5 h-5" />

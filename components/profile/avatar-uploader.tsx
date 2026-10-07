@@ -111,7 +111,7 @@ export default function AvatarUploader({ userId, photoUrl, name }: AvatarUploade
 
     return (
         <div className="flex items-center gap-5">
-            <div className="relative w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
+            <div className="relative w-20 h-20 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
                 {preview ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={preview} alt="" className="w-full h-full object-cover" />

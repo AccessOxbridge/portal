@@ -32,7 +32,7 @@ function SubmitButton({
         <button
             type="submit"
             disabled={pending}
-            className="px-4 py-2.5 rounded-2xl bg-accent text-white font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none flex items-center justify-center min-w-[100px]"
+            className="px-4 py-2.5 rounded-2xl bg-legacy-accent text-white font-bold hover:shadow-2xl hover:shadow-legacy-accent/40 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none flex items-center justify-center min-w-[100px]"
         >
             {pending ? (
                 <div className="flex items-center gap-2">

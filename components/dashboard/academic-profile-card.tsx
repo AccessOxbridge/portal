@@ -58,17 +58,17 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
             href="/dashboard/student/profile"
             className={`block p-6 bg-white rounded-[32px] border shadow-xl shadow-gray-200/50 transition-all group hover:shadow-indigo-100 ${isIncomplete
                 ? 'border-amber-200 bg-amber-50/50 hover:border-amber-300'
-                : 'border-gray-100 hover:border-accent/30'
+                : 'border-gray-100 hover:border-legacy-accent/30'
                 }`}
         >
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-100' : 'bg-accent/10'
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-100' : 'bg-legacy-accent/10'
                         }`}>
                         {isIncomplete ? (
                             <AlertCircle className="w-6 h-6 text-amber-600" />
                         ) : (
-                            <GraduationCap className="w-6 h-6 text-accent" />
+                            <GraduationCap className="w-6 h-6 text-legacy-accent" />
                         )}
                     </div>
                     <div className="min-w-0">

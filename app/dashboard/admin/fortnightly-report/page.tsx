@@ -70,14 +70,14 @@ export default async function FortnightlyReportPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
                     Fortnightly Report
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
                     Generate and send a consolidated AI report of the current 14-day period to students and parents via email
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
-                    <div className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg font-medium">
+                    <div className="px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent rounded-lg font-medium">
                         Period: {periodLabel}
                     </div>
                     <div className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg font-medium">

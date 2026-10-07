@@ -184,7 +184,7 @@ export default function AdminPayoutsPage() {
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">Mentor Payouts</h1>
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Mentor Payouts</h1>
                 <p className="mt-2 text-gray-500 text-lg">Pay the invoices mentors have sent to finance</p>
             </header>
 
@@ -220,7 +220,7 @@ export default function AdminPayoutsPage() {
                 <button
                     onClick={() => setConfirming(true)}
                     disabled={pickedInvoices.length === 0 || processing}
-                    className="px-6 py-2.5 rounded-xl font-bold bg-accent text-white disabled:opacity-40 hover:opacity-90 shadow-lg"
+                    className="px-6 py-2.5 rounded-xl font-bold bg-legacy-accent text-white disabled:opacity-40 hover:opacity-90 shadow-lg"
                 >
                     {processing ? 'Processing…' : `Pay selected${pickedInvoices.length ? ` (${pickedInvoices.length})` : ''}`}
                 </button>
@@ -310,7 +310,7 @@ export default function AdminPayoutsPage() {
                         </div>
                         <div className="flex gap-3 justify-end">
                             <button onClick={() => setConfirming(false)} className="px-5 py-2.5 rounded-xl font-bold text-gray-600 border border-gray-200 hover:bg-gray-50">Cancel</button>
-                            <button onClick={doPay} className="px-5 py-2.5 rounded-xl font-bold bg-accent text-white hover:opacity-90">Pay {fmtGBP(pickedTotal)}</button>
+                            <button onClick={doPay} className="px-5 py-2.5 rounded-xl font-bold bg-legacy-accent text-white hover:opacity-90">Pay {fmtGBP(pickedTotal)}</button>
                         </div>
                     </div>
                 </div>
@@ -327,7 +327,7 @@ function FilterSelect({ label, value, onChange, options }: { label: string; valu
     return (
         <div className="flex flex-col">
             <label className="text-xs font-semibold text-gray-500 mb-1">{label}</label>
-            <select value={value} onChange={e => onChange(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-accent/30">
+            <select value={value} onChange={e => onChange(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-legacy-accent/30">
                 {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
         </div>

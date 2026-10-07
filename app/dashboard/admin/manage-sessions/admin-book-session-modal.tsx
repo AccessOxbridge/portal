@@ -178,7 +178,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
         <>
             <button
                 onClick={openModal}
-                className="bg-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 shrink-0"
+                className="bg-legacy-accent text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 shrink-0"
             >
                 <CalendarPlus className="w-4 h-4" />
                 Book a Session
@@ -203,10 +203,10 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                         </div>
 
                         <div className="p-6 overflow-y-auto flex-1 space-y-6">
-                            <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                            <div className="p-4 bg-legacy-accent/5 border border-legacy-accent/20 rounded-2xl">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
-                                        <Calendar className="w-4 h-4 text-accent" />
+                                    <div className="w-8 h-8 bg-legacy-accent/10 rounded-lg flex items-center justify-center shrink-0">
+                                        <Calendar className="w-4 h-4 text-legacy-accent" />
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-700 leading-relaxed">
@@ -222,7 +222,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                 <select
                                     value={pairKey}
                                     onChange={(e) => setPairKey(e.target.value)}
-                                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                                 >
                                     <option value="">Select a student</option>
                                     {assignedPairs.map((p) => (
@@ -248,7 +248,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                     <select
                                         value={tz}
                                         onChange={(e) => setTimezone(e.target.value)}
-                                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                                     >
                                         {getTimezoneOptions(selectedPair?.mentorTimezone ?? null).map((z) => (
                                             <option key={z} value={z}>{z}</option>
@@ -264,7 +264,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                             value={date}
                                             min={getZonedNow(tz).date}
                                             onChange={(e) => setDate(e.target.value)}
-                                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                                         />
                                     </div>
                                     <div>
@@ -272,7 +272,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                         <select
                                             value={startTime}
                                             onChange={(e) => setStartTime(e.target.value)}
-                                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                                         >
                                             <option value="">Select start time</option>
                                             {(() => {
@@ -293,7 +293,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                             <select
                                                 value={endTime}
                                                 onChange={(e) => setEndTime(e.target.value)}
-                                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                                             >
                                                 <option value="">Select end time / duration</option>
                                                 {[60, 120].map((d) => {
@@ -339,7 +339,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading || !selectedPair || !date || !startTime || !endTime}
-                                className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center gap-2"
+                                className="bg-legacy-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center gap-2"
                             >
                                 {loading ? (
                                     <span className="flex items-center gap-2">

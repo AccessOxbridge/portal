@@ -271,9 +271,9 @@ export default function ComposeDialog({
                         <button
                             type="button"
                             onClick={addSuggestedMentors}
-                            className="w-full text-left px-3 py-2 rounded-xl bg-accent/[0.06] border border-accent/20 text-xs text-gray-700 hover:bg-accent/10 transition-colors"
+                            className="w-full text-left px-3 py-2 rounded-xl bg-legacy-accent/[0.06] border border-legacy-accent/20 text-xs text-gray-700 hover:bg-legacy-accent/10 transition-colors"
                         >
-                            <span className="font-semibold text-accent">Add their mentors</span>
+                            <span className="font-semibold text-legacy-accent">Add their mentors</span>
                             <span className="text-gray-500">
                                 {' '}
                                 · {suggestedMentors.map((m) => m.full_name || 'Mentor').join(', ')}
@@ -291,7 +291,7 @@ export default function ComposeDialog({
                             placeholder="Search students or mentors…"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent/30"
+                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/15 focus:border-legacy-accent/30"
                         />
                     </div>
                 </div>
@@ -303,7 +303,7 @@ export default function ComposeDialog({
 
                     {isSearching && recipients.length === 0 ? (
                         <div className="flex items-center justify-center py-12">
-                            <Loader2 className="w-5 h-5 text-accent animate-spin" />
+                            <Loader2 className="w-5 h-5 text-legacy-accent animate-spin" />
                         </div>
                     ) : recipients.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-400">
@@ -338,7 +338,7 @@ export default function ComposeDialog({
                                                 className="w-11 h-11 rounded-full object-cover shrink-0"
                                             />
                                         ) : (
-                                            <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center text-white font-semibold shrink-0">
+                                            <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold shrink-0">
                                                 {recipient.full_name?.[0]?.toUpperCase() || 'U'}
                                             </div>
                                         )}
@@ -352,7 +352,7 @@ export default function ComposeDialog({
                                                     className={cn(
                                                         'shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded-full',
                                                         recipient.role === 'student'
-                                                            ? 'bg-accent/10 text-accent'
+                                                            ? 'bg-legacy-accent/10 text-legacy-accent'
                                                             : 'bg-rich-green-accent/10 text-rich-green-accent'
                                                     )}
                                                 >
@@ -374,14 +374,14 @@ export default function ComposeDialog({
                                                 className={cn(
                                                     'w-5 h-5 rounded-full border flex items-center justify-center shrink-0',
                                                     isPicked
-                                                        ? 'bg-accent border-accent text-white'
+                                                        ? 'bg-legacy-accent border-legacy-accent text-white'
                                                         : 'border-gray-300 text-transparent'
                                                 )}
                                             >
                                                 <Check className="w-3 h-3" />
                                             </span>
                                         ) : isOpening ? (
-                                            <Loader2 className="w-5 h-5 text-accent animate-spin shrink-0" />
+                                            <Loader2 className="w-5 h-5 text-legacy-accent animate-spin shrink-0" />
                                         ) : (
                                             <MessageCircle
                                                 className={cn(
@@ -403,7 +403,7 @@ export default function ComposeDialog({
                             type="button"
                             onClick={handleCreateGroup}
                             disabled={!canCreateGroup || creating}
-                            className="w-full py-2.5 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:hover:bg-accent"
+                            className="w-full py-2.5 rounded-xl bg-legacy-accent text-white text-sm font-semibold hover:bg-legacy-accent/90 transition-colors disabled:opacity-40 disabled:hover:bg-legacy-accent"
                         >
                             {creating ? (
                                 <Loader2 className="w-4 h-4 mx-auto animate-spin" />
@@ -434,7 +434,7 @@ export function ComposeButton({
             aria-label="New message"
             title="New message"
             className={cn(
-                'p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:text-accent hover:border-accent/30 hover:bg-accent/[0.06] transition-colors shrink-0',
+                'p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:text-legacy-accent hover:border-legacy-accent/30 hover:bg-legacy-accent/[0.06] transition-colors shrink-0',
                 className
             )}
         >

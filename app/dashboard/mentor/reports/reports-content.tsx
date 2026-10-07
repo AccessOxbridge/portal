@@ -123,8 +123,8 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     {/* Student Avatar */}
-                    <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                        <User className="w-6 h-6 text-accent" />
+                    <div className="w-12 h-12 rounded-full bg-legacy-accent/10 flex items-center justify-center shrink-0">
+                        <User className="w-6 h-6 text-legacy-accent" />
                     </div>
 
                     <div>
@@ -149,7 +149,7 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
                     {isPending ? (
                         <Link
                             href={`/dashboard/mentor/sessions/${session.id}/report`}
-                            className="px-4 py-2 bg-accent text-white text-sm font-medium rounded-xl hover:bg-accent/90 transition-colors"
+                            className="px-4 py-2 bg-legacy-accent text-white text-sm font-medium rounded-xl hover:bg-legacy-accent/90 transition-colors"
                         >
                             Submit Report
                         </Link>

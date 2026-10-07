@@ -89,8 +89,8 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
 
                 <form onSubmit={save} className="p-8 space-y-6">
                     <div>
-                        <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-4">
-                            <Target className="w-6 h-6 text-accent" />
+                        <div className="w-12 h-12 bg-legacy-accent/10 rounded-2xl flex items-center justify-center mb-4">
+                            <Target className="w-6 h-6 text-legacy-accent" />
                         </div>
                         <h2 id="target-modal-title" className="text-2xl font-bold text-gray-900">
                             {row.target ? 'Edit session plan' : 'Set session plan'}
@@ -116,7 +116,7 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="e.g. Pays weekly for 2–3 hours"
-                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all resize-none"
+                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all resize-none"
                         />
                     </div>
 
@@ -145,7 +145,7 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="flex-1 py-3 bg-accent text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-3 bg-legacy-accent text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save plan'}
                         </button>

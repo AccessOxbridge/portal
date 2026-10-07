@@ -43,11 +43,11 @@ export default async function AdminApprovalsPage() {
         <div className="space-y-10">
             <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-accent tracking-tight">Application Approvals</h1>
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-legacy-accent tracking-tight">Application Approvals</h1>
                     <p className="mt-2 sm:mt-3 text-gray-500 text-base sm:text-lg font-medium">Review and manage mentor onboarding applications.</p>
                 </div>
                 <div className="flex space-x-2">
-                    <span className="bg-rich-beige-accent text-accent px-4 py-2 rounded-2xl text-sm font-bold shadow-inner">
+                    <span className="bg-rich-beige-accent text-legacy-accent px-4 py-2 rounded-2xl text-sm font-bold shadow-inner">
                         {mentors?.length || 0} Pending
                     </span>
                 </div>
@@ -96,7 +96,7 @@ export default async function AdminApprovalsPage() {
                                                         className="w-16 h-16 rounded-2xl object-cover shadow-lg group-hover:scale-110 transition-transform"
                                                     />
                                                 ) : (
-                                                    <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                                    <div className="w-16 h-16 bg-legacy-accent rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-110 transition-transform">
                                                         {app.profiles?.full_name?.[0] || '?'}
                                                     </div>
                                                 )}
@@ -123,7 +123,7 @@ export default async function AdminApprovalsPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-[32px] p-6 sm:p-8 border border-gray-100 shadow-inner">
                                             {responseEntries.map(([key, value]: [string, any]) => (
                                                 <div key={key}>
-                                                    <span className="block text-[10px] font-black text-accent uppercase tracking-widest mb-2 opacity-60">
+                                                    <span className="block text-[10px] font-black text-legacy-accent uppercase tracking-widest mb-2 opacity-60">
                                                         {formatResponseKey(key)}
                                                     </span>
                                                     <div className="text-gray-900 font-semibold leading-relaxed wrap-break-word">

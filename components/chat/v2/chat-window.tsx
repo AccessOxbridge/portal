@@ -432,7 +432,7 @@ export default function ChatWindow({
         return (
             <div className="flex-1 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
-                    <div className="w-7 h-7 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                    <div className="w-7 h-7 border-2 border-legacy-accent border-t-transparent rounded-full animate-spin" />
                     <span className="text-sm text-gray-400">Loading messages…</span>
                 </div>
             </div>
@@ -473,7 +473,7 @@ export default function ChatWindow({
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full bg-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                                        <div className="w-full h-full bg-legacy-accent flex items-center justify-center text-white text-[10px] font-semibold">
                                             {member.full_name?.[0]?.toUpperCase() || 'U'}
                                         </div>
                                     )}
@@ -488,7 +488,7 @@ export default function ChatWindow({
                             className="w-10 h-10 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-semibold">
+                        <div className="w-10 h-10 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold">
                             {otherUser.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                     )}
@@ -506,7 +506,7 @@ export default function ChatWindow({
                     {isGroup || adminUser ? (
                         <p className="text-xs text-gray-400">Group chat · Access Oxbridge team</p>
                     ) : otherUser.role_label ? (
-                        <p className="text-xs font-medium text-accent">{otherUser.role_label}</p>
+                        <p className="text-xs font-medium text-legacy-accent">{otherUser.role_label}</p>
                     ) : (
                         <p className={`text-xs ${isOtherUserOnline ? 'text-green-500' : 'text-gray-400'}`}>
                             {isOtherUserOnline ? 'Online' : 'Offline'}

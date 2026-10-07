@@ -95,14 +95,14 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                         placeholder="Search by student or mentor name..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/30"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent/30"
                     />
                 </div>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setFilterType('all')}
                         className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filterType === 'all'
-                                ? 'bg-accent text-white'
+                                ? 'bg-legacy-accent text-white'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
@@ -237,7 +237,7 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
 
                                     {/* Personalised Report */}
                                     {report.personalized_report && (
-                                        <div className="bg-gradient-to-br from-accent/5 to-blue-50 rounded-xl p-4">
+                                        <div className="bg-gradient-to-br from-legacy-accent/5 to-blue-50 rounded-xl p-4">
                                             <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                                 <Lightbulb className="w-5 h-5 text-amber-500" />
                                                 Personalised Report
@@ -268,7 +268,7 @@ export default function AdminReportsTable({ reports }: AdminReportsTableProps) {
                                             <ul className="space-y-1.5">
                                                 {report.key_points.map((point, idx) => (
                                                     <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                                                        <div className="w-1.5 h-1.5 bg-accent rounded-full mt-2 shrink-0" />
+                                                        <div className="w-1.5 h-1.5 bg-legacy-accent rounded-full mt-2 shrink-0" />
                                                         {point}
                                                     </li>
                                                 ))}

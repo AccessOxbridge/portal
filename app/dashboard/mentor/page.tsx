@@ -42,16 +42,16 @@ export default async function MentorDashboard() {
                 data-hide-floating-ui
                 className="flex flex-col items-center justify-center py-20 text-center"
             >
-                <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-6">
-                    <svg className="w-10 h-10 text-accent animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-20 h-20 bg-legacy-accent/10 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-10 h-10 text-legacy-accent animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-accent mb-6">Application Pending</h1>
+                <h1 className="text-3xl sm:text-4xl font-bold text-legacy-accent mb-6">Application Pending</h1>
                 <p className="text-gray-600 text-lg max-w-md mb-8 leading-relaxed">
                     Thank you for applying, <span className="font-semibold">{profile.full_name}</span>! Our team is currently reviewing your profile. We&apos;ll notify you via email once you&apos;re approved.
                 </p>
-                <div className="px-6 py-3 bg-rich-beige-accent rounded-2xl text-accent text-sm font-bold">
+                <div className="px-6 py-3 bg-rich-beige-accent rounded-2xl text-legacy-accent text-sm font-bold">
                     Estimated review time: 24-48 hours
                 </div>
                 <div className="mt-8">
@@ -87,7 +87,7 @@ export default async function MentorDashboard() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight">
                     Mentor Dashboard
                 </h1>
                 <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {profile.full_name}!</p>
@@ -101,13 +101,13 @@ export default async function MentorDashboard() {
                         </div>
                     ) : null}
                     <div className="w-14 h-14 bg-rich-beige-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
-                        <svg className="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 text-legacy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Student Requests</h2>
                     <p className="text-gray-500 mb-6 leading-relaxed text-sm">Incoming mentorship requests from students looking for guidance.</p>
-                    <a href="/dashboard/mentor/requests" className="text-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
+                    <a href="/dashboard/mentor/requests" className="text-legacy-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
                         View Requests <span className="ml-2">→</span>
                     </a>
                 </div>
@@ -154,7 +154,7 @@ export default async function MentorDashboard() {
 
                 <div className="p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group relative">
                     <div className="w-14 h-14 bg-rich-beige-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner">
-                        <svg className="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 text-legacy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
@@ -168,26 +168,26 @@ export default async function MentorDashboard() {
                                 </svg>
                                 Connected to Stripe
                             </div>
-                            <a href="/dashboard/mentor/payouts" className="text-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
+                            <a href="/dashboard/mentor/payouts" className="text-legacy-accent font-bold group-hover:translate-x-2 transition-transform inline-flex items-center">
                                 View Payouts <span className="ml-2">→</span>
                             </a>
                         </>
                     ) : (
                         <>
                             <p className="text-gray-500 mb-4 leading-relaxed text-sm">Complete your onboarding to set up payment and start receiving payouts.</p>
-                            <a href="/dashboard/mentor/training" className="inline-flex items-center gap-2 text-accent font-bold hover:translate-x-1 transition-transform">
+                            <a href="/dashboard/mentor/training" className="inline-flex items-center gap-2 text-legacy-accent font-bold hover:translate-x-1 transition-transform">
                                 Complete Onboarding <span className="ml-2">→</span>
                             </a>
                         </>
                     )}
                 </div>
 
-                <div className="p-8 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 flex flex-col justify-between">
+                <div className="p-8 bg-legacy-accent rounded-[32px] shadow-2xl shadow-legacy-accent/30 flex flex-col justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-4">Complete Onboarding</h2>
                         <p className="text-white/70 mb-8 text-sm leading-relaxed">Finish your training, sign contract, and complete your profile to start receiving allocations.</p>
                     </div>
-                    <a href="/dashboard/mentor/training" className="bg-rich-amber-accent text-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center">
+                    <a href="/dashboard/mentor/training" className="bg-rich-amber-accent text-legacy-accent font-bold py-4 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10 text-center">
                         Go to Training
                     </a>
                 </div>

@@ -56,7 +56,7 @@ export default async function AdminDashboard() {
                     <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
                         Download Report
                     </button>
-                    <button className="px-4 py-2 bg-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-accent/10">
+                    <button className="px-4 py-2 bg-legacy-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-legacy-accent/10">
                         Add New Mentor
                     </button>
                 </div> */}
@@ -81,7 +81,7 @@ export default async function AdminDashboard() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Client Management</h2>
                     <p className="text-gray-500 text-sm mb-8 grow">Manage client accounts, subscriptions, and support tickets.</p>
-                    <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
+                    <span className="w-full py-3 bg-gray-50 group-hover:bg-legacy-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
                         Manage Clients
                     </span>
                 </Link>
@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Mentor Management</h2>
                     <p className="text-gray-500 text-sm mb-8 grow">Oversee mentor profiles, availability, and performance metrics.</p>
-                    <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
+                    <span className="w-full py-3 bg-gray-50 group-hover:bg-legacy-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
                         Manage Mentors
                     </span>
                 </Link>
@@ -103,7 +103,7 @@ export default async function AdminDashboard() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Blog Management</h2>
                     <p className="text-gray-500 text-sm mb-8 grow">Create and manage content for the Oxford-Bridge network.</p>
-                    <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
+                    <span className="w-full py-3 bg-gray-50 group-hover:bg-legacy-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
                         Manage Articles
                     </span>
                 </Link>
@@ -114,7 +114,7 @@ export default async function AdminDashboard() {
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Creator Management</h2>
                     <p className="text-gray-500 text-sm mb-8 grow">Manage content creators and track referral performance.</p>
-                    <span className="w-full py-3 bg-gray-50 group-hover:bg-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
+                    <span className="w-full py-3 bg-gray-50 group-hover:bg-legacy-accent group-hover:text-white text-gray-600 text-center rounded-xl text-sm font-semibold transition-colors">
                         Manage Creators
                     </span>
                 </Link>

@@ -87,17 +87,17 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                     <>
                         <Link
                             href="/dashboard/student/resources"
-                            className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-accent transition-colors mb-2 w-fit"
+                            className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-legacy-accent transition-colors mb-2 w-fit"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             All Resources
                         </Link>
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-2xl">
+                            <div className="w-14 h-14 rounded-2xl bg-legacy-accent/10 flex items-center justify-center text-2xl">
                                 {activeLabel?.emoji ?? '📚'}
                             </div>
                             <div>
-                                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
                                     {activeLabel?.label ?? categorySlug}
                                 </h1>
                                 {activeLabel?.description && (
@@ -108,7 +108,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                     </>
                 ) : (
                     <>
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">Learning Resources</h1>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight">Learning Resources</h1>
                         <p className="mt-2 text-gray-500 text-xl font-medium">
                             Expert guides to help you get into Oxford or Cambridge.
                         </p>
@@ -123,16 +123,16 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                         <Link
                             key={slug}
                             href={`/dashboard/student/resources?category=${slug}`}
-                            className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/30 transition-all group flex flex-col gap-3"
+                            className="p-6 bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md hover:border-legacy-accent/30 transition-all group flex flex-col gap-3"
                         >
-                            <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-xl">
+                            <div className="w-12 h-12 rounded-2xl bg-legacy-accent/10 flex items-center justify-center text-xl">
                                 {emoji}
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold text-gray-900 group-hover:text-accent transition-colors">{label}</h2>
+                                <h2 className="text-lg font-bold text-gray-900 group-hover:text-legacy-accent transition-colors">{label}</h2>
                                 <p className="text-sm text-gray-500 mt-1 leading-relaxed">{description}</p>
                             </div>
-                            <div className="flex items-center gap-1 text-accent text-sm font-semibold mt-auto">
+                            <div className="flex items-center gap-1 text-legacy-accent text-sm font-semibold mt-auto">
                                 Browse articles <ChevronRight className="w-4 h-4" />
                             </div>
                         </Link>
@@ -149,7 +149,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                             href={`/dashboard/student/resources?category=${slug}`}
                             className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                                 slug === categorySlug
-                                    ? 'bg-accent text-white shadow-md shadow-accent/20'
+                                    ? 'bg-legacy-accent text-white shadow-md shadow-legacy-accent/20'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                         >
@@ -192,7 +192,7 @@ function ArticleCard({ article }: { article: any }) {
     return (
         <Link
             href={articleURL}
-            className="group flex flex-col sm:flex-row gap-5 p-6 bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/20 transition-all"
+            className="group flex flex-col sm:flex-row gap-5 p-6 bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md hover:border-legacy-accent/20 transition-all"
         >
             {article.image && (
                 <div className="shrink-0 w-full sm:w-36 h-28 rounded-2xl overflow-hidden bg-gray-100">
@@ -207,7 +207,7 @@ function ArticleCard({ article }: { article: any }) {
             <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <div className="flex flex-wrap gap-2">
                     {article.categories?.map((cat: string) => (
-                        <span key={cat} className="px-2.5 py-0.5 bg-accent/10 text-accent rounded-lg text-xs font-bold uppercase tracking-wider">
+                        <span key={cat} className="px-2.5 py-0.5 bg-legacy-accent/10 text-legacy-accent rounded-lg text-xs font-bold uppercase tracking-wider">
                             {cat}
                         </span>
                     ))}
@@ -217,7 +217,7 @@ function ArticleCard({ article }: { article: any }) {
                         </span>
                     )}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 group-hover:text-accent transition-colors leading-snug">
+                <h3 className="text-lg font-bold text-gray-900 group-hover:text-legacy-accent transition-colors leading-snug">
                     {article.title}
                 </h3>
                 <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{article.description}</p>
@@ -226,7 +226,7 @@ function ArticleCard({ article }: { article: any }) {
                         <Clock className="w-3.5 h-3.5" />
                         <span>{article.reading_time} min read</span>
                     </div>
-                    <span className="ml-auto flex items-center gap-1 text-accent font-semibold">
+                    <span className="ml-auto flex items-center gap-1 text-legacy-accent font-semibold">
                         Read <ChevronRight className="w-3.5 h-3.5" />
                     </span>
                 </div>

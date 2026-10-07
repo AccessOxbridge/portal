@@ -69,7 +69,7 @@ export default function CollapsibleText({
                 onClick={() => setExpanded((current) => !current)}
                 className={cn(
                     'mt-1 inline-flex items-center gap-1 text-[13px] font-semibold transition-colors',
-                    onDark ? 'text-white/80 hover:text-white' : 'text-accent hover:text-accent/80'
+                    onDark ? 'text-white/80 hover:text-white' : 'text-legacy-accent hover:text-legacy-accent/80'
                 )}
             >
                 {expanded ? (

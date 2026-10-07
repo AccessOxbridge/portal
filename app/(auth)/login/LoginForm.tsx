@@ -10,9 +10,9 @@ export function LoginForm({ notice }: { notice?: string }) {
     const [isLoading, setIsLoading] = useState(false)
 
     return (
-        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-accent/30 selection:text-accent">
+        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-legacy-accent/30 selection:text-legacy-accent">
             {/* Left Section - Decorative Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
+            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-legacy-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
                     <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
@@ -76,7 +76,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                             height={50}
                             className="mb-4 rounded-xl shadow-lg"
                         />
-                        <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
+                        <h1 className="text-2xl font-bold text-legacy-accent">Access Oxbridge</h1>
                     </div>
 
                     <div className="mb-10 text-center lg:text-left">
@@ -101,7 +101,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                                 type="email"
                                 required
                                 placeholder="name@example.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
@@ -110,7 +110,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                                 <label className="text-sm font-semibold text-gray-700" htmlFor="password">
                                     Password
                                 </label>
-                                <Link href="/forgot-password" className="text-xs font-bold text-accent hover:underline decoration-2 underline-offset-4">
+                                <Link href="/forgot-password" className="text-xs font-bold text-legacy-accent hover:underline decoration-2 underline-offset-4">
                                     Forgot password?
                                 </Link>
                             </div>
@@ -120,7 +120,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                                 type="password"
                                 required
                                 placeholder="••••••••"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
@@ -128,7 +128,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                             formAction={login}
                             disabled={isLoading}
                             className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${!isLoading
-                                ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
+                                ? 'bg-legacy-accent hover:bg-[#07214d] hover:shadow-legacy-accent/40'
                                 : 'bg-gray-300 cursor-not-allowed shadow-none'
                                 } flex items-center justify-center gap-2`}
                         >
@@ -156,7 +156,7 @@ export function LoginForm({ notice }: { notice?: string }) {
                     <div className="mt-8 text-center">
                         <p className="text-gray-600 font-medium">
                             Want to become a mentor?{' '}
-                            <Link href="/become-a-mentor" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
+                            <Link href="/become-a-mentor" className="text-legacy-accent font-bold hover:underline decoration-2 underline-offset-4">
                                 Apply here
                             </Link>
                         </p>

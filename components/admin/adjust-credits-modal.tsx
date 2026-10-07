@@ -133,7 +133,7 @@ export function AdjustCreditsModal({
                         type="number"
                         value={delta}
                         onChange={(e) => setDelta(parseInt(e.target.value, 10) || 0)}
-                        className="w-24 text-center px-3 py-2.5 rounded-xl border border-gray-200 font-bold text-gray-900 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                        className="w-24 text-center px-3 py-2.5 rounded-xl border border-gray-200 font-bold text-gray-900 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                     />
                     <button
                         type="button"
@@ -168,7 +168,7 @@ export function AdjustCreditsModal({
                     rows={3}
                     maxLength={500}
                     placeholder="e.g. Paid £89 by bank transfer on 5 Sept, ref AO-1043"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                 />
 
                 {error && (
@@ -189,7 +189,7 @@ export function AdjustCreditsModal({
                         type="button"
                         onClick={handleSave}
                         disabled={!canSave}
-                        className="px-4 py-2.5 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 disabled:opacity-50"
+                        className="px-4 py-2.5 rounded-xl bg-legacy-accent text-white font-medium hover:bg-legacy-accent/90 disabled:opacity-50"
                     >
                         {saving ? 'Saving...' : 'Apply adjustment'}
                     </button>

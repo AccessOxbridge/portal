@@ -61,7 +61,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                     placeholder="Search by mentor or student name..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                 />
             </div>
 
@@ -108,7 +108,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                     <td className="px-6 py-4 text-right">
                                         <button
                                             onClick={() => setExpandedId(expandedId === feedback.id ? null : feedback.id)}
-                                            className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors inline-flex items-center gap-1"
+                                            className="p-2 text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/10 rounded-lg transition-colors inline-flex items-center gap-1"
                                         >
                                             {(feedback.experience || feedback.transcript || feedback.summary || feedback.transcriptUrl) && (
                                                 <FileText className="w-4 h-4" />
@@ -154,7 +154,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                                         href={feedback.sessionId ? `/api/transcript/${feedback.sessionId}` : feedback.transcriptUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-accent hover:underline text-sm"
+                                                        className="text-legacy-accent hover:underline text-sm"
                                                     >
                                                         View Transcript →
                                                     </a>

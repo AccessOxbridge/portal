@@ -473,7 +473,7 @@ export default function AdminMessagesContent({
                                 placeholder="Search by name or email…"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent/30"
+                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/15 focus:border-legacy-accent/30"
                             />
                         </div>
                         <ComposeButton onClick={() => setIsComposeOpen(true)} />
@@ -513,7 +513,7 @@ export default function AdminMessagesContent({
                                     className={cn(
                                         'w-full p-4 text-left transition-colors hover:bg-gray-50 border-l-2',
                                         selectedConversation?.id === conv.id
-                                            ? 'bg-accent/[0.06] border-accent'
+                                            ? 'bg-legacy-accent/[0.06] border-legacy-accent'
                                             : 'border-transparent'
                                     )}
                                 >
@@ -563,7 +563,7 @@ export default function AdminMessagesContent({
                                         {hasUnread && (
                                             <span
                                                 aria-label={`${conv.unread_count} unread`}
-                                                className="min-w-[20px] h-[20px] px-1.5 bg-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold tabular-nums"
+                                                className="min-w-[20px] h-[20px] px-1.5 bg-legacy-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold tabular-nums"
                                             >
                                                 {(conv.unread_count ?? 0) > 99 ? '99+' : conv.unread_count}
                                             </span>
@@ -620,7 +620,7 @@ export default function AdminMessagesContent({
                         >
                             {isLoadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                                    <div className="w-6 h-6 border-2 border-legacy-accent border-t-transparent rounded-full animate-spin" />
                                 </div>
                             ) : messages.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
@@ -662,7 +662,7 @@ export default function AdminMessagesContent({
                                                             className={cn(
                                                                 'text-[11px] font-semibold',
                                                                 role === 'student'
-                                                                    ? 'text-accent'
+                                                                    ? 'text-legacy-accent'
                                                                     : role === 'mentor'
                                                                         ? 'text-rich-green-accent'
                                                                         : 'text-amber-600'
@@ -705,7 +705,7 @@ export default function AdminMessagesContent({
                                                                 isIntervention
                                                                     ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-amber-50 border border-amber-200 text-amber-900'
                                                                     : alignRight
-                                                                        ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-accent text-white'
+                                                                        ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-legacy-accent text-white'
                                                                         : 'text-gray-700'
                                                             )}
                                                         >
@@ -716,7 +716,7 @@ export default function AdminMessagesContent({
                                                                     isIntervention
                                                                         ? 'from-amber-50'
                                                                         : alignRight
-                                                                            ? 'from-accent'
+                                                                            ? 'from-legacy-accent'
                                                                             : 'from-[#FAFBFC]'
                                                                 }
                                                             />
@@ -742,8 +742,8 @@ export default function AdminMessagesContent({
                             <div className="flex items-center gap-2 px-4 md:px-6 pt-3">
                                 {isDirect ? (
                                     <>
-                                        <MessageCircle className="w-4 h-4 text-accent" />
-                                        <span className="text-xs font-medium text-accent">
+                                        <MessageCircle className="w-4 h-4 text-legacy-accent" />
+                                        <span className="text-xs font-medium text-legacy-accent">
                                             {isMentorSupport ? 'Reply as Claire Marlowe' : 'Reply as Help & Support'}
                                         </span>
                                     </>
@@ -776,7 +776,7 @@ export default function AdminMessagesContent({
                         <button
                             type="button"
                             onClick={() => setIsComposeOpen(true)}
-                            className="mt-5 px-4 py-2.5 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors"
+                            className="mt-5 px-4 py-2.5 rounded-xl bg-legacy-accent text-white text-sm font-semibold hover:bg-legacy-accent/90 transition-colors"
                         >
                             New message
                         </button>

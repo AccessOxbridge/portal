@@ -20,7 +20,7 @@ export default function CreditsFloatingButton({ credits, onClick }: Props) {
             bg-white/70 backdrop-blur-md border border-white/40 transition-all duration-300 hover:scale-[1.02]
             active:scale-[0.98] shadow-2xl shadow-black/5 cursor-pointer"
         >
-            <div className="flex items-center justify-center p-2 rounded-xl bg-accent text-white shadow-lg shadow-accent/20 transition-colors duration-300 group-hover:bg-accent/90">
+            <div className="flex items-center justify-center p-2 rounded-xl bg-legacy-accent text-white shadow-lg shadow-legacy-accent/20 transition-colors duration-300 group-hover:bg-legacy-accent/90">
                 <Clock className="w-5 h-5" />
             </div>
 
@@ -42,7 +42,7 @@ export default function CreditsFloatingButton({ credits, onClick }: Props) {
 
             <div className="hidden sm:block h-8 w-px mx-1 bg-gray-200" />
 
-            <div className="hidden sm:block p-1 rounded-full text-accent transition-transform group-hover:translate-x-1">
+            <div className="hidden sm:block p-1 rounded-full text-legacy-accent transition-transform group-hover:translate-x-1">
                 <Plus className="w-4 h-4" />
             </div>
         </button>

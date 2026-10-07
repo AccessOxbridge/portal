@@ -113,7 +113,7 @@ export default function MobileTabBar({
                                 aria-current={isActive ? 'page' : undefined}
                                 className={cn(
                                     'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors',
-                                    isActive ? 'text-accent' : 'text-gray-400 active:text-gray-600'
+                                    isActive ? 'text-legacy-accent' : 'text-gray-400 active:text-gray-600'
                                 )}
                             >
                                 <span className="relative">
@@ -137,7 +137,7 @@ export default function MobileTabBar({
                                 <span
                                     className={cn(
                                         'text-[10px] leading-none font-semibold truncate max-w-full px-0.5',
-                                        isActive ? 'text-accent' : 'text-gray-500'
+                                        isActive ? 'text-legacy-accent' : 'text-gray-500'
                                     )}
                                 >
                                     {MOBILE_TAB_LABELS[item.name] ?? item.name}
@@ -153,7 +153,7 @@ export default function MobileTabBar({
                         aria-expanded={moreOpen}
                         className={cn(
                             'relative flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors',
-                            moreOpen ? 'text-accent' : 'text-gray-400 active:text-gray-600'
+                            moreOpen ? 'text-legacy-accent' : 'text-gray-400 active:text-gray-600'
                         )}
                     >
                         <span className="relative">
@@ -165,7 +165,7 @@ export default function MobileTabBar({
                         <span
                             className={cn(
                                 'text-[10px] leading-none font-semibold',
-                                moreOpen ? 'text-accent' : 'text-gray-500'
+                                moreOpen ? 'text-legacy-accent' : 'text-gray-500'
                             )}
                         >
                             More

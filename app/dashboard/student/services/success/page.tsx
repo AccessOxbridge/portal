@@ -53,8 +53,8 @@ export default async function PaymentSuccessPage({
 
             {/* Credits Added */}
             {purchase && (
-                <div className="bg-accent/5 border border-accent/20 rounded-3xl p-8 mb-8">
-                    <div className="text-6xl font-black text-accent mb-2">
+                <div className="bg-legacy-accent/5 border border-legacy-accent/20 rounded-3xl p-8 mb-8">
+                    <div className="text-6xl font-black text-legacy-accent mb-2">
                         +{purchase.credits_purchased}
                     </div>
                     <p className="text-gray-600">credits added</p>
@@ -73,7 +73,7 @@ export default async function PaymentSuccessPage({
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                     href="/dashboard/student"
-                    className="px-8 py-4 bg-accent text-white font-bold rounded-2xl hover:bg-accent/90 transition-all shadow-lg shadow-accent/20"
+                    className="px-8 py-4 bg-legacy-accent text-white font-bold rounded-2xl hover:bg-legacy-accent/90 transition-all shadow-lg shadow-legacy-accent/20"
                 >
                     Start Booking Sessions
                 </Link>

@@ -118,8 +118,8 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
     if (rows.length === 0) {
         return (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
-                    <MessageSquareHeart className="w-7 h-7 text-accent" />
+                <div className="w-14 h-14 rounded-2xl bg-legacy-accent/10 flex items-center justify-center mx-auto">
+                    <MessageSquareHeart className="w-7 h-7 text-legacy-accent" />
                 </div>
                 <p className="mt-4 font-bold text-gray-900">No check-ins yet</p>
                 <p className="mt-1 text-sm text-gray-500">

@@ -57,7 +57,7 @@ export default function AdminSessionsTable({ sessions }: Props) {
                     placeholder="Search by mentor or student name..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                 />
             </div>
 
@@ -83,7 +83,7 @@ export default function AdminSessionsTable({ sessions }: Props) {
                                             href={`/api/transcript/${session.id}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-accent hover:underline text-sm font-medium"
+                                            className="inline-flex items-center gap-1.5 text-legacy-accent hover:underline text-sm font-medium"
                                         >
                                             <ExternalLink className="w-4 h-4" />
                                             View Transcript

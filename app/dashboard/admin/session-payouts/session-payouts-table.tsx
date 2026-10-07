@@ -314,7 +314,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                             onClick={() => setFilterAndReset(key)}
                             className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                                 filter === key
-                                    ? 'bg-white text-accent shadow-sm'
+                                    ? 'bg-white text-legacy-accent shadow-sm'
                                     : 'text-gray-500 hover:text-gray-700'
                             }`}
                         >
@@ -330,7 +330,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                         placeholder="Search student, mentor, or session id…"
                         value={search}
                         onChange={(e) => setSearchAndReset(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none text-sm"
                     />
                 </div>
             </div>
@@ -385,7 +385,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                 >
                                     <td className="px-4 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                                            <div className="w-9 h-9 rounded-full bg-legacy-accent text-white flex items-center justify-center text-sm font-semibold shrink-0">
                                                 {session.studentName?.[0] || 'S'}
                                             </div>
                                             <span className="text-sm font-semibold text-gray-900">
@@ -406,7 +406,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                         <button
                                             type="button"
                                             onClick={() => copyId(session.id)}
-                                            className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-500 hover:text-accent"
+                                            className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-500 hover:text-legacy-accent"
                                             title={session.id}
                                         >
                                             {session.id.slice(0, 8)}…
@@ -479,7 +479,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                                                     })
                                                                 )
                                                             }}
-                                                            className="w-24 text-right bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/60"
+                                                            className="w-24 text-right bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-legacy-accent/40 focus:border-legacy-accent/60"
                                                         />
                                                     </div>
                                                     {session.overrideActive && (
@@ -503,7 +503,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                                                 !dirty ||
                                                                 isSaving
                                                                     ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
-                                                                    : 'border-accent/20 bg-accent text-white hover:bg-accent/90 shadow-sm'
+                                                                    : 'border-legacy-accent/20 bg-legacy-accent text-white hover:bg-legacy-accent/90 shadow-sm'
                                                             }`}
                                                         >
                                                             {isSaving ? (
@@ -587,7 +587,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                 onChange={(e) =>
                                     setPageSizeAndReset(Number(e.target.value))
                                 }
-                                className="w-14 text-center bg-white border border-gray-300 rounded px-1.5 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                                className="w-14 text-center bg-white border border-gray-300 rounded px-1.5 py-1 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/40"
                             />
                         </label>
 
@@ -611,7 +611,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                                     onClick={() => setPage(n)}
                                     className={`min-w-8 h-8 px-2 rounded-full text-sm font-medium transition-colors ${
                                         n === safePage
-                                            ? 'bg-accent text-white'
+                                            ? 'bg-legacy-accent text-white'
                                             : 'text-gray-600 hover:bg-gray-100'
                                     }`}
                                 >

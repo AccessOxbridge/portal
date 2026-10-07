@@ -89,7 +89,7 @@ export default function StudentDashboardContent({
                 {/* Top row: heading + welcome aligned with hours remaining & bell (same vertical level) */}
                 <div className="flex flex-wrap items-center justify-between gap-4 -mt-1 md:-mt-5">
                     <div>
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight">
                             Student Dashboard
                         </h1>
                         <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {greetingName}!</p>
@@ -108,7 +108,7 @@ export default function StudentDashboardContent({
                             {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
                                 <div className="flex flex-wrap items-center gap-3">
                                     {academicProfile.target_university && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent rounded-full text-sm font-semibold">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                             </svg>
@@ -116,7 +116,7 @@ export default function StudentDashboardContent({
                                         </span>
                                     )}
                                     {academicProfile.target_course && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent rounded-full text-sm font-semibold">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                             </svg>
@@ -124,7 +124,7 @@ export default function StudentDashboardContent({
                                         </span>
                                     )}
                                     {academicProfile.application_year && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
+                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent rounded-full text-sm font-semibold">
                                             <Calendar className="w-4 h-4" />
                                             {academicProfile.application_year} Entry
                                         </span>
@@ -148,7 +148,7 @@ export default function StudentDashboardContent({
                                     </div>
                                 </div>
                                 {activeSession.scheduled_at && (
-                                    <p className="text-accent font-bold text-sm mt-4">
+                                    <p className="text-legacy-accent font-bold text-sm mt-4">
                                         {formatDate(activeSession.scheduled_at)} · {formatTime(activeSession.scheduled_at)}
                                     </p>
                                 )}
@@ -170,14 +170,14 @@ export default function StudentDashboardContent({
                                 <div className="mt-5">
                                     <Link
                                         href="/dashboard/student/sessions"
-                                        className="block w-full py-3 bg-accent text-white font-bold text-[18px] rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
+                                        className="block w-full py-3 bg-legacy-accent text-white font-bold text-[18px] rounded-2xl shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
                                     >
                                         View Pending Requests
                                     </Link>
                                     {canBook ? (
                                         <button
                                             onClick={tryOpenBookSession}
-                                            className="block w-full py-3 text-accent font-semibold text-[16px] text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
+                                            className="block w-full py-3 text-legacy-accent font-semibold text-[16px] text-center border-2 border-legacy-accent/20 rounded-2xl hover:bg-legacy-accent/5 transition-colors"
                                         >
                                             + Book Another Session
                                         </button>
@@ -196,7 +196,7 @@ export default function StudentDashboardContent({
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 w-full space-y-6">
+                            <div className="p-6 bg-legacy-accent rounded-[32px] shadow-2xl shadow-legacy-accent/30 w-full space-y-6">
                                 <div className="space-y-3">
                                     <p className="text-xs font-semibold text-white/70 uppercase tracking-wider">
                                         This Week
@@ -215,14 +215,14 @@ export default function StudentDashboardContent({
                                     <button
                                         type="button"
                                         onClick={tryOpenBookSession}
-                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
+                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-legacy-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
                                     >
                                         Book a Session
                                     </button>
                                 ) : !profileComplete ? (
                                     <Link
                                         href="/dashboard/student/profile"
-                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
+                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-legacy-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
                                     >
                                         Complete Profile
                                     </Link>
@@ -268,9 +268,9 @@ export default function StudentDashboardContent({
                                 { label: 'Interview Mastery', slug: 'interview-tips' },
                                 { label: 'Subject Deep Dives', slug: 'uk-universities' },
                             ].map(({ label, slug }) => (
-                                <Link key={slug} href={`/dashboard/student/resources?category=${slug}`} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-accent/30 transition-colors flex items-center justify-between group/item">
+                                <Link key={slug} href={`/dashboard/student/resources?category=${slug}`} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-legacy-accent/30 transition-colors flex items-center justify-between group/item">
                                     <span className="font-semibold text-gray-700">{label}</span>
-                                    <svg className="w-5 h-5 text-gray-300 group-hover/item:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-5 h-5 text-gray-300 group-hover/item:text-legacy-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </Link>

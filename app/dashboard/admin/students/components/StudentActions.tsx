@@ -61,7 +61,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
         <>
             <div className="flex items-center justify-end gap-2">
                 <a
-                    className="p-2 text-gray-400 hover:text-accent transition-colors"
+                    className="p-2 text-gray-400 hover:text-legacy-accent transition-colors"
                     title="Email Student"
                     href={`mailto:${email}`}
                 >
@@ -99,7 +99,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
                                 value={parentEmail}
                                 onChange={(e) => setParentEmail(e.target.value)}
                                 placeholder="e.g., parent@example.com"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                             <p className="mt-1 text-xs text-gray-500">Used for fortnightly progress reports.</p>
                         </div>
@@ -115,7 +115,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
                                 type="button"
                                 onClick={handleSaveEdit}
                                 disabled={saving}
-                                className="px-4 py-2.5 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 disabled:opacity-50"
+                                className="px-4 py-2.5 rounded-xl bg-legacy-accent text-white font-medium hover:bg-legacy-accent/90 disabled:opacity-50"
                             >
                                 {saving ? 'Saving...' : 'Save'}
                             </button>

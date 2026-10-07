@@ -1,10 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../assets/globals.css";
 import NotificationBell from "@/components/dashboard/notification-bell";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// UI revamp: Geist is loaded for the new components (font-ui) and becomes the
+// default font in phase 1. Until then Inter stays the default.
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -40,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}>
       <body
         className="font-sans antialiased"
       >

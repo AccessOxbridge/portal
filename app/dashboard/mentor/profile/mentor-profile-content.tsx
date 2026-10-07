@@ -45,7 +45,7 @@ function SaveButton({ dirty }: { dirty: boolean }) {
         <button
             type="submit"
             disabled={pending || !dirty}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl shadow-lg shadow-legacy-accent/20 hover:bg-legacy-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
             <Save className="w-5 h-5" />
             {pending ? 'Saving…' : 'Save Changes'}
@@ -142,8 +142,8 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
             {/* Identity */}
             <section className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                        <User className="w-5 h-5 text-accent" />
+                    <div className="w-10 h-10 bg-legacy-accent/10 rounded-xl flex items-center justify-center">
+                        <User className="w-5 h-5 text-legacy-accent" />
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900">Your Details</h3>
@@ -153,7 +153,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                 <div className="p-6 space-y-5">
                     {/* Photo */}
                     <div className="flex items-center gap-5">
-                        <div className="relative w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
+                        <div className="relative w-20 h-20 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
                             {photoPreview ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={photoPreview} alt="" className="w-full h-full object-cover" />
@@ -191,7 +191,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                 value={form.full_name}
                                 onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                                 placeholder="Your full name"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                         </div>
                         <div>
@@ -219,7 +219,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                     value={form.phone}
                                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                     placeholder="e.g., +44 7700 900000"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                 />
                             </div>
                         </div>
@@ -233,7 +233,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                     value={form.university}
                                     onChange={(e) => setForm({ ...form, university: e.target.value })}
                                     placeholder="e.g., University of Oxford"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                 />
                             </div>
                         </div>
@@ -249,7 +249,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                 value={form.timezone}
                                 onChange={(e) => setForm({ ...form, timezone: e.target.value })}
                                 placeholder="e.g., Europe/London"
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-2">
@@ -278,7 +278,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                         onChange={(e) => setForm({ ...form, bio: e.target.value })}
                         rows={5}
                         placeholder="Tell students about your background, achievements, and how you like to mentor…"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-y"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all resize-y"
                     />
                 </div>
             </section>
@@ -309,8 +309,8 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                     onClick={() => toggleExpertise(subject)}
                                     className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
                                         selected
-                                            ? 'bg-accent text-white border-accent'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:border-accent/40 hover:text-accent'
+                                            ? 'bg-legacy-accent text-white border-legacy-accent'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-legacy-accent/40 hover:text-legacy-accent'
                                     }`}
                                 >
                                     {subject}

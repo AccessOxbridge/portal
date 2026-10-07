@@ -1,6 +1,10 @@
 /* Updated: 2025-12-15T05:46:41.316Z */
 /* @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap'); */
 @import "tailwindcss";
+/* tw-animate-css is installed but stays off until phase 1: 17 existing
+   animate-in / fade-in classes have never run (the library was never loaded),
+   and turning it on now would start animations nobody has seen. Phase 1
+   removes or replaces them, then enables this import. */
 /* @import "tw-animate-css"; */
 
 @custom-variant dark (&:is(.dark *));
@@ -12,9 +16,9 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --color-accent: #092c68;
-  --color-accent-light: #595a81;
-  --color-accent-foreground: #15196b;
+  --color-legacy-accent: #092c68;
+  --color-legacy-accent-light: #595a81;
+  --color-legacy-accent-foreground: #15196b;
   --color-rich-green-accent: #4f868e;
   --color-rich-amber-accent: #ffb81d;
   --color-rich-beige-accent: #ebf3f3;
@@ -23,6 +27,42 @@
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
+
+  /* UI revamp: fonts. Geist is the new UI font; it becomes the default
+     (--font-sans) in phase 1, when the shell switches over. */
+  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-ui-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* UI revamp: named radii (the existing rounded-sm/md/lg scale is untouched
+     until every page has moved over). */
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-sheet: 1rem;
+
+  /* UI revamp: surfaces. Depth comes from a hairline ring plus a soft shadow
+     (better-ui); the colours are variables so they can be tuned in one place. */
+  --shadow-border:
+    0px 0px 0px 1px var(--shadow-ring),
+    0px 1px 2px -1px var(--shadow-drop),
+    0px 2px 4px 0px var(--shadow-soft);
+  --shadow-border-hover:
+    0px 0px 0px 1px var(--shadow-ring-hover),
+    0px 1px 2px -1px var(--shadow-drop-hover),
+    0px 2px 4px 0px var(--shadow-soft-hover);
+  --shadow-overlay:
+    0px 0px 0px 1px var(--shadow-ring),
+    0px 8px 24px -4px oklch(0 0 0 / 0.12),
+    0px 2px 6px 0px oklch(0 0 0 / 0.06);
+
+  /* UI revamp: motion curves (emil-design-eng, better-ui).
+       snappy: things entering, popovers, dropdowns
+       move:   things moving on screen
+       drawer: bottom sheets and drawers (iOS-like)
+       icon:   contextual icon cross-fades */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-icon: cubic-bezier(0.2, 0, 0, 1);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -46,6 +86,111 @@
 
 }
 
+/*
+  UI revamp design tokens (docs/ui-revamp-plan.md, section 3). shadcn/ui
+  names, stone neutrals, the deep navy sidebar ("blue 2") and a brighter blue
+  for links and progress. Contrast measured for every text pair (AA) and for
+  control borders (3:1); the table is in the plan.
+*/
+:root {
+  --background: oklch(0.985 0.001 106.423);      /* stone 50 #FAFAF9 */
+  --foreground: oklch(0.147 0.004 49.25);         /* stone 950 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.25);
+  --primary: #13275a;                             /* deep navy, white text 14.3:1 */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0.001 106.424);         /* stone 100 */
+  --secondary-foreground: oklch(0.216 0.006 56.043);
+  --muted: oklch(0.97 0.001 106.424);
+  --muted-foreground: #78716c;                    /* stone 500: 4.8:1 on white, 4.6:1 on stone 50 */
+  --accent: oklch(0.97 0.001 106.424);            /* shadcn hover surface */
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --brand: #2563eb;                               /* links, progress, selection: 5.2:1 on white */
+  --brand-foreground: oklch(1 0 0);
+  --destructive: #dc2626;                         /* 4.8:1 on white */
+  --success: #047857;                             /* 5.5:1 on white */
+  --warning: #b45309;                             /* 5.0:1 on white */
+  --border: oklch(0.923 0.003 48.717);            /* stone 200: dividers and card edges */
+  --input: #958e8a;                               /* control borders: 3.2:1 on white */
+  --ring: #2563eb;                                /* focus ring, used at /40 */
+
+  --tint-blue: #eff6ff;    --tint-blue-foreground: #1e3a8a;
+  --tint-violet: #f5f3ff;  --tint-violet-foreground: #4c1d95;
+  --tint-amber: #fffbeb;   --tint-amber-foreground: #78350f;
+  --tint-green: #ecfdf5;   --tint-green-foreground: #065f46;
+  --tint-rose: #fff1f2;    --tint-rose-foreground: #9f1239;
+
+  --sidebar: #13275a;
+  --sidebar-foreground: oklch(1 0 0 / 0.72);      /* 8.1:1 on the navy */
+  --sidebar-primary: oklch(1 0 0);
+  --sidebar-accent: oklch(1 0 0 / 0.1);           /* hover */
+  --sidebar-active: oklch(1 0 0 / 0.14);          /* active pill */
+  --sidebar-border: oklch(1 0 0 / 0.1);
+  --sidebar-ring: oklch(1 0 0 / 0.4);
+
+  --chart-1: #2563eb;
+  --chart-2: #13275a;
+  --chart-3: #38bdf8;
+  --chart-4: #a78bfa;
+  --chart-5: #fbbf24;
+
+  --shadow-ring: oklch(0 0 0 / 0.06);
+  --shadow-drop: oklch(0 0 0 / 0.06);
+  --shadow-soft: oklch(0 0 0 / 0.04);
+  --shadow-ring-hover: oklch(0 0 0 / 0.08);
+  --shadow-drop-hover: oklch(0 0 0 / 0.08);
+  --shadow-soft-hover: oklch(0 0 0 / 0.06);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-tint-blue: var(--tint-blue);
+  --color-tint-blue-foreground: var(--tint-blue-foreground);
+  --color-tint-violet: var(--tint-violet);
+  --color-tint-violet-foreground: var(--tint-violet-foreground);
+  --color-tint-amber: var(--tint-amber);
+  --color-tint-amber-foreground: var(--tint-amber-foreground);
+  --color-tint-green: var(--tint-green);
+  --color-tint-green-foreground: var(--tint-green-foreground);
+  --color-tint-rose: var(--tint-rose);
+  --color-tint-rose-foreground: var(--tint-rose-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -67,7 +212,11 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-border);
+    /* Was var(--color-border), which was never defined and so resolved to
+       currentColor. Spelled out now that the revamp defines --color-border
+       for its own components, so untouched pages keep the exact same
+       borders. Switched to the token once every page has moved over. */
+    border-color: currentColor;
   }
 }
 

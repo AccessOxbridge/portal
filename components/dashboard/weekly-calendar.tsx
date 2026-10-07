@@ -118,13 +118,13 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                         className={`flex flex-col items-center gap-1 group transition-all shrink-0 ${isSelected(date) ? 'scale-110' : 'hover:scale-105'
                             }`}
                     >
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected(date) ? 'text-accent' : 'text-gray-400'
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected(date) ? 'text-legacy-accent' : 'text-gray-400'
                             }`}>
                             {date.toLocaleDateString('en-GB', { weekday: 'short' })}
                         </span>
                         <div className={`w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold transition-all ${isToday(date)
                             ? isSelected(date) ? 'bg-red-500 text-white' : 'bg-red-50 text-red-500 border border-red-200'
-                            : isSelected(date) ? 'bg-accent text-white' : 'text-gray-600 group-hover:bg-gray-100'
+                            : isSelected(date) ? 'bg-legacy-accent text-white' : 'text-gray-600 group-hover:bg-gray-100'
                             }`}>
                             {date.getDate()}
                         </div>
@@ -136,7 +136,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
             <div className="p-4 sm:p-6 min-h-[300px]">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
                     <h3 className="font-bold text-base sm:text-lg text-gray-800 flex items-center gap-2 min-w-0">
-                        <CalendarIcon className="w-5 h-5 text-accent shrink-0" />
+                        <CalendarIcon className="w-5 h-5 text-legacy-accent shrink-0" />
                         <span className="truncate">
                             {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
                         </span>
@@ -158,7 +158,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                         {daySessions.map((session) => (
                             <div
                                 key={session.id}
-                                className="group relative bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
+                                className="group relative bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl hover:border-legacy-accent/30 hover:shadow-lg hover:shadow-legacy-accent/5 transition-all cursor-pointer"
                                 onClick={() => {
                                     if (session.zoom_url) {
                                         window.open(
@@ -170,11 +170,11 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                                     <div className="flex items-center gap-4 min-w-0">
-                                        <div className="w-12 h-12 shrink-0 bg-accent/10 rounded-xl flex items-center justify-center text-accent font-bold text-xl">
+                                        <div className="w-12 h-12 shrink-0 bg-legacy-accent/10 rounded-xl flex items-center justify-center text-legacy-accent font-bold text-xl">
                                             {session.person_name?.[0] || personLabel[0]}
                                         </div>
                                         <div className="min-w-0">
-                                            <h4 className="font-bold text-gray-900 group-hover:text-accent transition-colors">
+                                            <h4 className="font-bold text-gray-900 group-hover:text-legacy-accent transition-colors">
                                                 Session with {session.person_name}
                                             </h4>
                                             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 font-medium">
@@ -188,7 +188,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
 
                                     {session.zoom_url ? (
                                         <div className="flex items-center gap-2 shrink-0">
-                                            <button className={`${canJoinZoom ? 'bg-accent' : 'bg-amber-500'} text-white w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
+                                            <button className={`${canJoinZoom ? 'bg-legacy-accent' : 'bg-amber-500'} text-white w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
                                                 <Video className="w-4 h-4" />
                                                 {canJoinZoom ? zoomButtonLabel : 'Top up to Join'}
                                             </button>

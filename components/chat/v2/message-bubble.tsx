@@ -92,7 +92,7 @@ export default function MessageBubble({
                                 className="w-8 h-8 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent text-xs font-semibold">
+                            <div className="w-8 h-8 rounded-full bg-legacy-accent/10 flex items-center justify-center text-legacy-accent text-xs font-semibold">
                                 {senderName?.[0]?.toUpperCase() || 'U'}
                             </div>
                         ))}
@@ -148,13 +148,13 @@ export default function MessageBubble({
             {hasText && (
                 <div
                     className={cn(
-                        'max-w-[75%] sm:max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-accent text-white transition-opacity',
+                        'max-w-[75%] sm:max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-legacy-accent text-white transition-opacity',
                         isLastInGroup && 'rounded-br-md',
                         status === 'sending' && 'opacity-70',
-                        failed && 'bg-accent/70'
+                        failed && 'bg-legacy-accent/70'
                     )}
                 >
-                    <CollapsibleText content={content} onDark fadeFrom="from-accent" />
+                    <CollapsibleText content={content} onDark fadeFrom="from-legacy-accent" />
                 </div>
             )}
 
@@ -170,7 +170,7 @@ export default function MessageBubble({
                             {status === 'sent' && (
                                 // Icons rather than '✓✓' text, which renders as
                                 // different glyphs across platforms.
-                                <span className={isRead ? 'text-accent' : 'text-gray-300'}>
+                                <span className={isRead ? 'text-legacy-accent' : 'text-gray-300'}>
                                     {isRead ? (
                                         <CheckCheck className="w-3.5 h-3.5" />
                                     ) : (

@@ -98,7 +98,7 @@ function MentorSubjects({ expertise }: { expertise: string[] | null }) {
                 <button
                     type="button"
                     onClick={() => setExpanded(false)}
-                    className="px-2 py-0.5 text-xs font-medium text-accent hover:underline"
+                    className="px-2 py-0.5 text-xs font-medium text-legacy-accent hover:underline"
                 >
                     Show less
                 </button>
@@ -138,7 +138,7 @@ function OnboardingBars({ mentor }: { mentor: Mentor }) {
 
 // The status tiles double as the status filter, replacing the old dropdown.
 const STATUS_TILES: { value: string; label: string; accent: string }[] = [
-    { value: 'all', label: 'All mentors', accent: 'bg-accent' },
+    { value: 'all', label: 'All mentors', accent: 'bg-legacy-accent' },
     { value: 'active', label: 'Active', accent: 'bg-green-500' },
     { value: 'pending_approval', label: 'Pending review', accent: 'bg-amber-400' },
     { value: 'details_required', label: 'Incomplete', accent: 'bg-gray-300' }
@@ -212,7 +212,7 @@ export default function AdminMentorsPage() {
                     <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
                         Export CSV
                     </button>
-                    <Link href="/dashboard/admin/approvals" className="px-4 py-2 bg-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-accent/10">
+                    <Link href="/dashboard/admin/approvals" className="px-4 py-2 bg-legacy-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-legacy-accent/10">
                         Review Applications
                     </Link>
                 </div>
@@ -232,7 +232,7 @@ export default function AdminMentorsPage() {
                                 setPage(1)
                             }}
                             className={`text-left bg-white border rounded-2xl p-4 shadow-sm transition-all ${isActive
-                                ? 'border-accent ring-2 ring-accent/10'
+                                ? 'border-legacy-accent ring-2 ring-legacy-accent/10'
                                 : 'border-gray-100 hover:border-gray-200 hover:shadow'
                                 }`}
                         >
@@ -251,13 +251,13 @@ export default function AdminMentorsPage() {
             {/* Filters Bar */}
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-legacy-accent animate-pulse' : 'text-gray-400'}`} />
                     <input
                         type="text"
                         placeholder="Search by name..."
                         value={debouncedSearch}
                         onChange={(e) => setDebouncedSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all shadow-inner"
                     />
                 </div>
                 <div className="flex flex-wrap gap-2 w-full md:w-auto">
@@ -310,7 +310,7 @@ export default function AdminMentorsPage() {
             <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                        <Loader2 className="w-8 h-8 text-legacy-accent animate-spin" />
                     </div>
                 ) : mentors.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -350,11 +350,11 @@ export default function AdminMentorsPage() {
                                             <tr
                                                 key={mentor.id}
                                                 onClick={(e) => openMentor(e, mentor.id)}
-                                                className="hover:bg-accent/[0.03] transition-colors group cursor-pointer"
+                                                className="hover:bg-legacy-accent/[0.03] transition-colors group cursor-pointer"
                                             >
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+                                                        <div className="w-10 h-10 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
                                                             {mentor.photo_url ? (
                                                                 <img src={mentor.photo_url} alt="" className="w-full h-full object-cover" />
                                                             ) : (
@@ -364,7 +364,7 @@ export default function AdminMentorsPage() {
                                                         <div className="min-w-0">
                                                             <Link
                                                                 href={`/dashboard/admin/mentors/${mentor.id}`}
-                                                                className="block font-semibold text-gray-900 truncate max-w-[180px] group-hover:text-accent group-hover:underline underline-offset-2"
+                                                                className="block font-semibold text-gray-900 truncate max-w-[180px] group-hover:text-legacy-accent group-hover:underline underline-offset-2"
                                                             >
                                                                 {name}
                                                             </Link>
@@ -373,7 +373,7 @@ export default function AdminMentorsPage() {
                                                                     <a
                                                                         href={`mailto:${mentor.profile.email}`}
                                                                         title={`Email ${name}`}
-                                                                        className="hover:text-accent hover:underline underline-offset-2"
+                                                                        className="hover:text-legacy-accent hover:underline underline-offset-2"
                                                                     >
                                                                         {mentor.profile.email}
                                                                     </a>
@@ -383,7 +383,7 @@ export default function AdminMentorsPage() {
                                                                 {mentor.phone && (
                                                                     <>
                                                                         {' · '}
-                                                                        <a href={`tel:${mentor.phone}`} className="hover:text-accent hover:underline underline-offset-2">
+                                                                        <a href={`tel:${mentor.phone}`} className="hover:text-legacy-accent hover:underline underline-offset-2">
                                                                             {mentor.phone}
                                                                         </a>
                                                                     </>
@@ -416,10 +416,10 @@ export default function AdminMentorsPage() {
                                                 {/* Avg Rating Removed */}
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <span className="text-xs font-bold text-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                                        <span className="text-xs font-bold text-legacy-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                                             View profile
                                                         </span>
-                                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-accent transition-colors shrink-0" />
+                                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-legacy-accent transition-colors shrink-0" />
                                                         <span className="w-px self-stretch bg-gray-100" aria-hidden="true" />
                                                         <MentorActions mentorId={mentor.id} currentStatus={currentStatus} mentorName={name} photoUrl={mentor.photo_url} />
                                                     </div>

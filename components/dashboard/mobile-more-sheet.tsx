@@ -87,7 +87,7 @@ export default function MobileMoreSheet({
                     <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-gray-200" />
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
+                            <div className="w-10 h-10 rounded-xl bg-legacy-accent/10 text-legacy-accent flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
                                 {photoUrl ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img src={photoUrl} alt="" className="w-full h-full object-cover" />
@@ -120,7 +120,7 @@ export default function MobileMoreSheet({
                         <button
                             type="button"
                             onClick={openBookSession}
-                            className="w-full mb-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-accent/20 active:scale-[0.99] transition-transform"
+                            className="w-full mb-3 inline-flex items-center justify-center gap-2 rounded-2xl bg-legacy-accent px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-legacy-accent/20 active:scale-[0.99] transition-transform"
                         >
                             <Calendar className="w-4 h-4 shrink-0" />
                             Book a session
@@ -139,7 +139,7 @@ export default function MobileMoreSheet({
                                     className={cn(
                                         'flex items-center justify-between gap-3 rounded-xl px-3 min-h-[48px] transition-colors',
                                         isActive
-                                            ? 'bg-accent/10 text-accent'
+                                            ? 'bg-legacy-accent/10 text-legacy-accent'
                                             : 'text-gray-700 active:bg-gray-100'
                                     )}
                                 >
@@ -147,7 +147,7 @@ export default function MobileMoreSheet({
                                         <item.icon
                                             className={cn(
                                                 'w-5 h-5 shrink-0',
-                                                isActive ? 'text-accent' : 'text-gray-400'
+                                                isActive ? 'text-legacy-accent' : 'text-gray-400'
                                             )}
                                         />
                                         <span className="font-medium text-sm truncate">

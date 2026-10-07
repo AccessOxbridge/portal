@@ -100,7 +100,7 @@ export default function MyMentorsContent({
                 <button
                     onClick={() => setActiveTab('active')}
                     className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'active'
-                        ? 'bg-white text-accent shadow-sm'
+                        ? 'bg-white text-legacy-accent shadow-sm'
                         : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
@@ -115,7 +115,7 @@ export default function MyMentorsContent({
                     <button
                         onClick={() => setActiveTab('past')}
                         className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'past'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
@@ -161,7 +161,7 @@ export default function MyMentorsContent({
                                         className="w-16 h-16 rounded-2xl object-cover shrink-0"
                                     />
                                 ) : (
-                                    <div className="w-16 h-16 rounded-2xl bg-accent text-white flex items-center justify-center text-xl font-bold shrink-0">
+                                    <div className="w-16 h-16 rounded-2xl bg-legacy-accent text-white flex items-center justify-center text-xl font-bold shrink-0">
                                         {mentor.full_name?.[0] || 'M'}
                                     </div>
                                 )}
@@ -202,7 +202,7 @@ export default function MyMentorsContent({
                                             </button>
                                             <Link
                                                 href="/dashboard/student/sessions"
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent font-semibold rounded-xl hover:bg-accent/20 transition-colors text-sm"
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent font-semibold rounded-xl hover:bg-legacy-accent/20 transition-colors text-sm"
                                             >
                                                 <Calendar className="w-4 h-4" />
                                                 View Sessions

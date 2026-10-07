@@ -93,7 +93,7 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
 
                 {/* Progress Fill */}
                 <div
-                    className="absolute top-8 left-0 h-1 bg-gradient-to-r from-accent to-green-500 rounded-full transition-all duration-1000"
+                    className="absolute top-8 left-0 h-1 bg-gradient-to-r from-legacy-accent to-green-500 rounded-full transition-all duration-1000"
                     style={{ width: `${currentProgress}%` }}
                 />
 
@@ -114,7 +114,7 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
                                 <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${status === 'completed'
                                         ? 'bg-green-500 text-white'
                                         : status === 'current'
-                                            ? 'bg-accent text-white ring-4 ring-accent/20'
+                                            ? 'bg-legacy-accent text-white ring-4 ring-legacy-accent/20'
                                             : status === 'upcoming'
                                                 ? 'bg-amber-500 text-white ring-4 ring-amber-200'
                                                 : 'bg-white text-gray-400 border-2 border-gray-200'
@@ -126,7 +126,7 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
                                 <span className={`mt-3 text-sm font-semibold ${status === 'completed'
                                         ? 'text-green-600'
                                         : status === 'current'
-                                            ? 'text-accent'
+                                            ? 'text-legacy-accent'
                                             : status === 'upcoming'
                                                 ? 'text-amber-600'
                                                 : 'text-gray-500'

@@ -85,7 +85,7 @@ export default function StudentPaceTable({ rows }: { rows: StudentPaceRow[] }) {
                             onClick={() => setFilter(key)}
                             className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors ${
                                 filter === key
-                                    ? 'bg-accent text-white border-accent'
+                                    ? 'bg-legacy-accent text-white border-legacy-accent'
                                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                             }`}
                         >
@@ -103,7 +103,7 @@ export default function StudentPaceTable({ rows }: { rows: StudentPaceRow[] }) {
                         placeholder="Search student or mentor"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                     />
                 </div>
             </div>
@@ -238,8 +238,8 @@ export default function StudentPaceTable({ rows }: { rows: StudentPaceRow[] }) {
                                             onClick={() => setEditing(row)}
                                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
                                                 row.target
-                                                    ? 'text-gray-500 hover:text-accent hover:bg-accent/10'
-                                                    : 'bg-accent/10 text-accent hover:bg-accent hover:text-white'
+                                                    ? 'text-gray-500 hover:text-legacy-accent hover:bg-legacy-accent/10'
+                                                    : 'bg-legacy-accent/10 text-legacy-accent hover:bg-legacy-accent hover:text-white'
                                             }`}
                                         >
                                             {row.target ? <Pencil className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}

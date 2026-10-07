@@ -141,7 +141,7 @@ export default function SessionRatingCard({
                 <button
                     type="button"
                     onClick={successCta.onClick}
-                    className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                    className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
                 >
                     {successCta.label}
                 </button>
@@ -198,7 +198,7 @@ export default function SessionRatingCard({
                                 onMouseEnter={() => setHovered(value)}
                                 onFocus={() => setHovered(value)}
                                 onBlur={() => setHovered(0)}
-                                className="p-1 rounded-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                                className="p-1 rounded-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-legacy-accent/40"
                             >
                                 <Star
                                     className={`w-10 h-10 transition-colors ${
@@ -233,7 +233,7 @@ export default function SessionRatingCard({
                                         onClick={() => toggleTag(tag)}
                                         className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                                             selected
-                                                ? 'bg-accent text-white border-accent'
+                                                ? 'bg-legacy-accent text-white border-legacy-accent'
                                                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                                         }`}
                                     >
@@ -260,7 +260,7 @@ export default function SessionRatingCard({
                         placeholder="What went well? What could be better?"
                         rows={3}
                         maxLength={2000}
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-accent/30 focus:border-legacy-accent resize-none"
                     />
                 </div>
 
@@ -274,7 +274,7 @@ export default function SessionRatingCard({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                        className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
                     >
                         <Send className="w-4 h-4" />
                         {loading ? 'Sending…' : 'Submit feedback'}

@@ -117,7 +117,7 @@ export default function JourneyTimeline({
                             <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all ${status === 'completed'
                                     ? 'bg-green-500 text-white'
                                     : status === 'current'
-                                        ? 'bg-accent text-white ring-4 ring-accent/20 animate-pulse'
+                                        ? 'bg-legacy-accent text-white ring-4 ring-legacy-accent/20 animate-pulse'
                                         : 'bg-gray-100 text-gray-400'
                                 }`}>
                                 {status === 'completed' ? (
@@ -133,7 +133,7 @@ export default function JourneyTimeline({
                             <span className={`mt-3 text-xs font-semibold ${status === 'completed'
                                     ? 'text-green-600'
                                     : status === 'current'
-                                        ? 'text-accent'
+                                        ? 'text-legacy-accent'
                                         : 'text-gray-400'
                                 }`}>
                                 {stage.label}

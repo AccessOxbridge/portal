@@ -33,7 +33,7 @@ export function AdjustCreditsCell({
                 >
                     {balance}
                 </span>
-                <span className="text-[10px] font-medium text-gray-400 group-hover:text-accent transition-colors">
+                <span className="text-[10px] font-medium text-gray-400 group-hover:text-legacy-accent transition-colors">
                     Adjust
                 </span>
             </button>

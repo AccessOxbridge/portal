@@ -203,7 +203,7 @@ export default function Sidebar({
         <aside
             className={cn(
                 // Hidden below `md` — phones get MobileTopBar + MobileTabBar instead.
-                'bg-accent border-r border-white/10 hidden md:flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
+                'bg-legacy-accent border-r border-white/10 hidden md:flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
                 collapsed ? 'w-[4.5rem]' : 'w-64'
             )}
         >
@@ -214,7 +214,7 @@ export default function Sidebar({
                     aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                     className={cn(
                         'absolute z-[60] top-7 flex h-6 w-6 items-center justify-center rounded-full',
-                        'border border-white/20 bg-accent text-white/80 shadow-lg',
+                        'border border-white/20 bg-legacy-accent text-white/80 shadow-lg',
                         'hover:bg-white/15 hover:text-white hover:border-white/30 transition-colors -right-3'
                     )}
                 >
@@ -273,7 +273,7 @@ export default function Sidebar({
                             }
                         }}
                         className={cn(
-                            'mb-2 inline-flex items-center justify-center rounded-2xl bg-white text-accent font-semibold shadow-md shadow-black/20 hover:bg-amber-100 hover:text-accent transition-colors',
+                            'mb-2 inline-flex items-center justify-center rounded-2xl bg-white text-legacy-accent font-semibold shadow-md shadow-black/20 hover:bg-amber-100 hover:text-legacy-accent transition-colors',
                             collapsed ? 'w-full p-2.5' : 'w-full gap-2 text-sm py-2.5'
                         )}
                     >
@@ -455,7 +455,7 @@ export default function Sidebar({
                         {/* Drop-up menu (above profile button) – connected */}
                         <div
                             className={cn(
-                                'absolute overflow-hidden border border-white/10 bg-accent shadow-lg transition-all duration-200 ease-out z-50',
+                                'absolute overflow-hidden border border-white/10 bg-legacy-accent shadow-lg transition-all duration-200 ease-out z-50',
                                 collapsed
                                     ? 'bottom-0 left-full ml-2 w-48 rounded-2xl'
                                     : 'bottom-full left-0 right-0 rounded-t-2xl border-b-0',

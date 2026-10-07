@@ -102,7 +102,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
     }, [students, query, sort])
 
     const summaryCards = [
-        { label: 'Active students', value: summary.activeStudents, icon: Users, color: 'text-accent', bg: 'bg-accent/10' },
+        { label: 'Active students', value: summary.activeStudents, icon: Users, color: 'text-legacy-accent', bg: 'bg-legacy-accent/10' },
         { label: 'Sessions completed', value: summary.sessionsCompleted, icon: CalendarCheck, color: 'text-blue-600', bg: 'bg-blue-100' },
         { label: 'Upcoming sessions', value: summary.upcomingSessions, icon: CalendarClock, color: 'text-green-600', bg: 'bg-green-100' },
         { label: 'Pending reports', value: summary.pendingReports, icon: FileWarning, color: 'text-amber-600', bg: 'bg-amber-100' },
@@ -144,7 +144,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="Search students…"
-                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                             />
                         </div>
                         <div className="flex items-center gap-2">
@@ -152,7 +152,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                             <select
                                 value={sort}
                                 onChange={(e) => setSort(e.target.value as SortKey)}
-                                className="px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm bg-white"
+                                className="px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm bg-white"
                             >
                                 {SORT_OPTIONS.map((o) => (
                                     <option key={o.value} value={o.value}>
@@ -171,7 +171,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                 className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6"
                             >
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
+                                    <div className="w-12 h-12 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-lg shrink-0 overflow-hidden">
                                         {s.photo_url ? (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
@@ -199,7 +199,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                         {s.email && (
                                             <a
                                                 href={`mailto:${s.email}`}
-                                                className="inline-flex items-center gap-1.5 max-w-full text-sm text-gray-500 hover:text-accent transition-colors mt-0.5"
+                                                className="inline-flex items-center gap-1.5 max-w-full text-sm text-gray-500 hover:text-legacy-accent transition-colors mt-0.5"
                                             >
                                                 <Mail className="w-3.5 h-3.5 shrink-0" />
                                                 <span className="truncate">{s.email}</span>
@@ -274,14 +274,14 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                         <button
                                             type="button"
                                             onClick={() => setRequestStudentId(s.id)}
-                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:translate-x-0.5 transition-transform"
+                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-legacy-accent hover:translate-x-0.5 transition-transform"
                                         >
                                             <CalendarPlus className="w-4 h-4" />
                                             Request session
                                         </button>
                                         <Link
                                             href="/dashboard/mentor/messages"
-                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:translate-x-0.5 transition-transform"
+                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-legacy-accent hover:translate-x-0.5 transition-transform"
                                         >
                                             <MessageCircle className="w-4 h-4" />
                                             Message

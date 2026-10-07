@@ -117,7 +117,7 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                         key={f}
                         onClick={() => setFilter(f)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filter === f
-                            ? 'bg-accent text-white'
+                            ? 'bg-legacy-accent text-white'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
@@ -144,7 +144,7 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                     setAdminNotes(issue.admin_notes || '')
                                 }}
                                 className={`p-5 bg-white rounded-[20px] border-2 transition-all cursor-pointer hover:shadow-md ${selectedIssue?.id === issue.id
-                                    ? 'border-accent shadow-lg'
+                                    ? 'border-legacy-accent shadow-lg'
                                     : 'border-gray-100 hover:border-gray-200'
                                     }`}
                             >
@@ -208,13 +208,13 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                     <div className="flex items-center gap-2">
                                         <User className="w-4 h-4 text-gray-400" />
                                         <span className="font-medium text-gray-900">{selectedIssue.reporter_name}</span>
-                                        <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded">
+                                        <span className="text-xs bg-legacy-accent/10 text-legacy-accent px-2 py-0.5 rounded">
                                             {selectedIssue.reporter_type}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-500">
                                         <Mail className="w-4 h-4" />
-                                        <a href={`mailto:${selectedIssue.reporter_email}`} className="hover:text-accent">
+                                        <a href={`mailto:${selectedIssue.reporter_email}`} className="hover:text-legacy-accent">
                                             {selectedIssue.reporter_email}
                                         </a>
                                     </div>
@@ -243,7 +243,7 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                         onChange={(e) => setAdminNotes(e.target.value)}
                                         placeholder="Add notes about this issue..."
                                         rows={3}
-                                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/50 resize-none"
                                     />
                                 </div>
 

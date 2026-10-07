@@ -61,7 +61,7 @@ export default function AttachmentGrid({
                                 className={cn(
                                     'relative overflow-hidden rounded-xl bg-gray-100 border border-black/5',
                                     'transition-transform hover:scale-[1.01] active:scale-100',
-                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
+                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-legacy-accent focus-visible:ring-offset-2',
                                     single && 'max-h-[280px]'
                                 )}
                             >
@@ -97,12 +97,12 @@ export default function AttachmentGrid({
                         className={cn(
                             'group flex items-center gap-3 max-w-[280px] w-full px-3 py-2.5 rounded-xl border transition-colors',
                             url
-                                ? 'bg-white border-gray-200 hover:border-accent/40 hover:bg-accent/[0.03]'
+                                ? 'bg-white border-gray-200 hover:border-legacy-accent/40 hover:bg-legacy-accent/[0.03]'
                                 : 'bg-gray-50 border-gray-100 pointer-events-none opacity-60'
                         )}
                     >
-                        <span className="shrink-0 w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                            <FileText className="w-4.5 h-4.5 text-accent" />
+                        <span className="shrink-0 w-9 h-9 rounded-lg bg-legacy-accent/10 flex items-center justify-center">
+                            <FileText className="w-4.5 h-4.5 text-legacy-accent" />
                         </span>
                         <span className="min-w-0 flex-1">
                             <span className="block text-[13px] font-medium text-gray-800 truncate">
@@ -112,7 +112,7 @@ export default function AttachmentGrid({
                                 {formatBytes(file.size)}
                             </span>
                         </span>
-                        <Download className="shrink-0 w-4 h-4 text-gray-300 group-hover:text-accent transition-colors" />
+                        <Download className="shrink-0 w-4 h-4 text-gray-300 group-hover:text-legacy-accent transition-colors" />
                     </a>
                 )
             })}

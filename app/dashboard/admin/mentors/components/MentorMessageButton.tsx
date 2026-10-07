@@ -41,7 +41,7 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
             <button
                 type="button"
                 onClick={openChat}
-                className="p-2 text-gray-400 hover:text-accent transition-colors"
+                className="p-2 text-gray-400 hover:text-legacy-accent transition-colors"
                 title="Message Mentor"
             >
                 <MessageSquare className="w-4 h-4" />
@@ -76,14 +76,14 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
                                         <p className="text-sm text-red-600 font-medium">{error}</p>
                                         <button
                                             onClick={openChat}
-                                            className="mt-3 px-4 py-2 bg-accent text-white text-sm font-semibold rounded-xl hover:bg-accent/90 transition-colors"
+                                            className="mt-3 px-4 py-2 bg-legacy-accent text-white text-sm font-semibold rounded-xl hover:bg-legacy-accent/90 transition-colors"
                                         >
                                             Try again
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="flex-1 flex items-center justify-center">
-                                        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                                        <Loader2 className="w-6 h-6 text-legacy-accent animate-spin" />
                                     </div>
                                 )
                             ) : (

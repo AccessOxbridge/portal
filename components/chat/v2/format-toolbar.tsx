@@ -181,7 +181,7 @@ export default function FormatToolbar({ onCommand, disabled = false }: FormatToo
                         // command runs.
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => onCommand(command)}
-                        className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/[0.06] transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                        className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/[0.06] transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-400"
                     >
                         <Icon className="w-[15px] h-[15px]" />
                     </button>

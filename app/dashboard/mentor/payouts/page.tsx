@@ -90,7 +90,7 @@ export default async function MentorPayoutsPage() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight">
                     Earnings & Payouts
                 </h1>
                 <p className="mt-4 text-gray-500 text-xl font-medium">
@@ -128,11 +128,11 @@ export default async function MentorPayoutsPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500 mb-1">Hourly Rate</p>
-                        <p className="text-2xl font-bold text-accent">{formatPrice(hourlyRate)}</p>
+                        <p className="text-2xl font-bold text-legacy-accent">{formatPrice(hourlyRate)}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500 mb-1">Sessions This Month</p>
-                        <p className="text-2xl font-bold text-accent">{sessionsThisMonth || 0}</p>
+                        <p className="text-2xl font-bold text-legacy-accent">{sessionsThisMonth || 0}</p>
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500 mb-1">Payment Status</p>

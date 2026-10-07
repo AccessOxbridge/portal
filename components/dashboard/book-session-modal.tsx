@@ -272,7 +272,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                             <select
                                 value={mentorId}
                                 onChange={(e) => setMentorId(e.target.value)}
-                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm"
+                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                             >
                                 <option value="">Select a mentor</option>
                                 {mentors.map((mentor) => (
@@ -300,14 +300,14 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                                 {timeSlots.map((slot, index) => (
                                     <div
                                         key={`${slot.startTime}-${slot.endTime}`}
-                                        className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-xl font-medium text-sm"
+                                        className="flex items-center gap-2 bg-legacy-accent/10 text-legacy-accent px-4 py-2 rounded-xl font-medium text-sm"
                                     >
                                         <Clock className="w-4 h-4 shrink-0" />
                                         <span>{formatSlotDisplay(slot)}</span>
                                         <button
                                             type="button"
                                             onClick={() => removeTimeSlot(index)}
-                                            className="hover:bg-accent/20 rounded-full p-1 transition-colors"
+                                            className="hover:bg-legacy-accent/20 rounded-full p-1 transition-colors"
                                             aria-label="Remove time slot"
                                         >
                                             <X className="w-3 h-3" />
@@ -367,7 +367,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                             type="button"
                             onClick={addTimeSlot}
                             disabled={!date || !startTime || !endTime}
-                            className="w-full py-3 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
                             Add Time Slot
@@ -409,7 +409,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                     <button
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
+                        className="bg-legacy-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">

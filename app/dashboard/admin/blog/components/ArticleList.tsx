@@ -72,7 +72,7 @@ export function ArticleList({ articles }: ArticleListProps) {
                             </Link>
                             <Link
                                 href={`/dashboard/admin/blog/edit/${article.id}`}
-                                className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-accent rounded-xl hover:opacity-90 transition-all shadow-sm"
+                                className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-legacy-accent rounded-xl hover:opacity-90 transition-all shadow-sm"
                             >
                                 Edit Article
                             </Link>

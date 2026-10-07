@@ -89,7 +89,7 @@ export default function AdminClientsPage() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-2xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-legacy-accent text-white rounded-2xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/20"
                 >
                     <Plus className="w-5 h-5" />
                     Register Premium Client
@@ -99,13 +99,13 @@ export default function AdminClientsPage() {
             {/* Search */}
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-legacy-accent animate-pulse' : 'text-gray-400'}`} />
                     <input
                         type="text"
                         placeholder="Search by name or email..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all shadow-inner"
                     />
                 </div>
                 <div className="text-sm text-gray-400 font-medium">
@@ -117,7 +117,7 @@ export default function AdminClientsPage() {
             <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
                 {isLoading && clients.length === 0 ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                        <Loader2 className="w-8 h-8 text-legacy-accent animate-spin" />
                     </div>
                 ) : clients.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -131,7 +131,7 @@ export default function AdminClientsPage() {
                         {!searchTerm && (
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="mt-6 text-accent font-semibold hover:underline"
+                                className="mt-6 text-legacy-accent font-semibold hover:underline"
                             >
                                 Register your first client
                             </button>
@@ -200,8 +200,8 @@ export default function AdminClientsPage() {
 
                         <div className="p-10">
                             <div className="mb-8">
-                                <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-6">
-                                    <UserPlus className="w-7 h-7 text-accent" />
+                                <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center mb-6">
+                                    <UserPlus className="w-7 h-7 text-legacy-accent" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-900">Register Premium Client</h2>
                                 <p className="text-gray-500 mt-2">A welcome email with login details will be sent automatically.</p>
@@ -217,7 +217,7 @@ export default function AdminClientsPage() {
                                             name="full_name"
                                             type="text"
                                             placeholder="Jane Doe"
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -228,7 +228,7 @@ export default function AdminClientsPage() {
                                         <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                         <select
                                             name="role"
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all appearance-none cursor-pointer"
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all appearance-none cursor-pointer"
                                         >
                                             <option value="client">Premium Client</option>
                                             <option value="admin">Admin</option>
@@ -250,7 +250,7 @@ export default function AdminClientsPage() {
                                             name="email"
                                             type="email"
                                             placeholder="jane@example.com"
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -265,7 +265,7 @@ export default function AdminClientsPage() {
                                 <button
                                     disabled={isPending}
                                     type="submit"
-                                    className="w-full py-4 bg-accent text-white rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                    className="w-full py-4 bg-legacy-accent text-white rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                                 >
                                     {isPending ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />

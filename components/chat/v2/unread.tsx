@@ -188,11 +188,11 @@ export const UnreadDivider = forwardRef<HTMLDivElement, { count: number }>(funct
     const label = `${count} unread message${count === 1 ? '' : 's'}`
     return (
         <div ref={ref} className="flex items-center gap-3 py-3" role="separator" aria-label={label}>
-            <span className="flex-1 h-px bg-accent/20" />
-            <span className="px-3 py-1 rounded-full bg-accent/10 text-[11px] font-semibold text-accent tracking-wide">
+            <span className="flex-1 h-px bg-legacy-accent/20" />
+            <span className="px-3 py-1 rounded-full bg-legacy-accent/10 text-[11px] font-semibold text-legacy-accent tracking-wide">
                 {label}
             </span>
-            <span className="flex-1 h-px bg-accent/20" />
+            <span className="flex-1 h-px bg-legacy-accent/20" />
         </div>
     )
 })
@@ -203,11 +203,11 @@ export function JumpToLatestButton({ unseen, onClick }: { unseen: number; onClic
             type="button"
             onClick={onClick}
             aria-label={unseen > 0 ? `Jump to latest, ${unseen} unread` : 'Jump to latest message'}
-            className="absolute bottom-4 right-4 md:right-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-accent hover:border-accent/30 transition-colors"
+            className="absolute bottom-4 right-4 md:right-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center text-gray-500 hover:text-legacy-accent hover:border-legacy-accent/30 transition-colors"
         >
             <ArrowDown className="w-4 h-4" />
             {unseen > 0 && (
-                <span className="absolute -top-2 -right-1 min-w-[20px] h-[20px] px-1 bg-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white tabular-nums">
+                <span className="absolute -top-2 -right-1 min-w-[20px] h-[20px] px-1 bg-legacy-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white tabular-nums">
                     {unseen > 99 ? '99+' : unseen}
                 </span>
             )}

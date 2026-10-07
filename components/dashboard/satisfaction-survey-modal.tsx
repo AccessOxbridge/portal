@@ -156,7 +156,7 @@ export default function SatisfactionSurveyModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                            className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
                         >
                             Done
                         </button>
@@ -164,8 +164,8 @@ export default function SatisfactionSurveyModal({
                 ) : (
                     <>
                         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-                                <MessageSquareHeart className="w-5 h-5 text-accent" />
+                            <div className="w-11 h-11 rounded-xl bg-legacy-accent/10 flex items-center justify-center shrink-0">
+                                <MessageSquareHeart className="w-5 h-5 text-legacy-accent" />
                             </div>
                             <div>
                                 <h2 className="text-xl font-extrabold text-gray-900">
@@ -209,7 +209,7 @@ export default function SatisfactionSurveyModal({
                                     placeholder="Anything working well, or anything we should fix?"
                                     rows={3}
                                     maxLength={SURVEY_COMMENT_MAX_LENGTH}
-                                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-accent/30 focus:border-legacy-accent resize-none"
                                 />
                             </div>
 
@@ -222,7 +222,7 @@ export default function SatisfactionSurveyModal({
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                                className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
                             >
                                 <Send className="w-4 h-4" />
                                 {loading ? 'Sending…' : 'Submit'}
@@ -269,9 +269,9 @@ function RatingRow({
                             role="radio"
                             aria-checked={selected}
                             onClick={() => onChange(option)}
-                            className={`py-3 rounded-2xl text-base font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
+                            className={`py-3 rounded-2xl text-base font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-legacy-accent/40 ${
                                 selected
-                                    ? 'bg-accent text-white border-accent'
+                                    ? 'bg-legacy-accent text-white border-legacy-accent'
                                     : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                             }`}
                         >

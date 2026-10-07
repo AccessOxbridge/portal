@@ -25,7 +25,7 @@ const UNIQUE_SUBJECTS = [...new Set(Object.values(SUBJECT_OPTIONS).flat())].sort
 const CARD = 'rounded-[24px] border border-gray-100 bg-white shadow-lg shadow-gray-100/50'
 
 const INPUT_BASE = 'w-full rounded-xl border bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:outline-none focus:ring-2'
-const INPUT_IDLE = 'border-gray-200 focus:border-accent focus:ring-accent/20'
+const INPUT_IDLE = 'border-gray-200 focus:border-legacy-accent focus:ring-legacy-accent/20'
 const INPUT_ERROR = 'border-red-300 focus:border-red-400 focus:ring-red-100'
 
 const SECTION_LAYOUT = [
@@ -314,7 +314,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           <div className={`flex items-stretch rounded-xl border bg-gray-50 transition-all duration-200 focus-within:ring-2 ${
             fieldErrors.phone_number
               ? 'border-red-300 focus-within:ring-red-100'
-              : 'border-gray-200 focus-within:border-accent focus-within:ring-accent/20'
+              : 'border-gray-200 focus-within:border-legacy-accent focus-within:ring-legacy-accent/20'
           }`}>
             {/* Country code button */}
             <div ref={countryDropdownRef} className="relative shrink-0">
@@ -358,7 +358,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                           }
                         }}
                         placeholder="Search country or code…"
-                        className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-accent focus:outline-none"
+                        className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-legacy-accent focus:outline-none"
                       />
                     </div>
                   </div>
@@ -374,7 +374,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                           document.getElementById('phone_number_digits')?.focus()
                         }}
                         className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-gray-50 ${
-                          country.code === selectedCountry.code ? 'bg-accent/5 font-medium text-accent' : 'text-gray-700'
+                          country.code === selectedCountry.code ? 'bg-legacy-accent/5 font-medium text-legacy-accent' : 'text-gray-700'
                         }`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -483,7 +483,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                   <img src={photoPreview} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
                 ) : (
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                    selectedFiles[question.id] ? 'bg-accent/10 text-accent' : 'bg-gray-100 text-gray-400'
+                    selectedFiles[question.id] ? 'bg-legacy-accent/10 text-legacy-accent' : 'bg-gray-100 text-gray-400'
                   }`}>
                     {selectedFiles[question.id]
                       ? <FileText className="h-4 w-4" />
@@ -541,7 +541,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             data-select-id={question.id}
             onClick={() => setOpenSelectId(prev => prev === question.id ? null : question.id)}
             className={`flex w-full items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 text-left transition-all duration-200 hover:border-gray-300 ${
-              openSelectId === question.id ? 'border-accent ring-2 ring-accent/20' : 'border-gray-200'
+              openSelectId === question.id ? 'border-legacy-accent ring-2 ring-legacy-accent/20' : 'border-gray-200'
             }`}
           >
             <span className={selectValues[question.id] ? 'text-gray-900' : 'text-gray-400'}>
@@ -560,7 +560,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                     setOpenSelectId(null)
                   }}
                   className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
-                    selectValues[question.id] === option ? 'bg-accent/5 font-medium text-accent' : 'text-gray-700'
+                    selectValues[question.id] === option ? 'bg-legacy-accent/5 font-medium text-legacy-accent' : 'text-gray-700'
                   }`}
                 >
                   {option}
@@ -587,7 +587,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={`flex w-full items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 text-left transition-all duration-200 hover:border-gray-300 ${
-              isDropdownOpen ? 'border-accent ring-2 ring-accent/20' : 'border-gray-200'
+              isDropdownOpen ? 'border-legacy-accent ring-2 ring-legacy-accent/20' : 'border-gray-200'
             }`}
           >
             <span className={selectedSubjects.length === 0 ? 'text-gray-400' : 'text-gray-900'}>
@@ -604,14 +604,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               {selectedSubjects.map((subject) => (
                 <span
                   key={subject}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 py-1 pl-3 pr-1.5 text-xs font-medium text-accent"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-legacy-accent/10 py-1 pl-3 pr-1.5 text-xs font-medium text-legacy-accent"
                 >
                   <span className="max-w-[180px] truncate">{subject}</span>
                   <button
                     type="button"
                     onClick={() => toggleSubject(subject)}
                     aria-label={`Remove ${subject}`}
-                    className="rounded-full p-0.5 transition-colors hover:bg-accent/20"
+                    className="rounded-full p-0.5 transition-colors hover:bg-legacy-accent/20"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -632,7 +632,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search subjects…"
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-accent focus:outline-none"
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-legacy-accent focus:outline-none"
                     autoFocus
                   />
                 </div>
@@ -715,18 +715,18 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               height={36}
               className="shrink-0 rounded-xl"
             />
-            <span className="text-lg font-extrabold tracking-tight text-accent sm:text-xl">
+            <span className="text-lg font-extrabold tracking-tight text-legacy-accent sm:text-xl">
               Access Oxbridge
             </span>
           </div>
-          <LogoutButton className="shrink-0 whitespace-nowrap rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-gray-600 hover:text-accent" />
+          <LogoutButton className="shrink-0 whitespace-nowrap rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-gray-600 hover:text-legacy-accent" />
         </div>
 
         <header className="mb-8">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent/60">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-legacy-accent/60">
             Mentor application
           </p>
-          <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-accent sm:text-4xl">
+          <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-legacy-accent sm:text-4xl">
             Complete your profile{welcomeName}
           </h1>
           <p className="max-w-2xl leading-relaxed text-gray-500">
@@ -749,11 +749,11 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             {SECTIONS.map((section) => (
               <section key={section.id} className={`p-6 sm:p-8 ${CARD}`}>
                 <div className="mb-6 flex items-start gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rich-beige-accent text-accent shadow-inner">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rich-beige-accent text-legacy-accent shadow-inner">
                     <section.icon className="h-5 w-5" />
                   </span>
                   <div>
-                    <h2 className="text-lg font-bold text-accent">{section.title}</h2>
+                    <h2 className="text-lg font-bold text-legacy-accent">{section.title}</h2>
                     <p className="mt-1 text-sm text-gray-500">{section.description}</p>
                   </div>
                 </div>
@@ -777,14 +777,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           <aside className="space-y-5 lg:sticky lg:top-8">
             <div className={`p-5 ${CARD}`}>
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-accent">Your progress</h2>
-                <span className="text-xs font-semibold text-accent">
+                <h2 className="text-sm font-bold text-legacy-accent">Your progress</h2>
+                <span className="text-xs font-semibold text-legacy-accent">
                   {completedCount} of {REQUIRED_QUESTIONS.length}
                 </span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
                 <div
-                  className="h-full rounded-full bg-accent transition-all duration-300"
+                  className="h-full rounded-full bg-legacy-accent transition-all duration-300"
                   style={{ width: `${completionPct}%` }}
                 />
               </div>
@@ -795,7 +795,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                   return (
                     <li key={question.id} className="flex items-center gap-2.5 text-sm">
                       <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
-                        done ? 'bg-accent text-white' : 'border border-gray-300'
+                        done ? 'bg-legacy-accent text-white' : 'border border-gray-300'
                       }`}>
                         {done && <Check className="h-2.5 w-2.5" />}
                       </span>
@@ -809,7 +809,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             </div>
 
             <div className="rounded-[24px] bg-rich-beige-accent p-5">
-              <h3 className="mb-4 text-sm font-bold text-accent">What happens next</h3>
+              <h3 className="mb-4 text-sm font-bold text-legacy-accent">What happens next</h3>
               <ol className="space-y-4">
                 {[
                   { title: 'You submit', detail: 'Takes about 10 minutes.' },
@@ -818,14 +818,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                 ].map((step, index, steps) => (
                   <li key={step.title} className="relative flex gap-3">
                     {index < steps.length - 1 && (
-                      <span className="absolute left-[5px] top-4 h-full w-px bg-accent/15" />
+                      <span className="absolute left-[5px] top-4 h-full w-px bg-legacy-accent/15" />
                     )}
                     <span className={`relative mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
-                      index === 0 ? 'bg-accent' : 'bg-accent/25'
+                      index === 0 ? 'bg-legacy-accent' : 'bg-legacy-accent/25'
                     }`} />
                     <span>
-                      <span className="block text-sm font-medium text-accent">{step.title}</span>
-                      <span className="block text-xs text-accent/60">{step.detail}</span>
+                      <span className="block text-sm font-medium text-legacy-accent">{step.title}</span>
+                      <span className="block text-xs text-legacy-accent/60">{step.detail}</span>
                     </span>
                   </li>
                 ))}
@@ -852,11 +852,11 @@ function SubjectOption({
       type="button"
       onClick={() => onToggle(subject)}
       className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50 ${
-        selected ? 'font-medium text-accent' : 'text-gray-700'
+        selected ? 'font-medium text-legacy-accent' : 'text-gray-700'
       }`}
     >
       <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
-        selected ? 'border-accent bg-accent text-white' : 'border-gray-300'
+        selected ? 'border-legacy-accent bg-legacy-accent text-white' : 'border-gray-300'
       }`}>
         {selected && <Check className="h-3 w-3" />}
       </span>
@@ -875,7 +875,7 @@ function SubmitButton({ hasFileErrors }: { hasFileErrors: boolean }) {
       className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 active:scale-[0.98] ${
         pending || hasFileErrors
           ? 'cursor-not-allowed bg-gray-300 shadow-none'
-          : 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
+          : 'bg-legacy-accent hover:bg-[#07214d] hover:shadow-legacy-accent/40'
       }`}
     >
       {pending ? (

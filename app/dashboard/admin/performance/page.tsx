@@ -56,7 +56,7 @@ export default async function AdminPerformancePage() {
     return (
         <div className="max-w-7xl mx-auto space-y-10">
             <header>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">Performance</h1>
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">Performance</h1>
                 <p className="mt-3 text-gray-500 text-lg">
                     Students against their target session pace, and mentor ratings.
                 </p>

@@ -38,7 +38,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">Edit Article</h1>
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Edit Article</h1>
                 <p className="mt-2 text-gray-500 text-lg">Update the article "{article.title}".</p>
             </header>
 

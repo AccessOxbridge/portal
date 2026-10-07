@@ -126,15 +126,15 @@ export default function SettingsContent({
     return (
         <div className="max-w-3xl space-y-8">
             <div>
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">Settings</h1>
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Settings</h1>
                 <p className="mt-2 text-gray-500 text-lg">Manage your account, timezone and password.</p>
             </div>
 
             {/* Account info (read-only) */}
             <section className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                        <User className="w-5 h-5 text-accent" />
+                    <div className="w-10 h-10 bg-legacy-accent/10 rounded-xl flex items-center justify-center">
+                        <User className="w-5 h-5 text-legacy-accent" />
                     </div>
                     <div>
                         <h2 className="font-bold text-gray-900">Account</h2>
@@ -167,7 +167,7 @@ export default function SettingsContent({
                     <select
                         value={tz}
                         onChange={(e) => { setTz(e.target.value); setTzFeedback(null) }}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all bg-white"
                     >
                         {tz === '' && <option value="">Select your timezone…</option>}
                         {tzOptions.map((option) => (
@@ -187,7 +187,7 @@ export default function SettingsContent({
                             type="button"
                             onClick={handleSaveTimezone}
                             disabled={tzPending || tz === savedTz || tz === ''}
-                            className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            className="inline-flex items-center gap-2 bg-legacy-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                         >
                             {tzPending && <Loader2 className="w-4 h-4 animate-spin" />}
                             Save timezone
@@ -224,7 +224,7 @@ export default function SettingsContent({
                         type="button"
                         onClick={handleSendResetLink}
                         disabled={pwPending}
-                        className="inline-flex items-center gap-2 bg-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                        className="inline-flex items-center gap-2 bg-legacy-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                     >
                         {pwPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
                         Send password reset link

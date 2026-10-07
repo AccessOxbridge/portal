@@ -220,7 +220,7 @@ export default function EventsManager({ initialEvents }: Props) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'all' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'all' ? 'bg-legacy-accent text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                     >
                         All Events
                     </button>
@@ -243,7 +243,7 @@ export default function EventsManager({ initialEvents }: Props) {
                 {!isCreating && !editingId && (
                     <button
                         onClick={() => { setIsCreating(true); resetForm(); }}
-                        className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors"
+                        className="flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:bg-legacy-accent/90 transition-colors"
                     >
                         <Plus className="w-5 h-5" />
                         Add Event
@@ -264,7 +264,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 type="text"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                 placeholder="e.g., Mastering the Oxbridge Interview"
                             />
                         </div>
@@ -274,7 +274,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 <select
                                     value={formData.event_type}
                                     onChange={(e) => setFormData({ ...formData, event_type: e.target.value as 'webinar' | 'in_person' })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
                                 >
                                     <option value="webinar">Webinar</option>
                                     <option value="in_person">In Person</option>
@@ -292,7 +292,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 type="datetime-local"
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                             />
                         </div>
                         <div>
@@ -302,7 +302,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 min="15"
                                 value={formData.duration_minutes}
                                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 60 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                             />
                         </div>
                         <div>
@@ -312,7 +312,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 min="1"
                                 value={formData.capacity}
                                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 50 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                             />
                         </div>
                         <div>
@@ -321,7 +321,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 type="text"
                                 value={formData.host}
                                 onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                 placeholder="e.g., Dr. Sarah Mitchell"
                             />
                         </div>
@@ -332,7 +332,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                     type="url"
                                     value={formData.meeting_url}
                                     onChange={(e) => setFormData({ ...formData, meeting_url: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                     placeholder="https://zoom.us/..."
                                 />
                             </div>
@@ -343,7 +343,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                     type="text"
                                     value={formData.location}
                                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                     placeholder="e.g., Oxford University, Broad Street"
                                 />
                             </div>
@@ -354,7 +354,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 type="url"
                                 value={formData.recording_url}
                                 onChange={(e) => setFormData({ ...formData, recording_url: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                                 placeholder="For past events"
                             />
                         </div>
@@ -364,7 +364,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                     type="checkbox"
                                     checked={formData.is_active}
                                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="w-5 h-5 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                                 />
                                 <span className="text-sm font-medium text-gray-700">Active (visible to students)</span>
                             </label>
@@ -374,7 +374,7 @@ export default function EventsManager({ initialEvents }: Props) {
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none resize-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none resize-none"
                                 rows={3}
                                 placeholder="Brief description of the event"
                             />
@@ -384,7 +384,7 @@ export default function EventsManager({ initialEvents }: Props) {
                         <button
                             onClick={isCreating ? handleCreate : handleUpdate}
                             disabled={loading || !formData.title || !formData.date}
-                            className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:bg-legacy-accent/90 transition-colors disabled:opacity-50"
                         >
                             <Check className="w-5 h-5" />
                             {loading ? 'Saving...' : (isCreating ? 'Create Event' : 'Save Changes')}
@@ -460,7 +460,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                 <button
                                     onClick={() => startEdit(event)}
                                     disabled={loading || isCreating || !!editingId}
-                                    className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="p-2 text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     <Pencil className="w-4 h-4" />
                                 </button>

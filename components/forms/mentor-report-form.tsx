@@ -69,7 +69,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
                         autoFocus
                         value={(formData[field.id] as string) || ''}
                         onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                        className="w-full h-40 p-6 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700 text-lg"
+                        className="w-full h-40 p-6 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-legacy-accent focus:bg-white transition-all outline-none resize-none text-gray-700 text-lg"
                         placeholder="Type your response here..."
                     />
                 )
@@ -82,7 +82,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
                                 type="button"
                                 onClick={() => setFormData({ ...formData, [field.id]: rating })}
                                 className={`w-14 h-14 rounded-xl text-xl font-bold transition-all ${formData[field.id] === rating
-                                        ? 'bg-accent text-white scale-110 shadow-lg shadow-accent/30'
+                                        ? 'bg-legacy-accent text-white scale-110 shadow-lg shadow-legacy-accent/30'
                                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                                     }`}
                             >
@@ -100,7 +100,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
                                 type="button"
                                 onClick={() => setFormData({ ...formData, [field.id]: option })}
                                 className={`px-6 py-3 rounded-xl font-medium transition-all ${formData[field.id] === option
-                                        ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                                        ? 'bg-legacy-accent text-white shadow-lg shadow-legacy-accent/30'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                             >
@@ -120,7 +120,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
                 <div className="p-5 sm:p-12">
                     <div className="flex justify-between items-center mb-8">
                         <div>
-                            <span className="text-accent font-bold text-sm tracking-wider uppercase">
+                            <span className="text-legacy-accent font-bold text-sm tracking-wider uppercase">
                                 Step {step} of {fields.length}
                             </span>
                             <h2 className="text-3xl font-extrabold text-gray-900 mt-1">
@@ -159,7 +159,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
                         <button
                             disabled={loading || !isStepValid()}
                             onClick={() => step === fields.length ? handleSubmit() : setStep(step + 1)}
-                            className="bg-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            className="bg-legacy-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
 
                 <div className="h-2 bg-gray-100">
                     <div
-                        className="h-full bg-accent transition-all duration-500 ease-out"
+                        className="h-full bg-legacy-accent transition-all duration-500 ease-out"
                         style={{ width: `${(step / fields.length) * 100}%` }}
                     />
                 </div>

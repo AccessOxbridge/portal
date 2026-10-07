@@ -67,7 +67,7 @@ export default function FeedbackOverview({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-2xl border border-gray-200 p-6">
                     <p className="text-sm font-medium text-gray-500 mb-1">Total responses</p>
-                    <p className="text-3xl font-black text-accent">{totalResponses}</p>
+                    <p className="text-3xl font-black text-legacy-accent">{totalResponses}</p>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-200 p-6">
                     <p className="text-sm font-medium text-gray-500 mb-1">Average rating</p>
@@ -105,7 +105,7 @@ export default function FeedbackOverview({
                             <button
                                 type="button"
                                 onClick={() => setShowAll((v) => !v)}
-                                className="text-sm font-semibold text-accent hover:underline shrink-0"
+                                className="text-sm font-semibold text-legacy-accent hover:underline shrink-0"
                             >
                                 {showAll ? 'Apply minimum' : `Show all (+${belowThreshold})`}
                             </button>

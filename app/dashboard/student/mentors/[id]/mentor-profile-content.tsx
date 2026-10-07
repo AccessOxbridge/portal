@@ -92,7 +92,7 @@ export default function StudentMentorProfileContent({
             {/* Header Card */}
             <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
                 <div className="flex items-start gap-6">
-                    <div className="w-20 h-20 rounded-2xl bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden">
+                    <div className="w-20 h-20 rounded-2xl bg-legacy-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden">
                         {mentor.photo_url ? (
                             <img src={mentor.photo_url} alt={mentor.full_name} className="w-full h-full object-cover" />
                         ) : (
@@ -139,7 +139,7 @@ export default function StudentMentorProfileContent({
                             </button>
                             <Link
                                 href="/dashboard/student/sessions"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent font-semibold rounded-xl hover:bg-accent/20 transition-colors text-sm"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent font-semibold rounded-xl hover:bg-legacy-accent/20 transition-colors text-sm"
                             >
                                 <Calendar className="w-4 h-4" />
                                 View Sessions
@@ -190,7 +190,7 @@ export default function StudentMentorProfileContent({
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
                         {mentor.expertise.map((exp) => (
-                            <span key={exp} className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg text-sm font-medium">
+                            <span key={exp} className="px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent rounded-lg text-sm font-medium">
                                 {exp}
                             </span>
                         ))}

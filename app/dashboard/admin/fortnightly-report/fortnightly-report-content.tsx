@@ -168,7 +168,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                     <button
                         type="button"
                         onClick={toggleAll}
-                        className="text-sm text-accent hover:underline"
+                        className="text-sm text-legacy-accent hover:underline"
                     >
                         {selectedIds.size === students.length ? 'Deselect all' : 'Select all'}
                     </button>
@@ -181,7 +181,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                                     type="checkbox"
                                     checked={selectedIds.has(s.id)}
                                     onChange={() => toggleOne(s.id)}
-                                    className="rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                                 />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
@@ -219,7 +219,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                                 <button
                                     type="button"
                                     onClick={() => handlePreview({ id: s.id, name: s.full_name })}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-accent/30 text-xs font-medium text-accent hover:bg-accent/5"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-legacy-accent/30 text-xs font-medium text-legacy-accent hover:bg-legacy-accent/5"
                                 >
                                     <Eye className="w-3.5 h-3.5" />
                                     View fortnightly report
@@ -235,7 +235,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                     type="button"
                     onClick={handleSend}
                     disabled={sending || selectedIds.size === 0}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-medium shadow-sm hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-legacy-accent text-white font-medium shadow-sm hover:bg-legacy-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {sending ? (
                         <>
@@ -305,7 +305,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                                 type="button"
                                 onClick={() => setPreviewTab('student')}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-full ${previewTab === 'student'
-                                    ? 'bg-accent text-white'
+                                    ? 'bg-legacy-accent text-white'
                                     : 'bg-gray-100 text-gray-600'
                                     }`}
                             >
@@ -315,7 +315,7 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
                                 type="button"
                                 onClick={() => setPreviewTab('parent')}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-full ${previewTab === 'parent'
-                                    ? 'bg-accent text-white'
+                                    ? 'bg-legacy-accent text-white'
                                     : 'bg-gray-100 text-gray-600'
                                     }`}
                             >

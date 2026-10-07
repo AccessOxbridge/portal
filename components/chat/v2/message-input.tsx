@@ -166,7 +166,7 @@ export default function MessageInput({
           <div
             className={cn(
                 'w-full rounded-2xl border bg-white transition-colors',
-                isFocused ? 'border-accent/40 ring-2 ring-accent/10' : 'border-gray-200'
+                isFocused ? 'border-legacy-accent/40 ring-2 ring-legacy-accent/10' : 'border-gray-200'
             )}
           >
             {/* Chosen files sit inside the box, above the field. */}
@@ -181,7 +181,7 @@ export default function MessageInput({
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 h-16 px-3 rounded-lg border border-gray-200 bg-gray-50 max-w-[200px]">
-                                    <FileText className="w-4 h-4 text-accent shrink-0" />
+                                    <FileText className="w-4 h-4 text-legacy-accent shrink-0" />
                                     <span className="min-w-0">
                                         <span className="block text-[12px] font-medium text-gray-700 truncate">
                                             {item.file.name}
@@ -257,7 +257,7 @@ export default function MessageInput({
                     // The standing hint line under the composer is gone; keep
                     // paste/drag discoverable here instead.
                     title="Attach a photo or file. You can also paste or drag one in"
-                    className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/[0.06] transition-colors disabled:opacity-40"
+                    className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/[0.06] transition-colors disabled:opacity-40"
                 >
                     <Paperclip className="w-[18px] h-[18px]" />
                 </button>
@@ -271,7 +271,7 @@ export default function MessageInput({
                   className={cn(
                       'shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all',
                       canSend
-                          ? 'bg-accent text-white hover:bg-accent/90'
+                          ? 'bg-legacy-accent text-white hover:bg-legacy-accent/90'
                           : 'bg-gray-100 text-gray-300 cursor-not-allowed'
                   )}
               >

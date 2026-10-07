@@ -190,7 +190,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                         onClick={() => setFilter('upcoming')}
                         className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                             filter === 'upcoming'
-                                ? 'bg-white text-accent shadow-sm'
+                                ? 'bg-white text-legacy-accent shadow-sm'
                                 : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -201,7 +201,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                         onClick={() => setFilter('past')}
                         className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                             filter === 'past'
-                                ? 'bg-white text-accent shadow-sm'
+                                ? 'bg-white text-legacy-accent shadow-sm'
                                 : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -212,7 +212,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                         onClick={() => setFilter('all')}
                         className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                             filter === 'all'
-                                ? 'bg-white text-accent shadow-sm'
+                                ? 'bg-white text-legacy-accent shadow-sm'
                                 : 'text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -227,7 +227,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                         placeholder="Search by student or mentor..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none text-sm"
                     />
                 </div>
             </div>
@@ -265,7 +265,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                 <tr key={session.id} className="hover:bg-gray-50 transition-colors align-top">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center text-sm font-semibold">
+                                            <div className="w-9 h-9 rounded-full bg-legacy-accent text-white flex items-center justify-center text-sm font-semibold">
                                                 {session.studentName?.[0] || 'S'}
                                             </div>
                                             <div className="flex flex-col">
@@ -288,7 +288,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                                 onChange={(e) =>
                                                     handleMentorChange(session.id, e.target.value)
                                                 }
-                                                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/60"
+                                                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/40 focus:border-legacy-accent/60"
                                             >
                                                 {sortedMentors.map((mentor) => (
                                                     <option key={mentor.id} value={mentor.id}>
@@ -330,7 +330,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
                                                     !hasChanged || isSaving
                                                         ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
-                                                        : 'border-accent/20 bg-accent text-white hover:bg-accent/90 shadow-sm'
+                                                        : 'border-legacy-accent/20 bg-legacy-accent text-white hover:bg-legacy-accent/90 shadow-sm'
                                                 }`}
                                             >
                                                 {isSaving ? (

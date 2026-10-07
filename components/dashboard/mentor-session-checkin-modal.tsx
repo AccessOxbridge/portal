@@ -194,7 +194,7 @@ export default function MentorSessionCheckinModal({
                         }}
                         className={`py-3 rounded-2xl border-2 font-bold transition-colors ${
                             selected
-                                ? 'border-accent bg-accent/10 text-accent'
+                                ? 'border-legacy-accent bg-legacy-accent/10 text-legacy-accent'
                                 : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
                         }`}
                     >
@@ -228,8 +228,8 @@ export default function MentorSessionCheckinModal({
                 </button>
 
                 <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-                        <BookOpen className="w-5 h-5 text-accent" />
+                    <div className="w-11 h-11 rounded-xl bg-legacy-accent/10 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-5 h-5 text-legacy-accent" />
                     </div>
                     <div className="pr-10">
                         <h2 className="text-xl font-extrabold text-gray-900">Quick check-in</h2>
@@ -298,7 +298,7 @@ export default function MentorSessionCheckinModal({
                     <button
                         type="button"
                         onClick={() => setRequestOpen(true)}
-                        className="w-full py-3 border-2 border-accent text-accent font-bold rounded-2xl hover:bg-accent/5 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 border-2 border-legacy-accent text-legacy-accent font-bold rounded-2xl hover:bg-legacy-accent/5 transition-colors flex items-center justify-center gap-2"
                     >
                         <CalendarPlus className="w-4 h-4" />
                         {requestSent ? 'Request another session' : 'Request a session'}
@@ -311,7 +311,7 @@ export default function MentorSessionCheckinModal({
                             type="button"
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity disabled:opacity-60"
+                            className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity disabled:opacity-60"
                         >
                             {saving ? 'Saving…' : 'Done'}
                         </button>

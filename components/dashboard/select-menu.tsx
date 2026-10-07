@@ -141,8 +141,8 @@ export default function SelectMenu({
                             className={[
                                 'w-full text-left px-3 py-2 text-sm transition-colors',
                                 isSelected
-                                    ? 'bg-accent text-white font-medium'
-                                    : 'text-gray-800 hover:bg-accent/10',
+                                    ? 'bg-legacy-accent text-white font-medium'
+                                    : 'text-gray-800 hover:bg-legacy-accent/10',
                             ].join(' ')}
                         >
                             {option.label}
@@ -163,7 +163,7 @@ export default function SelectMenu({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 className={[
-                    'w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm text-left',
+                    'w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm text-left',
                     disabled
                         ? 'text-gray-400 cursor-not-allowed'
                         : 'hover:border-gray-300',

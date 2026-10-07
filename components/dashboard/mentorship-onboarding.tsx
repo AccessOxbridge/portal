@@ -210,7 +210,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                 <div className="p-8 sm:p-12">
                     <div className="flex justify-between items-center mb-8">
                         <div>
-                            <span className="text-accent font-bold text-sm tracking-wider uppercase">Step {step} of {steps.length}</span>
+                            <span className="text-legacy-accent font-bold text-sm tracking-wider uppercase">Step {step} of {steps.length}</span>
                             <h2 className="text-3xl font-extrabold text-gray-900 mt-1">{currentStep.title}</h2>
                         </div>
                         <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -224,7 +224,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                         {currentStep.description}
                     </p>
 
-                    <div className="mb-6 rounded-2xl border border-accent/15 bg-accent/5 p-5">
+                    <div className="mb-6 rounded-2xl border border-legacy-accent/15 bg-legacy-accent/5 p-5">
                         <p className="text-sm leading-relaxed text-gray-700">
                             <span className="font-bold text-gray-900">Please fill in the form with as much detail as possible</span> so our strategists can curate the best roadmap for you.
                             Using this information, we’ll allocate you to mentors who will guide you to success.
@@ -241,7 +241,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         type="text"
                                         value={formData.schoolName}
                                         onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
+                                        className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-gray-700"
                                         placeholder="e.g., Westminster School"
                                     />
                                 </div>
@@ -252,7 +252,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         type="text"
                                         value={formData.schoolCountry}
                                         onChange={(e) => setFormData({ ...formData, schoolCountry: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
+                                        className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-gray-700"
                                         placeholder="e.g., United Kingdom"
                                     />
                                 </div>
@@ -264,7 +264,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                             <select
                                                 value={formData.curriculum}
                                                 onChange={(e) => setFormData({ ...formData, curriculum: e.target.value as any })}
-                                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
+                                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
                                             >
                                                 <option value="">Select IB / A-Level / Other</option>
                                                 <option value="IB">IB</option>
@@ -285,7 +285,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 type="text"
                                                 value={formData.curriculumOther}
                                                 onChange={(e) => setFormData({ ...formData, curriculumOther: e.target.value })}
-                                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
+                                                className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-gray-700"
                                                 placeholder="e.g., AP, National Curriculum..."
                                             />
                                         </div>
@@ -309,15 +309,15 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         {formData.subjects.map((s, idx) => (
                                             <div
                                                 key={`${s.name}-${idx}`}
-                                                className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-xl font-medium"
+                                                className="flex items-center gap-2 bg-legacy-accent/10 text-legacy-accent px-4 py-2 rounded-xl font-medium"
                                             >
                                                 <span className="max-w-[180px] truncate">{s.name}</span>
-                                                <span className="px-2 py-0.5 rounded-lg bg-accent/15 text-accent text-sm font-bold">
+                                                <span className="px-2 py-0.5 rounded-lg bg-legacy-accent/15 text-legacy-accent text-sm font-bold">
                                                     {s.predicted_grade}
                                                 </span>
                                                 <button
                                                     onClick={() => removeSubject(idx)}
-                                                    className="hover:bg-accent/20 rounded-full p-1 transition-colors"
+                                                    className="hover:bg-legacy-accent/20 rounded-full p-1 transition-colors"
                                                     type="button"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 type="text"
                                                 value={newSubject.name}
                                                 onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                                 placeholder="e.g., Mathematics"
                                             />
                                             <datalist id="subject-options">
@@ -353,7 +353,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 type="text"
                                                 value={newSubject.predicted_grade}
                                                 onChange={(e) => setNewSubject({ ...newSubject, predicted_grade: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                                 placeholder="e.g., A*, 7, 42/45..."
                                             />
                                         </div>
@@ -363,7 +363,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         type="button"
                                         onClick={addSubject}
                                         disabled={!newSubject.name.trim() || !newSubject.predicted_grade.trim()}
-                                        className="mt-4 w-full py-3 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="mt-4 w-full py-3 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -380,12 +380,12 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     {formData.targetUniversities.map((uni, index) => (
                                         <div
                                             key={`${uni}-${index}`}
-                                            className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-xl font-medium"
+                                            className="flex items-center gap-2 bg-legacy-accent/10 text-legacy-accent px-4 py-2 rounded-xl font-medium"
                                         >
                                             <span className="max-w-[260px] truncate">{uni}</span>
                                             <button
                                                 onClick={() => removeTargetUniversity(index)}
-                                                className="hover:bg-accent/20 rounded-full p-1 transition-colors"
+                                                className="hover:bg-legacy-accent/20 rounded-full p-1 transition-colors"
                                                 type="button"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -404,14 +404,14 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         type="text"
                                         value={newTargetUniversity}
                                         onChange={(e) => setNewTargetUniversity(e.target.value)}
-                                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                         placeholder="e.g., Oxford"
                                     />
                                     <button
                                         type="button"
                                         onClick={addTargetUniversity}
                                         disabled={!newTargetUniversity.trim() || formData.targetUniversities.length >= 5}
-                                        className="px-5 py-3 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-5 py-3 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         +
                                     </button>
@@ -439,7 +439,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     type="text"
                                     value={formData.timezone}
                                     onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                                    className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-gray-700"
+                                    className="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-gray-700"
                                     placeholder="e.g., Europe/London"
                                 />
                                 <p className="text-xs text-gray-500">
@@ -465,12 +465,12 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         {formData.timeSlots.map((slot, index) => (
                                             <div
                                                 key={index}
-                                                className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-xl font-medium"
+                                                className="flex items-center gap-2 bg-legacy-accent/10 text-legacy-accent px-4 py-2 rounded-xl font-medium"
                                             >
                                                 <span>{formatSlotDisplay(slot)}</span>
                                                 <button
                                                     onClick={() => removeTimeSlot(index)}
-                                                    className="hover:bg-accent/20 rounded-full p-1 transition-colors"
+                                                    className="hover:bg-legacy-accent/20 rounded-full p-1 transition-colors"
                                                     type="button"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,7 +490,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 <select
                                                     value={newSlot.day}
                                                     onChange={(e) => setNewSlot({ ...newSlot, day: e.target.value })}
-                                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
+                                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none appearance-none transition-all text-gray-700"
                                                 >
                                                     <option value="">Select day</option>
                                                     {DAYS.map(d => (
@@ -510,7 +510,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 type="time"
                                                 value={newSlot.startTime}
                                                 onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                             />
                                         </div>
                                         <div>
@@ -519,7 +519,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                                 type="time"
                                                 value={newSlot.endTime}
                                                 onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
                                             />
                                         </div>
                                     </div>
@@ -527,7 +527,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                         type="button"
                                         onClick={addTimeSlot}
                                         disabled={!newSlot.day || !newSlot.startTime || !newSlot.endTime}
-                                        className="mt-4 w-full py-3 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="mt-4 w-full py-3 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -543,7 +543,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     <textarea
                                         value={formData.academicInterests}
                                         onChange={(e) => setFormData({ ...formData, academicInterests: e.target.value })}
-                                        className="w-full h-32 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
+                                        className="w-full h-32 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-legacy-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
                                         placeholder="Topics you’re curious about, areas you want to explore, books/papers you’ve read, questions you want to answer..."
                                     />
                                 </div>
@@ -552,7 +552,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     <textarea
                                         value={formData.extracurriculars}
                                         onChange={(e) => setFormData({ ...formData, extracurriculars: e.target.value })}
-                                        className="w-full h-32 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
+                                        className="w-full h-32 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-legacy-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
                                         placeholder="Clubs, competitions, leadership, volunteering, work experience, sports, music, projects... (If none, write N/A)"
                                     />
                                 </div>
@@ -561,7 +561,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                                     <textarea
                                         value={formData.anythingElse}
                                         onChange={(e) => setFormData({ ...formData, anythingElse: e.target.value })}
-                                        className="w-full h-28 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
+                                        className="w-full h-28 p-5 rounded-2xl border border-gray-100 bg-gray-50 shadow-inner focus:ring-2 focus:ring-legacy-accent focus:bg-white transition-all outline-none resize-none text-gray-700"
                                         placeholder="Any constraints, preferred mentor style, deadlines, context we should know..."
                                     />
                                 </div>
@@ -582,7 +582,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                         <button
                             disabled={loading || !isStepValid()}
                             onClick={() => step === steps.length ? handleSubmit() : setStep(step + 1)}
-                            className="bg-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            className="bg-legacy-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-2">
@@ -601,7 +601,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
 
                 <div className="h-2 bg-gray-100">
                     <div
-                        className="h-full bg-accent transition-all duration-500 ease-out"
+                        className="h-full bg-legacy-accent transition-all duration-500 ease-out"
                         style={{ width: `${(step / steps.length) * 100}%` }}
                     />
                 </div>

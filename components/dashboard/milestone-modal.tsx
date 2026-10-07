@@ -175,10 +175,10 @@ export default function MilestoneModal({ milestone, ready, preview = false }: Mi
                 </button>
 
                 <div className="bg-gradient-to-b from-rich-beige-accent to-white px-6 pt-10 pb-6 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mx-auto shadow-lg">
+                    <div className="w-16 h-16 rounded-2xl bg-legacy-accent flex items-center justify-center mx-auto shadow-lg">
                         <Trophy className="w-8 h-8 text-rich-amber-accent" />
                     </div>
-                    <p className="mt-5 inline-block px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold uppercase tracking-wide">
+                    <p className="mt-5 inline-block px-3 py-1 rounded-full bg-legacy-accent/10 text-legacy-accent text-xs font-bold uppercase tracking-wide">
                         {copy.badge}
                     </p>
                     <h2 className="mt-3 text-2xl font-extrabold text-gray-900">{copy.title}</h2>
@@ -189,7 +189,7 @@ export default function MilestoneModal({ milestone, ready, preview = false }: Mi
                     <button
                         type="button"
                         onClick={close}
-                        className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                        className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
                     >
                         Keep going
                     </button>

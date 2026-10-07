@@ -99,7 +99,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                             </p>
                         </div>
 
-                        <button className="group w-full bg-accent text-white hover:bg-blue-50 px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
+                        <button className="group w-full bg-legacy-accent text-white hover:bg-blue-50 px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
                             <span>Speak to {strategistText} Strategist</span>
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
@@ -135,15 +135,15 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                 </div>
 
                 {/* Box 2: 1-1 Mentorship (Most Popular) */}
-                <div className="flex flex-col h-full relative p-8 bg-white rounded-[32px] border-2 border-accent shadow-xl shadow-accent/10 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 z-10">
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-accent text-white text-xs font-bold rounded-full tracking-wide shadow-md uppercase">
+                <div className="flex flex-col h-full relative p-8 bg-white rounded-[32px] border-2 border-legacy-accent shadow-xl shadow-legacy-accent/10 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 z-10">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-legacy-accent text-white text-xs font-bold rounded-full tracking-wide shadow-md uppercase">
                         Most Popular
                     </div>
 
                     <div className="flex-1 space-y-6">
                         <div className="flex justify-between items-start">
-                            <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center">
-                                <Star className="w-7 h-7 text-accent fill-accent" />
+                            <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
+                                <Star className="w-7 h-7 text-legacy-accent fill-legacy-accent" />
                             </div>
                             <div className="text-xs font-medium text-amber-600 bg-amber-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-amber-100 animate-pulse">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
@@ -161,7 +161,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                                 <span className="text-3xl font-black text-gray-900">£44.99</span>
                                 <span className="text-lg text-gray-400 line-through decoration-2">£79.99</span>
                             </div>
-                            <p className="text-xs font-bold text-accent mt-1">Member's Discount Applied</p>
+                            <p className="text-xs font-bold text-legacy-accent mt-1">Member's Discount Applied</p>
                         </div>
 
                         <div className="space-y-3">
@@ -179,7 +179,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                     <button
                         onClick={() => mentorshipPackage && handlePurchase(mentorshipPackage.id)}
                         disabled={loading !== null || !mentorshipPackage}
-                        className="mt-8 w-full py-4 rounded-2xl bg-accent text-white font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/20"
+                        className="mt-8 w-full py-4 rounded-2xl bg-legacy-accent text-white font-bold hover:bg-legacy-accent/90 transition-all shadow-lg shadow-legacy-accent/20"
                     >
                         {loading === mentorshipPackage?.id ? 'Processing...' : 'Get Started'}
                     </button>

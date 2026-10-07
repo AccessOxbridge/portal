@@ -62,7 +62,7 @@ export function MentorAssignCell({ studentId, currentMentorIds, mentors, onSaved
             <button
                 type="button"
                 onClick={() => setOpen((o) => !o)}
-                className="w-full flex items-center justify-between gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/60 hover:border-gray-300 transition-colors"
+                className="w-full flex items-center justify-between gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/40 focus:border-legacy-accent/60 hover:border-gray-300 transition-colors"
             >
                 <div className="flex flex-wrap gap-1 min-h-[20px] items-center">
                     {currentMentorIds.length === 0 ? (
@@ -71,7 +71,7 @@ export function MentorAssignCell({ studentId, currentMentorIds, mentors, onSaved
                         currentMentorIds.map((id) => (
                             <span
                                 key={id}
-                                className="inline-flex items-center gap-1 bg-accent/10 text-accent text-xs font-medium px-2 py-0.5 rounded-full"
+                                className="inline-flex items-center gap-1 bg-legacy-accent/10 text-legacy-accent text-xs font-medium px-2 py-0.5 rounded-full"
                             >
                                 {mentorNameById(id)}
                             </span>
@@ -99,7 +99,7 @@ export function MentorAssignCell({ studentId, currentMentorIds, mentors, onSaved
                                         checked={isAssigned}
                                         disabled={isPending}
                                         onChange={() => toggleMentor(mentor.id, isAssigned)}
-                                        className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent/40"
+                                        className="w-4 h-4 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent/40"
                                     />
                                     <span className="flex-1 truncate">{mentor.name}</span>
                                     {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 shrink-0" />}

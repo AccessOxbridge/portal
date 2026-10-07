@@ -45,13 +45,13 @@ export function MentorFilters({ initialSearch, initialStatus }: { initialSearch:
     return (
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
             <div className="relative w-full md:w-96">
-                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isPending ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isPending ? 'text-legacy-accent animate-pulse' : 'text-gray-400'}`} />
                 <input
                     type="text"
                     placeholder="Search by bio or expertise..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all shadow-inner"
                 />
             </div>
             <div className="flex gap-2 w-full md:w-auto">

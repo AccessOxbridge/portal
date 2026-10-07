@@ -28,7 +28,7 @@ export default function SatisfactionChip({ onClick }: { onClick: () => void }) {
             className="group flex items-center gap-3 px-2 2xl:pl-2 2xl:pr-4 py-2 rounded-2xl bg-white/70 backdrop-blur-md border border-white/40
             shadow-2xl shadow-black/5 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-            <div className="relative flex items-center justify-center p-2 rounded-xl bg-rich-beige-accent text-accent">
+            <div className="relative flex items-center justify-center p-2 rounded-xl bg-rich-beige-accent text-legacy-accent">
                 <MessageSquareHeart className="w-5 h-5" />
                 {/* It lost the full-width strip's prominence; the dot is what
                     still says "this wants something from you". */}
@@ -36,7 +36,7 @@ export default function SatisfactionChip({ onClick }: { onClick: () => void }) {
             </div>
 
             <div className="hidden 2xl:flex flex-col text-left">
-                <span className="text-sm font-bold text-accent leading-tight">Quick check-in</span>
+                <span className="text-sm font-bold text-legacy-accent leading-tight">Quick check-in</span>
                 <span className="text-[9px] font-semibold tracking-wide text-gray-400 uppercase">
                     30 seconds
                 </span>

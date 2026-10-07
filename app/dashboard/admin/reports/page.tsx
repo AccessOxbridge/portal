@@ -109,14 +109,14 @@ export default async function AdminReportsPage() {
     return (
         <div className="max-w-7xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
                     Session Reports
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">
                     View all session reports generated for student-mentor sessions
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
-                    <div className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg font-medium">
+                    <div className="px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent rounded-lg font-medium">
                         {tableData.length} Total Reports
                     </div>
                     <div className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg font-medium">

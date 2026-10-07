@@ -268,13 +268,13 @@ export default function MentorSessionsContent({
                     <button
                         onClick={() => setActiveTab('upcoming')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         Upcoming
                         {upcomingSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-legacy-accent/10 text-legacy-accent rounded-full text-xs">
                                 {upcomingSessions.length}
                             </span>
                         )}
@@ -282,7 +282,7 @@ export default function MentorSessionsContent({
                     <button
                         onClick={() => setActiveTab('current')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
@@ -296,7 +296,7 @@ export default function MentorSessionsContent({
                     <button
                         onClick={() => setActiveTab('past')}
                         className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                            ? 'bg-white text-accent shadow-sm'
+                            ? 'bg-white text-legacy-accent shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                             }`}
                     >
@@ -311,7 +311,7 @@ export default function MentorSessionsContent({
                 <button
                     type="button"
                     onClick={() => setShowRequestModal(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-legacy-accent/20"
                 >
                     <CalendarPlus className="w-4 h-4" />
                     Request a Session
@@ -334,7 +334,7 @@ export default function MentorSessionsContent({
                         <button
                             type="button"
                             onClick={() => setShowRequestModal(true)}
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                         >
                             Request a Session
                             <ArrowRight className="w-4 h-4" />
@@ -413,7 +413,7 @@ export default function MentorSessionsContent({
                     {activeTab === 'upcoming' && (
                         <Link
                             href="/dashboard/mentor/requests"
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
                         >
                             <Users className="w-4 h-4" />
                             View Requests
@@ -431,7 +431,7 @@ export default function MentorSessionsContent({
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div className="flex items-start gap-4">
                                     {/* Student Avatar */}
-                                    <div className="w-14 h-14 rounded-2xl bg-accent text-white flex items-center justify-center text-lg font-bold shrink-0">
+                                    <div className="w-14 h-14 rounded-2xl bg-legacy-accent text-white flex items-center justify-center text-lg font-bold shrink-0">
                                         {session.student_full_name?.[0] || 'S'}
                                     </div>
 
@@ -473,7 +473,7 @@ export default function MentorSessionsContent({
                                                     rel="noopener noreferrer"
                                                     className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
                                                         ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                        : 'bg-accent text-white hover:scale-[1.02]'
+                                                        : 'bg-legacy-accent text-white hover:scale-[1.02]'
                                                         }`}
                                                 >
                                                     <Video className="w-4 h-4" />

@@ -213,7 +213,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                 <h2 className="text-2xl font-bold text-gray-900">Invoices</h2>
                 <button
                     onClick={openCreate}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-accent text-white hover:opacity-90 transition-all shadow-lg"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold bg-legacy-accent text-white hover:opacity-90 transition-all shadow-lg"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                     Create invoice
@@ -267,7 +267,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                                         <span className="block text-amber-600 mt-1">Select at least 2 hours of sessions to send an invoice to Finance.</span>
                                     )}
                                 </p>
-                                <button onClick={generateDraft} disabled={picked.size === 0 || busy || belowMinimum} className="px-5 py-2.5 rounded-xl font-bold bg-accent text-white disabled:opacity-40 hover:opacity-90">
+                                <button onClick={generateDraft} disabled={picked.size === 0 || busy || belowMinimum} className="px-5 py-2.5 rounded-xl font-bold bg-legacy-accent text-white disabled:opacity-40 hover:opacity-90">
                                     {busy ? 'Generating…' : 'Generate draft'}
                                 </button>
                             </div>
@@ -333,7 +333,7 @@ function FilterSelect({ label, value, onChange, options }: { label: string; valu
     return (
         <div className="flex flex-col">
             <label className="text-xs font-semibold text-gray-500 mb-1">{label}</label>
-            <select value={value} onChange={e => onChange(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-accent/30">
+            <select value={value} onChange={e => onChange(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-legacy-accent/30">
                 {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
         </div>
@@ -456,7 +456,7 @@ function InvoiceDetail({ inv, mentorName, mentorEmail, busy, onSubmit, onDiscard
             <div className="flex flex-wrap gap-3 mt-8">
                 {inv.status === 'draft' && (
                     <>
-                        <button onClick={onSubmit} disabled={busy || inv.total_minutes < MIN_INVOICE_MINUTES} className="px-5 py-2.5 rounded-xl font-bold bg-accent text-white disabled:opacity-40 hover:opacity-90">
+                        <button onClick={onSubmit} disabled={busy || inv.total_minutes < MIN_INVOICE_MINUTES} className="px-5 py-2.5 rounded-xl font-bold bg-legacy-accent text-white disabled:opacity-40 hover:opacity-90">
                             {busy ? 'Working…' : 'Send to Finance'}
                         </button>
                         <button onClick={onDiscard} disabled={busy} className="px-5 py-2.5 rounded-xl font-bold text-red-600 border border-red-200 hover:bg-red-50 disabled:opacity-40">

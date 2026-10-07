@@ -84,7 +84,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                     <p className="text-sm font-medium text-gray-500 mb-1">
                         {activeTab === 'inbound' ? 'Credits Sold' : 'Total Payouts'}
                     </p>
-                    <p className="text-3xl font-black text-accent">
+                    <p className="text-3xl font-black text-legacy-accent">
                         {activeTab === 'inbound'
                             ? totalCredits
                             : formatPrice(totalPayoutAmount)}
@@ -154,7 +154,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                                         {purchase.credit_packages?.name || 'Custom'}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-accent/10 text-accent">
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-legacy-accent/10 text-legacy-accent">
                                             +{purchase.credits_purchased}
                                         </span>
                                     </td>

@@ -178,10 +178,10 @@ export default function MentorRequestSessionModal({
                 </div>
 
                 <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
-                    <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                    <div className="p-4 bg-legacy-accent/5 border border-legacy-accent/20 rounded-2xl">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
-                                <Calendar className="w-4 h-4 text-accent" />
+                            <div className="w-8 h-8 bg-legacy-accent/10 rounded-lg flex items-center justify-center shrink-0">
+                                <Calendar className="w-4 h-4 text-legacy-accent" />
                             </div>
                             <div>
                                 <p className="text-sm text-gray-700 leading-relaxed">
@@ -258,7 +258,7 @@ export default function MentorRequestSessionModal({
                             onChange={(e) => setNote(e.target.value)}
                             rows={3}
                             placeholder="Let them know what you'd like to cover, or why you're proposing this time…"
-                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm resize-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm resize-none"
                         />
                     </div>
 
@@ -287,7 +287,7 @@ export default function MentorRequestSessionModal({
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !studentId || !date || !startTime || !endTime}
-                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
+                        className="bg-legacy-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">

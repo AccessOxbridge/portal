@@ -44,7 +44,7 @@ export default function InterventionBubble({
         <div className="flex gap-2.5">
             <div className="w-8 shrink-0">
                 {isFirstInGroup && (
-                    <div className="w-8 h-8 rounded-full bg-white border border-accent/20 flex items-center justify-center overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-white border border-legacy-accent/20 flex items-center justify-center overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/logo.png" alt="Access Oxbridge" className="w-5 h-5 object-contain" />
                     </div>
@@ -54,8 +54,8 @@ export default function InterventionBubble({
             <div className="min-w-0 max-w-[85%]">
                 {isFirstInGroup && (
                     <div className="flex items-baseline gap-2 mb-1">
-                        <span className="text-[13px] font-semibold text-accent">Claire Marlowe</span>
-                        <span className="px-1.5 py-px rounded-full bg-accent/10 text-[10px] font-semibold text-accent">
+                        <span className="text-[13px] font-semibold text-legacy-accent">Claire Marlowe</span>
+                        <span className="px-1.5 py-px rounded-full bg-legacy-accent/10 text-[10px] font-semibold text-legacy-accent">
                             Access Oxbridge
                         </span>
                         <span className="text-[11px] text-gray-400 tabular-nums">{time}</span>

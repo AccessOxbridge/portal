@@ -125,7 +125,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                         >
                             <div className="flex items-center gap-4">
                                 {/* Mentor Avatar */}
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-legacy-accent/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                                     {item.mentor_photo_url ? (
                                         <img
                                             src={item.mentor_photo_url}
@@ -133,7 +133,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <User className="w-6 h-6 text-accent" />
+                                        <User className="w-6 h-6 text-legacy-accent" />
                                     )}
                                 </div>
 
@@ -165,7 +165,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                     type="button"
                                     onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                     disabled={chatLoadingMentorId === item.mentor_id}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent hover:bg-accent/20 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent hover:bg-legacy-accent/20 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     <MessageCircle className="w-3.5 h-3.5" />
                                     {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}
@@ -270,7 +270,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                                 type="button"
                                                 onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                                 disabled={chatLoadingMentorId === item.mentor_id}
-                                                className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 shadow-sm"
+                                                className="flex items-center gap-2 px-4 py-2.5 bg-legacy-accent text-white text-sm font-medium rounded-lg hover:bg-legacy-accent/90 transition-colors disabled:opacity-50 shadow-sm"
                                             >
                                                 <MessageCircle className="w-4 h-4" />
                                                 {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}

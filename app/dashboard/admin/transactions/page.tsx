@@ -46,7 +46,7 @@ export default async function AdminTransactionsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
+                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
                     Transactions
                 </h1>
                 <p className="mt-3 text-gray-500 text-lg">

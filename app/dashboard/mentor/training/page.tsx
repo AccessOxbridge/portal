@@ -78,7 +78,7 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
                 </p>
                 <Link
                     href="/dashboard/mentor/onboarding"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
                 >
                     Go to mentor application
                 </Link>

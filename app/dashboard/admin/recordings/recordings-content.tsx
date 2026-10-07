@@ -88,7 +88,7 @@ export default function AdminRecordingsContent({ batches }: Props) {
                         placeholder="Search by mentor or student name..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
                     />
                 </div>
                 <label className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
@@ -96,7 +96,7 @@ export default function AdminRecordingsContent({ batches }: Props) {
                         type="checkbox"
                         checked={withRecordingOnly}
                         onChange={(e) => setWithRecordingOnly(e.target.checked)}
-                        className="rounded border-gray-300 text-accent focus:ring-accent"
+                        className="rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
                     />
                     With recording only
                 </label>
@@ -170,7 +170,7 @@ export default function AdminRecordingsContent({ batches }: Props) {
                                                             `${batch.studentName} ↔ ${batch.mentorName} · ${formatDate(session.scheduledAt)}`
                                                         )
                                                     }}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors shrink-0"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-legacy-accent text-white text-sm font-semibold hover:bg-legacy-accent/90 transition-colors shrink-0"
                                                 >
                                                     <PlayCircle className="w-4 h-4" />
                                                     Watch

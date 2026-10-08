@@ -52,8 +52,6 @@ export default async function MentorReportsPage() {
         submittedReports?.map(r => [r.session_id, r.created_at]) || []
     )
 
-    const now = new Date()
-
     // Process sessions into to-complete and completed categories
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
@@ -65,12 +63,12 @@ export default async function MentorReportsPage() {
         submitted_at: submissionDates.get(session.id) || null
     }))
 
-    // Sessions that need reports: completed/ended sessions without reports
+    // Sessions that need reports: ones that took place (completed, or ended
+    // on Zoom; the same rule as payouts) without a report. Cancelled and
+    // never-started sessions don't need one.
     const toComplete = processedSessions.filter(session => {
-        // Session must be past or ended
-        const isPast = session.scheduled_at && new Date(session.scheduled_at) < now
         const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
-        return (isPast || isEnded) && !session.has_report
+        return isEnded && !session.has_report
     }).sort((a, b) => {
         // Most recent first (they need attention)
         if (!a.scheduled_at) return 1

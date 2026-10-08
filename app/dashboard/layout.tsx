@@ -164,15 +164,14 @@ export default async function DashboardLayout({
     let pendingRequestsCount = 0
 
     if (isMentor && showSidebar) {
-        const nowIso = new Date().toISOString()
-        const now = new Date()
-
-        // Get all past/ended sessions for this mentor (for reports)
+        // Sessions that took place: completed, or ended on Zoom. The same rule
+        // as payouts, so cancelled and never-started sessions don't ask for a
+        // report. Matches the Reports page's "To complete" list.
         const { data: sessions } = await supabase
             .from('sessions')
-            .select('id, scheduled_at, status, zoom_meeting_status')
+            .select('id')
             .eq('mentor_id', user.id)
-            .or(`scheduled_at.lt.${nowIso},zoom_meeting_status.eq.ended,status.eq.completed`)
+            .or('status.eq.completed,zoom_meeting_status.eq.ended')
 
         if (sessions && sessions.length > 0) {
             const sessionIds = sessions.map(s => s.id)
@@ -188,11 +187,7 @@ export default async function DashboardLayout({
             const submittedSessionIds = new Set(submittedReports?.map(r => r.session_id) || [])
 
             // Count sessions that need reports
-            pendingReportsCount = sessions.filter(session => {
-                const isPast = session.scheduled_at && new Date(session.scheduled_at) < now
-                const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
-                return (isPast || isEnded) && !submittedSessionIds.has(session.id)
-            }).length
+            pendingReportsCount = sessions.filter(session => !submittedSessionIds.has(session.id)).length
         }
 
         // Pending student requests (mentorship_requests awaiting mentor response)

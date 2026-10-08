@@ -83,7 +83,14 @@ export default async function StudentDashboard() {
         .order('scheduled_at', { ascending: false })
         .limit(200)
 
-    const calendarSessions = (calendarRows || []).map((session: any) => ({
+    type CalendarRow = {
+        id: string
+        scheduled_at: string
+        duration_minutes: number | null
+        zoom_join_url: string | null
+        mentor: { full_name: string | null } | null
+    }
+    const calendarSessions = ((calendarRows || []) as unknown as CalendarRow[]).map((session) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
         duration_minutes: session.duration_minutes ?? null,

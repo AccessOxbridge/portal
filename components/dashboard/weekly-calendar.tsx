@@ -28,6 +28,8 @@ interface WeeklyCalendarProps {
 export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits, timezone = null }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
+    // Read once on load: used to mark sessions that have already ended.
+    const [loadedAt] = useState(() => Date.now())
     // Mentors omit `credits`; only students pass a balance and need the top-up gate.
     const creditsRequired = typeof credits === 'number'
     const canJoinZoom = !creditsRequired || credits > 0
@@ -173,7 +175,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                         {daySessions.map((session) => {
                             // A session that has finished stays visible but can't be
                             // joined: its Zoom room is closed.
-                            const ended = new Date(session.scheduled_at).getTime() + (session.duration_minutes ?? 60) * 60000 < Date.now()
+                            const ended = new Date(session.scheduled_at).getTime() + (session.duration_minutes ?? 60) * 60000 < loadedAt
                             return (
                             <div
                                 key={session.id}

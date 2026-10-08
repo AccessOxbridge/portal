@@ -226,7 +226,7 @@ More sentence case and em dashes (phase 3, second sweep):
 - Next-session card: `Active mentorship` / `Mentor: {name}` > `Up next` / `{Today, Tomorrow, In n days}` / `{weekday day month}` / `{time} with {mentor}` (unscheduled sessions keep `Active mentorship` / `Mentor: {name}`)
 - Within an hour of the start: `Starting soon`, with `Join session`, `Top up to join` or `Zoom link pending` (the week calendar's rules)
 - New buttons on the card: `Book another session` (when booking is available) and `View my sessions`
-- No session or request: `This week` / `{n} sessions booked`, plus one new line under it:
+- No session or request: `This week` / `{n} sessions booked` > `Up next` with a `{n} sessions this week` chip, and the title `Book your next session` / `Complete your profile` / `Your mentor is on the way`, plus one new line under it:
   - `Pick a few times that suit you and your mentor chooses one.` (can book)
   - `Finish your profile so we can match you with a mentor.` (profile incomplete)
   - `The team is choosing your mentor.` (waiting for a mentor)

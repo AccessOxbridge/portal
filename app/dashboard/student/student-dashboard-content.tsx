@@ -165,8 +165,11 @@ export default function StudentDashboardContent({
                     <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
                 </Rise>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Rise i={1} className="md:col-span-2 md:row-span-2">
+                {/* Wide screens: the up-next card beside hours and profile. Narrower
+                    (tablets, laptops under 1280px): the card spans the row, the two
+                    small cards sit side by side underneath. */}
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <Rise i={1} className="md:col-span-2 xl:row-span-2">
                         <div
                             className={cn(
                                 'flex h-full flex-col gap-5 rounded-card p-6 ring-1 transition-colors duration-300 sm:flex-row sm:items-center sm:gap-6 sm:p-7',
@@ -271,11 +274,16 @@ export default function StudentDashboardContent({
                                         <Calendar weight="duotone" className="size-9" />
                                     </span>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-medium text-tint-amber-foreground">This week</p>
-                                        <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground tabular-nums">
-                                            {sessionsThisWeek} {sessionsThisWeek === 1 ? 'session booked' : 'sessions booked'}
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <p className="text-sm font-medium text-tint-amber-foreground">Up next</p>
+                                            <span className="rounded-full bg-card px-2.5 py-0.5 text-xs font-medium text-tint-amber-foreground tabular-nums">
+                                                {sessionsThisWeek} {sessionsThisWeek === 1 ? 'session' : 'sessions'} this week
+                                            </span>
+                                        </div>
+                                        <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground text-balance">
+                                            {canBook ? 'Book your next session' : !profileComplete ? 'Complete your profile' : 'Your mentor is on the way'}
                                         </p>
-                                        <p className="mt-1 text-lg text-tint-amber-foreground">
+                                        <p className="mt-1 text-lg text-tint-amber-foreground text-pretty">
                                             {canBook ? 'Pick a few times that suit you and your mentor chooses one.' : !profileComplete ? 'Finish your profile so we can match you with a mentor.' : 'The team is choosing your mentor.'}
                                         </p>
                                         <div className="mt-5 flex flex-wrap gap-2">

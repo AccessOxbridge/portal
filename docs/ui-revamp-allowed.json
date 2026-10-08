@@ -8,6 +8,46 @@
                 "components/ui/select.tsx"
             ],
             "why": "SelectField's hidden input. It carries the same name the replaced native <select> had, so form submissions are unchanged."
+        },
+        {
+            "category": "href",
+            "item": "{nextZoomUrl}",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Join session within the last hour before the next session; same Zoom link and new-tab behaviour as the week calendar's Join."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/student/services",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Top up to join at 0 hours; the same destination the week calendar already uses."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/student/sessions",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. View my sessions link to the existing sessions page."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/timezone > getZonedNow",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Pure date helper for the 'Today / Tomorrow / In 2 days' label. Fetches nothing."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/timezone > resolveTz",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Pure date helper for the same label. Fetches nothing."
         }
     ]
 }

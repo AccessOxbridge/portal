@@ -218,3 +218,18 @@ More sentence case and em dashes (phase 3, second sweep):
             <ArrowSquareOut weight="bold" className="size-4" />`
 - `components/dashboard/stripe-dashboard-button.tsx`: the `→` is now an external-link icon
 - `app/dashboard/mentor/reports/reports-content.tsx`: `To Complete` > `To complete`
+
+## Student home redesign ("A + up next", approved 2026-10-08)
+
+`app/dashboard/student/student-dashboard-content.tsx`
+- `Student dashboard` + `Welcome back, {full name}!` > `Welcome back` + `Hi {first name}`
+- Next-session card: `Active mentorship` / `Mentor: {name}` > `Up next` / `{Today, Tomorrow, In n days}` / `{weekday day month}` / `{time} with {mentor}` (unscheduled sessions keep `Active mentorship` / `Mentor: {name}`)
+- Within an hour of the start: `Starting soon`, with `Join session`, `Top up to join` or `Zoom link pending` (the week calendar's rules)
+- New buttons on the card: `Book another session` (when booking is available) and `View my sessions`
+- No session or request: `This week` / `{n} sessions booked`, plus one new line under it:
+  - `Pick a few times that suit you and your mentor chooses one.` (can book)
+  - `Finish your profile so we can match you with a mentor.` (profile incomplete)
+  - `The team is choosing your mentor.` (waiting for a mentor)
+
+`components/dashboard/application-timeline.tsx`
+- Title `Application timeline` > `Road to {target university}` when a target is set

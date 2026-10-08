@@ -6,9 +6,11 @@ import { cn } from '@/utils/lib'
 interface ApplicationTimelineProps {
     applicationYear?: number | null
     entranceExamDate?: string | null
+    /** Display only: titles the card "Road to Cambridge" when set. */
+    targetUniversity?: string | null
 }
 
-export default function ApplicationTimeline({ applicationYear, entranceExamDate }: ApplicationTimelineProps) {
+export default function ApplicationTimeline({ applicationYear, entranceExamDate, targetUniversity }: ApplicationTimelineProps) {
     const now = new Date()
     const currentYear = applicationYear || now.getFullYear()
 
@@ -83,7 +85,7 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
     return (
         <div className="rounded-card bg-card p-5 shadow-border sm:p-6">
             <div className="mb-6 flex items-center justify-between gap-3">
-                <h3 className="text-base font-semibold text-foreground">Application timeline</h3>
+                <h3 className="text-base font-semibold text-foreground">{targetUniversity ? `Road to ${targetUniversity}` : 'Application timeline'}</h3>
                 <span className="text-sm text-muted-foreground tabular-nums">{currentYear} entry</span>
             </div>
 

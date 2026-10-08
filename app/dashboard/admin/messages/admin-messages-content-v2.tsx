@@ -751,7 +751,7 @@ export default function AdminMessagesContent({
                                     <>
                                         <AlertTriangle className="size-4 text-warning" />
                                         <span className="text-xs font-medium text-tint-amber-foreground">
-                                            Send as Access Oxbridge Support — both participants will see this
+                                            Send as Access Oxbridge Support. Both participants will see this
                                         </span>
                                     </>
                                 )}

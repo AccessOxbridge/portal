@@ -11,7 +11,7 @@ import {
     CheckCircle,
     CaretDown as ChevronDown,
     CaretLeft as ChevronLeft,
-    CaretUp as ChevronUp,
+    CaretUpDown,
     WarningCircle as AlertCircle,
     User,
 } from '@phosphor-icons/react/ssr'
@@ -22,10 +22,12 @@ import { navigation, studentSections } from './nav-items'
 import { version as appVersion } from '@/package.json'
 import { useUnreadMessages } from './use-unread-messages'
 import { Avatar } from '@/components/ui/avatar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/overlay'
 
 interface SidebarProps {
     role: string;
     userName: string;
+    userEmail?: string;
     userId?: string;
     photoUrl?: string | null;
     pendingReportsCount?: number;
@@ -41,6 +43,7 @@ interface SidebarProps {
 export default function Sidebar({
     role,
     userName,
+    userEmail,
     userId,
     photoUrl,
     pendingReportsCount = 0,
@@ -57,7 +60,6 @@ export default function Sidebar({
     const [searchQuery, setSearchQuery] = useState('')
     const [profileMenuOpen, setProfileMenuOpen] = useState(false)
     const searchInputRef = useRef<HTMLInputElement>(null)
-    const profileMenuRef = useRef<HTMLDivElement>(null)
 
     // Custom sidebar tab order (persisted per user + role in localStorage)
     const [navOrder, setNavOrder] = useState<string[]>([])
@@ -122,17 +124,8 @@ export default function Sidebar({
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [])
 
-    // Close profile drop-up when clicking outside (student only)
-    useEffect(() => {
-        if (effectiveRole !== 'student' || !profileMenuOpen) return
-        const handleClickOutside = (e: MouseEvent) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
-                setProfileMenuOpen(false)
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [effectiveRole, profileMenuOpen])
+    // The profile menu (student only) is a Radix DropdownMenu: it closes on an
+    // outside click or Escape by itself and returns focus to its button.
 
     // Base nav items for the current role, reordered to match the saved custom order.
     // Items not present in the saved order keep their original position (appended in
@@ -462,80 +455,60 @@ export default function Sidebar({
             {/* Footer: who's signed in, settings and sign out */}
             <div className={cn('border-t border-sidebar-border', collapsed ? 'p-2' : 'p-3')}>
                 {effectiveRole === 'student' ? (
-                    <div className="relative" ref={profileMenuRef}>
-                        {/* Drop-up menu above the profile button */}
-                        <div
-                            className={cn(
-                                'absolute z-50 overflow-hidden rounded-card border border-transparent bg-popover p-1 text-popover-foreground shadow-overlay',
-                                'transition-[opacity,translate,scale] duration-150 ease-snappy motion-reduce:transition-opacity',
-                                collapsed
-                                    ? 'bottom-0 left-full ml-3 w-52 origin-bottom-left'
-                                    : 'bottom-full left-0 right-0 mb-2 origin-bottom',
-                                profileMenuOpen
-                                    ? 'visible opacity-100 translate-y-0 scale-100'
-                                    : collapsed
-                                      ? 'pointer-events-none invisible opacity-0 -translate-x-1 scale-[0.96]'
-                                      : 'pointer-events-none invisible opacity-0 translate-y-1 scale-[0.96]'
-                            )}
-                        >
-                            <Link
-                                href="/dashboard/student/profile"
-                                onClick={() => setProfileMenuOpen(false)}
-                                className="flex items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-muted"
-                            >
-                                <User className="size-4 text-muted-foreground" />
-                                <span>My profile</span>
-                            </Link>
-                            <Link
-                                href="/dashboard/settings"
-                                onClick={() => setProfileMenuOpen(false)}
-                                className="flex items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-sm text-foreground transition-colors duration-150 hover:bg-muted"
-                            >
-                                <Settings className="size-4 text-muted-foreground" />
-                                <span>Settings</span>
-                            </Link>
-                            <div className="-mx-1 my-1 h-px bg-border" />
+                    <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen}>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setProfileMenuOpen(false)
-                                    handleSignOut()
-                                }}
-                                className="flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-sm text-destructive transition-colors duration-150 hover:bg-tint-rose"
-                            >
-                                <LogOut className="size-4" />
-                                <span>Sign out</span>
-                            </button>
-                        </div>
-
-                        <button
-                            type="button"
-                            title={userName || 'Profile'}
-                            aria-expanded={profileMenuOpen}
-                            onClick={() => setProfileMenuOpen((open) => !open)}
-                            className={cn(
-                                rowBase,
-                                'w-full text-left hover:bg-sidebar-accent',
-                                profileMenuOpen && 'bg-sidebar-accent',
-                                collapsed ? 'justify-center p-1.5' : 'justify-between gap-3 p-2'
-                            )}
-                        >
-                            <span className={cn('flex min-w-0 items-center', !collapsed && 'gap-3')}>
-                                <Avatar name={userName || 'User'} src={photoUrl} size="md" />
-                                {!collapsed && (
-                                    <span className="flex min-w-0 flex-col">
-                                        <span className="truncate text-sm font-medium text-white">{userName || 'User'}</span>
-                                        <span className="truncate text-xs capitalize text-white/60">{role}</span>
-                                    </span>
+                                title={userName || 'Profile'}
+                                className={cn(
+                                    rowBase,
+                                    'w-full text-left hover:bg-sidebar-accent',
+                                    profileMenuOpen && 'bg-sidebar-accent',
+                                    collapsed ? 'justify-center p-1.5' : 'justify-between gap-3 p-2'
                                 )}
-                            </span>
-                            {!collapsed && (
-                                <ChevronUp
-                                    className={cn('size-4 shrink-0 text-white/50 transition-[rotate] duration-200 ease-snappy', profileMenuOpen ? 'rotate-0' : 'rotate-180')}
-                                />
-                            )}
-                        </button>
-                    </div>
+                            >
+                                <span className={cn('flex min-w-0 items-center', !collapsed && 'gap-3')}>
+                                    <Avatar name={userName || 'User'} src={photoUrl} size="md" />
+                                    {!collapsed && (
+                                        <span className="flex min-w-0 flex-col">
+                                            <span className="truncate text-sm font-medium text-white">{userName || 'User'}</span>
+                                            <span className="truncate text-xs capitalize text-white/60">{role}</span>
+                                        </span>
+                                    )}
+                                </span>
+                                {!collapsed && <CaretUpDown className="size-4 shrink-0 text-white/50" />}
+                            </button>
+                        </DropdownMenuTrigger>
+                        {/* Opens beside the sidebar (shadcn's sidebar pattern), lined up
+                            with the bottom of the button, so it never covers the nav. */}
+                        <DropdownMenuContent side="right" align="end" sideOffset={12} className="w-60">
+                            <div className="flex items-center gap-2.5 px-2 py-2">
+                                <Avatar name={userName || 'User'} src={photoUrl} size="sm" />
+                                <div className="min-w-0 leading-tight">
+                                    <p className="truncate text-sm font-medium text-foreground">{userName || 'User'}</p>
+                                    {userEmail && <p className="truncate text-xs text-muted-foreground">{userEmail}</p>}
+                                </div>
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/student/profile">
+                                    <User />
+                                    <span>My profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/settings">
+                                    <Settings />
+                                    <span>Settings</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive" onSelect={() => handleSignOut()}>
+                                <LogOut />
+                                <span>Sign out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 ) : (
                     <>
                         <div

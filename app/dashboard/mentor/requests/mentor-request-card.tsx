@@ -289,7 +289,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                             disabled={timeSlots.length === 0}
                             className="w-full py-5 bg-primary text-white font-semibold rounded-card shadow-[0_8px_30px_rgb(67,56,202,0.3)] active:scale-[0.98] transition-[background-color,box-shadow,color] duration-150 text-lg disabled:opacity-50"
                         >
-                            Select a Time Slot
+                            Select a time slot
                         </button>
                         <button
                             onClick={() => setShowRejectDialog(true)}
@@ -301,7 +301,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                     </>
                 ) : (
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-muted-foreground">Choose a Time Slot</h4>
+                        <h4 className="text-sm font-semibold text-muted-foreground">Choose a time slot</h4>
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                             {timeSlots.map((slot, index) => (
                                 <button

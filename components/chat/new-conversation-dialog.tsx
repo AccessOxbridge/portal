@@ -101,7 +101,7 @@ export default function NewConversationDialog({
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-semibold text-foreground">Start a Conversation</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Start a conversation</h2>
                         <p className="text-sm text-muted-foreground">
                             Select a {userRole === 'student' ? 'mentor' : 'student'} to chat with
                         </p>

@@ -186,3 +186,35 @@ Empty values and em dashes:
 - `app/dashboard/mentor/page.tsx`: `Application Pending` > `Application pending`; `Student Requests` > `Student requests`; `Active Sessions` > `Active sessions`; `Earnings & Payouts` > `Earnings and payouts`; `View Requests` / `View Payouts` / `Complete Onboarding` / `Go to Training` > sentence case (the `→` characters are now arrow icons); `🎥 Start at` > `Start at` (the camera is now an icon)
 
 Kept as written: names (Access Oxbridge, Claire Marlowe, Stripe), `Privacy Policy`, dropdown options, and the mentor contract's legal wording.
+
+More sentence case and em dashes (phase 3, second sweep):
+- `app/dashboard/admin/messages/admin-messages-content-v2.tsx`: `Send as Access Oxbridge Support [em dash] both participants will see this` > `Send as Access Oxbridge Support. Both participants will see this`
+- `app/dashboard/mentor/payouts/page.tsx`: `Earnings & Payouts` > `Earnings and payouts`
+- `app/dashboard/mentor/payouts/report-issue-form.tsx`: `Report a Payment Issue` > `Report a payment issue`
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `Areas of Expertise` > `Areas of expertise`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Select a Time Slot` > `Select a time slot`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Choose a Time Slot` > `Choose a time slot`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Request a Session` > `Request a session`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Report a Problem` > `Report a problem`
+- `app/dashboard/mentor/training/page.tsx`: `Training & Onboarding` > `Training and onboarding`
+- `app/dashboard/mentor/training/training-content.tsx`: `Training & Onboarding` > `Training and onboarding`
+- `app/dashboard/mentor/training/training-content.tsx`: `Welcome to the Access Oxbridge Team` > `Welcome to the Access Oxbridge team`
+- `app/dashboard/mentor/training/training-content.tsx`: `Getting to Know You` > `Getting to know you`
+- `app/dashboard/mentor/training/training-content.tsx`: `Continue to Contract` > `Continue to contract`
+- `app/dashboard/mentor/training/training-content.tsx`: `Continue to Background Checks` > `Continue to background checks`
+- `app/dashboard/mentor/training/training-content.tsx`: `Continue to Payment Setup` > `Continue to payment setup`
+- `app/dashboard/mentor/training/training-content.tsx`: `Continue to Profile` > `Continue to profile`
+- `app/dashboard/mentor/training/training-content.tsx`: `Confirm & Continue` > `Confirm and continue`
+- `components/chat/new-conversation-dialog.tsx`: `Start a Conversation` > `Start a conversation`
+- `components/chat/v2/messages-content.tsx`: `Start a New Conversation` > `Start a new conversation`
+- `components/dashboard/mentorship-onboarding.tsx`: `Subjects & Predicted Grades` > `Subjects and predicted grades`
+- `app/dashboard/mentor/profile/page.tsx`: `Keep your details up to date [em dash] this is what students and the team see.` > `Keep your details up to date. This is what students and the team see.`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `label="Billing Country"` > `label="Billing country"`
+- `components/dashboard/stripe-dashboard-button.tsx`: `className="px-6 py-3 bg-white text-[#635BFF] font-bold rounded-xl hover:bg-gray-50 transition-colors"
+        >
+            Open Dashboard →` > `className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 text-base font-medium whitespace-nowrap text-[#635BFF] transition-[background-color,scale] duration-150 ease-out hover:bg-white/90 active:scale-[0.96]"
+        >
+            Open dashboard
+            <ArrowSquareOut weight="bold" className="size-4" />`
+- `components/dashboard/stripe-dashboard-button.tsx`: the `→` is now an external-link icon
+- `app/dashboard/mentor/reports/reports-content.tsx`: `To Complete` > `To complete`

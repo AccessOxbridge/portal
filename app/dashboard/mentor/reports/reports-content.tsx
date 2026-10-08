@@ -34,7 +34,7 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
                         }`}
                 >
                     <Clock className="size-4" />
-                    To Complete
+                    To complete
                     {toComplete.length > 0 && (
                         <span className="ml-1 px-2 py-0.5 bg-warning text-white text-xs font-semibold rounded-full">
                             {toComplete.length}

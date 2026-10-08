@@ -385,6 +385,8 @@ export default async function DashboardLayout({
                       'User'
                   )
                 : profile.full_name || user.email?.split('@')[0] || 'User',
+        // Shown in the student's profile menu, so it's clear which account is signed in.
+        userEmail: user.email ?? '',
         userId: user.id,
         // Mentors keep their photo on `mentors`; everyone else — students,
         // admins — carries it on `profiles`.

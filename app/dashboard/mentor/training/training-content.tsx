@@ -555,7 +555,7 @@ export default function TrainingContent({
             {/* Header */}
             <header className="text-center">
                 <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
-                    Training & Onboarding
+                    Training and onboarding
                 </h1>
                 <p className="mt-2 text-lg text-muted-foreground">
                     Complete all steps to start receiving student allocations
@@ -639,7 +639,7 @@ export default function TrainingContent({
                             <GraduationCap className="size-10 text-primary" />
                         </div>
                         <h2 className="text-3xl font-semibold text-foreground">
-                            Welcome to the Access Oxbridge Team
+                            Welcome to the Access Oxbridge team
                         </h2>
                         <p className="text-xl text-primary font-medium">
                             We are so glad to have you, {mentorName}! 🎉
@@ -671,7 +671,7 @@ export default function TrainingContent({
                                 <ClipboardList className="size-7 text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-semibold text-foreground">Getting to Know You</h2>
+                                <h2 className="text-2xl font-semibold text-foreground">Getting to know you</h2>
                                 <p className="text-muted-foreground">A few questions to help us build your profile</p>
                             </div>
                         </div>
@@ -684,7 +684,7 @@ export default function TrainingContent({
                                     onClick={() => setCurrentStep(2)}
                                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
-                                    Continue to Contract
+                                    Continue to contract
                                     <ChevronRight className="size-5" />
                                 </button>
                             </div>
@@ -764,7 +764,7 @@ export default function TrainingContent({
                                         onClick={() => setCurrentStep(3)}
                                         className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                                     >
-                                        Continue to Background Checks
+                                        Continue to background checks
                                         <ChevronRight className="size-5" />
                                     </button>
                                 </div>
@@ -892,7 +892,7 @@ export default function TrainingContent({
                                     onClick={() => setCurrentStep(4)}
                                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
-                                    Continue to Payment Setup
+                                    Continue to payment setup
                                     <ChevronRight className="size-5" />
                                 </button>
                             </div>
@@ -945,7 +945,7 @@ export default function TrainingContent({
                                     onClick={() => setCurrentStep(5)}
                                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
-                                    Continue to Profile
+                                    Continue to profile
                                     <ChevronRight className="size-5" />
                                 </button>
                             </div>
@@ -1292,7 +1292,7 @@ function BackgroundUploadForm({
                                 disabled={isUploading || !backgroundCheckConfirmed}
                                 className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                             >
-                                Confirm & Continue
+                                Confirm and continue
                                 <ChevronRight className="size-5" />
                             </button>
                         </div>

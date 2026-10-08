@@ -27,7 +27,7 @@ export default async function MentorRequestsPage() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-primary tracking-tight">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
                     Mentorship requests
                 </h1>
                 <p className="mt-4 text-muted-foreground text-xl font-medium">

@@ -726,7 +726,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           <p className="mb-3 text-xs font-semibold text-primary/60">
             Mentor application
           </p>
-          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
+          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Complete your profile{welcomeName}
           </h1>
           <p className="max-w-2xl leading-relaxed text-muted-foreground">

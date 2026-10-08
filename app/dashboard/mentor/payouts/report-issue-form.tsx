@@ -94,7 +94,7 @@ export default function ReportIssueForm({ mentorId }: ReportIssueFormProps) {
                             className="inline-flex items-center gap-2 px-4 py-2.5 bg-warning text-white font-semibold rounded-control hover:bg-warning/90 transition-colors"
                         >
                             <AlertCircle className="size-4" />
-                            Report a Payment Issue
+                            Report a payment issue
                         </button>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-4 bg-card p-4 rounded-control border border-border">

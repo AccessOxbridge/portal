@@ -58,7 +58,7 @@ export default async function MentorProfilePage() {
             <header className="mb-10">
                 <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">My profile</h1>
                 <p className="mt-2 text-lg text-muted-foreground">
-                    Keep your details up to date — this is what students and the team see.
+                    Keep your details up to date. This is what students and the team see.
                 </p>
             </header>
 

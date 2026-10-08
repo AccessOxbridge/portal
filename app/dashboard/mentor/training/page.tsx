@@ -72,7 +72,7 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
     if (!mentor) {
         return (
             <div className="max-w-2xl mx-auto text-center py-16 px-6">
-                <h1 className="text-2xl font-semibold text-foreground mb-4">Training & Onboarding</h1>
+                <h1 className="text-2xl font-semibold text-foreground mb-4">Training and onboarding</h1>
                 <p className="text-muted-foreground mb-8">
                     Please complete your mentor application first. Once your application is set up, you can access training and onboarding here.
                 </p>

@@ -315,7 +315,7 @@ export default function MentorSessionsContent({
                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm"
                 >
                     <CalendarPlus className="size-4" />
-                    Request a Session
+                    Request a session
                 </button>
             </div>
 
@@ -337,7 +337,7 @@ export default function MentorSessionsContent({
                             onClick={() => setShowRequestModal(true)}
                             className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-6"
                         >
-                            Request a Session
+                            Request a session
                             <ArrowRight className="size-4" />
                         </button>
                     </div>
@@ -552,7 +552,7 @@ export default function MentorSessionsContent({
                     <div className="border border-transparent relative z-50 w-full max-w-md mx-4 bg-card rounded-card shadow-border overflow-hidden">
                         <div className="p-6 border-b border-border flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-semibold text-foreground">Report a Problem</h2>
+                                <h2 className="text-xl font-semibold text-foreground">Report a problem</h2>
                                 <p className="text-sm text-muted-foreground mt-1">Let us know if your student didn&apos;t show up.</p>
                             </div>
                             <button

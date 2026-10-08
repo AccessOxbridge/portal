@@ -296,7 +296,7 @@ export default function MentorshipOnboarding({ onClose }: { onClose: () => void 
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-lg font-semibold text-foreground">Subjects & Predicted Grades</h3>
+                                        <h3 className="text-lg font-semibold text-foreground">Subjects and predicted grades</h3>
                                         <p className="text-sm text-muted-foreground">Add at least 1. Use “Predicted Grade” as it appears on your reports.</p>
                                     </div>
                                     <div className={`text-sm font-medium ${formData.subjects.length >= 1 ? 'text-success' : 'text-warning'}`}>

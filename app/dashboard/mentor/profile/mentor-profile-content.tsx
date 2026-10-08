@@ -290,7 +290,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                         <CheckCircle2 className="size-5 text-success" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-foreground">Areas of Expertise</h3>
+                        <h3 className="font-semibold text-foreground">Areas of expertise</h3>
                         <p className="text-sm text-muted-foreground">Subjects you can mentor students in</p>
                     </div>
                 </div>

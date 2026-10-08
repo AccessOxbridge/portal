@@ -25,8 +25,8 @@ export function todayIso(): string {
 }
 
 const INPUT_CLASS =
-    'w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all'
-const LABEL_CLASS = 'text-sm font-bold text-gray-700 ml-1'
+    'w-full bg-muted/60 border border-border rounded-card py-3 pl-11 pr-4 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary/20 transition-[background-color,box-shadow,color] duration-150'
+const LABEL_CLASS = 'text-sm font-semibold text-foreground ml-1'
 
 const PLAN_COPY: Record<PlanType, { label: string; hint: string }> = {
     package: { label: 'Package', hint: 'A fixed number of sessions over a set number of weeks.' },
@@ -65,7 +65,7 @@ export function SessionTargetFields({
     return (
         <div className="space-y-4">
             <input type="hidden" name={`${namePrefix}plan_type`} value={value.planType} />
-            <div className="grid grid-cols-2 gap-2 p-1 bg-gray-50 border border-gray-100 rounded-2xl">
+            <div className="grid grid-cols-2 gap-2 p-1 bg-muted/60 border border-border rounded-card">
                 {(['package', 'ongoing'] as PlanType[]).map((type) => (
                     <button
                         key={type}
@@ -78,17 +78,17 @@ export function SessionTargetFields({
                                 weeks: type === 'ongoing' && !value.weeks ? '1' : value.weeks,
                             })
                         }
-                        className={`py-2 rounded-xl text-sm font-semibold transition-all ${
+                        className={`py-2 rounded-control text-sm font-semibold transition-[background-color,box-shadow,color] duration-150 ${
                             value.planType === type
-                                ? 'bg-white text-legacy-accent shadow-sm border border-gray-100'
-                                : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-card text-primary shadow-border border border-border'
+                                : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         {PLAN_COPY[type].label}
                     </button>
                 ))}
             </div>
-            <p className="text-xs text-gray-500 -mt-2 ml-1">{PLAN_COPY[value.planType].hint}</p>
+            <p className="text-xs text-muted-foreground -mt-2 ml-1">{PLAN_COPY[value.planType].hint}</p>
 
             <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
@@ -96,7 +96,7 @@ export function SessionTargetFields({
                         {isPackage ? 'Sessions in total' : 'Sessions'}
                     </label>
                     <div className="relative">
-                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         <input
                             id={`${namePrefix}sessions`}
                             name={`${namePrefix}sessions`}
@@ -107,7 +107,7 @@ export function SessionTargetFields({
                             value={value.sessions}
                             readOnly={lockSessions}
                             onChange={(e) => onChange({ ...value, sessions: e.target.value })}
-                            className={`${INPUT_CLASS} ${lockSessions ? 'text-gray-500 cursor-not-allowed' : ''}`}
+                            className={`${INPUT_CLASS} ${lockSessions ? 'text-muted-foreground cursor-not-allowed' : ''}`}
                         />
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export function SessionTargetFields({
                         {isPackage ? 'Over (weeks)' : 'Every (weeks)'}
                     </label>
                     <div className="relative">
-                        <Repeat className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Repeat className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         <input
                             id={`${namePrefix}weeks`}
                             name={`${namePrefix}weeks`}
@@ -134,7 +134,7 @@ export function SessionTargetFields({
                 </div>
             </div>
             {lockSessions && (
-                <p className="text-xs text-gray-500 -mt-2 ml-1">Taken from Total Hours (1 hour = 1 session).</p>
+                <p className="text-xs text-muted-foreground -mt-2 ml-1">Taken from total hours (1 hour = 1 session).</p>
             )}
 
             <div className="space-y-2">
@@ -142,7 +142,7 @@ export function SessionTargetFields({
                     Start date
                 </label>
                 <div className="relative">
-                    <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
                         id={`${namePrefix}start_date`}
                         name={`${namePrefix}start_date`}
@@ -156,12 +156,12 @@ export function SessionTargetFields({
             </div>
 
             {valid && (
-                <div className="rounded-2xl bg-legacy-accent/5 border border-legacy-accent/10 px-4 py-3 text-sm text-gray-700">
-                    <span className="font-semibold text-legacy-accent">
+                <div className="rounded-card bg-primary/5 border border-primary/10 px-4 py-3 text-sm text-foreground">
+                    <span className="font-semibold text-primary">
                         {describeTarget({ planType: value.planType, sessions, weeks })}
                     </span>
                     {end && (
-                        <span className="text-gray-500">
+                        <span className="text-muted-foreground">
                             {' '}
                             · ends{' '}
                             {end.toLocaleDateString('en-GB', {

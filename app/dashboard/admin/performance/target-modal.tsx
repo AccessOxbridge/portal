@@ -72,7 +72,7 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
             onClick={close}
         >
             <div
-                className="bg-white w-full max-w-md rounded-[32px] shadow-2xl relative max-h-[90vh] overflow-y-auto duration-200"
+                className="border border-transparent bg-card w-full max-w-md rounded-card shadow-border relative max-h-[90vh] overflow-y-auto duration-200"
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -81,24 +81,24 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                 <button
                     onClick={close}
                     disabled={isPending}
-                    className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all disabled:opacity-50"
+                    className="absolute top-5 right-5 p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-full transition-[background-color,box-shadow,color] duration-150 disabled:opacity-50"
                     aria-label="Close"
                 >
-                    <X className="w-5 h-5" />
+                    <X className="size-5" />
                 </button>
 
                 <form onSubmit={save} className="p-8 space-y-6">
                     <div>
-                        <div className="w-12 h-12 bg-legacy-accent/10 rounded-2xl flex items-center justify-center mb-4">
-                            <Target className="w-6 h-6 text-legacy-accent" />
+                        <div className="size-12 bg-primary/10 rounded-card flex items-center justify-center mb-4">
+                            <Target className="size-6 text-primary" />
                         </div>
-                        <h2 id="target-modal-title" className="text-2xl font-bold text-gray-900">
+                        <h2 id="target-modal-title" className="text-2xl font-semibold text-foreground">
                             {row.target ? 'Edit session plan' : 'Set session plan'}
                         </h2>
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-muted-foreground mt-1">
                             {row.name}
                             {row.completedAllTime > 0 && (
-                                <span className="text-gray-400"> · {row.completedAllTime} completed so far</span>
+                                <span className="text-muted-foreground"> · {row.completedAllTime} completed so far</span>
                             )}
                         </p>
                     </div>
@@ -106,8 +106,8 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                     <SessionTargetFields value={draft} onChange={setDraft} namePrefix="edit_target_" />
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="edit_target_note">
-                            Note <span className="font-normal text-gray-400">(optional)</span>
+                        <label className="text-sm font-semibold text-foreground ml-1" htmlFor="edit_target_note">
+                            Note <span className="font-normal text-muted-foreground">(optional)</span>
                         </label>
                         <textarea
                             id="edit_target_note"
@@ -116,13 +116,13 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="e.g. Pays weekly for 2–3 hours"
-                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all resize-none"
+                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm py-2.5 px-3.5 leading-relaxed resize-none"
                         />
                     </div>
 
                     {error && (
-                        <div className="flex items-start gap-3 p-4 rounded-2xl bg-red-50 text-red-700 border border-red-100">
-                            <AlertCircle className="w-5 h-5 shrink-0" />
+                        <div className="flex items-start gap-3 p-4 rounded-card bg-tint-rose text-tint-rose-foreground border border-border">
+                            <AlertCircle className="size-5 shrink-0" />
                             <span className="text-sm font-medium">{error}</span>
                         </div>
                     )}
@@ -133,10 +133,10 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                                 type="button"
                                 onClick={remove}
                                 disabled={isPending}
-                                className={`px-4 py-3 rounded-2xl text-sm font-semibold transition-all disabled:opacity-50 ${
+                                className={`px-4 py-3 rounded-card text-sm font-semibold transition-[background-color,box-shadow,color] duration-150 disabled:opacity-50 ${
                                     confirmRemove
-                                        ? 'bg-red-600 text-white hover:bg-red-700'
-                                        : 'text-red-600 hover:bg-red-50'
+                                        ? 'bg-destructive text-white hover:bg-destructive/90'
+                                        : 'text-destructive hover:bg-tint-rose'
                                 }`}
                             >
                                 {confirmRemove ? 'Confirm remove' : 'Remove'}
@@ -145,9 +145,9 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="flex-1 py-3 bg-legacy-accent text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-3 bg-primary text-white rounded-card font-semibold hover:opacity-90 transition-[background-color,box-shadow,color] duration-150 shadow-border shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Save plan'}
+                            {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Save plan'}
                         </button>
                     </div>
                 </form>

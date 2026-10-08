@@ -39,10 +39,10 @@ export default async function AdminEventsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    Manage Events
+                <h1 className="text-4xl font-semibold text-primary tracking-tight">
+                    Manage events
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Create, edit, and manage webinars and in-person events for students
                 </p>
             </header>

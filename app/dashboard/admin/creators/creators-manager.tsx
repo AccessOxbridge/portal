@@ -73,36 +73,36 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900">All Creators</h2>
-                    <p className="text-sm text-gray-500">Manage creators and view their performance</p>
+                    <h2 className="text-xl font-semibold text-foreground">All creators</h2>
+                    <p className="text-sm text-muted-foreground">Manage creators and view their performance</p>
                 </div>
                 <button
                     onClick={() => {
                         generateCode()
                         setIsAddModalOpen(true)
                     }}
-                    className="px-4 py-2 bg-legacy-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all shadow-lg shadow-legacy-accent/10 flex items-center gap-2"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Add Creator
+                    Add creator
                 </button>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
                 {creators.map((creator) => (
-                    <div key={creator.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-gray-200 transition-colors">
+                    <div key={creator.id} className="border border-transparent bg-card p-6 rounded-card shadow-border flex items-center justify-between hover:border-border transition-colors">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-blue-50 flex items-center justify-center text-lg font-bold text-legacy-accent">
+                            <div className="size-12 rounded-full bg-tint-violet flex items-center justify-center text-lg font-semibold text-primary">
                                 {creator.name.charAt(0)}
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-900">{creator.name}</h3>
-                                <div className="flex items-center gap-3 text-sm text-gray-500">
+                                <h3 className="font-semibold text-foreground">{creator.name}</h3>
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                     <span>{creator.email}</span>
-                                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                    <span className="font-mono bg-gray-50 px-2 py-0.5 rounded border border-gray-200 text-xs">
+                                    <span className="size-1 rounded-full bg-muted"></span>
+                                    <span className="font-mono bg-muted/60 px-2 py-0.5 rounded border border-border text-xs">
                                         {creator.tracking_code}
                                     </span>
                                 </div>
@@ -110,11 +110,11 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                         </div>
                         <div className="flex items-center gap-8">
                             <div className="text-right">
-                                <span className="block text-2xl font-bold text-gray-900">{creator.referrals_count || 0}</span>
-                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Referrals</span>
+                                <span className="block text-2xl font-semibold text-foreground">{creator.referrals_count || 0}</span>
+                                <span className="text-xs font-medium text-muted-foreground">Referrals</span>
                             </div>
-                            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button className="p-2 text-muted-foreground hover:text-muted-foreground transition-colors">
+                                <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                 </svg>
                             </button>
@@ -123,9 +123,9 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                 ))}
 
                 {creators.length === 0 && (
-                    <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                        <h3 className="text-gray-900 font-medium mb-1">No creators yet</h3>
-                        <p className="text-gray-500 text-sm">Add your first creator to start tracking referrals</p>
+                    <div className="text-center py-12 bg-muted/60 rounded-card border border-dashed border-border">
+                        <h3 className="text-foreground font-medium mb-1">No creators yet</h3>
+                        <p className="text-muted-foreground text-sm">Add your first creator to start tracking referrals</p>
                     </div>
                 )}
             </div>
@@ -144,74 +144,74 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-xl z-50 p-6"
+                            className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-card rounded-card shadow-border z-50 p-6"
                         >
-                            <h2 className="text-xl font-bold text-gray-900 mb-6">Add New Creator</h2>
+                            <h2 className="text-xl font-semibold text-foreground mb-6">Add new creator</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">Full name</label>
                                     <input
                                         required
                                         type="text"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent"
+                                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                         placeholder="e.g. Sarah Smith"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">Email address</label>
                                     <input
                                         required
                                         type="email"
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent"
+                                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                         placeholder="sarah@example.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio (Optional)</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">Bio (Optional)</label>
                                     <textarea
                                         value={formData.bio}
                                         onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent h-24 resize-none"
+                                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm py-2.5 px-3.5 leading-relaxed h-24 resize-none"
                                         placeholder="Short description..."
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tracking Code</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">Tracking code</label>
                                     <div className="flex gap-2">
                                         <input
                                             required
                                             type="text"
                                             value={formData.tracking_code}
                                             onChange={e => setFormData({ ...formData, tracking_code: e.target.value.toUpperCase() })}
-                                            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent font-mono uppercase"
+                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5 font-mono"
                                         />
                                         <button
                                             type="button"
                                             onClick={generateCode}
-                                            className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+                                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                                         >
                                             Regenerate
                                         </button>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">This is the code students will enter during signup.</p>
+                                    <p className="text-xs text-muted-foreground mt-1">This is the code students will enter during signup.</p>
                                 </div>
 
                                 <div className="flex gap-3 mt-8">
                                     <button
                                         type="button"
                                         onClick={() => setIsAddModalOpen(false)}
-                                        className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3 flex-1"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="flex-1 px-4 py-2.5 bg-legacy-accent text-white rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg shadow-legacy-accent/10 disabled:opacity-50"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3 flex-1"
                                     >
                                         {isLoading ? 'Creating...' : 'Create Creator'}
                                     </button>

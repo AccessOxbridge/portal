@@ -22,11 +22,11 @@ export default async function CreateArticlePage() {
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Create New Article</h1>
-                <p className="mt-2 text-gray-500 text-lg">Write and publish a new blog article.</p>
+                <h1 className="text-4xl font-semibold text-primary tracking-tight">Create new article</h1>
+                <p className="mt-2 text-muted-foreground text-lg">Write and publish a new blog article.</p>
             </header>
 
-            <div className="bg-white shadow-xl shadow-gray-200/50 rounded-[40px] border border-gray-100 overflow-hidden">
+            <div className="bg-card shadow-border rounded-[40px] border border-border overflow-hidden">
                 <div className="p-8">
                     <ArticleForm author={profile.full_name || 'Unknown Author'} />
                 </div>

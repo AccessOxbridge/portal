@@ -233,3 +233,123 @@ More sentence case and em dashes (phase 3, second sweep):
 
 `components/dashboard/application-timeline.tsx`
 - Title `Application timeline` > `Road to {target university}` when a target is set
+
+## Phase 4: admin
+
+Sentence case (headings, labels, buttons, empty states). Kept as written: the Terms and Conditions page and its date, "Oxford-Bridge network", acronyms (URL, CV, UCAS).
+- `app/dashboard/admin/approvals/page.tsx`: `Application Approvals` > `Application approvals`
+- `app/dashboard/admin/approvals/page.tsx`: `Mentor&apos;s Resume` > `Mentor&apos;s resume`
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `Article Content` > `Article content`
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `Article Title` > `Article title`
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `Cover Image URL` > `Cover image URL`
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `Featured Article` > `Featured article`
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `Short Summary` > `Short summary`
+- `app/dashboard/admin/blog/components/ArticleList.tsx`: `Edit Article` > `Edit article`
+- `app/dashboard/admin/blog/components/ArticleList.tsx`: `View Live` > `View live`
+- `app/dashboard/admin/blog/components/CreateArticleButton.tsx`: `Create Article` > `Create article`
+- `app/dashboard/admin/blog/create/page.tsx`: `Create New Article` > `Create new article`
+- `app/dashboard/admin/blog/edit/[id]/page.tsx`: `Edit Article` > `Edit article`
+- `app/dashboard/admin/blog/page.tsx`: `All Articles` > `All articles`
+- `app/dashboard/admin/blog/page.tsx`: `Blog Management` > `Blog management`
+- `app/dashboard/admin/clients/page.tsx`: `Client Details` > `Client details`
+- `app/dashboard/admin/clients/page.tsx`: `Email Address` > `Email address`
+- `app/dashboard/admin/clients/page.tsx`: `Full Name` > `Full name`
+- `app/dashboard/admin/clients/page.tsx`: `Premium Client` > `Premium client`
+- `app/dashboard/admin/clients/page.tsx`: `Premium Clients` > `Premium clients`
+- `app/dashboard/admin/clients/page.tsx`: `Register Client` > `Register client`
+- `app/dashboard/admin/clients/page.tsx`: `Register Premium Client` > `Register premium client`
+- `app/dashboard/admin/clients/page.tsx`: `Registration Date` > `Registration date`
+- `app/dashboard/admin/clients/page.tsx`: `View Account` > `View account`
+- `app/dashboard/admin/create-account/create-account-client.tsx`: `Create Account` > `Create account`
+- `app/dashboard/admin/create-account/create-account-client.tsx`: `Full Name` > `Full name`
+- `app/dashboard/admin/create-account/create-account-client.tsx`: `Total Hours` > `Total hours`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `Add Creator` > `Add creator`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `Add New Creator` > `Add new creator`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `All Creators` > `All creators`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `Email Address` > `Email address`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `Full Name` > `Full name`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `Tracking Code` > `Tracking code`
+- `app/dashboard/admin/creators/page.tsx`: `Creator Management` > `Creator management`
+- `app/dashboard/admin/events/events-manager.tsx`: `Add Event` > `Add event`
+- `app/dashboard/admin/events/events-manager.tsx`: `All Events` > `All events`
+- `app/dashboard/admin/events/events-manager.tsx`: `Event Type` > `Event type`
+- `app/dashboard/admin/events/events-manager.tsx`: `In Person` > `In person`
+- `app/dashboard/admin/events/events-manager.tsx`: `Start Date & Time` > `Start date & time`
+- `app/dashboard/admin/events/page.tsx`: `Manage Events` > `Manage events`
+- `app/dashboard/admin/feedbacks/feedback-table.tsx`: `Experience Feedback:` > `Experience feedback:`
+- `app/dashboard/admin/feedbacks/feedback-table.tsx`: `Session Date` > `Session date`
+- `app/dashboard/admin/feedbacks/feedback-table.tsx`: `Session Transcript:` > `Session transcript:`
+- `app/dashboard/admin/feedbacks/feedback-table.tsx`: `View Transcript →` > `View transcript`
+- `app/dashboard/admin/feedbacks/page.tsx`: `Student Feedback` > `Student feedback`
+- `app/dashboard/admin/fortnightly-report/page.tsx`: `Fortnightly Report` > `Fortnightly report`
+- `app/dashboard/admin/issues/issues-table.tsx`: `Admin Notes` > `Admin notes`
+- `app/dashboard/admin/issues/issues-table.tsx`: `Update Status` > `Update status`
+- `app/dashboard/admin/issues/page.tsx`: `User Issues` > `User issues`
+- `app/dashboard/admin/manage-sessions/admin-book-session-modal.tsx`: `Book Session` > `Book session`
+- `app/dashboard/admin/manage-sessions/admin-book-session-modal.tsx`: `Book a Session` > `Book a session`
+- `app/dashboard/admin/manage-sessions/admin-book-session-modal.tsx`: `End Time` > `End time`
+- `app/dashboard/admin/manage-sessions/admin-book-session-modal.tsx`: `Start Time` > `Start time`
+- `app/dashboard/admin/manage-sessions/manage-sessions-table.tsx`: `No Sessions Found` > `No sessions found`
+- `app/dashboard/admin/manage-sessions/manage-sessions-table.tsx`: `Session Time` > `Session time`
+- `app/dashboard/admin/manage-sessions/page.tsx`: `Manage Sessions` > `Manage sessions`
+- `app/dashboard/admin/mentors/[id]/mentor-ratings.tsx`: `Feedback &amp; Ratings` > `Feedback &amp; ratings`
+- `app/dashboard/admin/mentors/[id]/page.tsx`: `/5 Rating` > `/5 rating`
+- `app/dashboard/admin/mentors/[id]/page.tsx`: `Back to Mentors` > `Back to mentors`
+- `app/dashboard/admin/mentors/[id]/page.tsx`: `Onboarding Form Responses` > `Onboarding form responses`
+- `app/dashboard/admin/mentors/[id]/page.tsx`: `← Back to Mentors` > `← Back to mentors`
+- `app/dashboard/admin/mentors/components/MentorActions.tsx`: `Change Status` > `Change status`
+- `app/dashboard/admin/mentors/components/MentorActions.tsx`: `Request Details` > `Request details`
+- `app/dashboard/admin/mentors/components/MentorActions.tsx`: `Set Active` > `Set active`
+- `app/dashboard/admin/mentors/components/MentorActions.tsx`: `Set Pending` > `Set pending`
+- `app/dashboard/admin/mentors/components/MentorFilters.tsx`: `All Status` > `All status`
+- `app/dashboard/admin/mentors/components/MentorFilters.tsx`: `Details Required` > `Details required`
+- `app/dashboard/admin/mentors/components/MentorFilters.tsx`: `Pending Approval` > `Pending approval`
+- `app/dashboard/admin/mentors/page.tsx`: `All Subjects` > `All subjects`
+- `app/dashboard/admin/mentors/page.tsx`: `All Universities` > `All universities`
+- `app/dashboard/admin/mentors/page.tsx`: `Review Applications` > `Review applications`
+- `app/dashboard/admin/page.tsx`: `Add New Mentor` > `Add new mentor`
+- `app/dashboard/admin/page.tsx`: `Admin Home` > `Admin home`
+- `app/dashboard/admin/page.tsx`: `Blog Management` > `Blog management`
+- `app/dashboard/admin/page.tsx`: `Client Management` > `Client management`
+- `app/dashboard/admin/page.tsx`: `Creator Management` > `Creator management`
+- `app/dashboard/admin/page.tsx`: `Download Report` > `Download report`
+- `app/dashboard/admin/page.tsx`: `Manage Articles` > `Manage articles`
+- `app/dashboard/admin/page.tsx`: `Manage Clients` > `Manage clients`
+- `app/dashboard/admin/page.tsx`: `Manage Creators` > `Manage creators`
+- `app/dashboard/admin/page.tsx`: `Manage Mentors` > `Manage mentors`
+- `app/dashboard/admin/page.tsx`: `Mentor Management` > `Mentor management`
+- `app/dashboard/admin/page.tsx`: `Platform Performance` > `Platform performance`
+- `app/dashboard/admin/payouts/page.tsx`: `Bill To` > `Bill to`
+- `app/dashboard/admin/payouts/page.tsx`: `Invoice Details` > `Invoice details`
+- `app/dashboard/admin/payouts/page.tsx`: `Mentor Payouts` > `Mentor payouts`
+- `app/dashboard/admin/payouts/page.tsx`: `TOTAL PAY` > `Total pay`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `Add New Package` > `Add new package`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `No credit packages yet. Create one to get started!` > `No credit packages yet. Create one to get started.`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `Package Name` > `Package name`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `Sort Order` > `Sort order`
+- `app/dashboard/admin/products/page.tsx`: `Create, edit, and manage Products that students can purchase` > `Create, edit, and manage products that students can purchase`
+- `app/dashboard/admin/products/page.tsx`: `Manage Products` > `Manage products`
+- `app/dashboard/admin/recordings/page.tsx`: `Session Recordings` > `Session recordings`
+- `app/dashboard/admin/recordings/recordings-content.tsx`: `No Completed Sessions` > `No completed sessions`
+- `app/dashboard/admin/reports/page.tsx`: `Session Reports` > `Session reports`
+- `app/dashboard/admin/reports/reports-table.tsx`: `Action Items` > `Action items`
+- `app/dashboard/admin/reports/reports-table.tsx`: `Key Takeaways` > `Key takeaways`
+- `app/dashboard/admin/reports/reports-table.tsx`: `Mentor&apos;s Session Notes` > `Mentor&apos;s session notes`
+- `app/dashboard/admin/reports/reports-table.tsx`: `No Reports Yet` > `No reports yet`
+- `app/dashboard/admin/reports/reports-table.tsx`: `Personalised Report` > `Personalised report`
+- `app/dashboard/admin/reports/reports-table.tsx`: `Session Summary` > `Session summary`
+- `app/dashboard/admin/satisfaction/page.tsx`: `Student Satisfaction` > `Student satisfaction`
+- `app/dashboard/admin/session-payouts/page.tsx`: `Session Payouts` > `Session payouts`
+- `app/dashboard/admin/session-payouts/session-payouts-table.tsx`: `No. of Rows` > `No. of rows`
+- `app/dashboard/admin/sessions/page.tsx`: `Session Transcripts` > `Session transcripts`
+- `app/dashboard/admin/sessions/sessions-table.tsx`: `No Completed Sessions` > `No completed sessions`
+- `app/dashboard/admin/sessions/sessions-table.tsx`: `Session Date` > `Session date`
+- `app/dashboard/admin/sessions/sessions-table.tsx`: `View Transcript` > `View transcript`
+- `app/dashboard/admin/student-help/page.tsx`: `Student Help Requests` > `Student help requests`
+- `app/dashboard/admin/transactions/transactions-tabs.tsx`: `Paid At` > `Paid at`
+- `app/dashboard/admin/transactions/transactions-tabs.tsx`: `Total Revenue` > `Total revenue`
+- `components/admin/session-target-fields.tsx`: `Taken from Total Hours (1 hour = 1 session).` > `Taken from total hours (1 hour = 1 session).`
+
+Empty values (`[em dash]` > `Not set` / `None`):
+- `app/dashboard/admin/payouts/page.tsx`: invoice reference, invoice number, student name > `Not set`
+- `app/dashboard/admin/performance/mentor-ratings-table.tsx`, `student-pace-table.tsx`, `satisfaction/satisfaction-overview.tsx`: empty cells > `None`

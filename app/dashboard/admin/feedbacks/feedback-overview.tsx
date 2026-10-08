@@ -65,37 +65,37 @@ export default function FeedbackOverview({
     return (
         <div className="space-y-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Total responses</p>
-                    <p className="text-3xl font-black text-legacy-accent">{totalResponses}</p>
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Total responses</p>
+                    <p className="text-3xl font-semibold text-primary">{totalResponses}</p>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Average rating</p>
-                    <p className="text-3xl font-black text-amber-500 flex items-center gap-2">
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Average rating</p>
+                    <p className="text-3xl font-semibold text-warning flex items-center gap-2">
                         {overallAverage !== null ? overallAverage.toFixed(1) : '—'}
-                        <span className="text-lg text-gray-400">/ 5</span>
+                        <span className="text-lg text-muted-foreground">/ 5</span>
                     </p>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Response rate</p>
-                    <p className="text-3xl font-black text-gray-900">
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Response rate</p>
+                    <p className="text-3xl font-semibold text-foreground">
                         {responseRate !== null ? `${responseRate}%` : '—'}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                         {totalResponses} of {completedSessions} completed sessions rated
                     </p>
                 </div>
             </div>
 
             {ranked.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="bg-card rounded-card border border-border p-6">
                     <div className="flex items-start justify-between gap-4 mb-6">
                         <div>
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-gray-400" />
+                            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                                <TrendingUp className="size-5 text-muted-foreground" />
                                 Mentors by average rating
                             </h2>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                                 {showAll
                                     ? 'Showing every mentor with at least one rating.'
                                     : `Mentors with at least ${DEFAULT_MIN_RESPONSES} ratings.`}
@@ -105,7 +105,7 @@ export default function FeedbackOverview({
                             <button
                                 type="button"
                                 onClick={() => setShowAll((v) => !v)}
-                                className="text-sm font-semibold text-legacy-accent hover:underline shrink-0"
+                                className="text-sm font-semibold text-primary hover:underline shrink-0"
                             >
                                 {showAll ? 'Apply minimum' : `Show all (+${belowThreshold})`}
                             </button>
@@ -160,12 +160,12 @@ export default function FeedbackOverview({
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500">
+                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
                         {ranked.slice(0, 3).map((m, i) => (
                             <span key={m.mentorId} className="flex items-center gap-1.5">
-                                <span className="font-bold text-gray-400">#{i + 1}</span>
-                                <Star weight="fill" className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                                <span className="font-semibold text-gray-700">
+                                <span className="font-semibold text-muted-foreground">#{i + 1}</span>
+                                <Star weight="fill" className="size-3.5 text-amber-400 fill-amber-400" />
+                                <span className="font-semibold text-foreground">
                                     {m.mentorName}
                                 </span>
                                 {m.average.toFixed(1)} ({m.count})

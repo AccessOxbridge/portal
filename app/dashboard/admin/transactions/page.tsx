@@ -46,10 +46,10 @@ export default async function AdminTransactionsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
+                <h1 className="text-4xl font-semibold text-primary tracking-tight">
                     Transactions
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View all inbound and outbound transactions
                 </p>
             </header>

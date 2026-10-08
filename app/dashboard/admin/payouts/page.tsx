@@ -75,9 +75,9 @@ const fmtTimeRange = (scheduledAt?: string | null, dur?: number) => {
 const fmtDur = (min: number) => `${Math.floor((min || 0) / 60)}h ${(min || 0) % 60}m`
 const statusLabel = (s: string) => ({ submitted: 'Sent to Finance', paid: 'Paid' } as Record<string, string>)[s] || s
 const badgeClass = (s: string) => ({
-    submitted: 'bg-indigo-100 text-indigo-700',
-    paid: 'bg-green-100 text-green-700',
-} as Record<string, string>)[s] || 'bg-gray-100 text-gray-700'
+    submitted: 'bg-tint-blue text-tint-blue-foreground',
+    paid: 'bg-tint-green text-tint-green-foreground',
+} as Record<string, string>)[s] || 'bg-muted text-foreground'
 
 function StatusBadge({ status }: { status: string }) {
     return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeClass(status)}`}>{statusLabel(status)}</span>
@@ -184,21 +184,21 @@ export default function AdminPayoutsPage() {
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Mentor Payouts</h1>
-                <p className="mt-2 text-gray-500 text-lg">Pay the invoices mentors have sent to finance</p>
+                <h1 className="text-4xl font-semibold text-primary tracking-tight">Mentor payouts</h1>
+                <p className="mt-2 text-muted-foreground text-lg">Pay the invoices mentors have sent to finance</p>
             </header>
 
-            {error && <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">{error}</div>}
+            {error && <div className="p-4 bg-tint-rose border border-border rounded-control text-tint-rose-foreground">{error}</div>}
 
             {/* Per-invoice results summary */}
             {results && results.length > 0 && (
-                <div className="p-5 bg-white border border-gray-100 rounded-[24px] shadow-lg space-y-2">
-                    <h3 className="font-bold text-gray-900">Payout results</h3>
+                <div className="border border-transparent p-5 bg-card rounded-card shadow-border space-y-2">
+                    <h3 className="font-semibold text-foreground">Payout results</h3>
                     {results.map(r => {
                         const inv = invoices.find(i => i.invoice_id === r.invoice_id)
                         const label = inv?.invoice_number || inv?.mentor_name || r.invoice_id.slice(0, 8)
                         return (
-                            <div key={r.invoice_id} className={`text-sm px-3 py-2 rounded-lg ${r.success ? (r.bank_payout_pending ? 'bg-amber-50 text-amber-800' : 'bg-green-50 text-green-800') : 'bg-red-50 text-red-700'}`}>
+                            <div key={r.invoice_id} className={`text-sm px-3 py-2 rounded-lg ${r.success ? (r.bank_payout_pending ? 'bg-tint-amber text-tint-amber-foreground' : 'bg-tint-green text-tint-green-foreground') : 'bg-tint-rose text-tint-rose-foreground'}`}>
                                 <span className="font-semibold">{label}</span>{' — '}
                                 {r.success
                                     ? (r.bank_payout_pending ? `paid (transfer ok) ⚠️ bank payout pending: ${r.warning}` : 'paid ✓')
@@ -214,13 +214,13 @@ export default function AdminPayoutsPage() {
                 <FilterSelect label="Status" value={fStatus} onChange={setFStatus} options={[['submitted', 'Sent to Finance'], ['paid', 'Paid'], ['all', 'All']]} />
                 <FilterSelect label="Period" value={fPeriod} onChange={setFPeriod} options={[['all', 'All time'], ['30d', 'Last 30 days'], ['year', 'This year']]} />
                 <FilterSelect label="Billing Country" value={fCountry} onChange={setFCountry} options={[['all', 'All'], ['uk', 'United Kingdom']]} />
-                <button onClick={resetFilters} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50">Reset</button>
+                <button onClick={resetFilters} className="px-4 py-2.5 rounded-control text-sm font-semibold text-muted-foreground border border-border hover:bg-muted/60">Reset</button>
                 <div className="flex-1" />
-                <button onClick={selectAllVisible} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50">Select all payable</button>
+                <button onClick={selectAllVisible} className="px-4 py-2.5 rounded-control text-sm font-semibold text-muted-foreground border border-border hover:bg-muted/60">Select all payable</button>
                 <button
                     onClick={() => setConfirming(true)}
                     disabled={pickedInvoices.length === 0 || processing}
-                    className="px-6 py-2.5 rounded-xl font-bold bg-legacy-accent text-white disabled:opacity-40 hover:opacity-90 shadow-lg"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
                     {processing ? 'Processing…' : `Pay selected${pickedInvoices.length ? ` (${pickedInvoices.length})` : ''}`}
                 </button>
@@ -231,9 +231,9 @@ export default function AdminPayoutsPage() {
                 {/* Left list */}
                 <div className="lg:col-span-2 space-y-3 lg:max-h-[720px] lg:overflow-y-auto pr-1">
                     {loading ? (
-                        <p className="text-gray-500 p-6">Loading…</p>
+                        <p className="text-muted-foreground p-6">Loading…</p>
                     ) : filtered.length === 0 ? (
-                        <div className="p-8 bg-gray-50 rounded-[24px] text-center text-gray-500">
+                        <div className="p-8 bg-muted/60 rounded-card text-center text-muted-foreground">
                             {fStatus === 'submitted' ? 'No invoices waiting to be paid.' : 'No invoices match these filters.'}
                         </div>
                     ) : filtered.map(inv => {
@@ -241,11 +241,11 @@ export default function AdminPayoutsPage() {
                         const canPay = payable(inv)
                         return (
                             <div key={inv.invoice_id}
-                                className={`p-4 rounded-2xl border transition-all ${isSel ? 'border-indigo-300 bg-indigo-50/60 shadow-md' : 'border-gray-100 bg-white hover:shadow-md'}`}>
+                                className={`p-4 rounded-card border transition-[background-color,box-shadow,color] duration-150 ${isSel ? 'border-brand/30 bg-tint-blue/60 shadow-border' : 'border-border bg-card hover:shadow-border'}`}>
                                 <div className="flex items-start gap-3">
                                     <input
                                         type="checkbox"
-                                        className="mt-1 w-4 h-4 accent-[var(--accent,#4f46e5)] disabled:opacity-30"
+                                        className="mt-1 size-4 accent-[var(--accent,#4f46e5)] disabled:opacity-30"
                                         checked={picked.has(inv.invoice_id)}
                                         disabled={!canPay}
                                         onChange={() => togglePick(inv.invoice_id)}
@@ -254,26 +254,26 @@ export default function AdminPayoutsPage() {
                                     <button onClick={() => setSelectedId(inv.invoice_id)} className="flex-1 text-left min-w-0">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="min-w-0">
-                                                <p className="font-bold text-gray-900 truncate">{inv.mentor_name}</p>
-                                                <p className="text-xs text-gray-400 truncate">{inv.invoice_number || inv.invoice_reference || 'Invoice'}</p>
+                                                <p className="font-semibold text-foreground truncate">{inv.mentor_name}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{inv.invoice_number || inv.invoice_reference || 'Invoice'}</p>
                                             </div>
                                             <StatusBadge status={inv.status} />
                                         </div>
                                         <div className="flex items-center justify-between text-sm mt-2">
-                                            <span className="text-gray-500">{inv.sessions_count} session{inv.sessions_count !== 1 ? 's' : ''} · {fmtDur(inv.total_minutes)}</span>
-                                            <span className="font-bold text-gray-900">{fmtGBP(inv.amount_cents, inv.currency)}</span>
+                                            <span className="text-muted-foreground">{inv.sessions_count} session{inv.sessions_count !== 1 ? 's' : ''} · {fmtDur(inv.total_minutes)}</span>
+                                            <span className="font-semibold text-foreground">{fmtGBP(inv.amount_cents, inv.currency)}</span>
                                         </div>
                                         <div className="mt-2">
                                             {inv.status === 'paid' ? (
-                                                <span className="text-xs text-gray-400">Paid {fmtDate(inv.paid_at)}</span>
+                                                <span className="text-xs text-muted-foreground">Paid {fmtDate(inv.paid_at)}</span>
                                             ) : inv.ready ? (
-                                                <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium"><span className="w-2 h-2 rounded-full bg-green-500" />Stripe connected</span>
+                                                <span className="inline-flex items-center gap-1 text-xs text-success font-medium"><span className="size-2 rounded-full bg-success" />Stripe connected</span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 text-xs text-amber-600 font-medium"><span className="w-2 h-2 rounded-full bg-amber-500" />Stripe not set up</span>
+                                                <span className="inline-flex items-center gap-1 text-xs text-warning font-medium"><span className="size-2 rounded-full bg-warning" />Stripe not set up</span>
                                             )}
                                         </div>
                                         {resultById[inv.invoice_id] && (
-                                            <p className={`text-xs mt-1 ${resultById[inv.invoice_id].success ? 'text-green-600' : 'text-red-600'}`}>
+                                            <p className={`text-xs mt-1 ${resultById[inv.invoice_id].success ? 'text-success' : 'text-destructive'}`}>
                                                 {resultById[inv.invoice_id].success ? (resultById[inv.invoice_id].bank_payout_pending ? '⚠️ bank payout pending' : 'paid ✓') : `failed: ${resultById[inv.invoice_id].error}`}
                                             </p>
                                         )}
@@ -289,7 +289,7 @@ export default function AdminPayoutsPage() {
                     {selected ? (
                         <InvoiceDetail inv={selected} busy={processing} onVoid={() => voidInvoice(selected)} />
                     ) : (
-                        <div className="p-12 bg-gray-50 rounded-[24px] text-center text-gray-500">Select an invoice to view its details.</div>
+                        <div className="p-12 bg-muted/60 rounded-card text-center text-muted-foreground">Select an invoice to view its details.</div>
                     )}
                 </div>
             </div>
@@ -297,20 +297,20 @@ export default function AdminPayoutsPage() {
             {/* Confirmation dialog */}
             {confirming && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                    <div className="bg-white rounded-[24px] shadow-2xl max-w-md w-full p-8">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm payout</h3>
-                        <p className="text-gray-500 text-sm mb-6">This transfers funds to mentors&apos; connected accounts and cannot be undone.</p>
+                    <div className="border border-transparent bg-card rounded-card shadow-border max-w-md w-full p-8">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">Confirm payout</h3>
+                        <p className="text-muted-foreground text-sm mb-6">This transfers funds to mentors&apos; connected accounts and cannot be undone.</p>
                         <div className="space-y-3 mb-6">
                             <Row label="Invoices" value={`${pickedInvoices.length}`} />
                             <Row label="Mentors" value={`${pickedMentors}`} />
                             <Row label="Sessions" value={`${pickedSessions}`} />
-                            <div className="flex justify-between pt-3 border-t border-gray-900 font-extrabold text-lg">
+                            <div className="flex justify-between pt-3 border-t border-foreground font-semibold text-lg">
                                 <span>Total</span><span>{fmtGBP(pickedTotal)}</span>
                             </div>
                         </div>
                         <div className="flex gap-3 justify-end">
-                            <button onClick={() => setConfirming(false)} className="px-5 py-2.5 rounded-xl font-bold text-gray-600 border border-gray-200 hover:bg-gray-50">Cancel</button>
-                            <button onClick={doPay} className="px-5 py-2.5 rounded-xl font-bold bg-legacy-accent text-white hover:opacity-90">Pay {fmtGBP(pickedTotal)}</button>
+                            <button onClick={() => setConfirming(false)} className="px-5 py-2.5 rounded-control font-semibold text-muted-foreground border border-border hover:bg-muted/60">Cancel</button>
+                            <button onClick={doPay} className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3">Pay {fmtGBP(pickedTotal)}</button>
                         </div>
                     </div>
                 </div>
@@ -320,14 +320,14 @@ export default function AdminPayoutsPage() {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
-    return <div className="flex justify-between text-sm"><span className="text-gray-500">{label}</span><span className="font-semibold text-gray-900">{value}</span></div>
+    return <div className="flex justify-between text-sm"><span className="text-muted-foreground">{label}</span><span className="font-semibold text-foreground">{value}</span></div>
 }
 
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
     return (
         <div className="flex flex-col">
-            <label className="text-xs font-semibold text-gray-500 mb-1">{label}</label>
-            <select value={value} onChange={e => onChange(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-legacy-accent/30">
+            <label className="text-xs font-semibold text-muted-foreground mb-1">{label}</label>
+            <select value={value} onChange={e => onChange(e.target.value)} className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5">
                 {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
         </div>
@@ -337,67 +337,67 @@ function FilterSelect({ label, value, onChange, options }: { label: string; valu
 function InvoiceDetail({ inv, busy, onVoid }: { inv: AdminInvoice; busy: boolean; onVoid: () => void }) {
     const period = inv.period_start && inv.period_end ? `${fmtDate(inv.period_start)} – ${fmtDate(inv.period_end)}` : fmtDate(inv.invoice_date)
     return (
-        <div className="bg-white rounded-[24px] border border-gray-100 shadow-lg p-8">
+        <div className="border border-transparent bg-card rounded-card shadow-border p-8">
             {inv.is_self_billed && (
-                <div className="mb-4 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold tracking-widest inline-block">SELF-BILLING</div>
+                <div className="mb-4 px-3 py-1.5 rounded-lg bg-tint-amber text-tint-amber-foreground text-xs font-semibold tracking-widest inline-block">SELF-BILLING</div>
             )}
             <div className="flex items-start justify-between">
                 <div>
-                    <h3 className="text-2xl font-extrabold text-gray-900">{inv.status === 'paid' ? 'Remittance' : 'Invoice'}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{period}</p>
-                    <p className="text-sm text-gray-500">{inv.completed_count} of {inv.sessions_count} completed</p>
+                    <h3 className="text-2xl font-semibold text-foreground">{inv.status === 'paid' ? 'Remittance' : 'Invoice'}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{period}</p>
+                    <p className="text-sm text-muted-foreground">{inv.completed_count} of {inv.sessions_count} completed</p>
                 </div>
                 <div className="text-right">
                     <StatusBadge status={inv.status} />
-                    <p className="text-xs text-gray-400 mt-2">{inv.status === 'paid' ? `Paid ${fmtDate(inv.paid_at)}` : `Sent ${fmtDate(inv.submitted_at)}`}</p>
+                    <p className="text-xs text-muted-foreground mt-2">{inv.status === 'paid' ? `Paid ${fmtDate(inv.paid_at)}` : `Sent ${fmtDate(inv.submitted_at)}`}</p>
                 </div>
             </div>
 
-            <div className="border-t border-gray-100 my-6" />
+            <div className="border-t border-border my-6" />
 
             <div className="grid grid-cols-2 gap-6">
                 <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">From</p>
-                    <p className="font-bold text-gray-900">{inv.mentor_name}</p>
-                    <p className="text-gray-600 text-sm">{inv.mentor_email}</p>
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">From</p>
+                    <p className="font-semibold text-foreground">{inv.mentor_name}</p>
+                    <p className="text-muted-foreground text-sm">{inv.mentor_email}</p>
                 </div>
                 <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Bill To</p>
-                    <p className="font-bold text-gray-900">{BILL_TO.name}</p>
-                    {BILL_TO.lines.map((l, i) => <p key={i} className="text-gray-600 text-sm">{l}</p>)}
-                    <p className="text-gray-600 text-sm">{BILL_TO.postcode}</p>
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">Bill to</p>
+                    <p className="font-semibold text-foreground">{BILL_TO.name}</p>
+                    {BILL_TO.lines.map((l, i) => <p key={i} className="text-muted-foreground text-sm">{l}</p>)}
+                    <p className="text-muted-foreground text-sm">{BILL_TO.postcode}</p>
                 </div>
             </div>
 
             <div className="mt-6">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Invoice Details</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-2">Invoice details</p>
                 <div className="text-sm space-y-1">
-                    <div className="flex justify-between"><span className="text-gray-500">Invoice date</span><span>{fmtDate(inv.invoice_date)}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500">Invoice reference</span><span>{inv.invoice_reference || '—'}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500">Invoice number</span><span className="font-semibold">{inv.invoice_number || '—'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invoice date</span><span>{fmtDate(inv.invoice_date)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invoice reference</span><span>{inv.invoice_reference || 'Not set'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invoice number</span><span className="font-semibold">{inv.invoice_number || 'Not set'}</span></div>
                 </div>
             </div>
 
-            <div className="mt-6 border border-gray-100 rounded-xl overflow-hidden">
-                <div className="grid grid-cols-12 bg-gray-50 px-4 py-2.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div className="mt-6 border border-border rounded-control overflow-hidden">
+                <div className="grid grid-cols-12 bg-muted/60 px-4 py-2.5 text-xs font-semibold text-muted-foreground">
                     <div className="col-span-4">Session</div>
                     <div className="col-span-5">Description</div>
                     <div className="col-span-1 text-right">Dur.</div>
                     <div className="col-span-2 text-right">Amount</div>
                 </div>
                 {inv.items.map((it, i) => (
-                    <div key={i} className="grid grid-cols-12 px-4 py-3 border-t border-gray-100 text-sm">
+                    <div key={i} className="grid grid-cols-12 px-4 py-3 border-t border-border text-sm">
                         <div className="col-span-4">
-                            <p className="font-medium text-gray-900">{fmtDate(it.session_date)}</p>
-                            <p className="text-xs text-gray-400">{fmtTimeRange(it.scheduled_at, it.duration_minutes)}</p>
-                            {it.completed && <p className="text-xs text-green-600">Completed</p>}
+                            <p className="font-medium text-foreground">{fmtDate(it.session_date)}</p>
+                            <p className="text-xs text-muted-foreground">{fmtTimeRange(it.scheduled_at, it.duration_minutes)}</p>
+                            {it.completed && <p className="text-xs text-success">Completed</p>}
                         </div>
                         <div className="col-span-5">
-                            <p className="font-medium text-gray-900">{it.description || '1-1 Mentorship Session'}</p>
-                            <p className="text-xs text-gray-500">Student: {it.student_name || '—'}</p>
+                            <p className="font-medium text-foreground">{it.description || '1-1 Mentorship Session'}</p>
+                            <p className="text-xs text-muted-foreground">Student: {it.student_name || 'Not set'}</p>
                         </div>
-                        <div className="col-span-1 text-right text-gray-600">{fmtDur(it.duration_minutes)}</div>
-                        <div className="col-span-2 text-right font-medium text-gray-900">{fmtGBP(it.amount_cents, inv.currency)}</div>
+                        <div className="col-span-1 text-right text-muted-foreground">{fmtDur(it.duration_minutes)}</div>
+                        <div className="col-span-2 text-right font-medium text-foreground">{fmtGBP(it.amount_cents, inv.currency)}</div>
                     </div>
                 ))}
             </div>
@@ -405,33 +405,33 @@ function InvoiceDetail({ inv, busy, onVoid }: { inv: AdminInvoice; busy: boolean
             <div className="flex justify-end mt-6">
                 <div className="w-full sm:w-1/2 space-y-1 text-sm">
                     <div className="flex justify-between">
-                        <span>Gross pay <span className="text-gray-400">(Total: {fmtDur(inv.total_minutes)})</span></span>
+                        <span>Gross pay <span className="text-muted-foreground">(Total: {fmtDur(inv.total_minutes)})</span></span>
                         <span>{fmtGBP(inv.subtotal_cents, inv.currency)}</span>
                     </div>
                     <div className="flex justify-between"><span>Withholding tax</span><span>−{fmtGBP(inv.withholding_cents, inv.currency)}</span></div>
                     {inv.vat_cents > 0 && <div className="flex justify-between"><span>VAT</span><span>{fmtGBP(inv.vat_cents, inv.currency)}</span></div>}
-                    <div className="flex justify-between pt-2 mt-2 border-t border-gray-900 font-extrabold text-base">
-                        <span>TOTAL PAY</span><span>{fmtGBP(inv.amount_cents, inv.currency)}</span>
+                    <div className="flex justify-between pt-2 mt-2 border-t border-foreground font-semibold text-base">
+                        <span>Total pay</span><span>{fmtGBP(inv.amount_cents, inv.currency)}</span>
                     </div>
                 </div>
             </div>
 
             {inv.status === 'paid' && (
-                <div className="mt-6 border-2 border-green-600 rounded-xl p-4">
-                    <p className="text-green-600 font-extrabold text-lg tracking-widest">PAID</p>
-                    <p className="text-xs text-gray-600 mt-1">Payment date: {fmtDate(inv.paid_at)}</p>
+                <div className="mt-6 border-2 border-success rounded-control p-4">
+                    <p className="text-success font-semibold text-lg tracking-widest">PAID</p>
+                    <p className="text-xs text-muted-foreground mt-1">Payment date: {fmtDate(inv.paid_at)}</p>
                 </div>
             )}
 
             {inv.status === 'submitted' && !inv.ready && (
-                <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                <div className="mt-6 p-4 rounded-control bg-tint-amber border border-border text-tint-amber-foreground text-sm">
                     This mentor hasn&apos;t completed Stripe Connect onboarding, so this invoice can&apos;t be paid yet.
                 </div>
             )}
 
             {inv.status === 'submitted' && (
                 <div className="flex justify-end mt-8">
-                    <button onClick={onVoid} disabled={busy} className="px-5 py-2.5 rounded-xl font-bold text-red-600 border border-red-200 hover:bg-red-50 disabled:opacity-40">
+                    <button onClick={onVoid} disabled={busy} className="px-5 py-2.5 rounded-control font-semibold text-destructive border border-border hover:bg-tint-rose disabled:opacity-40">
                         Void invoice
                     </button>
                 </div>

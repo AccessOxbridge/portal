@@ -61,53 +61,53 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
         <>
             <div className="flex items-center justify-end gap-2">
                 <a
-                    className="p-2 text-gray-400 hover:text-legacy-accent transition-colors"
+                    className="p-2 text-muted-foreground hover:text-primary transition-colors"
                     title="Email Student"
                     href={`mailto:${email}`}
                 >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="size-4" />
                 </a>
                 <button
                     onClick={openEdit}
-                    className="p-2 transition-colors rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    className="p-2 transition-colors rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-muted"
                     title="Edit student"
                 >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <MoreHorizontal className="size-4" />
                 </button>
             </div>
 
             {isEditOpen && (
                 <>
                     <div className="fixed inset-0 bg-black/40 z-30" onClick={closeEdit} />
-                    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+                    <div className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-full max-w-md bg-card rounded-card shadow-border p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">Edit student</h3>
+                            <h3 className="text-lg font-semibold text-foreground">Edit student</h3>
                             <button
                                 onClick={closeEdit}
-                                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-muted-foreground rounded-lg transition-colors"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="size-5" />
                             </button>
                         </div>
-                        <p className="text-sm text-gray-500 mb-4">
+                        <p className="text-sm text-muted-foreground mb-4">
                             {student.profile?.full_name || 'Student'} · {email}
                         </p>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Parent/guardian email</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Parent/guardian email</label>
                             <input
                                 type="email"
                                 value={parentEmail}
                                 onChange={(e) => setParentEmail(e.target.value)}
                                 placeholder="e.g., parent@example.com"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             />
-                            <p className="mt-1 text-xs text-gray-500">Used for fortnightly progress reports.</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Used for fortnightly progress reports.</p>
                         </div>
                         <div className="mt-6 flex justify-end gap-2">
                             <button
                                 type="button"
                                 onClick={closeEdit}
-                                className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50"
+                                className="px-4 py-2.5 rounded-control border border-border text-foreground font-medium hover:bg-muted/60"
                             >
                                 Cancel
                             </button>
@@ -115,7 +115,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
                                 type="button"
                                 onClick={handleSaveEdit}
                                 disabled={saving}
-                                className="px-4 py-2.5 rounded-xl bg-legacy-accent text-white font-medium hover:bg-legacy-accent/90 disabled:opacity-50"
+                                className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                             >
                                 {saving ? 'Saving...' : 'Save'}
                             </button>

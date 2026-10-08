@@ -46,9 +46,9 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-    active: 'bg-green-50 text-green-700 border-green-100',
-    pending_approval: 'bg-amber-50 text-amber-700 border-amber-100',
-    details_required: 'bg-gray-50 text-gray-600 border-gray-100'
+    active: 'bg-tint-green text-tint-green-foreground border-border',
+    pending_approval: 'bg-tint-amber text-tint-amber-foreground border-border',
+    details_required: 'bg-muted/60 text-muted-foreground border-border'
 }
 
 const statusIcons: Record<string, any> = {
@@ -66,7 +66,7 @@ function MentorSubjects({ expertise }: { expertise: string[] | null }) {
     const subjects = sortBySubjectPriority(expertise)
 
     if (subjects.length === 0) {
-        return <span className="text-xs text-gray-400">-</span>
+        return <span className="text-xs text-muted-foreground">-</span>
     }
 
     const visible = expanded ? subjects : subjects.slice(0, 2)
@@ -79,7 +79,7 @@ function MentorSubjects({ expertise }: { expertise: string[] | null }) {
                 <span
                     key={i}
                     title={exp}
-                    className={`px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs ${expanded ? '' : 'truncate max-w-[100px]'}`}
+                    className={`px-2 py-0.5 bg-muted text-muted-foreground rounded text-xs ${expanded ? '' : 'truncate max-w-[100px]'}`}
                 >
                     {exp}
                 </span>
@@ -89,7 +89,7 @@ function MentorSubjects({ expertise }: { expertise: string[] | null }) {
                     type="button"
                     onClick={() => setExpanded(true)}
                     title={subjects.join(', ')}
-                    className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs font-medium hover:bg-gray-200 hover:text-gray-700 transition-colors"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
                     {hidden > 0 ? `+${hidden} more` : 'View all'}
                 </button>
@@ -98,7 +98,7 @@ function MentorSubjects({ expertise }: { expertise: string[] | null }) {
                 <button
                     type="button"
                     onClick={() => setExpanded(false)}
-                    className="px-2 py-0.5 text-xs font-medium text-legacy-accent hover:underline"
+                    className="px-2 py-0.5 text-xs font-medium text-primary hover:underline"
                 >
                     Show less
                 </button>
@@ -123,13 +123,13 @@ function OnboardingBars({ mentor }: { mentor: Mentor }) {
                     <span
                         key={i}
                         className={`block w-3.5 h-1.5 rounded-sm ${step.done
-                            ? isComplete ? 'bg-green-500' : 'bg-amber-400'
-                            : 'bg-gray-200'
+                            ? isComplete ? 'bg-success' : 'bg-warning'
+                            : 'bg-muted'
                             }`}
                     />
                 ))}
             </div>
-            <span className="text-xs font-semibold text-gray-600 tabular-nums">
+            <span className="text-xs font-semibold text-muted-foreground tabular-nums">
                 {isComplete ? 'Complete' : `${completed} of ${total}`}
             </span>
         </div>
@@ -138,10 +138,10 @@ function OnboardingBars({ mentor }: { mentor: Mentor }) {
 
 // The status tiles double as the status filter, replacing the old dropdown.
 const STATUS_TILES: { value: string; label: string; accent: string }[] = [
-    { value: 'all', label: 'All mentors', accent: 'bg-legacy-accent' },
-    { value: 'active', label: 'Active', accent: 'bg-green-500' },
-    { value: 'pending_approval', label: 'Pending review', accent: 'bg-amber-400' },
-    { value: 'details_required', label: 'Incomplete', accent: 'bg-gray-300' }
+    { value: 'all', label: 'All mentors', accent: 'bg-primary' },
+    { value: 'active', label: 'Active', accent: 'bg-success' },
+    { value: 'pending_approval', label: 'Pending review', accent: 'bg-warning' },
+    { value: 'details_required', label: 'Incomplete', accent: 'bg-muted' }
 ]
 
 export default function AdminMentorsPage() {
@@ -205,15 +205,15 @@ export default function AdminMentorsPage() {
         <div className="space-y-8 max-w-7xl mx-auto">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Mentors</h1>
-                    <p className="text-gray-500 mt-1">Manage all mentors on the platform.</p>
+                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Mentors</h1>
+                    <p className="text-muted-foreground mt-1">Manage all mentors on the platform.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                    <button className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3">
                         Export CSV
                     </button>
-                    <Link href="/dashboard/admin/approvals" className="px-4 py-2 bg-legacy-accent text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-lg shadow-legacy-accent/10">
-                        Review Applications
+                    <Link href="/dashboard/admin/approvals" className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3">
+                        Review applications
                     </Link>
                 </div>
             </header>
@@ -231,16 +231,16 @@ export default function AdminMentorsPage() {
                                 setStatusFilter(tile.value)
                                 setPage(1)
                             }}
-                            className={`text-left bg-white border rounded-2xl p-4 shadow-sm transition-all ${isActive
-                                ? 'border-legacy-accent ring-2 ring-legacy-accent/10'
-                                : 'border-gray-100 hover:border-gray-200 hover:shadow'
+                            className={`border border-transparent text-left bg-card rounded-card p-4 shadow-border transition-[background-color,box-shadow,color] duration-150 ${isActive
+                                ? 'border-primary ring-2 ring-primary/10'
+                                : 'border-border hover:border-border hover:shadow'
                                 }`}
                         >
                             <span className={`block w-8 h-1 rounded-full mb-3 ${tile.accent}`} />
-                            <span className="block text-2xl font-extrabold text-gray-900 tracking-tight tabular-nums">
+                            <span className="block text-2xl font-semibold text-foreground tracking-tight tabular-nums">
                                 {statusCounts[tile.value as keyof MentorStatusCounts]}
                             </span>
-                            <span className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                            <span className="block text-[11px] font-semibold text-muted-foreground mt-0.5">
                                 {tile.label}
                             </span>
                         </button>
@@ -249,33 +249,33 @@ export default function AdminMentorsPage() {
             </div>
 
             {/* Filters Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
+            <div className="border border-transparent flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-card shadow-border">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-legacy-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 size-4 ${isLoading ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
                     <input
                         type="text"
                         placeholder="Search by name..."
                         value={debouncedSearch}
                         onChange={(e) => setDebouncedSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/5 focus:border-legacy-accent/20 transition-all shadow-inner"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-10"
                     />
                 </div>
                 <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     {/* University Filter */}
                     <div className="relative w-full md:w-auto">
                         <select
-                            className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10"
+                            className="bg-muted/60 border border-border rounded-control px-4 py-2 text-sm font-medium text-muted-foreground focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10"
                             value={universityFilter}
                             onChange={(e) => {
                                 setUniversityFilter(e.target.value)
                                 setPage(1)
                             }}
                         >
-                            <option value="all">All Universities</option>
+                            <option value="all">All universities</option>
                             <option value="oxford">Oxford</option>
                             <option value="cambridge">Cambridge</option>
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
@@ -285,19 +285,19 @@ export default function AdminMentorsPage() {
                     {/* Subject Filter */}
                     <div className="relative w-full md:w-auto">
                         <select
-                            className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10 max-w-[200px]"
+                            className="bg-muted/60 border border-border rounded-control px-4 py-2 text-sm font-medium text-muted-foreground focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10 max-w-[200px]"
                             value={subjectFilter}
                             onChange={(e) => {
                                 setSubjectFilter(e.target.value)
                                 setPage(1)
                             }}
                         >
-                            <option value="all">All Subjects</option>
+                            <option value="all">All subjects</option>
                             {ALL_SUBJECTS.map(subject => (
                                 <option key={subject} value={subject}>{subject}</option>
                             ))}
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
@@ -307,18 +307,18 @@ export default function AdminMentorsPage() {
             </div>
 
             {/* Mentors Table */}
-            <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
+            <div className="border border-transparent bg-card rounded-card overflow-hidden shadow-border">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-legacy-accent animate-spin" />
+                        <Loader2 className="size-8 text-primary animate-spin" />
                     </div>
                 ) : mentors.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Users className="w-8 h-8 text-gray-300" />
+                        <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mb-4">
+                            <Users className="size-8 text-muted-foreground/60" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">No mentors found</h3>
-                        <p className="text-gray-500 max-w-sm">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">No mentors found</h3>
+                        <p className="text-muted-foreground max-w-sm">
                             {statusFilter !== 'all'
                                 ? `No mentors with status: "${statusLabels[statusFilter] || statusFilter}"`
                                 : searchTerm
@@ -331,17 +331,17 @@ export default function AdminMentorsPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 border-b border-gray-100">
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">University</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Subject</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Onboarding</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Sessions</th>
-                                        <th className="px-5 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                    <tr className="bg-muted/60 border-b border-border">
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">Mentor</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">University</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">Subject</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">Status</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">Onboarding</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground">Sessions</th>
+                                        <th className="px-5 py-4 text-xs font-semibold text-muted-foreground text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-border">
                                     {mentors.map((mentor) => {
                                         const currentStatus = mentor.status || 'details_required'
                                         const StatusIcon = statusIcons[currentStatus] || Clock
@@ -350,11 +350,11 @@ export default function AdminMentorsPage() {
                                             <tr
                                                 key={mentor.id}
                                                 onClick={(e) => openMentor(e, mentor.id)}
-                                                className="hover:bg-legacy-accent/[0.03] transition-colors group cursor-pointer"
+                                                className="hover:bg-primary/[0.03] transition-colors group cursor-pointer"
                                             >
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-legacy-accent text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+                                                        <div className="size-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm shrink-0 overflow-hidden">
                                                             {mentor.photo_url ? (
                                                                 <img src={mentor.photo_url} alt="" className="w-full h-full object-cover" />
                                                             ) : (
@@ -364,16 +364,16 @@ export default function AdminMentorsPage() {
                                                         <div className="min-w-0">
                                                             <Link
                                                                 href={`/dashboard/admin/mentors/${mentor.id}`}
-                                                                className="block font-semibold text-gray-900 truncate max-w-[180px] group-hover:text-legacy-accent group-hover:underline underline-offset-2"
+                                                                className="block font-semibold text-foreground truncate max-w-[180px] group-hover:text-primary group-hover:underline underline-offset-2"
                                                             >
                                                                 {name}
                                                             </Link>
-                                                            <div className="text-xs text-gray-400 truncate max-w-[180px]">
+                                                            <div className="text-xs text-muted-foreground truncate max-w-[180px]">
                                                                 {mentor.profile?.email ? (
                                                                     <a
                                                                         href={`mailto:${mentor.profile.email}`}
                                                                         title={`Email ${name}`}
-                                                                        className="hover:text-legacy-accent hover:underline underline-offset-2"
+                                                                        className="hover:text-primary hover:underline underline-offset-2"
                                                                     >
                                                                         {mentor.profile.email}
                                                                     </a>
@@ -383,7 +383,7 @@ export default function AdminMentorsPage() {
                                                                 {mentor.phone && (
                                                                     <>
                                                                         {' · '}
-                                                                        <a href={`tel:${mentor.phone}`} className="hover:text-legacy-accent hover:underline underline-offset-2">
+                                                                        <a href={`tel:${mentor.phone}`} className="hover:text-primary hover:underline underline-offset-2">
                                                                             {mentor.phone}
                                                                         </a>
                                                                     </>
@@ -393,7 +393,7 @@ export default function AdminMentorsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <span className="text-sm text-gray-700 font-medium">
+                                                    <span className="text-sm text-foreground font-medium">
                                                         {mentor.university || '-'}
                                                     </span>
                                                 </td>
@@ -401,8 +401,8 @@ export default function AdminMentorsPage() {
                                                     <MentorSubjects expertise={mentor.expertise} />
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${statusColors[currentStatus]}`}>
-                                                        <StatusIcon className="w-3.5 h-3.5" />
+                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusColors[currentStatus]}`}>
+                                                        <StatusIcon className="size-3.5" />
                                                         {statusLabels[currentStatus] || currentStatus.replace('_', ' ')}
                                                     </span>
                                                 </td>
@@ -410,17 +410,17 @@ export default function AdminMentorsPage() {
                                                     <OnboardingBars mentor={mentor} />
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <span className="text-sm font-semibold text-gray-900 tabular-nums">{mentor.sessions_completed}</span>
-                                                    <span className="text-xs text-gray-400 ml-1">completed</span>
+                                                    <span className="text-sm font-semibold text-foreground tabular-nums">{mentor.sessions_completed}</span>
+                                                    <span className="text-xs text-muted-foreground ml-1">completed</span>
                                                 </td>
                                                 {/* Avg Rating Removed */}
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <span className="text-xs font-bold text-legacy-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                                        <span className="text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                                             View profile
                                                         </span>
-                                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-legacy-accent transition-colors shrink-0" />
-                                                        <span className="w-px self-stretch bg-gray-100" aria-hidden="true" />
+                                                        <ChevronRight className="size-4 text-muted-foreground/60 group-hover:text-primary transition-colors shrink-0" />
+                                                        <span className="w-px self-stretch bg-muted" aria-hidden="true" />
                                                         <MentorActions mentorId={mentor.id} currentStatus={currentStatus} mentorName={name} photoUrl={mentor.photo_url} />
                                                     </div>
                                                 </td>
@@ -432,22 +432,22 @@ export default function AdminMentorsPage() {
                         </div>
 
                         {/* Pagination */}
-                        <div className="px-6 py-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                            <span className="text-sm text-gray-500">
-                                Showing <span className="font-semibold text-gray-900">{offset + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(offset + limit, totalCount)}</span> of <span className="font-semibold text-gray-900">{totalCount}</span> mentors
+                        <div className="px-6 py-4 border-t border-border bg-muted/60 flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Showing <span className="font-semibold text-foreground">{offset + 1}</span> to <span className="font-semibold text-foreground">{Math.min(offset + limit, totalCount)}</span> of <span className="font-semibold text-foreground">{totalCount}</span> mentors
                             </span>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPage(Math.max(1, page - 1))}
                                     disabled={page <= 1}
-                                    className={`px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium transition-colors ${page <= 1 ? 'pointer-events-none opacity-50 bg-gray-50' : 'bg-white hover:bg-gray-50 text-gray-700'}`}
+                                    className={`px-4 py-2 border border-border rounded-control text-sm font-medium transition-colors ${page <= 1 ? 'pointer-events-none opacity-50 bg-muted/60' : 'bg-card hover:bg-muted/60 text-foreground'}`}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                                     disabled={page >= totalPages}
-                                    className={`px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium transition-colors ${page >= totalPages ? 'pointer-events-none opacity-50 bg-gray-50' : 'bg-white hover:bg-gray-50 text-gray-700'}`}
+                                    className={`px-4 py-2 border border-border rounded-control text-sm font-medium transition-colors ${page >= totalPages ? 'pointer-events-none opacity-50 bg-muted/60' : 'bg-card hover:bg-muted/60 text-foreground'}`}
                                 >
                                     Next
                                 </button>

@@ -36,12 +36,12 @@ export default function AdminSessionsTable({ sessions }: Props) {
 
     if (sessions.length === 0) {
         return (
-            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="w-8 h-8 text-gray-300" />
+            <div className="bg-card rounded-card border border-border p-12 text-center">
+                <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="size-8 text-muted-foreground/60" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Completed Sessions</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">
+                <h3 className="text-lg font-semibold text-foreground mb-2">No completed sessions</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">
                     Completed sessions will appear here with transcript links once they are available.
                 </p>
             </div>
@@ -51,45 +51,45 @@ export default function AdminSessionsTable({ sessions }: Props) {
     return (
         <div className="space-y-6">
             <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground" />
                 <input
                     type="text"
                     placeholder="Search by mentor or student name..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none"
+                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-12"
                 />
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-card rounded-card border border-border overflow-hidden">
                 <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-muted/60 border-b border-border">
                         <tr>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Student</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Mentor</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Session Date</th>
-                            <th className="text-right px-6 py-4 text-sm font-bold text-gray-600">Transcript</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Student</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Mentor</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Session date</th>
+                            <th className="text-right px-6 py-4 text-sm font-semibold text-muted-foreground">Transcript</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border">
                         {filtered.map((session) => (
-                            <tr key={session.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-gray-900">{session.studentName}</td>
-                                <td className="px-6 py-4 text-gray-700">{session.mentorName}</td>
-                                <td className="px-6 py-4 text-gray-500 text-sm">{formatDate(session.scheduledAt)}</td>
+                            <tr key={session.id} className="hover:bg-muted/60 transition-colors">
+                                <td className="px-6 py-4 font-medium text-foreground">{session.studentName}</td>
+                                <td className="px-6 py-4 text-foreground">{session.mentorName}</td>
+                                <td className="px-6 py-4 text-muted-foreground text-sm">{formatDate(session.scheduledAt)}</td>
                                 <td className="px-6 py-4 text-right">
                                     {session.transcriptUrl ? (
                                         <a
                                             href={`/api/transcript/${session.id}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-legacy-accent hover:underline text-sm font-medium"
+                                            className="inline-flex items-center gap-1.5 text-primary hover:underline text-sm font-medium"
                                         >
-                                            <ExternalLink className="w-4 h-4" />
-                                            View Transcript
+                                            <ExternalLink className="size-4" />
+                                            View transcript
                                         </a>
                                     ) : (
-                                        <span className="text-gray-400 text-sm">Processing…</span>
+                                        <span className="text-muted-foreground text-sm">Processing…</span>
                                     )}
                                 </td>
                             </tr>
@@ -99,7 +99,7 @@ export default function AdminSessionsTable({ sessions }: Props) {
             </div>
 
             {filtered.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No matching sessions</p>
+                <p className="text-center text-muted-foreground py-8">No matching sessions</p>
             )}
         </div>
     )

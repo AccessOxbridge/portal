@@ -70,17 +70,17 @@ export default async function FortnightlyReportPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    Fortnightly Report
+                <h1 className="text-4xl font-semibold text-primary tracking-tight">
+                    Fortnightly report
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Generate and send a consolidated AI report of the current 14-day period to students and parents via email
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
-                    <div className="px-3 py-1.5 bg-legacy-accent/10 text-legacy-accent rounded-lg font-medium">
+                    <div className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg font-medium">
                         Period: {periodLabel}
                     </div>
-                    <div className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg font-medium">
+                    <div className="px-3 py-1.5 bg-muted text-muted-foreground rounded-lg font-medium">
                         {students.length} student{students.length !== 1 ? 's' : ''} with sessions
                     </div>
                 </div>

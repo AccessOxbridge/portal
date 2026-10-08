@@ -18,6 +18,7 @@ interface UpcomingSession {
     scheduled_at: string
     zoom_join_url: string | null
     mentor_full_name: string
+    mentor_photo_url?: string | null
 }
 
 interface AcademicProfile {
@@ -181,7 +182,7 @@ export default function StudentDashboardContent({
                         >
                             {activeSession ? (
                                 <>
-                                    <Avatar name={activeSession.mentor_full_name || 'Mentor'} size="xl" className="size-20 shrink-0 text-2xl ring-4 ring-card" />
+                                    <Avatar name={activeSession.mentor_full_name || 'Mentor'} src={activeSession.mentor_photo_url} size="xl" className="size-20 shrink-0 text-2xl ring-4 ring-card" />
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-2">
                                             <p className={cn('text-sm font-medium', startingSoon ? 'text-tint-green-foreground' : 'text-tint-amber-foreground')}>
@@ -341,7 +342,8 @@ export default function StudentDashboardContent({
                             scheduled_at: s.scheduled_at,
                             duration_minutes: s.duration_minutes,
                             zoom_url: s.zoom_join_url,
-                            person_name: s.mentor_full_name
+                            person_name: s.mentor_full_name,
+                            person_photo_url: s.mentor_photo_url ?? null
                         }))}
                         personLabel="Mentor"
                         credits={profile?.credits || 0}

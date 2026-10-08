@@ -56,6 +56,14 @@
                 "app/dashboard/student/page.tsx"
             ],
             "why": "Bug fix requested by Raj on 2026-10-08: the student home's week calendar only received upcoming sessions, so past days always looked empty. One extra read-only SELECT of the student's own recent sessions (active or completed, newest 200) feeds the calendar; ended sessions are shown without Join."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/mentor-photo > getMentorPhotoUrl",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-08: show mentor photos on the student home (up-next card, week calendar) and in the booking sheet. Read-only: the existing session and assignment queries also select photo_url:mentors(photo_url), the same pattern the sessions, reports and recordings pages use; this helper only reads it."
         }
     ]
 }

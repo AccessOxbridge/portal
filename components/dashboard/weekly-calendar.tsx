@@ -12,6 +12,8 @@ interface Session {
     scheduled_at: string
     zoom_url: string | null
     person_name: string
+    /** The other person's photo, when known; initials otherwise. */
+    person_photo_url?: string | null
     /** Used to tell when a past session has ended (60 minutes if unknown). */
     duration_minutes?: number | null
 }
@@ -194,7 +196,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                             >
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                                     <div className="flex min-w-0 items-center gap-3.5">
-                                        <Avatar name={session.person_name || personLabel} size="md" />
+                                        <Avatar name={session.person_name || personLabel} src={session.person_photo_url} size="md" />
                                         <div className="min-w-0">
                                             <h4 className="truncate font-medium text-foreground">
                                                 Session with {session.person_name}

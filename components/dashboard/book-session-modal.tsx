@@ -37,7 +37,7 @@ interface BookSessionModalProps {
     onClose: () => void
     studentProfile: StudentBookingProfile
     /** The student's currently assigned mentors. When there's more than one, the student picks who to book with. */
-    mentors: { id: string; name: string }[]
+    mentors: { id: string; name: string; photoUrl?: string | null }[]
 }
 
 export default function BookSessionModal({ isOpen, onClose, studentProfile, mentors }: BookSessionModalProps) {
@@ -292,7 +292,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                         </div>
                     ) : mentors.length === 1 ? (
                         <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                            <Avatar name={mentors[0].name} size="sm" />
+                            <Avatar name={mentors[0].name} src={mentors[0].photoUrl} size="sm" />
                             <span>With <span className="font-medium text-foreground">{mentors[0].name}</span></span>
                         </div>
                     ) : null}

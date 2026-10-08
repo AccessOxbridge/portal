@@ -57,7 +57,7 @@ interface StudentCreditsProviderProps {
     bookingProfile?: StudentBookingProfile | null
     canBook?: boolean
     /** The student's currently assigned mentors, for the booking modal's mentor picker. */
-    mentors?: { id: string; name: string }[]
+    mentors?: { id: string; name: string; photoUrl?: string | null }[]
     /**
      * A recently completed session this student hasn't rated or dismissed, if
      * any. Selected server-side so the popup can appear on any dashboard page.

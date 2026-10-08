@@ -253,7 +253,7 @@ export default async function DashboardLayout({
     // sessions page: a complete profile AND an admin-assigned mentor.
     let bookingProfile: StudentBookingProfile | null = null
     let canBook = false
-    let bookingMentors: { id: string; name: string }[] = []
+    let bookingMentors: { id: string; name: string; photoUrl: string | null }[] = []
     if (isStudent) {
         const { data: academicProfile } = await supabase
             .from('student_profiles')
@@ -263,13 +263,14 @@ export default async function DashboardLayout({
 
         const { data: currentAssignments } = await supabase
             .from('student_mentor_assignments')
-            .select('mentor_id, mentor:profiles!student_mentor_assignments_mentor_id_fkey (full_name)')
+            .select('mentor_id, mentor:profiles!student_mentor_assignments_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
             .eq('student_id', user.id)
             .eq('is_current', true)
 
         bookingMentors = (currentAssignments || []).map((a: any) => ({
             id: a.mentor_id,
             name: a.mentor?.full_name || 'Mentor',
+            photoUrl: getMentorPhotoUrl(a.mentor),
         }))
         const hasMentors = bookingMentors.length > 0
         const profileComplete = !!(

@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { getMentorPhotoUrl } from '@/lib/mentor-photo'
 import { getGreetingName } from '@/utils/lib'
 import StudentDashboardContent from './student-dashboard-content'
 
@@ -37,7 +38,8 @@ export default async function StudentDashboard() {
         .select(`
             *,
             mentor:profiles!sessions_mentor_id_fkey (
-                full_name
+                full_name,
+                photo_url:mentors(photo_url)
             )
         `)
         .eq('student_id', user.id)
@@ -54,7 +56,8 @@ export default async function StudentDashboard() {
             scheduled_at,
             zoom_join_url,
             mentor:profiles!sessions_mentor_id_fkey (
-                full_name
+                full_name,
+                photo_url:mentors(photo_url)
             )
         `)
         .eq('student_id', user.id)
@@ -74,7 +77,8 @@ export default async function StudentDashboard() {
             duration_minutes,
             zoom_join_url,
             mentor:profiles!sessions_mentor_id_fkey (
-                full_name
+                full_name,
+                photo_url:mentors(photo_url)
             )
         `)
         .eq('student_id', user.id)
@@ -88,14 +92,15 @@ export default async function StudentDashboard() {
         scheduled_at: string
         duration_minutes: number | null
         zoom_join_url: string | null
-        mentor: { full_name: string | null } | null
+        mentor: { full_name: string | null; photo_url?: unknown } | null
     }
     const calendarSessions = ((calendarRows || []) as unknown as CalendarRow[]).map((session) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
         duration_minutes: session.duration_minutes ?? null,
         zoom_join_url: session.zoom_join_url,
-        mentor_full_name: session.mentor?.full_name || 'Mentor'
+        mentor_full_name: session.mentor?.full_name || 'Mentor',
+        mentor_photo_url: getMentorPhotoUrl(session.mentor)
     }))
 
     const nowDate = new Date()
@@ -107,7 +112,8 @@ export default async function StudentDashboard() {
     // Flatten mentor name if exists
     const sessionWithMentor = sessionToShow ? {
         ...sessionToShow,
-        mentor_full_name: (sessionToShow.mentor as any)?.full_name
+        mentor_full_name: (sessionToShow.mentor as any)?.full_name,
+        mentor_photo_url: getMentorPhotoUrl(sessionToShow.mentor)
     } : null
 
     // Process upcoming sessions
@@ -115,7 +121,8 @@ export default async function StudentDashboard() {
         id: session.id,
         scheduled_at: session.scheduled_at,
         zoom_join_url: session.zoom_join_url,
-        mentor_full_name: session.mentor?.full_name || 'Mentor'
+        mentor_full_name: session.mentor?.full_name || 'Mentor',
+        mentor_photo_url: getMentorPhotoUrl(session.mentor)
     }))
 
     // Fetch student academic profile (full for booking modal)

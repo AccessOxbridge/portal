@@ -74,5 +74,23 @@
             ],
             "why": "The admin home's Shortcut card forwards its href prop to <Link>. The four destinations are still written out literally on each <Shortcut href=\"...\">, so the gate counts them unchanged."
         }
+    ],
+    "newFiles": [
+        {
+            "file": "app/dashboard/admin/overview-data.ts",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Reads with the admin client after the page's admin-role check, like manage-sessions and session-payouts. Completed sessions only."
+        },
+        {
+            "file": "app/dashboard/admin/admin-overview.tsx",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Display only; every tile links to the page that already handles it."
+        },
+        {
+            "file": "app/dashboard/mentor/overview-data.ts",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. The live page passes the mentor's own signed-in client, so RLS limits it to their rows. Ratings deliberately excluded."
+        },
+        {
+            "file": "app/dashboard/mentor/mentor-overview.tsx",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Display only; Start session is the same /api/sessions/{id}/start link the current home uses."
+        }
     ]
 }

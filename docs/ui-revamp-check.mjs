@@ -169,8 +169,16 @@ const infoCats = new Set(INFO.map((r) => r.cat))
 const ALLOWED = existsSync('docs/ui-revamp-allowed.json')
     ? JSON.parse(readFileSync('docs/ui-revamp-allowed.json', 'utf8')).allowed
     : []
+// Whole new files approved as read-only features (docs/ui-revamp-allowed.json
+// "newFiles"): extra copies that live only in them are excused.
+const NEW_FILES = existsSync('docs/ui-revamp-allowed.json')
+    ? (JSON.parse(readFileSync('docs/ui-revamp-allowed.json', 'utf8')).newFiles ?? []).map((f) => f.file)
+    : []
 const excused = (cat, item, bf, hf) => {
     const rule = ALLOWED.find((a) => a.category === cat && a.item === item)
+    const extraOnly = hf.filter((f) => !bf.includes(f))
+    // Each extra file must be covered by the item's rule or be an approved new file.
+    if (hf.length > bf.length && extraOnly.length > 0 && extraOnly.every((f) => NEW_FILES.includes(f) || rule?.files.includes(f))) return true
     if (!rule) return false
     const extra = hf.filter((f) => !bf.includes(f))
     return hf.length > bf.length && extra.every((f) => rule.files.includes(f))

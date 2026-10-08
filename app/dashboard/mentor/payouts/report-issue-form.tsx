@@ -37,7 +37,7 @@ export default function ReportIssueForm({ mentorId }: ReportIssueFormProps) {
             const data = await response.json()
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to submit issue')
+                throw new Error(data.error || "Couldn't send your report. Try again in a moment.")
             }
 
             setSubmitStatus('success')
@@ -130,7 +130,7 @@ export default function ReportIssueForm({ mentorId }: ReportIssueFormProps) {
 
                             {submitStatus === 'error' && (
                                 <div className="p-3 bg-tint-rose border border-border rounded-lg text-sm text-destructive">
-                                    {errorMessage || 'Failed to submit issue. Please try again.'}
+                                    {errorMessage || "Couldn't send your report. Try again in a moment."}
                                 </div>
                             )}
 

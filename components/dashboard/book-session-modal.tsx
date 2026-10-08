@@ -229,7 +229,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                     setError(result.error || 'Insufficient credits to complete this booking.')
                     return
                 }
-                throw new Error(result.error || 'Failed to submit booking request.')
+                throw new Error(result.error || "Couldn't send your booking request. Try again in a moment.")
             }
 
             router.refresh()

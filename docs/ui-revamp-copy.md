@@ -399,3 +399,35 @@ Admin labels in code (second sweep). Kept as written: blog categories (saved dat
 - `app/error/page.tsx`: `Try Again` > `Try again`
 - `app/(auth)/become-a-mentor/MentorRegisterForm.tsx`: `Creating account...` > `Creating account` (the button also shows a spinner); `Password must include:` no longer upper case; new phone-only line under the title (the brand panel with the steps is hidden on phones): `You'll fill in a short application next. We review it within 24 to 48 hours.`
 - `app/dashboard/settings/login-history.tsx`: `Login History` > `Login history`; `Date &amp; Time` > `Date and time`; `IP Address` > `IP address`; empty account `[em dash]` > `None`; empty IP `[em dash]` > `Unknown`
+
+## Phase 5: error wording (2026-10-08)
+
+Student and mentor error fallbacks only (shown when the server sends no message of its own). Pattern: what didn't work, then what to do. Admin messages and console logs unchanged.
+
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: `Failed to cancel pending requests` > `Couldn't cancel your requests. Try again in a moment.`
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: `Failed to cancel` > `Couldn't cancel. Try again in a moment.`
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: `Failed to submit report` > `Couldn't send your report. Try again in a moment.`
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: `Something went wrong. Please try again.` > `Something went wrong. Try again in a moment.`
+- `app/dashboard/student/profile/academic-profile-content.tsx`: `Failed to save. Please try again.` > `Couldn't save your profile. Try again in a moment.`
+- `app/dashboard/student/sessions/mentor-session-request-card.tsx`: `Failed to accept request` > `Couldn't accept the request. Try again in a moment.`
+- `app/dashboard/student/sessions/mentor-session-request-card.tsx`: `Failed to decline request` > `Couldn't decline the request. Try again in a moment.`
+- `components/dashboard/book-session-modal.tsx`: `Failed to submit booking request.` > `Couldn't send your booking request. Try again in a moment.`
+- `components/dashboard/reschedule-session-modal.tsx`: `Failed to send reschedule request.` > `Couldn't send your reschedule request. Try again in a moment.`
+- `components/dashboard/credits-request-modal.tsx`: `Failed to send request` > `Couldn't send your request. Try again in a moment.`
+- `components/dashboard/credits-request-modal.tsx`: `Something went wrong. Please try again.` > `Something went wrong. Try again in a moment.`
+- `components/dashboard/help-support-button.tsx`: `Failed to send your message` > `Couldn't send your message. Try again in a moment.`
+- `components/dashboard/credit-packages.tsx`: `Failed to create checkout session` > `Couldn't open checkout. Try again in a moment.`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Failed to cancel request` > `Couldn't cancel the request. Try again in a moment.`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Failed to submit report` > `Couldn't send your report. Try again in a moment.`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Something went wrong. Please try again.` > `Something went wrong. Try again in a moment.`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Failed to accept request. Please try again.` > `Couldn't accept the request. Try again in a moment.`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Failed to decline request. Please try again.` > `Couldn't decline the request. Try again in a moment.`
+- `components/dashboard/mentor-request-session-modal.tsx`: `Failed to send session request.` > `Couldn't send your session request. Try again in a moment.`
+- `components/forms/mentor-report-form.tsx`: `Failed to submit report. Please try again.` > `Couldn't send your report. Try again in a moment.`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `Failed to submit` > `Couldn't send the invoice. Try again in a moment.`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `Failed to generate invoice` > `Couldn't create the invoice. Try again in a moment.`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `Failed to discard` > `Couldn't discard the invoice. Try again in a moment.`
+- `app/dashboard/mentor/payouts/report-issue-form.tsx`: `Failed to submit issue. Please try again.` > `Couldn't send your report. Try again in a moment.`
+- `app/dashboard/mentor/payouts/report-issue-form.tsx`: `Failed to submit issue` > `Couldn't send your report. Try again in a moment.`
+- `components/dashboard/stripe-onboarding-button.tsx`: `Failed to start Stripe onboarding` > `Couldn't open Stripe. Try again in a moment.`
+- `components/dashboard/stripe-onboarding-button.tsx`: `Failed to start onboarding` > `Couldn't open Stripe. Try again in a moment.`

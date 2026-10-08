@@ -223,10 +223,10 @@ export default function MentorSessionsContent({
                 body: JSON.stringify({ requestId })
             })
             const data = await res.json().catch(() => ({}))
-            if (!res.ok) throw new Error(data.error || 'Failed to cancel request')
+            if (!res.ok) throw new Error(data.error || "Couldn't cancel the request. Try again in a moment.")
             router.refresh()
         } catch (e) {
-            toast.error(e instanceof Error ? e.message : 'Failed to cancel request')
+            toast.error(e instanceof Error ? e.message : "Couldn't cancel the request. Try again in a moment.")
         } finally {
             setCancellingId(null)
         }
@@ -593,14 +593,14 @@ export default function MentorSessionsContent({
                                         })
                                         const data = await res.json().catch(() => ({}))
                                         if (!res.ok) {
-                                            setReportError(data.error || 'Failed to submit report')
+                                            setReportError(data.error || "Couldn't send your report. Try again in a moment.")
                                             return
                                         }
                                         setReportSessionId(null)
                                         setShowReportSuccess(true)
                                         setTimeout(() => setShowReportSuccess(false), 4000)
                                     } catch {
-                                        setReportError('Something went wrong. Please try again.')
+                                        setReportError("Something went wrong. Try again in a moment.")
                                     } finally {
                                         setReportSubmitting(false)
                                     }

@@ -146,7 +146,7 @@ export default function MentorRequestSessionModal({
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to send session request.')
+                throw new Error(result.error || "Couldn't send your session request. Try again in a moment.")
             }
 
             router.refresh()

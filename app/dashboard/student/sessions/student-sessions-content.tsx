@@ -281,10 +281,10 @@ export default function StudentSessionsContent({
         try {
             const res = await fetch('/api/student/pending-requests/cancel', { method: 'POST' })
             const data = await res.json().catch(() => ({}))
-            if (!res.ok) throw new Error(data.error || 'Failed to cancel')
+            if (!res.ok) throw new Error(data.error || "Couldn't cancel. Try again in a moment.")
             router.refresh()
         } catch (e) {
-            toast.error(e instanceof Error ? e.message : 'Failed to cancel pending requests')
+            toast.error(e instanceof Error ? e.message : "Couldn't cancel your requests. Try again in a moment.")
         } finally {
             setCancelling(false)
         }
@@ -717,14 +717,14 @@ export default function StudentSessionsContent({
                                     })
                                     const data = await res.json().catch(() => ({}))
                                     if (!res.ok) {
-                                        setReportError(data.error || 'Failed to submit report')
+                                        setReportError(data.error || "Couldn't send your report. Try again in a moment.")
                                         return
                                     }
                                     setReportSessionId(null)
                                     setShowReportSuccess(true)
                                     setTimeout(() => setShowReportSuccess(false), 4000)
                                 } catch {
-                                    setReportError('Something went wrong. Please try again.')
+                                    setReportError("Something went wrong. Try again in a moment.")
                                 } finally {
                                     setReportSubmitting(false)
                                 }

@@ -132,7 +132,7 @@ export default function RescheduleSessionModal({
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to send reschedule request.')
+                throw new Error(result.error || "Couldn't send your reschedule request. Try again in a moment.")
             }
 
             router.refresh()

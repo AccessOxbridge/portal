@@ -42,7 +42,7 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
             await handleMentorshipRequest(request.id, 'accept')
             router.refresh()
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to accept request')
+            setError(err instanceof Error ? err.message : "Couldn't accept the request. Try again in a moment.")
         } finally {
             setLoading(null)
         }
@@ -55,7 +55,7 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
             await handleMentorshipRequest(request.id, 'reject')
             router.refresh()
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to decline request')
+            setError(err instanceof Error ? err.message : "Couldn't decline the request. Try again in a moment.")
         } finally {
             setLoading(null)
         }

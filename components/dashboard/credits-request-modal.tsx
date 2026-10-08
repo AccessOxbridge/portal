@@ -72,11 +72,11 @@ export default function CreditsRequestModal({
             })
             const data = await res.json()
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to send request')
+                throw new Error(data.error || "Couldn't send your request. Try again in a moment.")
             }
             setSuccess(true)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+            setError(err instanceof Error ? err.message : "Something went wrong. Try again in a moment.")
         } finally {
             setLoading(false)
         }

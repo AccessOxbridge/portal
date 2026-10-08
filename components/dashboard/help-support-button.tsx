@@ -51,7 +51,7 @@ export default function HelpSupportButton() {
             })
             const data = await res.json().catch(() => ({}))
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to send your message')
+                throw new Error(data.error || "Couldn't send your message. Try again in a moment.")
             }
             setIsSent(true)
             setMessage('')

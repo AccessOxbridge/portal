@@ -154,7 +154,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
             router.refresh()
         } catch (err) {
             console.error('Failed to save profile:', err)
-            toast.error('Failed to save. Please try again.')
+            toast.error("Couldn't save your profile. Try again in a moment.")
         } finally {
             setSaving(false)
         }

@@ -70,7 +70,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             await handleMentorshipRequest(request.id, 'accept', effective)
         } catch (error) {
             console.error('Failed to accept:', error)
-            toast.error(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')
+            toast.error(error instanceof Error ? error.message : "Couldn't accept the request. Try again in a moment.")
         } finally {
             setLoading(false)
         }
@@ -83,7 +83,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             setShowRejectDialog(false)
         } catch (error) {
             console.error('Failed to reject:', error)
-            toast.error('Failed to decline request. Please try again.')
+            toast.error("Couldn't decline the request. Try again in a moment.")
         } finally {
             setLoading(false)
         }

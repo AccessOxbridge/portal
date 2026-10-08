@@ -164,7 +164,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                 body: JSON.stringify({ session_ids: Array.from(picked) }),
             })
             const json = await res.json()
-            if (!res.ok) { setNotice(json.error || 'Failed to generate invoice'); return }
+            if (!res.ok) { setNotice(json.error || "Couldn't create the invoice. Try again in a moment."); return }
             const dropped = (json.dropped_session_ids?.length || 0) + (json.already_invoiced_session_ids?.length || 0)
             if (dropped > 0) setNotice(`${dropped} session(s) were already invoiced and were skipped.`)
             setCreating(false)
@@ -179,7 +179,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
         try {
             const res = await fetch(`/api/mentor/invoices/${id}/submit`, { method: 'POST' })
             const json = await res.json()
-            if (!res.ok) { setNotice(json.error || 'Failed to submit'); return }
+            if (!res.ok) { setNotice(json.error || "Couldn't send the invoice. Try again in a moment."); return }
             if (json.warning) setNotice(json.warning)
             await loadInvoices(id)
         } finally { setBusy(false) }
@@ -199,7 +199,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
         try {
             const res = await fetch(`/api/mentor/invoices/${id}/discard`, { method: 'POST' })
             const json = await res.json()
-            if (!res.ok) { setNotice(json.error || 'Failed to discard'); return }
+            if (!res.ok) { setNotice(json.error || "Couldn't discard the invoice. Try again in a moment."); return }
             setSelectedId(null)
             await loadInvoices()
         } finally { setBusy(false) }

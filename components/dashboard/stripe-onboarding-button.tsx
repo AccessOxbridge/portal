@@ -24,14 +24,14 @@ export function StripeOnboardingButton({ variant }: StripeOnboardingButtonProps)
 
             if (!res.ok) {
                 const error = await res.json()
-                throw new Error(error.error || 'Failed to start onboarding')
+                throw new Error(error.error || "Couldn't open Stripe. Try again in a moment.")
             }
 
             const { url } = await res.json()
             window.location.href = url
         } catch (error: any) {
             console.error('Onboarding error:', error)
-            toast.error(error.message || 'Failed to start Stripe onboarding')
+            toast.error(error.message || "Couldn't open Stripe. Try again in a moment.")
             setLoading(false)
         }
     }

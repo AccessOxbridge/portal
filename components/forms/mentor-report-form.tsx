@@ -48,7 +48,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
             router.refresh()
         } catch (err) {
             console.error('Failed to submit report:', err)
-            toast.error('Failed to submit report. Please try again.')
+            toast.error("Couldn't send your report. Try again in a moment.")
         } finally {
             setLoading(false)
         }

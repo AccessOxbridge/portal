@@ -38,7 +38,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
             const data = await res.json()
 
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to create checkout session')
+                throw new Error(data.error || "Couldn't open checkout. Try again in a moment.")
             }
 
             // Redirect to Stripe Checkout

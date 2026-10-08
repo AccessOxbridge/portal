@@ -3,51 +3,30 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { CalendarCheck, ChatsCircle, Path } from '@phosphor-icons/react/ssr'
 import { login } from '../../auth/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/field'
-
-const HIGHLIGHTS = [
-    { icon: CalendarCheck, text: 'Book and join sessions with your mentor' },
-    { icon: ChatsCircle, text: 'Message your mentor and the team' },
-    { icon: Path, text: 'Follow your road to Oxford or Cambridge' },
-]
 
 export function LoginForm({ notice }: { notice?: string }) {
     const [isLoading, setIsLoading] = useState(false)
 
     return (
         <div className="flex min-h-[100dvh] bg-background">
-            {/* Brand panel (desktop): the sidebar navy, so signing in feels like
-                stepping into the same place. */}
-            <aside className="relative hidden w-[44%] max-w-2xl shrink-0 flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex xl:p-16">
+            {/* Brand panel (desktop): the sidebar navy and the logo, nothing
+                more. Students and mentors both sign in here. */}
+            <aside className="relative hidden w-[44%] max-w-2xl shrink-0 flex-col overflow-hidden bg-primary px-12 py-10 text-primary-foreground lg:flex xl:px-16">
                 <div aria-hidden className="pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-white/[0.06] blur-3xl" />
                 <div aria-hidden className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand/20 blur-3xl" />
 
-                <div className="relative flex items-center gap-3">
-                    <Image src="/logo.png" alt="" width={44} height={44} className="[mix-blend-mode:screen]" />
-                    <span className="text-xl font-extrabold tracking-tight">Access Oxbridge</span>
+                <div className="absolute inset-0 flex items-center px-12 xl:px-16">
+                    <div className="flex items-center gap-5">
+                        <Image src="/logo.png" alt="" width={88} height={88} priority className="shrink-0 [mix-blend-mode:screen]" />
+                        <span className="text-4xl font-extrabold tracking-tight xl:text-5xl">Access Oxbridge</span>
+                    </div>
                 </div>
 
-                <div className="relative max-w-md">
-                    <h2 className="text-4xl font-semibold leading-tight tracking-tight text-balance xl:text-5xl">
-                        Your Oxbridge journey, all in one place
-                    </h2>
-                    <ul className="mt-10 space-y-4">
-                        {HIGHLIGHTS.map(({ icon: Icon, text }) => (
-                            <li key={text} className="flex items-center gap-3.5 text-base text-primary-foreground/85">
-                                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-white/15">
-                                    <Icon weight="duotone" className="size-5 text-primary-foreground" />
-                                </span>
-                                {text}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <p className="relative text-sm text-primary-foreground/60">© 2026 Access Oxbridge. All rights reserved.</p>
+                <p className="relative mt-auto text-sm text-primary-foreground/60">© 2026 Access Oxbridge. All rights reserved.</p>
             </aside>
 
             {/* Form */}

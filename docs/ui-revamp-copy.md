@@ -387,7 +387,7 @@ Admin labels in code (second sweep). Kept as written: blog categories (saved dat
 
 ## Phase 5: sign-in pages (2026-10-08)
 
-- `app/(auth)/login/LoginForm.tsx`: brand panel `Welcome Back` > `Your Oxbridge journey, all in one place`, plus three new lines: `Book and join sessions with your mentor`, `Message your mentor and the team`, `Follow your road to Oxford or Cambridge`
+- `app/(auth)/login/LoginForm.tsx`: brand panel `Welcome Back` removed; the panel shows only the logo and `Access Oxbridge` (students and mentors share this page, per Raj)
 - `app/(auth)/login/LoginForm.tsx`: `Login` > `Welcome back`
 - `app/(auth)/login/LoginForm.tsx`: `Please enter your details to sign in.` > `Sign in to your Access Oxbridge account.`
 - `app/(auth)/login/LoginForm.tsx`: `Email Address` > `Email address`

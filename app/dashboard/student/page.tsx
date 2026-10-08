@@ -63,6 +63,34 @@ export default async function StudentDashboard() {
         .order('scheduled_at', { ascending: true })
         .limit(15)
 
+    // The week calendar shows past weeks too, so it gets the student's recent
+    // sessions (newest 200, cancelled ones left out), not just upcoming ones.
+    // Read-only; the queries above are unchanged.
+    const { data: calendarRows } = await supabase
+        .from('sessions')
+        .select(`
+            id,
+            scheduled_at,
+            duration_minutes,
+            zoom_join_url,
+            mentor:profiles!sessions_mentor_id_fkey (
+                full_name
+            )
+        `)
+        .eq('student_id', user.id)
+        .in('status', ['active', 'completed'])
+        .not('scheduled_at', 'is', null)
+        .order('scheduled_at', { ascending: false })
+        .limit(200)
+
+    const calendarSessions = (calendarRows || []).map((session: any) => ({
+        id: session.id,
+        scheduled_at: session.scheduled_at,
+        duration_minutes: session.duration_minutes ?? null,
+        zoom_join_url: session.zoom_join_url,
+        mentor_full_name: session.mentor?.full_name || 'Mentor'
+    }))
+
     const nowDate = new Date()
     const sessionToShow = (activeSessions || []).find((session: any) => {
         if (!session.scheduled_at) return true
@@ -127,6 +155,7 @@ export default async function StudentDashboard() {
             activeSession={sessionWithMentor}
             pendingRequests={pendingRequests || []}
             upcomingSessions={processedUpcomingSessions}
+            calendarSessions={calendarSessions}
             academicProfile={academicProfile as any}
             hasMentors={hasMentors}
             userId={user.id}

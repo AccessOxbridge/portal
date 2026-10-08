@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, VideoCamera as Video, Clock, CalendarBlank as CalendarIcon, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react/ssr'
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, VideoCamera as Video, Clock, CalendarBlank as CalendarIcon, ArrowSquareOut as ExternalLink, Check } from '@phosphor-icons/react/ssr'
 import { formatTimeInTz } from '@/lib/timezone'
 import { Avatar } from '@/components/ui/avatar'
 import { buttonVariants } from '@/components/ui/button'
@@ -12,6 +12,8 @@ interface Session {
     scheduled_at: string
     zoom_url: string | null
     person_name: string
+    /** Used to tell when a past session has ended (60 minutes if unknown). */
+    duration_minutes?: number | null
 }
 
 interface WeeklyCalendarProps {
@@ -168,12 +170,19 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {daySessions.map((session) => (
+                        {daySessions.map((session) => {
+                            // A session that has finished stays visible but can't be
+                            // joined: its Zoom room is closed.
+                            const ended = new Date(session.scheduled_at).getTime() + (session.duration_minutes ?? 60) * 60000 < Date.now()
+                            return (
                             <div
                                 key={session.id}
-                                className="group relative cursor-pointer rounded-card border border-transparent bg-card p-4 shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover"
+                                className={cn(
+                                    'group relative rounded-card border border-transparent bg-card p-4 shadow-border',
+                                    !ended && 'cursor-pointer transition-shadow duration-150 ease-out hover:shadow-border-hover',
+                                )}
                                 onClick={() => {
-                                    if (session.zoom_url) {
+                                    if (session.zoom_url && !ended) {
                                         window.open(
                                             canJoinZoom ? session.zoom_url : '/dashboard/student/services',
                                             canJoinZoom ? '_blank' : '_self'
@@ -197,7 +206,12 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                         </div>
                                     </div>
 
-                                    {session.zoom_url ? (
+                                    {ended ? (
+                                        <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground sm:self-auto">
+                                            <Check weight="bold" className="size-3" />
+                                            Ended
+                                        </span>
+                                    ) : session.zoom_url ? (
                                         <div className="flex shrink-0 items-center gap-2">
                                             <button className={cn(buttonVariants({ size: 'sm' }), 'w-full sm:w-auto', !canJoinZoom && 'bg-warning hover:bg-warning/90')}>
                                                 <Video weight="fill" />
@@ -209,7 +223,8 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                     )}
                                 </div>
                             </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
             </div>

@@ -42,6 +42,8 @@ interface StudentDashboardContentProps {
     activeSession: any
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
+    /** Past and upcoming sessions for the week calendar. */
+    calendarSessions?: (UpcomingSession & { duration_minutes: number | null })[]
     academicProfile: AcademicProfile | null
     hasMentors?: boolean
     userId: string
@@ -56,6 +58,7 @@ export default function StudentDashboardContent({
     activeSession,
     pendingRequests,
     upcomingSessions,
+    calendarSessions,
     academicProfile,
     hasMentors = false,
     userId,
@@ -333,9 +336,10 @@ export default function StudentDashboardContent({
                 {/* Weekly Calendar */}
                 <Rise i={5}>
                     <WeeklyCalendar
-                        sessions={upcomingSessions.map(s => ({
+                        sessions={(calendarSessions ?? upcomingSessions.map(s => ({ ...s, duration_minutes: null }))).map(s => ({
                             id: s.id,
                             scheduled_at: s.scheduled_at,
+                            duration_minutes: s.duration_minutes,
                             zoom_url: s.zoom_join_url,
                             person_name: s.mentor_full_name
                         }))}

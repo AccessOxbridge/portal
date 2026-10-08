@@ -48,6 +48,14 @@
                 "app/dashboard/student/student-dashboard-content.tsx"
             ],
             "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Pure date helper for the same label. Fetches nothing."
+        },
+        {
+            "category": "supabase table",
+            "item": "'sessions'",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Bug fix requested by Raj on 2026-10-08: the student home's week calendar only received upcoming sessions, so past days always looked empty. One extra read-only SELECT of the student's own recent sessions (active or completed, newest 200) feeds the calendar; ended sessions are shown without Join."
         }
     ]
 }

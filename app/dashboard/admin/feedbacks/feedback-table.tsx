@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Star, MagnifyingGlass as Search, CaretDown as ChevronDown, CaretUp as ChevronUp, FileText } from '@phosphor-icons/react/ssr'
 
 interface Feedback {
@@ -81,8 +81,11 @@ export default function FeedbackTable({ feedbacks }: Props) {
                     </thead>
                     <tbody className="divide-y divide-border">
                         {filtered.map((feedback) => (
-                            <>
-                                <tr key={feedback.id} className="hover:bg-muted/60 transition-colors">
+                            // Keyed fragment: each feedback renders up to three rows, and
+                            // without a key React can pair them with the wrong feedback
+                            // when the list is filtered.
+                            <Fragment key={feedback.id}>
+                                <tr className="hover:bg-muted/60 transition-colors">
                                     <td className="px-6 py-4 font-medium text-foreground">{feedback.studentName}</td>
                                     <td className="px-6 py-4 text-foreground">{feedback.mentorName}</td>
                                     <td className="px-6 py-4 text-muted-foreground text-sm">{formatDate(feedback.sessionDate)}</td>
@@ -164,7 +167,7 @@ export default function FeedbackTable({ feedbacks }: Props) {
                                         </td>
                                     </tr>
                                 )}
-                            </>
+                            </Fragment>
                         ))}
                         {filtered.length === 0 && (
                             <tr>

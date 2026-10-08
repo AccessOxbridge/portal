@@ -35,8 +35,10 @@ export interface AdminOverview {
     completedThisWeek: number
     completedLastWeek: number
     newStudentsThisMonth: number
-    hoursSoldThisMonth: number
-    revenueThisMonthCents: number
+    /** Hours added to students' balances: purchases plus admin top-ups (net of corrections). */
+    hoursAddedThisMonth: number
+    hoursAddedLastMonth: number
+    lastMonthLabel: string
     rating30d: { average: number | null; count: number }
     weekly: { weekStart: string; completed: number }[]
     atRisk: { id: string; name: string; lastLogin: string | null }[]
@@ -58,6 +60,10 @@ function ukDate(iso: string): string {
     return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date(iso))
 }
 
+function formatMonth(iso: string): string {
+    return new Intl.DateTimeFormat('en-GB', { timeZone: TZ, month: 'long' }).format(new Date(iso))
+}
+
 const nameOf = (p: unknown) => (p as { full_name?: string | null } | null)?.full_name || 'Unknown'
 
 export async function loadAdminOverview(): Promise<AdminOverview> {
@@ -69,6 +75,9 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     const lastWeek = new Date(new Date(thisWeek).getTime() - 7 * DAY).toISOString()
     const twelveWeeksAgo = new Date(new Date(thisWeek).getTime() - 11 * 7 * DAY).toISOString()
     const monthStart = zonedTimeToUtcISO(`${today.slice(0, 7)}-01`, '00:00', TZ)
+    const [year, month] = today.split('-').map(Number)
+    const lastMonthKey = month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`
+    const lastMonthStart = zonedTimeToUtcISO(`${lastMonthKey}-01`, '00:00', TZ)
     const in7Days = new Date(now.getTime() + 7 * DAY).toISOString()
     const ago48h = new Date(now.getTime() - 48 * HOUR).toISOString()
     const ago30d = new Date(now.getTime() - 30 * DAY).toISOString()
@@ -86,7 +95,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         upcoming,
         completedRecent,
         studentProfilesThisMonth,
-        purchases,
+        topUps,
         ratings,
         logins,
         mentorsTotal,
@@ -107,7 +116,9 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
             .order('scheduled_at', { ascending: true }),
         db.from('sessions').select('id, scheduled_at').eq('status', 'completed').gte('scheduled_at', twelveWeeksAgo < ago90d ? twelveWeeksAgo : ago90d),
         db.from('student_profiles').select('*', { count: 'exact', head: true }).gte('created_at', monthStart),
-        db.from('credit_purchases').select('credits_purchased, amount_paid_cents').eq('status', 'completed').gte('completed_at', monthStart),
+        // Hours reach students two ways: a portal purchase or an admin top-up.
+        // Both write a credit transaction; the portal holds no revenue figures.
+        db.from('credit_transactions').select('amount, created_at').in('type', ['purchase', 'admin_adjustment']).gte('created_at', lastMonthStart),
         db.from('form_responses').select('rating').eq('form_type', 'student_feedback').gte('created_at', ago30d),
         db.from('login_events').select('user_id, created_at').eq('status', 'success').order('created_at', { ascending: false }).limit(5000),
         db.from('mentors').select('*', { count: 'exact', head: true }).eq('status', 'active'),
@@ -149,7 +160,9 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
     const assigned = new Set((assignments.data ?? []).map((a) => a.student_id))
     const issueRows = issues.data ?? []
     const invoiceRows = invoices.data ?? []
-    const purchaseRows = purchases.data ?? []
+    const topUpRows = topUps.data ?? []
+    const hoursIn = (from: string, to: string) =>
+        topUpRows.filter((t) => t.created_at && t.created_at >= from && t.created_at < to).reduce((sum, t) => sum + (t.amount ?? 0), 0)
     const ratingRows = (ratings.data ?? []).filter((r) => typeof r.rating === 'number')
     const upcomingRows = upcoming.data ?? []
 
@@ -189,8 +202,9 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         completedThisWeek,
         completedLastWeek,
         newStudentsThisMonth: studentProfilesThisMonth.count ?? 0,
-        hoursSoldThisMonth: purchaseRows.reduce((sum, p) => sum + (p.credits_purchased ?? 0), 0),
-        revenueThisMonthCents: purchaseRows.reduce((sum, p) => sum + (p.amount_paid_cents ?? 0), 0),
+        hoursAddedThisMonth: hoursIn(monthStart, '9999'),
+        hoursAddedLastMonth: hoursIn(lastMonthStart, monthStart),
+        lastMonthLabel: formatMonth(lastMonthStart),
         rating30d: {
             average: ratingRows.length ? ratingRows.reduce((sum, r) => sum + (r.rating as number), 0) / ratingRows.length : null,
             count: ratingRows.length,

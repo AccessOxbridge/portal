@@ -89,8 +89,8 @@ export default function AdminOverview({ data, firstName }: { data: Data; firstNa
                         )}
                     </Stat>
                     <Stat label="New students this month" value={String(data.newStudentsThisMonth)} />
-                    <Stat label="Hours sold this month" value={String(data.hoursSoldThisMonth)}>
-                        <span className="text-muted-foreground">{gbp(data.revenueThisMonthCents)} through the portal</span>
+                    <Stat label="Hours added this month" value={String(data.hoursAddedThisMonth)}>
+                        <span className="text-muted-foreground">Purchases and top-ups; {data.hoursAddedLastMonth} in {data.lastMonthLabel}</span>
                     </Stat>
                     <Stat label="Session rating, last 30 days" value={data.rating30d.average === null ? 'None' : `${data.rating30d.average.toFixed(1)} / 5`}>
                         <span className="text-muted-foreground">{data.rating30d.count} {data.rating30d.count === 1 ? 'rating' : 'ratings'}</span>

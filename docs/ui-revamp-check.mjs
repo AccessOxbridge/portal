@@ -180,6 +180,14 @@ const excused = (cat, item, bf, hf) => {
     // Each extra file must be covered by the item's rule or be an approved new file.
     if (hf.length > bf.length && extraOnly.length > 0 && extraOnly.every((f) => NEW_FILES.includes(f) || rule?.files.includes(f))) return true
     if (!rule) return false
+    // Approved removals: every copy that went missing must be from a file
+    // the rule lists in removedFrom, and any copy that moved must land in an
+    // approved new file or the rule's files.
+    if (hf.length < bf.length && rule.removedFrom) {
+        const left = [...hf]
+        const missing = bf.filter((f) => { const i = left.indexOf(f); if (i === -1) return true; left.splice(i, 1); return false })
+        return missing.every((f) => rule.removedFrom.includes(f)) && left.every((f) => NEW_FILES.includes(f) || rule.files?.includes(f))
+    }
     const extra = hf.filter((f) => !bf.includes(f))
     return hf.length > bf.length && extra.every((f) => rule.files.includes(f))
 }

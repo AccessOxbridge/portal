@@ -73,6 +73,60 @@
                 "app/dashboard/admin/page.tsx"
             ],
             "why": "The admin home's Shortcut card forwards its href prop to <Link>. The four destinations are still written out literally on each <Shortcut href=\"...\">, so the gate counts them unchanged."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/blog",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/clients",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/creators",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/mentors",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/mentor/training",
+            "removedFrom": [
+                "app/dashboard/mentor/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the mentor home is now MentorOverview (an approved new file). The training link appears once, on the onboarding card shown only while onboarding is unfinished; Start session still goes to /api/sessions/{id}/start, written as ${next.id}."
+        },
+        {
+            "category": "href",
+            "item": "{`/api/sessions/${session.id}",
+            "removedFrom": [
+                "app/dashboard/mentor/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the mentor home is now MentorOverview (an approved new file). The training link appears once, on the onboarding card shown only while onboarding is unfinished; Start session still goes to /api/sessions/{id}/start, written as ${next.id}."
         }
     ],
     "newFiles": [

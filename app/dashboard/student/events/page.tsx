@@ -8,8 +8,8 @@ export default function EventsPage() {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Events</h1>
-                <p className="text-gray-500 mt-1">
+                <h1 className="text-2xl font-semibold text-foreground">Events</h1>
+                <p className="text-muted-foreground mt-1">
                     Discover webinars and in-person events to support your Oxbridge journey
                 </p>
             </div>
@@ -19,22 +19,22 @@ export default function EventsPage() {
                 {/* Webinars Card */}
                 <Link
                     href="/dashboard/student/events/webinars"
-                    className="group bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+                    className="group rounded-card bg-card p-6 text-foreground shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover"
                 >
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                            <Video className="w-7 h-7 text-white" />
+                        <div className="grid size-12 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                            <Video weight="duotone" className="size-6" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold">Webinars</h2>
-                            <p className="text-blue-100 text-sm">Online sessions</p>
+                            <h2 className="text-xl font-semibold">Webinars</h2>
+                            <p className="text-sm text-muted-foreground">Online sessions</p>
                         </div>
                     </div>
-                    <p className="text-blue-100 text-sm mb-4">
+                    <p className="mb-4 text-sm text-muted-foreground text-pretty">
                         Join live online sessions with mentors, admissions experts, and current Oxbridge students from anywhere.
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-medium group-hover:gap-3 transition-all">
-                        <span>View Webinars</span>
+                    <div className="flex items-center gap-2 text-sm font-medium text-brand transition-[gap] duration-150 group-hover:gap-3">
+                        <span>View webinars</span>
                         <ArrowRight className="w-4 h-4" />
                     </div>
                 </Link>
@@ -42,49 +42,49 @@ export default function EventsPage() {
                 {/* In Person Events Card */}
                 <Link
                     href="/dashboard/student/events/in-person"
-                    className="group bg-gradient-to-br from-rose-500 to-orange-500 rounded-2xl p-6 text-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+                    className="group rounded-card bg-card p-6 text-foreground shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover"
                 >
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                            <MapPin className="w-7 h-7 text-white" />
+                        <div className="grid size-12 place-items-center rounded-full bg-tint-rose text-tint-rose-foreground">
+                            <MapPin weight="duotone" className="size-6" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold">In Person Events</h2>
-                            <p className="text-rose-100 text-sm">Meet face-to-face</p>
+                            <h2 className="text-xl font-semibold">In-person events</h2>
+                            <p className="text-sm text-muted-foreground">Meet face-to-face</p>
                         </div>
                     </div>
-                    <p className="text-rose-100 text-sm mb-4">
+                    <p className="mb-4 text-sm text-muted-foreground text-pretty">
                         Attend exclusive networking events, campus tours, workshops, and mock interview days across the UK.
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-medium group-hover:gap-3 transition-all">
-                        <span>View Events</span>
+                    <div className="flex items-center gap-2 text-sm font-medium text-brand transition-[gap] duration-150 group-hover:gap-3">
+                        <span>View events</span>
                         <ArrowRight className="w-4 h-4" />
                     </div>
                 </Link>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-gray-50 rounded-2xl p-6">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <CalendarDays className="w-5 h-5 text-gray-600" />
-                    Your Event Activity
+            <div className="bg-muted/60 rounded-card p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <CalendarDays className="w-5 h-5 text-muted-foreground" />
+                    Your event activity
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-blue-600">3</div>
-                        <div className="text-xs text-gray-500">Upcoming Webinars</div>
+                    <div className="bg-card rounded-control p-4 text-center">
+                        <div className="text-2xl font-semibold text-brand">3</div>
+                        <div className="text-xs text-muted-foreground">Upcoming webinars</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-rose-500">2</div>
-                        <div className="text-xs text-gray-500">Upcoming Events</div>
+                    <div className="bg-card rounded-control p-4 text-center">
+                        <div className="text-2xl font-semibold text-destructive">2</div>
+                        <div className="text-xs text-muted-foreground">Upcoming events</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-green-600">5</div>
-                        <div className="text-xs text-gray-500">Events Attended</div>
+                    <div className="bg-card rounded-control p-4 text-center">
+                        <div className="text-2xl font-semibold text-success">5</div>
+                        <div className="text-xs text-muted-foreground">Events attended</div>
                     </div>
-                    <div className="bg-white rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-purple-600">2</div>
-                        <div className="text-xs text-gray-500">Recordings Available</div>
+                    <div className="bg-card rounded-control p-4 text-center">
+                        <div className="text-2xl font-semibold text-tint-violet-foreground">2</div>
+                        <div className="text-xs text-muted-foreground">Recordings available</div>
                     </div>
                 </div>
             </div>

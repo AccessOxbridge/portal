@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Clock, Plus } from '@phosphor-icons/react/ssr'
+import { X, Clock, Plus, Check, WarningCircle, PaperPlaneRight } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { buttonVariants } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { Avatar } from '@/components/ui/avatar'
+import { SelectField } from '@/components/ui/select'
+import { cn } from '@/utils/lib'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'
 import SelectMenu from '@/components/dashboard/select-menu'
@@ -245,34 +251,36 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
         !(mentors.length > 1 && !mentorId)
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={onClose}
             />
 
-            <div className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-xl sm:mx-4 max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between gap-3">
+            <div role="dialog" aria-modal="true" aria-labelledby="book-session-title" className={cn(sheet.panel, 'sm:max-w-xl')}>
+                <div className={sheet.handle}><span className={sheet.handleBar} /></div>
+                <div className={sheet.header}>
                     <div>
-                        <h2 className="text-2xl font-extrabold text-gray-900">Book a Session</h2>
-                        <p className="text-gray-500 mt-1">Add at least 3 times for your mentor to choose from</p>
+                        <h2 id="book-session-title" className={sheet.title}>Book a session</h2>
+                        <p className={sheet.description}>Add at least 3 times for your mentor to choose from</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        aria-label="Close"
+                        className={sheet.close}
                     >
-                        <X className="w-5 h-5 text-gray-600" />
+                        <X className="size-5" />
                     </button>
                 </div>
 
-                <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+                <div className={cn(sheet.body, 'space-y-5')}>
                     {mentors.length > 1 ? (
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Book with</label>
-                            <select
+                            <label htmlFor="book-mentor" className={sheet.label}>Book with</label>
+                            <SelectField
+                                id="book-mentor"
                                 value={mentorId}
                                 onChange={(e) => setMentorId(e.target.value)}
-                                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm"
                             >
                                 <option value="">Select a mentor</option>
                                 {mentors.map((mentor) => (
@@ -280,37 +288,38 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                                         {mentor.name}
                                     </option>
                                 ))}
-                            </select>
+                            </SelectField>
                         </div>
                     ) : mentors.length === 1 ? (
-                        <p className="text-sm text-gray-500">
-                            With <span className="font-semibold text-gray-800">{mentors[0].name}</span>
-                        </p>
+                        <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                            <Avatar name={mentors[0].name} size="sm" />
+                            <span>With <span className="font-medium text-foreground">{mentors[0].name}</span></span>
+                        </div>
                     ) : null}
 
                     {timeSlots.length > 0 && (
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-gray-700">Added slots</span>
-                                <span className={`text-sm font-medium ${timeSlots.length >= 3 ? 'text-green-600' : 'text-amber-600'}`}>
-                                    {timeSlots.length >= 3 ? `✓ ${timeSlots.length} slots` : `${timeSlots.length}/3 minimum`}
+                                <span className="text-sm font-medium text-foreground">Added slots</span>
+                                <span className={`inline-flex items-center gap-1 text-sm font-medium tabular-nums ${timeSlots.length >= 3 ? 'text-success' : 'text-warning'}`}>
+                                    {timeSlots.length >= 3 ? <><Check weight="bold" className="size-4" />{`${timeSlots.length} slots`}</> : `${timeSlots.length}/3 minimum`}
                                 </span>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {timeSlots.map((slot, index) => (
                                     <div
                                         key={`${slot.startTime}-${slot.endTime}`}
-                                        className="flex items-center gap-2 bg-legacy-accent/10 text-legacy-accent px-4 py-2 rounded-xl font-medium text-sm"
+                                        className="flex items-center gap-2 rounded-full bg-tint-blue py-1.5 ps-3 pe-1.5 text-sm font-medium text-tint-blue-foreground tabular-nums animate-in fade-in-0 zoom-in-96 duration-150 ease-snappy motion-reduce:animate-none"
                                     >
-                                        <Clock className="w-4 h-4 shrink-0" />
+                                        <Clock className="size-4 shrink-0" />
                                         <span>{formatSlotDisplay(slot)}</span>
                                         <button
                                             type="button"
                                             onClick={() => removeTimeSlot(index)}
-                                            className="hover:bg-legacy-accent/20 rounded-full p-1 transition-colors"
+                                            className="grid size-7 place-items-center rounded-full transition-colors hover:bg-white/70"
                                             aria-label="Remove time slot"
                                         >
-                                            <X className="w-3 h-3" />
+                                            <X className="size-3.5" />
                                         </button>
                                     </div>
                                 ))}
@@ -318,9 +327,9 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                         </div>
                     )}
 
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 space-y-4">
+                    <div className="space-y-4 rounded-card bg-muted/60 p-4 sm:p-5">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Date</label>
+                            <label className={sheet.label}>Date</label>
                             <DatePicker
                                 value={date}
                                 min={todayDate}
@@ -329,7 +338,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Start Time</label>
+                                <label className={sheet.label}>Start time</label>
                                 <SelectMenu
                                     value={startTime}
                                     onChange={setStartTime}
@@ -339,7 +348,7 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">End Time</label>
+                                <label className={sheet.label}>End time</label>
                                 <SelectMenu
                                     value={endTime}
                                     onChange={setEndTime}
@@ -360,69 +369,62 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
                                 />
                             </div>
                         </div>
-                        <p className="text-xs text-gray-500">
-                            Times shown in <strong>{tz}</strong>
+                        <p className="text-sm text-muted-foreground">
+                            Times shown in <strong className="font-medium text-foreground">{tz}</strong>
                         </p>
                         <button
                             type="button"
                             onClick={addTimeSlot}
                             disabled={!date || !startTime || !endTime}
-                            className="w-full py-3 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className={cn(buttonVariants({ variant: 'outline' }), 'w-full bg-card')}
                         >
-                            <Plus className="w-5 h-5" />
-                            Add Time Slot
+                            <Plus weight="bold" />
+                            Add time slot
                         </button>
                     </div>
 
                     {error && (
-                        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                        <div role="alert" className="flex items-start gap-3 rounded-card bg-tint-rose p-4">
+                            <WarningCircle weight="fill" className="mt-0.5 size-5 shrink-0 text-destructive" />
                             <div className="flex-1">
-                                <p className="text-red-700 text-sm leading-6">{error}</p>
+                                <p className="text-sm leading-6 text-tint-rose-foreground">{error}</p>
                                 {error.toLowerCase().includes('credits') && (
                                     <button
                                         onClick={() => router.push('/dashboard/student/services')}
-                                        className="mt-2 px-4 py-1.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                        className={cn(buttonVariants({ variant: 'destructive', size: 'sm' }), 'mt-2')}
                                     >
-                                        Get More Credits
+                                        Get more credits
                                     </button>
                                 )}
                             </div>
-                            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 p-1 flex items-center justify-center">
-                                <X className="w-4 h-4" />
+                            <button onClick={() => setError(null)} aria-label="Dismiss" className="grid size-8 shrink-0 place-items-center rounded-full text-tint-rose-foreground transition-colors hover:bg-white/60">
+                                <X className="size-4" />
                             </button>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                <div className={sheet.footer}>
                     <button
                         onClick={onClose}
-                        className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:text-gray-700 transition-colors"
+                        className={buttonVariants({ variant: 'ghost' })}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={!canSubmit}
-                        className="bg-legacy-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-legacy-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
+                        className={buttonVariants()}
                     >
                         {loading ? (
-                            <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                            <>
+                                <Spinner className="size-4" />
                                 Sending...
-                            </span>
+                            </>
                         ) : (
                             <>
-                                <Clock className="w-4 h-4" />
-                                Send Request
+                                <PaperPlaneRight weight="fill" />
+                                Send request
                             </>
                         )}
                     </button>

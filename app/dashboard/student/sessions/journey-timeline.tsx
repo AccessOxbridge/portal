@@ -1,6 +1,7 @@
 'use client'
 
-import { CheckCircle as CheckCircle2, Circle, Clock } from '@phosphor-icons/react/ssr'
+import { Check } from '@phosphor-icons/react/ssr'
+import { cn } from '@/utils/lib'
 
 interface JourneyTimelineProps {
     hasProfile: boolean
@@ -12,11 +13,11 @@ interface JourneyTimelineProps {
 }
 
 const stages = [
-    { id: 'profile', label: 'Profile Complete', description: 'Set up your academic profile' },
-    { id: 'request', label: 'Mentor Requested', description: 'Submitted a mentorship request' },
-    { id: 'matched', label: 'Mentor Matched', description: 'A mentor accepted your request' },
-    { id: 'scheduled', label: 'Session Scheduled', description: 'Your session is booked' },
-    { id: 'completed', label: 'Session Complete', description: 'First session finished' },
+    { id: 'profile', label: 'Profile complete', description: 'Set up your academic profile' },
+    { id: 'request', label: 'Mentor requested', description: 'Submitted a mentorship request' },
+    { id: 'matched', label: 'Mentor matched', description: 'A mentor accepted your request' },
+    { id: 'scheduled', label: 'Session scheduled', description: 'Your session is booked' },
+    { id: 'completed', label: 'Session complete', description: 'First session finished' },
 ]
 
 export default function JourneyTimeline({
@@ -87,61 +88,71 @@ export default function JourneyTimeline({
         subtitle = 'You have an active mentorship in progress.'
     }
 
+    // The four steps shown (the last stage is tracked but not drawn).
+    const shown = stages.filter((stage) => stage.id !== 'completed')
+
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 p-6 mb-8">
+        <div className="mb-6 rounded-card bg-card p-5 shadow-border sm:p-6">
             <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                 <div>
-                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Your Application Journey</h3>
+                    <h3 className="text-base font-semibold text-foreground">Your application journey</h3>
                     {subtitle && (
-                        <p className="text-sm text-gray-500 mt-1 sm:mt-1.5">{subtitle}</p>
+                        <p className="mt-0.5 text-sm text-muted-foreground text-pretty">{subtitle}</p>
                     )}
                 </div>
                 {completedSessionsCount > 0 && (
-                    <p className="text-sm font-semibold text-emerald-600 sm:text-right">
+                    <p className="text-sm font-medium text-success sm:text-right">
                         You’ve completed {completedSessionsCount} {completedSessionsCount === 1 ? 'session' : 'sessions'} so far
                     </p>
                 )}
             </div>
 
-            <div className="flex items-center justify-between relative">
-                {/* Progress Line */}
-                <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10" />
-
-                {stages.map((stage, index) => {
-                    if (stage.id === 'completed') return null
+            <ol className="flex items-start">
+                {shown.map((stage, index) => {
                     const status = getStageStatus(stage.id)
+                    const next = shown[index + 1]
 
                     return (
-                        <div key={stage.id} className="flex flex-col items-center text-center flex-1">
-                            {/* Icon */}
-                            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all ${status === 'completed'
-                                    ? 'bg-green-500 text-white'
-                                    : status === 'current'
-                                        ? 'bg-legacy-accent text-white ring-4 ring-legacy-accent/20 animate-pulse'
-                                        : 'bg-gray-100 text-gray-400'
-                                }`}>
-                                {status === 'completed' ? (
-                                    <CheckCircle2 className="w-5 h-5" />
-                                ) : status === 'current' ? (
-                                    <Clock className="w-5 h-5" />
-                                ) : (
-                                    <Circle className="w-5 h-5" />
-                                )}
-                            </div>
+                        <li key={stage.id} className="relative flex flex-1 flex-col items-center text-center" aria-current={status === 'current' ? 'step' : undefined}>
+                            {/* Connector to the next step: solid once this step is done, dashed until then. */}
+                            {next && (
+                                <span
+                                    aria-hidden="true"
+                                    className={cn(
+                                        'absolute top-[17px] left-[calc(50%+22px)] right-[calc(-50%+22px)] border-t-2',
+                                        status === 'completed' ? 'border-solid border-success/50' : 'border-dashed border-input',
+                                    )}
+                                />
+                            )}
+
+                            {/* Done: solid check. Current: blue ring with a dot. Not yet: dashed circle. */}
+                            {status === 'completed' ? (
+                                <span className="relative z-10 grid size-9 place-items-center rounded-full bg-success text-white">
+                                    <Check weight="bold" className="size-4" />
+                                    <span className="sr-only">Done:</span>
+                                </span>
+                            ) : status === 'current' ? (
+                                <span className="relative z-10 grid size-9 place-items-center rounded-full bg-card ring-2 ring-inset ring-brand">
+                                    <span className="size-3 rounded-full bg-brand" />
+                                    <span className="sr-only">Current step:</span>
+                                </span>
+                            ) : (
+                                <span className="relative z-10 size-9 rounded-full border-2 border-dashed border-input bg-card">
+                                    <span className="sr-only">Not started:</span>
+                                </span>
+                            )}
 
                             {/* Label */}
-                            <span className={`mt-3 text-xs font-semibold ${status === 'completed'
-                                    ? 'text-green-600'
-                                    : status === 'current'
-                                        ? 'text-legacy-accent'
-                                        : 'text-gray-400'
-                                }`}>
+                            <span className={cn(
+                                'mt-2.5 px-1 text-xs font-medium leading-tight text-balance sm:text-sm',
+                                status === 'current' ? 'text-foreground' : status === 'completed' ? 'text-foreground' : 'text-muted-foreground',
+                            )}>
                                 {stage.label}
                             </span>
-                        </div>
+                        </li>
                     )
                 })}
-            </div>
+            </ol>
         </div>
     )
 }

@@ -19,11 +19,16 @@ function tintFor(name: string) {
     return TINTS[h % TINTS.length]
 }
 
+/** First letter of the first and last words, skipping tags like "[MENTOR]". */
 function initialsOf(name: string) {
-    const parts = name.trim().split(/\s+/).filter(Boolean)
-    if (parts.length === 0) return '?'
-    if (parts.length === 1) return parts[0][0].toUpperCase()
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    const letters = name
+        .trim()
+        .split(/\s+/)
+        .map((word) => word.match(/\p{L}/u)?.[0])
+        .filter((letter): letter is string => !!letter)
+    if (letters.length === 0) return '?'
+    if (letters.length === 1) return letters[0].toUpperCase()
+    return (letters[0] + letters[letters.length - 1]).toUpperCase()
 }
 
 const SIZES = {

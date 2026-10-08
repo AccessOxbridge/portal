@@ -150,25 +150,25 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
             role="dialog"
             aria-label="Choose a date"
             style={{ top: position.top, left: position.left, width: POPOVER_WIDTH }}
-            className="fixed z-[100] bg-white rounded-2xl border border-gray-100 shadow-xl p-3"
+            className="fixed z-[1100] rounded-card border border-transparent bg-popover p-3 text-popover-foreground shadow-overlay animate-in fade-in-0 zoom-in-96 duration-150 ease-snappy motion-reduce:animate-none"
         >
             <div className="flex items-center justify-between mb-3 px-1">
                 <button
                     type="button"
                     onClick={() => setViewMonth((m) => subMonths(m, 1))}
                     disabled={!canGoPrev}
-                    className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                    className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
                     aria-label="Previous month"
                 >
                     <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-sm font-bold text-gray-900">
+                <span className="text-sm font-semibold text-foreground">
                     {format(viewMonth, 'MMMM yyyy')}
                 </span>
                 <button
                     type="button"
                     onClick={() => setViewMonth((m) => addMonths(m, 1))}
-                    className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                    className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     aria-label="Next month"
                 >
                     <ChevronRight className="w-4 h-4" />
@@ -179,7 +179,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                 {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => (
                     <div
                         key={d}
-                        className="h-8 flex items-center justify-center text-[11px] font-semibold text-gray-400"
+                        className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
                     >
                         {d}
                     </div>
@@ -201,12 +201,12 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                             disabled={disabled}
                             onClick={() => pickDay(day)}
                             className={[
-                                'h-11 sm:h-9 w-full rounded-lg text-sm font-medium transition-colors',
-                                !inMonth && !isSelected ? 'text-gray-300' : '',
-                                inMonth && !isSelected && !disabled ? 'text-gray-800 hover:bg-legacy-accent/10' : '',
-                                disabled ? 'text-gray-200 cursor-not-allowed' : '',
-                                isSelected ? 'bg-legacy-accent text-white hover:bg-legacy-accent' : '',
-                                !isSelected && isToday && inMonth ? 'ring-1 ring-inset ring-legacy-accent/40' : '',
+                                'h-11 sm:h-9 w-full rounded-full text-sm font-medium tabular-nums transition-colors',
+                                !inMonth && !isSelected ? 'text-muted-foreground/50' : '',
+                                inMonth && !isSelected && !disabled ? 'text-foreground hover:bg-muted' : '',
+                                disabled ? 'text-muted-foreground/30 cursor-not-allowed' : '',
+                                isSelected ? 'bg-primary text-primary-foreground hover:bg-primary' : '',
+                                !isSelected && isToday && inMonth ? 'text-brand ring-1 ring-inset ring-brand/40' : '',
                             ].filter(Boolean).join(' ')}
                         >
                             {format(day, 'd')}
@@ -225,12 +225,12 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                 onClick={() => setOpen((v) => !v)}
                 aria-haspopup="dialog"
                 aria-expanded={open}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm text-left hover:border-gray-300"
+                className="flex h-11 w-full items-center justify-between gap-2 rounded-control border border-input bg-card px-3.5 text-left text-base outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25"
             >
-                <span className={selected ? 'text-gray-900 font-medium' : 'text-gray-400'}>
+                <span className={selected ? 'text-foreground' : 'text-muted-foreground'}>
                     {displayLabel}
                 </span>
-                <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                <Calendar className="size-4 shrink-0 text-muted-foreground" />
             </button>
 
             {mounted && calendar ? createPortal(calendar, document.body) : null}

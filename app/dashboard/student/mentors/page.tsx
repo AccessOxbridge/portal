@@ -110,11 +110,11 @@ export default async function MyMentorsPage() {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    My Mentors
+            <header className="mb-6">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My mentors
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Your assigned mentors and your mentorship history
                 </p>
             </header>

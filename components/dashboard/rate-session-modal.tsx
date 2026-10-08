@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { X } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import SessionRatingCard from '@/components/feedback/session-rating-card'
+import { sheet } from '@/components/ui/sheet-classes'
+import { cn } from '@/utils/lib'
 
 /**
  * The one session this student is currently being asked to rate. Selected
@@ -87,9 +89,9 @@ export default function RateSessionModal({ session, onClosed }: RateSessionModal
     }
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={handleDismiss}
                 aria-hidden
             />
@@ -97,15 +99,15 @@ export default function RateSessionModal({ session, onClosed }: RateSessionModal
                 role="dialog"
                 aria-modal="true"
                 aria-label="Rate your session"
-                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto"
+                className={cn(sheet.panel, 'overflow-y-auto overscroll-contain sm:max-w-md')}
             >
                 <button
                     type="button"
                     onClick={handleDismiss}
-                    className="absolute top-6 right-6 w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors z-10"
+                    className={cn(sheet.close, 'absolute top-5 right-5 z-10')}
                     aria-label="Close"
                 >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="size-5" />
                 </button>
 
                 <SessionRatingCard

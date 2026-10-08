@@ -47,7 +47,10 @@ const isUiFile = (p) =>
     /\.(ts|tsx)$/.test(p) &&
     ROOTS.some((r) => p.startsWith(`${r}/`)) &&
     !/^app\/api\//.test(p) &&
-    !/^app\/auth\//.test(p)
+    !/^app\/auth\//.test(p) &&
+    // The revamp's own component gallery: dev-only (notFound() in production),
+    // so it can't change live behaviour, and its demo handlers would be noise.
+    !/^app\/dashboard\/ui-preview\//.test(p)
 
 function walk(dir, out = []) {
     for (const name of readdirSync(dir)) {
@@ -116,6 +119,13 @@ function dataImports(src) {
     return items
 }
 
+// Components whose `name` / `action` props aren't form fields or form actions:
+// Avatar's name picks initials, EmptyState's action is its button slot.
+const NOT_FORM = new Set(['Avatar', 'MentorAvatar', 'EmptyState'])
+const FORM_CATS = new Set(['form action prop', 'form field name'])
+// The JSX tag a match sits in: the nearest `<Tag` before it.
+const tagAt = (code, index) => /^<([A-Za-z][\w.]*)/.exec(code.slice(code.lastIndexOf('<', index)))?.[1]
+
 function extract(src) {
     const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1')
     const out = new Map()
@@ -124,7 +134,12 @@ function extract(src) {
         out.get(cat).push(item)
     }
     for (const item of dataImports(code)) add('data import', item)
-    for (const { cat, re, pick } of [...RULES, ...INFO]) for (const m of code.matchAll(re)) add(cat, pick(m))
+    for (const { cat, re, pick } of [...RULES, ...INFO]) {
+        for (const m of code.matchAll(re)) {
+            if (FORM_CATS.has(cat) && NOT_FORM.has(tagAt(code, m.index))) continue
+            add(cat, pick(m))
+        }
+    }
     return out
 }
 

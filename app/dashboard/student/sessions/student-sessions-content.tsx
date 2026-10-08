@@ -3,13 +3,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CalendarBlank as Calendar, VideoCamera as Video, FileText, ChatCentered as MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X, CalendarDots as CalendarClock } from '@phosphor-icons/react/ssr'
+import { CalendarBlank as Calendar, VideoCamera as Video, FileText, ChatCentered as MessageSquare, Clock, ArrowRight, Hourglass, Coins, XCircle, PlayCircle, X, CalendarDots as CalendarClock, CheckCircle } from '@phosphor-icons/react/ssr'
 import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import { MentorSessionRequestCard } from './mentor-session-request-card'
 import MentorAvatar from '@/components/dashboard/mentor-avatar'
 import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { segmentClass, segmentCount, segmentTrack } from '@/components/ui/segmented'
+import { cn } from '@/utils/lib'
 
 interface Session {
     id: string
@@ -290,14 +296,14 @@ export default function StudentSessionsContent({
             : pastSessions
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {showReportSuccess && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-sm flex items-center justify-between">
-                    <span className="font-semibold">Report successfully submitted.</span>
+                <div role="status" className="flex items-center justify-between gap-3 rounded-card bg-tint-green px-4 py-3 text-sm text-tint-green-foreground">
+                    <span className="inline-flex items-center gap-2 font-medium"><CheckCircle weight="fill" className="size-5" /> Report submitted.</span>
                     <button
                         type="button"
                         onClick={() => setShowReportSuccess(false)}
-                        className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold"
+                        className="rounded-full px-2 py-1 text-sm font-medium transition-colors duration-150 hover:bg-white/60"
                     >
                         Dismiss
                     </button>
@@ -305,16 +311,16 @@ export default function StudentSessionsContent({
             )}
             {/* Credit Status Banner */}
             {credits === 0 && (pendingRequests.length > 0 || upcomingSessions.length > 0) && (
-                <div className="p-6 bg-linear-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
-                    <div className="flex items-center gap-4 text-center md:text-left">
-                        <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                            <Clock className="w-6 h-6 text-amber-600" />
-                        </div>
+                <div className="flex flex-col items-start justify-between gap-4 rounded-card bg-tint-amber p-5 ring-1 ring-tint-amber-foreground/15 md:flex-row md:items-center">
+                    <div className="flex items-start gap-3.5">
+                        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-card text-tint-amber-foreground">
+                            <Clock weight="duotone" className="size-6" />
+                        </span>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">
+                            <h3 className="text-base font-semibold text-foreground">
                                 Ready to start your sessions?
                             </h3>
-                            <p className="text-gray-600">
+                            <p className="mt-0.5 text-sm text-tint-amber-foreground text-pretty">
                                 You have {pendingRequests.length + upcomingSessions.length} mentorship request(s) waiting. Add credits now to ensure your sessions are confirmed.
                             </p>
                         </div>
@@ -322,7 +328,7 @@ export default function StudentSessionsContent({
                     <button
                         type="button"
                         onClick={() => openCreditsRequest('topup')}
-                        className="px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-legacy-accent/20 whitespace-nowrap"
+                        className={cn(buttonVariants(), 'w-full whitespace-nowrap md:w-auto')}
                     >
                         Request credits
                     </button>
@@ -330,59 +336,51 @@ export default function StudentSessionsContent({
             )}
             {/* Tab Switcher + Cancel all (pending only) */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
-                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
+                <div className={segmentTrack}>
                     <button
                         onClick={() => setActiveTab('pending')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
-                            ? 'bg-white text-amber-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
+                        aria-pressed={activeTab === 'pending'}
+                        className={segmentClass(activeTab === 'pending')}
                     >
                         Pending
                         {pendingRequests.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-amber text-tint-amber-foreground')}>
                                 {pendingRequests.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('upcoming')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                            ? 'bg-white text-legacy-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
+                        aria-pressed={activeTab === 'upcoming'}
+                        className={segmentClass(activeTab === 'upcoming')}
                     >
                         Upcoming
                         {upcomingSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-legacy-accent/10 text-legacy-accent rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-blue text-tint-blue-foreground')}>
                                 {upcomingSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('current')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
-                            ? 'bg-white text-legacy-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
+                        aria-pressed={activeTab === 'current'}
+                        className={segmentClass(activeTab === 'current')}
                     >
                         Current
                         {currentSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-green text-tint-green-foreground')}>
                                 {currentSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('past')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                            ? 'bg-white text-legacy-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
+                        aria-pressed={activeTab === 'past'}
+                        className={segmentClass(activeTab === 'past')}
                     >
                         Past
                         {pastSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-card text-muted-foreground')}>
                                 {pastSessions.length}
                             </span>
                         )}
@@ -393,9 +391,9 @@ export default function StudentSessionsContent({
                         type="button"
                         onClick={handleCancelAllPending}
                         disabled={cancelling}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className={buttonVariants({ variant: 'destructive-ghost' })}
                     >
-                        <XCircle className="w-4 h-4 shrink-0" />
+                        <XCircle className="size-4 shrink-0" />
                         {cancelling ? 'Cancelling…' : 'Cancel my pending requests'}
                     </button>
                 )}
@@ -404,40 +402,35 @@ export default function StudentSessionsContent({
             {/* Pending Requests Tab */}
             {activeTab === 'pending' && (
                 pendingRequests.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                            <Hourglass className="w-10 h-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            No pending requests
-                        </h3>
-                        <p className="text-gray-500 max-w-sm">
-                            When you request a session with your mentor, it will appear here until they confirm a time.
-                        </p>
-                        {bookingReady ? (
+                    <EmptyState
+                        icon={Hourglass}
+                        title="No pending requests"
+                        description="When you request a session with your mentor, it will appear here until they confirm a time."
+                        className="py-16"
+                        action={bookingReady ? (
                             <button
                                 onClick={tryOpenBookSession}
-                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                className={buttonVariants()}
                             >
-                                Book a Session
-                                <ArrowRight className="w-4 h-4" />
+                                Book a session
+                                <ArrowRight weight="bold" />
                             </button>
                         ) : !canBook ? (
                             <Link
                                 href="/dashboard/student/profile"
-                                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                className={buttonVariants()}
                             >
                                 Complete profile to book
-                                <ArrowRight className="w-4 h-4" />
+                                <ArrowRight weight="bold" />
                             </Link>
                         ) : (
-                            <p className="mt-6 text-sm text-gray-400 max-w-sm">
+                            <p className="max-w-sm text-sm text-muted-foreground text-pretty">
                                 Your mentor will be assigned by the Access Oxbridge team. You can book a session as soon as they are assigned.
                             </p>
                         )}
-                    </div>
+                    />
                 ) : (
-                    <div className="grid gap-4">
+                    <div className="grid gap-3">
                         {pendingRequests.map((request) => (
                             request.initiated_by === 'mentor' ? (
                                 <MentorSessionRequestCard
@@ -456,17 +449,17 @@ export default function StudentSessionsContent({
                             ) : (
                                 <div
                                     key={request.id}
-                                    className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
+                                    className={sessionCard}
                                 >
                                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                                        <div className="flex items-start gap-4">
+                                        <div className="flex items-start gap-3.5">
                                             <MentorAvatar
                                                 name={request.mentor_full_name}
                                                 photoUrl={request.mentor_photo_url}
-                                                fallbackClassName="bg-amber-100 text-amber-600"
+                                                fallbackClassName="bg-tint-amber text-tint-amber-foreground"
                                             />
-                                            <div>
-                                                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                            <div className="min-w-0">
+                                                <h3 className="text-base font-semibold text-foreground text-pretty">
                                                     {request.reschedule_of_session_id
                                                         ? `Reschedule pending with ${request.mentor_full_name}`
                                                         : `Request sent to ${request.mentor_full_name}`}
@@ -480,9 +473,9 @@ export default function StudentSessionsContent({
                                                     ).map((slot) => (
                                                         <div
                                                             key={`${slot.startTime}-${slot.endTime || ''}`}
-                                                            className="flex items-center gap-1.5 text-sm text-gray-500"
+                                                            className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums"
                                                         >
-                                                            <Calendar className="w-4 h-4 shrink-0" />
+                                                            <Calendar className="size-4 shrink-0" />
                                                             <span>
                                                                 {`${formatDate(slot.startTime)} at ${formatTime(slot.startTime)}`}
                                                                 {slot.endTime ? ` – ${formatTime(slot.endTime)}` : ''}
@@ -490,22 +483,23 @@ export default function StudentSessionsContent({
                                                         </div>
                                                     ))}
                                                     {!(request.proposed_slots?.length || request.proposed_start) && (
-                                                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                                                            <Calendar className="w-4 h-4 shrink-0" />
+                                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums">
+                                                            <Calendar className="size-4 shrink-0" />
                                                             <span>{formatDate(request.created_at)}</span>
                                                         </div>
                                                     )}
                                                 </div>
                                                 {request.reschedule_of_session_id && request.original_scheduled_at && (
-                                                    <p className="mt-1 text-xs text-gray-400">
+                                                    <p className="mt-1 text-sm text-muted-foreground tabular-nums">
                                                         Current session: {formatDate(request.original_scheduled_at)} at {formatTime(request.original_scheduled_at)}
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
-                                        <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold">
-                                            Awaiting Response
-                                        </span>
+                                        <Badge tone="amber" size="lg" className="self-start">
+                                            <Hourglass weight="fill" />
+                                            Awaiting response
+                                        </Badge>
                                     </div>
                                 </div>
                             )
@@ -517,68 +511,63 @@ export default function StudentSessionsContent({
             {/* Sessions List (Upcoming / Past) */}
             {activeTab !== 'pending' && (
                 sessionsForTab.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                            <Calendar className="w-10 h-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {activeTab === 'upcoming' ? 'No upcoming sessions' : 'No past sessions'}
-                        </h3>
-                        <p className="text-gray-500 max-w-sm">
-                            {activeTab === 'upcoming'
-                                ? 'Once you get matched with a mentor and schedule a session, it will appear here.'
-                                : 'Your completed sessions will appear here with access to reports and feedback.'}
-                        </p>
-                            {activeTab === 'upcoming' && (
+                    <EmptyState
+                        icon={Calendar}
+                        title={activeTab === 'upcoming' ? 'No upcoming sessions' : 'No past sessions'}
+                        description={activeTab === 'upcoming'
+                            ? 'Once you get matched with a mentor and schedule a session, it will appear here.'
+                            : 'Your completed sessions will appear here with access to reports and feedback.'}
+                        className="py-16"
+                        action={activeTab === 'upcoming' && (
                             bookingReady ? (
                                 <button
                                     onClick={tryOpenBookSession}
-                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                    className={buttonVariants()}
                                 >
-                                    Book a Session
-                                    <ArrowRight className="w-4 h-4" />
+                                    Book a session
+                                    <ArrowRight weight="bold" />
                                 </button>
                             ) : !canBook ? (
                                 <Link
                                     href="/dashboard/student/profile"
-                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                                    className={buttonVariants()}
                                 >
                                     Complete profile to book
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight weight="bold" />
                                 </Link>
                             ) : (
-                                <p className="mt-6 text-sm text-gray-400 max-w-sm">
+                                <p className="max-w-sm text-sm text-muted-foreground text-pretty">
                                     Your mentor will be assigned by the Access Oxbridge team. You can book a session as soon as they are assigned.
                                 </p>
                             )
                         )}
-                    </div>
+                    />
                 ) : (
-                    <div className="grid gap-4">
+                    <div className="grid gap-3">
                         {sessionsForTab.map((session) => (
                             <div
                                 key={session.id}
-                                className="p-6 bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:shadow-gray-200/50 transition-all group"
+                                className={sessionCard}
                             >
                                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                                    <div className="flex items-start gap-4">
+                                    <div className="flex items-start gap-3.5">
                                         <MentorAvatar
                                             name={session.mentor_full_name}
                                             photoUrl={session.mentor_photo_url}
                                         />
 
-                                        <div>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                        <div className="min-w-0">
+                                            <h3 className="text-base font-semibold text-foreground">
                                                 Session with {session.mentor_full_name}
                                             </h3>
-                                            <div className="flex items-center gap-3 text-sm text-gray-500">
+                                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground tabular-nums">
                                                 <span className="flex items-center gap-1.5">
-                                                    <Calendar className="w-4 h-4" />
+                                                    <Calendar className="size-4" />
                                                     {formatDate(session.scheduled_at)}
                                                 </span>
                                                 {session.scheduled_at && (
                                                     <span className="flex items-center gap-1.5">
-                                                        <Clock className="w-4 h-4" />
+                                                        <Clock className="size-4" />
                                                         {formatTime(session.scheduled_at)}
                                                     </span>
                                                 )}
@@ -586,10 +575,13 @@ export default function StudentSessionsContent({
 
                                             {/* Status Badge */}
                                             {activeTab === 'upcoming' && isSessionSoon(session.scheduled_at) && (
-                                                <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold animate-pulse">
-                                                    <span className="w-2 h-2 bg-green-500 rounded-full" />
+                                                <Badge tone="green" className="mt-2.5">
+                                                    <span className="relative flex size-2">
+                                                        <span className="absolute inline-flex size-full animate-ping rounded-full bg-success/60 motion-reduce:animate-none" />
+                                                        <span className="relative inline-flex size-2 rounded-full bg-success" />
+                                                    </span>
                                                     Starting soon
-                                                </span>
+                                                </Badge>
                                             )}
                                         </div>
                                     </div>
@@ -604,26 +596,23 @@ export default function StudentSessionsContent({
                                                             href={session.zoom_join_url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
-                                                                ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                                : 'bg-legacy-accent text-white hover:scale-[1.02]'
-                                                                }`}
+                                                            className={cn(buttonVariants(), isSessionSoon(session.scheduled_at) && 'bg-success hover:bg-success/90')}
                                                         >
-                                                            <Video className="w-4 h-4" />
-                                                            Join Session
+                                                            <Video weight="fill" />
+                                                            Join session
                                                         </a>
                                                     ) : (
                                                         <button
                                                             type="button"
                                                             onClick={() => openCreditsRequest('booking')}
-                                                            className="inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl bg-legacy-accent text-white hover:scale-[1.02] transition-all"
+                                                            className={buttonVariants()}
                                                         >
-                                                            <Coins className="w-4 h-4" />
+                                                            <Coins />
                                                             Request credits to join
                                                         </button>
                                                     )
                                                 ) : (
-                                                    <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
+                                                    <span className={mutedPill}>
                                                         Zoom link coming soon
                                                     </span>
                                                 )}
@@ -631,9 +620,9 @@ export default function StudentSessionsContent({
                                                     <button
                                                         type="button"
                                                         onClick={() => setRescheduleSession(session)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                                        className={buttonVariants({ variant: 'outline' })}
                                                     >
-                                                        <CalendarClock className="w-4 h-4" />
+                                                        <CalendarClock />
                                                         Reschedule
                                                     </button>
                                                 )}
@@ -641,9 +630,9 @@ export default function StudentSessionsContent({
                                                     <button
                                                         type="button"
                                                         onClick={() => setReportSessionId(session.id)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-semibold hover:bg-red-100 transition-colors"
+                                                        className={buttonVariants({ variant: 'destructive-ghost' })}
                                                     >
-                                                        <MessageSquare className="w-4 h-4" />
+                                                        <MessageSquare />
                                                         Report
                                                     </button>
                                                 )}
@@ -654,32 +643,32 @@ export default function StudentSessionsContent({
                                                     <button
                                                         type="button"
                                                         onClick={() => setRecordingSessionId(session.id)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-100 text-indigo-700 font-bold rounded-xl hover:bg-indigo-200 transition-colors"
+                                                        className={buttonVariants({ variant: 'secondary' })}
                                                     >
-                                                        <PlayCircle className="w-4 h-4" />
-                                                        Watch Recording
+                                                        <PlayCircle weight="fill" className="text-tint-violet-foreground" />
+                                                        Watch recording
                                                     </button>
                                                 )}
                                                 {session.has_report && (
                                                     <Link
                                                         href={`/dashboard/student/sessions/${session.id}/report`}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-legacy-accent/10 text-legacy-accent font-bold rounded-xl hover:bg-legacy-accent/20 transition-colors"
+                                                        className={buttonVariants({ variant: 'outline' })}
                                                     >
-                                                        <FileText className="w-4 h-4" />
-                                                        View Report
+                                                        <FileText />
+                                                        View report
                                                     </Link>
                                                 )}
                                                 {!session.has_feedback && (
                                                     <Link
                                                         href={`/dashboard/student/sessions/${session.id}/feedback`}
-                                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl hover:bg-amber-200 transition-colors"
+                                                        className={cn(buttonVariants({ variant: 'secondary' }), 'bg-tint-amber text-tint-amber-foreground hover:bg-tint-amber/70')}
                                                     >
-                                                        <MessageSquare className="w-4 h-4" />
-                                                        Leave Feedback
+                                                        <MessageSquare />
+                                                        Leave feedback
                                                     </Link>
                                                 )}
                                                 {session.has_feedback && !session.has_report && (
-                                                    <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
+                                                    <span className={mutedPill}>
                                                         Report pending
                                                     </span>
                                                 )}
@@ -693,73 +682,59 @@ export default function StudentSessionsContent({
                 )
             )}
 
-            {reportSessionId && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center">
-                    <div
-                        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                        onClick={() => { setReportSessionId(null); setReportError(null) }}
-                    />
-                    <div className="relative z-50 w-full max-w-md mx-4 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                            <div>
-                                <h2 className="text-xl font-extrabold text-gray-900">Report a Problem</h2>
-                                <p className="text-sm text-gray-500 mt-1">Let us know if your mentor didn&apos;t show up.</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => { setReportSessionId(null); setReportError(null) }}
-                                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-gray-500 text-sm font-semibold"
-                            >
-                                ×
-                            </button>
+            {/* Closing by backdrop, Escape or the X all clear the report and its error, as the backdrop did. */}
+            <Dialog open={!!reportSessionId} onOpenChange={(open) => { if (!open) { setReportSessionId(null); setReportError(null) } }}>
+                <DialogContent size="sm">
+                    <DialogHeader>
+                        <DialogTitle>Report a problem</DialogTitle>
+                        <DialogDescription>Let us know if your mentor didn&apos;t show up.</DialogDescription>
+                    </DialogHeader>
+                    <DialogBody className="space-y-4">
+                        <div className="rounded-card bg-tint-rose p-4">
+                            <p className="text-sm font-medium text-foreground">
+                                Is the mentor absent?
+                            </p>
+                            <p className="mt-1 text-sm text-tint-rose-foreground text-pretty">
+                                Only use this if your mentor hasn&apos;t joined the Zoom room after the scheduled start time.
+                            </p>
                         </div>
-                        <div className="p-6 space-y-4">
-                            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
-                                <p className="text-sm text-gray-800 font-medium">
-                                    Is the mentor absent?
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Only use this if your mentor hasn&apos;t joined the Zoom room after the scheduled start time.
-                                </p>
-                            </div>
-                            {reportError && (
-                                <p className="text-sm text-red-600">{reportError}</p>
-                            )}
-                            <button
-                                type="button"
-                                disabled={reportSubmitting}
-                                onClick={async () => {
-                                    if (!reportSessionId) return
-                                    setReportSubmitting(true)
-                                    setReportError(null)
-                                    try {
-                                        const res = await fetch('/api/student/report-mentor-absent', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ session_id: reportSessionId })
-                                        })
-                                        const data = await res.json().catch(() => ({}))
-                                        if (!res.ok) {
-                                            setReportError(data.error || 'Failed to submit report')
-                                            return
-                                        }
-                                        setReportSessionId(null)
-                                        setShowReportSuccess(true)
-                                        setTimeout(() => setShowReportSuccess(false), 4000)
-                                    } catch {
-                                        setReportError('Something went wrong. Please try again.')
-                                    } finally {
-                                        setReportSubmitting(false)
+                        {reportError && (
+                            <p role="alert" className="text-sm text-destructive">{reportError}</p>
+                        )}
+                        <button
+                            type="button"
+                            disabled={reportSubmitting}
+                            onClick={async () => {
+                                if (!reportSessionId) return
+                                setReportSubmitting(true)
+                                setReportError(null)
+                                try {
+                                    const res = await fetch('/api/student/report-mentor-absent', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ session_id: reportSessionId })
+                                    })
+                                    const data = await res.json().catch(() => ({}))
+                                    if (!res.ok) {
+                                        setReportError(data.error || 'Failed to submit report')
+                                        return
                                     }
-                                }}
-                                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold text-sm shadow-lg shadow-red-200 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {reportSubmitting ? 'Submitting…' : 'Yes, mentor is absent'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                                    setReportSessionId(null)
+                                    setShowReportSuccess(true)
+                                    setTimeout(() => setShowReportSuccess(false), 4000)
+                                } catch {
+                                    setReportError('Something went wrong. Please try again.')
+                                } finally {
+                                    setReportSubmitting(false)
+                                }
+                            }}
+                            className={cn(buttonVariants({ variant: 'destructive' }), 'w-full')}
+                        >
+                            {reportSubmitting ? 'Submitting…' : 'Yes, mentor is absent'}
+                        </button>
+                    </DialogBody>
+                </DialogContent>
+            </Dialog>
 
             {recordingSessionId && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center">
@@ -767,14 +742,14 @@ export default function StudentSessionsContent({
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
                         onClick={() => setRecordingSessionId(null)}
                     />
-                    <div className="relative z-[61] w-full max-w-4xl mx-4 bg-black rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="relative z-[61] mx-4 w-full max-w-4xl overflow-hidden rounded-card bg-black shadow-overlay">
                         <button
                             type="button"
                             onClick={() => setRecordingSessionId(null)}
                             aria-label="Close recording"
-                            className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                            className="absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition-[background-color,scale] duration-150 ease-out hover:bg-white/20 active:scale-[0.96]"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="size-5" />
                         </button>
                         <video
                             key={recordingSessionId}
@@ -801,3 +776,6 @@ export default function StudentSessionsContent({
         </div>
     )
 }
+
+const sessionCard = 'rounded-card bg-card p-5 shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover sm:p-6'
+const mutedPill = 'inline-flex h-11 items-center rounded-full bg-muted px-4 text-sm text-muted-foreground'

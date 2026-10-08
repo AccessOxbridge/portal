@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MapPin, CalendarBlank as Calendar, Clock, Users, NavigationArrow as Navigation, ArrowSquareOut as ExternalLink, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/utils/lib'
 
 interface InPersonEvent {
     id: string
@@ -91,21 +93,21 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">In Person Events</h1>
-                <p className="text-gray-500 mt-1">
+                <h1 className="text-2xl font-semibold text-foreground">In Person Events</h1>
+                <p className="text-muted-foreground mt-1">
                     Attend exclusive in-person meetups, tours, and workshops
                 </p>
             </div>
 
             {/* Upcoming Events */}
             <section>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-rose-500" />
+                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-destructive" />
                     Upcoming Events
                 </h2>
                 {events.upcoming.length === 0 ? (
-                    <div className="bg-gray-50 rounded-2xl p-8 text-center text-gray-500">
-                        <MapPin className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                    <div className="bg-muted/60 rounded-card p-8 text-center text-muted-foreground">
+                        <MapPin className="w-10 h-10 mx-auto mb-3 text-muted-foreground/60" />
                         <p className="font-medium">No upcoming in-person events</p>
                         <p className="text-sm mt-1">Check back soon for new events!</p>
                     </div>
@@ -116,20 +118,20 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                             return (
                                 <div
                                     key={event.id}
-                                    className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:border-rose-100 transition-all duration-200"
+                                    className="bg-card border border-border rounded-card p-6 hover:shadow-border hover:border-border transition-[background-color,box-shadow,color] duration-150 duration-200"
                                 >
                                     <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                                         <div className="flex-1">
                                             <div className="flex items-start gap-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-400 rounded-xl flex items-center justify-center shrink-0">
-                                                    <MapPin className="w-6 h-6 text-white" />
+                                                <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-rose text-tint-rose-foreground">
+                                                    <MapPin weight="duotone" className="size-6" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900">
+                                                    <h3 className="text-lg font-semibold text-foreground">
                                                         {event.title}
                                                     </h3>
                                                     {event.description && (
-                                                        <p className="text-gray-600 text-sm mt-1">
+                                                        <p className="text-muted-foreground text-sm mt-1">
                                                             {event.description}
                                                         </p>
                                                     )}
@@ -137,8 +139,8 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                                             </div>
 
                                             <div className="mt-4 pl-15 space-y-2">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <Calendar className="w-4 h-4 text-muted-foreground" />
                                                     {new Date(event.date).toLocaleDateString('en-GB', {
                                                         weekday: 'long',
                                                         day: 'numeric',
@@ -146,8 +148,8 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                                                         year: 'numeric',
                                                     })}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Clock className="w-4 h-4 text-gray-400" />
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <Clock className="w-4 h-4 text-muted-foreground" />
                                                     {new Date(event.date).toLocaleTimeString('en-GB', {
                                                         hour: '2-digit',
                                                         minute: '2-digit'
@@ -155,14 +157,14 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                                                     {event.duration_minutes && ` (${event.duration_minutes} mins)`}
                                                 </div>
                                                 {event.location && (
-                                                    <div className="flex items-start gap-2 text-sm text-gray-600">
-                                                        <Navigation className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                                                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                                                        <Navigation className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                                                         <span>{event.location}</span>
                                                     </div>
                                                 )}
                                                 <div className="flex items-center gap-2 text-sm">
-                                                    <Users className="w-4 h-4 text-gray-400" />
-                                                    <span className={spotsLeft !== null && spotsLeft < 15 ? 'text-orange-600 font-medium' : 'text-gray-600'}>
+                                                    <Users className="w-4 h-4 text-muted-foreground" />
+                                                    <span className={spotsLeft !== null && spotsLeft < 15 ? 'text-warning font-medium' : 'text-muted-foreground'}>
                                                         {spotsLeft !== null ? `${spotsLeft} spots left` : `${event.registration_count} registered`}
                                                         {event.capacity && ` out of ${event.capacity}`}
                                                     </span>
@@ -173,13 +175,13 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                                         <div className="flex lg:flex-col items-center gap-2 lg:min-w-[140px]">
                                             {event.is_registered ? (
                                                 <>
-                                                    <span className="px-4 py-2 bg-green-50 text-green-600 rounded-xl text-sm font-medium">
+                                                    <span className="px-4 py-2 bg-tint-green text-success rounded-control text-sm font-medium">
                                                         ✓ Registered
                                                     </span>
                                                     <button
                                                         onClick={() => handleUnregister(event.id)}
                                                         disabled={registering === event.id}
-                                                        className="flex items-center gap-1.5 px-4 py-2 text-xs text-gray-400 hover:text-red-500 transition-colors"
+                                                        className="flex items-center gap-1.5 px-4 py-2 text-xs text-muted-foreground hover:text-destructive transition-colors"
                                                     >
                                                         {registering === event.id ? (
                                                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -192,7 +194,7 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
                                                 <button
                                                     onClick={() => handleRegister(event.id)}
                                                     disabled={registering === event.id || (spotsLeft !== null && spotsLeft <= 0)}
-                                                    className="w-full px-6 py-2.5 bg-gradient-to-r from-rose-500 to-orange-400 text-white rounded-xl text-sm font-medium hover:from-rose-600 hover:to-orange-500 transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                                                    className={cn(buttonVariants(), 'w-full')}
                                                 >
                                                     {registering === event.id ? (
                                                         <>
@@ -218,22 +220,22 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
             {/* Past Events */}
             {events.past.length > 0 && (
                 <section>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-gray-400" />
+                    <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-muted-foreground" />
                         Past Events
                     </h2>
                     <div className="grid gap-3">
                         {events.past.map((event) => (
                             <div
                                 key={event.id}
-                                className="bg-gray-50 border border-gray-100 rounded-xl p-4"
+                                className="bg-muted/60 border border-border rounded-control p-4"
                             >
                                 <div>
-                                    <h3 className="font-medium text-gray-900">{event.title}</h3>
+                                    <h3 className="font-medium text-foreground">{event.title}</h3>
                                     {event.description && (
-                                        <p className="text-sm text-gray-500 mt-0.5">{event.description}</p>
+                                        <p className="text-sm text-muted-foreground mt-0.5">{event.description}</p>
                                     )}
-                                    <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
+                                    <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
                                             {new Date(event.date).toLocaleDateString('en-GB', {

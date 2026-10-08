@@ -33,11 +33,11 @@ export default async function AcademicProfilePage() {
 
     return (
         <div className="max-w-3xl mx-auto">
-            <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    My Academic Profile
+            <header className="mb-6">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My academic profile
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Help us match you with the perfect mentor by completing your profile
                 </p>
             </header>
@@ -45,14 +45,14 @@ export default async function AcademicProfilePage() {
             {/* Photo sits above the questionnaire and saves on its own — it is
                 identity, not academic history, and shouldn't wait on this form
                 being complete. */}
-            <section className="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100">
-                    <h2 className="font-bold text-gray-900">Profile photo</h2>
-                    <p className="text-sm text-gray-500">
+            <section className="mb-6 overflow-hidden rounded-card bg-card shadow-border">
+                <div className="border-b border-border px-5 py-4 sm:px-6">
+                    <h2 className="text-base font-semibold text-foreground">Profile photo</h2>
+                    <p className="text-sm text-muted-foreground">
                         Shown to your mentors in messages and sessions
                     </p>
                 </div>
-                <div className="p-6">
+                <div className="p-5 sm:p-6">
                     <AvatarUploader
                         userId={user.id}
                         photoUrl={profile.photo_url ?? null}

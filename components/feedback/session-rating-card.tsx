@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { Star, PaperPlaneRight as Send, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { LOW_RATING_TAGS, LOW_RATING_THRESHOLD } from '@/config/feedback.config'
+import { buttonVariants } from '@/components/ui/button'
+import { fieldBase } from '@/components/ui/input'
+import { cn } from '@/utils/lib'
 
 /**
  * The post-session rating form: stars, optional reasons when something went
@@ -131,17 +134,17 @@ export default function SessionRatingCard({
 
     if (success && successCta) {
         return (
-            <div className="p-6 space-y-4">
-                <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                    <p className="text-sm text-emerald-800">
+            <div className="space-y-4 p-6">
+                <div role="status" className="flex items-start gap-3 rounded-card bg-tint-green p-4">
+                    <CheckCircle2 weight="fill" className="mt-0.5 size-5 shrink-0 text-success" />
+                    <p className="text-sm text-tint-green-foreground text-pretty">
                         Thanks! Your feedback has been shared with the Access Oxbridge team.
                     </p>
                 </div>
                 <button
                     type="button"
                     onClick={successCta.onClick}
-                    className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                    className={cn(buttonVariants(), 'w-full')}
                 >
                     {successCta.label}
                 </button>
@@ -151,7 +154,7 @@ export default function SessionRatingCard({
 
     return (
         <>
-            <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+            <div className="flex items-center gap-3.5 px-6 pt-6 pe-16 pb-2">
                 {mentorPhotoUrl ? (
                     // Plain <img> rather than next/image: no remotePatterns are
                     // configured for the Supabase storage host, and the rest of
@@ -160,26 +163,26 @@ export default function SessionRatingCard({
                     <img
                         src={mentorPhotoUrl}
                         alt=""
-                        className="w-11 h-11 rounded-xl object-cover shrink-0"
+                        className="size-12 shrink-0 rounded-full object-cover outline-1 -outline-offset-1 outline-black/10"
                     />
                 ) : (
-                    <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                        <Star className="w-5 h-5 text-amber-600" />
+                    <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-amber text-tint-amber-foreground">
+                        <Star weight="fill" className="size-6" />
                     </div>
                 )}
                 <div>
-                    <h2 className="text-xl font-extrabold text-gray-900">How was your session?</h2>
-                    <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">
+                    <h2 className="text-lg font-semibold text-foreground">How was your session?</h2>
+                    <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground text-pretty">
                         With {mentorName}
                         {sessionDate ? ` on ${sessionDate}` : ''}
                     </p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5 p-6">
                 <div>
                     <div
-                        className="flex items-center justify-center gap-2"
+                        className="flex items-center justify-center gap-1"
                         role="radiogroup"
                         aria-label="Rate your mentor from 1 to 5 stars"
                         onMouseLeave={() => setHovered(0)}
@@ -198,20 +201,20 @@ export default function SessionRatingCard({
                                 onMouseEnter={() => setHovered(value)}
                                 onFocus={() => setHovered(value)}
                                 onBlur={() => setHovered(0)}
-                                className="p-1 rounded-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-legacy-accent/40"
+                                className="rounded-full p-1.5 outline-none transition-transform duration-150 ease-out active:scale-[0.85] focus-visible:ring-[3px] focus-visible:ring-ring/40"
                             >
                                 <Star
                                     weight="fill"
-                                    className={`w-10 h-10 transition-colors ${
+                                    className={`size-10 transition-[color,scale] duration-150 ease-out ${
                                         value <= activeRating
-                                            ? 'text-amber-400 fill-amber-400'
-                                            : 'text-gray-200 fill-gray-200'
+                                            ? 'scale-110 text-amber-400'
+                                            : 'text-muted-foreground/25'
                                     }`}
                                 />
                             </button>
                         ))}
                     </div>
-                    <p className="text-center text-sm font-semibold text-gray-600 mt-3 h-5">
+                    <p className="mt-2 h-5 text-center text-sm font-medium text-muted-foreground" aria-live="polite">
                         {activeRating ? RATING_LABELS[activeRating] : ''}
                     </p>
                 </div>
@@ -219,9 +222,9 @@ export default function SessionRatingCard({
                 {/* Only for 1–3 stars: concrete, actionable reasons. */}
                 {showTags && (
                     <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-2">
+                        <p className="mb-2 text-sm font-medium text-foreground">
                             What went wrong?{' '}
-                            <span className="font-normal text-gray-400">(optional)</span>
+                            <span className="font-normal text-muted-foreground">(optional)</span>
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {LOW_RATING_TAGS.map((tag) => {
@@ -232,10 +235,10 @@ export default function SessionRatingCard({
                                         type="button"
                                         aria-pressed={selected}
                                         onClick={() => toggleTag(tag)}
-                                        className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                                        className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-[background-color,color,border-color,scale] duration-150 ease-out active:scale-[0.96] ${
                                             selected
-                                                ? 'bg-legacy-accent text-white border-legacy-accent'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                                ? 'border-primary bg-primary text-primary-foreground'
+                                                : 'border-input bg-card text-foreground hover:bg-muted'
                                         }`}
                                     >
                                         {tag}
@@ -249,10 +252,10 @@ export default function SessionRatingCard({
                 <div>
                     <label
                         htmlFor="session-rating-comment"
-                        className="block text-sm font-semibold text-gray-700 mb-2"
+                        className="mb-2 block text-sm font-medium text-foreground"
                     >
                         Anything you&apos;d like to add?{' '}
-                        <span className="font-normal text-gray-400">(optional)</span>
+                        <span className="font-normal text-muted-foreground">(optional)</span>
                     </label>
                     <textarea
                         id="session-rating-comment"
@@ -261,12 +264,12 @@ export default function SessionRatingCard({
                         placeholder="What went well? What could be better?"
                         rows={3}
                         maxLength={2000}
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-accent/30 focus:border-legacy-accent resize-none"
+                        className={cn(fieldBase, 'resize-none px-3.5 py-2.5 leading-relaxed')}
                     />
                 </div>
 
                 {error && (
-                    <p className="text-sm text-red-600 font-medium" role="alert">
+                    <p className="text-sm text-destructive" role="alert">
                         {error}
                     </p>
                 )}
@@ -275,16 +278,16 @@ export default function SessionRatingCard({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                        className={cn(buttonVariants(), 'w-full')}
                     >
-                        <Send className="w-4 h-4" />
+                        <Send weight="fill" />
                         {loading ? 'Sending…' : 'Submit feedback'}
                     </button>
                     {secondaryAction && (
                         <button
                             type="button"
                             onClick={secondaryAction.onClick}
-                            className="w-full py-3 text-gray-500 font-semibold rounded-2xl hover:bg-gray-50 transition-colors"
+                            className={cn(buttonVariants({ variant: 'ghost' }), 'w-full')}
                         >
                             {secondaryAction.label}
                         </button>

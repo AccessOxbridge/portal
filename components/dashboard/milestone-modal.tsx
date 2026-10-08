@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { X, Trophy } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/utils/lib'
 import { createClient } from '@/utils/supabase/client'
 import { MILESTONE_COPY, type Milestone } from '@/config/milestones.config'
 
@@ -153,9 +156,9 @@ export default function MilestoneModal({ milestone, ready, preview = false }: Mi
     const close = () => setIsOpen(false)
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={close}
                 aria-hidden
             />
@@ -163,33 +166,33 @@ export default function MilestoneModal({ milestone, ready, preview = false }: Mi
                 role="dialog"
                 aria-modal="true"
                 aria-label={copy.title}
-                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden"
+                className={cn(sheet.panel, 'sm:max-w-md')}
             >
                 <button
                     type="button"
                     onClick={close}
-                    className="absolute top-6 right-6 w-9 h-9 rounded-full bg-white/70 flex items-center justify-center hover:bg-white transition-colors z-10"
+                    className={cn(sheet.close, 'absolute top-5 right-5 z-10')}
                     aria-label="Close"
                 >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="size-5" />
                 </button>
 
-                <div className="bg-gradient-to-b from-rich-beige-accent to-white px-6 pt-10 pb-6 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-legacy-accent flex items-center justify-center mx-auto shadow-lg">
-                        <Trophy className="w-8 h-8 text-rich-amber-accent" />
+                <div className="px-6 pt-10 pb-6 text-center">
+                    <div className="mx-auto grid size-20 place-items-center rounded-full bg-primary ring-8 ring-tint-amber animate-in zoom-in-50 fade-in-0 duration-500 ease-snappy motion-reduce:animate-none">
+                        <Trophy weight="fill" className="size-10 text-rich-amber-accent" />
                     </div>
-                    <p className="mt-5 inline-block px-3 py-1 rounded-full bg-legacy-accent/10 text-legacy-accent text-xs font-bold uppercase tracking-wide">
+                    <p className="mt-6 inline-block rounded-full bg-tint-amber px-3 py-1 text-xs font-medium text-tint-amber-foreground">
                         {copy.badge}
                     </p>
-                    <h2 className="mt-3 text-2xl font-extrabold text-gray-900">{copy.title}</h2>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{copy.body}</p>
+                    <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground text-balance">{copy.title}</h2>
+                    <p className="mt-2 text-base leading-relaxed text-muted-foreground text-pretty">{copy.body}</p>
                 </div>
 
                 <div className="px-6 pb-6">
                     <button
                         type="button"
                         onClick={close}
-                        className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                        className={cn(buttonVariants(), 'w-full')}
                     >
                         Keep going
                     </button>

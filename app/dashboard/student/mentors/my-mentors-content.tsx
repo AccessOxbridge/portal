@@ -5,6 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Users, CalendarBlank as Calendar, Briefcase, ChatCircle as MessageCircle, UserCircle } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
+import { Avatar } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Spinner } from '@/components/ui/spinner'
+import { segmentClass, segmentCount, segmentTrack } from '@/components/ui/segmented'
+import { cn } from '@/utils/lib'
 
 interface Mentor {
     id: string
@@ -94,19 +101,17 @@ export default function MyMentorsContent({
     const mentors = effectiveTab === 'active' ? activeMentors : pastMentors
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Tab Switcher */}
-            <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+            <div className={segmentTrack}>
                 <button
                     onClick={() => setActiveTab('active')}
-                    className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'active'
-                        ? 'bg-white text-legacy-accent shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                    aria-pressed={effectiveTab === 'active'}
+                    className={segmentClass(effectiveTab === 'active')}
                 >
                     Current
                     {activeMentors.length > 0 && (
-                        <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                        <span className={cn(segmentCount, 'bg-tint-green text-tint-green-foreground')}>
                             {activeMentors.length}
                         </span>
                     )}
@@ -114,13 +119,11 @@ export default function MyMentorsContent({
                 {hasPastMentors && (
                     <button
                         onClick={() => setActiveTab('past')}
-                        className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${effectiveTab === 'past'
-                            ? 'bg-white text-legacy-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                            }`}
+                        aria-pressed={effectiveTab === 'past'}
+                        className={segmentClass(effectiveTab === 'past')}
                     >
                         Past
-                        <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                        <span className={cn(segmentCount, 'bg-card text-muted-foreground')}>
                             {pastMentors.length}
                         </span>
                     </button>
@@ -129,121 +132,103 @@ export default function MyMentorsContent({
 
             {/* Mentors List */}
             {mentors.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                        <Users className="w-10 h-10 text-gray-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {effectiveTab === 'active' ? 'No mentors assigned yet' : 'No past mentors'}
-                    </h3>
-                    <p className="text-gray-500 max-w-sm">
-                        {effectiveTab === 'active'
-                            ? 'The Access Oxbridge team will assign your mentor(s) shortly. Once assigned, they will appear here and you can book a session.'
-                            : 'If a mentor is ever unassigned, they will appear here.'}
-                    </p>
-                </div>
+                <EmptyState
+                    icon={Users}
+                    title={effectiveTab === 'active' ? 'No mentors assigned yet' : 'No past mentors'}
+                    description={effectiveTab === 'active'
+                        ? 'The Access Oxbridge team will assign your mentor(s) shortly. Once assigned, they will appear here and you can book a session.'
+                        : 'If a mentor is ever unassigned, they will appear here.'}
+                    className="py-16"
+                />
             ) : (
-                <div className="grid gap-6">
+                <div className="grid gap-4">
                     {mentors.map((mentor) => (
                         <div
                             key={mentor.id}
-                            className={`p-6 bg-white rounded-2xl border shadow-lg transition-all hover:shadow-xl ${mentor.has_active_session
-                                ? 'border-green-200 shadow-green-100/50'
-                                : 'border-gray-100 shadow-gray-100/50'
-                                }`}
+                            className="rounded-card bg-card p-5 shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover sm:p-6"
                         >
-                            <div className="flex items-start gap-5">
+                            <div className="flex items-start gap-4">
                                 {/* Mentor Avatar */}
-                                {mentor.photo_url ? (
-                                    <img
-                                        src={mentor.photo_url}
-                                        alt={mentor.full_name}
-                                        className="w-16 h-16 rounded-2xl object-cover shrink-0"
-                                    />
-                                ) : (
-                                    <div className="w-16 h-16 rounded-2xl bg-legacy-accent text-white flex items-center justify-center text-xl font-bold shrink-0">
-                                        {mentor.full_name?.[0] || 'M'}
-                                    </div>
-                                )}
+                                <Avatar name={mentor.full_name || 'Mentor'} src={mentor.photo_url} size="xl" className="max-sm:size-12 max-sm:text-base" />
 
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900">
+                                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <h3 className="text-lg font-semibold text-foreground">
                                                 {mentor.full_name}
                                             </h3>
                                             {mentor.has_active_session && (
-                                                <span className="inline-flex items-center gap-1.5 mt-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                                    Active Mentorship
-                                                </span>
+                                                <Badge tone="green" className="mt-1">
+                                                    <span className="size-1.5 rounded-full bg-success" />
+                                                    Active mentorship
+                                                </Badge>
                                             )}
                                         </div>
 
                                         <div className="flex flex-wrap items-center gap-2 md:shrink-0">
                                             <Link
                                                 href={`/dashboard/student/mentors/${mentor.id}`}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors text-sm"
+                                                className={buttonVariants({ variant: 'outline', size: 'sm' })}
                                             >
-                                                <UserCircle className="w-4 h-4" />
-                                                View Profile
+                                                <UserCircle />
+                                                View profile
                                             </Link>
                                             <button
                                                 onClick={() => handleStartChat(mentor.id)}
                                                 disabled={chatLoadingId === mentor.id}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className={buttonVariants({ variant: 'brand', size: 'sm' })}
                                             >
                                                 {chatLoadingId === mentor.id ? (
-                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                    <Spinner className="size-4" />
                                                 ) : (
-                                                    <MessageCircle className="w-4 h-4" />
+                                                    <MessageCircle weight="fill" />
                                                 )}
                                                 Chat
                                             </button>
                                             <Link
                                                 href="/dashboard/student/sessions"
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-legacy-accent/10 text-legacy-accent font-semibold rounded-xl hover:bg-legacy-accent/20 transition-colors text-sm"
+                                                className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                                             >
-                                                <Calendar className="w-4 h-4" />
-                                                View Sessions
+                                                <Calendar />
+                                                View sessions
                                             </Link>
                                         </div>
                                     </div>
 
                                     {mentor.bio && (
-                                        <p className="mt-3 text-gray-600 text-sm leading-relaxed line-clamp-2">
+                                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground text-pretty">
                                             {mentor.bio}
                                         </p>
                                     )}
 
                                     {/* Expertise Tags */}
                                     {mentor.expertise && mentor.expertise.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mt-4">
+                                        <div className="mt-3 flex flex-wrap gap-1.5">
                                             {mentor.expertise.slice(0, 4).map((skill, idx) => (
-                                                <span
+                                                <Badge
                                                     key={idx}
-                                                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium"
+                                                    tone="neutral"
                                                 >
                                                     {skill}
-                                                </span>
+                                                </Badge>
                                             ))}
                                             {mentor.expertise.length > 4 && (
-                                                <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">
+                                                <Badge tone="outline">
                                                     +{mentor.expertise.length - 4} more
-                                                </span>
+                                                </Badge>
                                             )}
                                         </div>
                                     )}
 
                                     {/* Stats */}
-                                    <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
-                                        <div className="flex items-center gap-2">
-                                            <Briefcase className="w-4 h-4" />
+                                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-border pt-3 text-sm text-muted-foreground tabular-nums">
+                                        <div className="flex items-center gap-1.5">
+                                            <Briefcase className="size-4" />
                                             <span>{mentor.total_sessions} session{mentor.total_sessions !== 1 ? 's' : ''}</span>
                                         </div>
                                         {mentor.last_session_at && (
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
+                                            <div className="flex items-center gap-1.5">
+                                                <Calendar className="size-4" />
                                                 <span>Last: {formatDate(mentor.last_session_at)}</span>
                                             </div>
                                         )}

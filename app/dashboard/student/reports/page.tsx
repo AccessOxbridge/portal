@@ -90,11 +90,11 @@ export default async function StudentReportsPage() {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    Session Reports
+            <header className="mb-6">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    Session reports
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View personalised reports and insights from your mentorship sessions
                 </p>
             </header>

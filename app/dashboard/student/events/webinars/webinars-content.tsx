@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { VideoCamera as Video, CalendarBlank as Calendar, Clock, Users, ArrowSquareOut as ExternalLink, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
+import { buttonVariants } from '@/components/ui/button'
 
 interface Webinar {
     id: string
@@ -88,21 +89,21 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Webinars</h1>
-                <p className="text-gray-500 mt-1">
+                <h1 className="text-2xl font-semibold text-foreground">Webinars</h1>
+                <p className="text-muted-foreground mt-1">
                     Join live online sessions with mentors and experts
                 </p>
             </div>
 
             {/* Upcoming Webinars */}
             <section>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Video className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Video className="w-5 h-5 text-brand" />
                     Upcoming Webinars
                 </h2>
                 {events.upcoming.length === 0 ? (
-                    <div className="bg-gray-50 rounded-2xl p-8 text-center text-gray-500">
-                        <Video className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                    <div className="bg-muted/60 rounded-card p-8 text-center text-muted-foreground">
+                        <Video className="w-10 h-10 mx-auto mb-3 text-muted-foreground/60" />
                         <p className="font-medium">No upcoming webinars</p>
                         <p className="text-sm mt-1">Check back soon for new sessions!</p>
                     </div>
@@ -111,19 +112,19 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
                         {events.upcoming.map((webinar) => (
                             <div
                                 key={webinar.id}
-                                className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:border-blue-100 transition-all duration-200"
+                                className="bg-card border border-border rounded-card p-6 hover:shadow-border hover:border-brand/20 transition-[background-color,box-shadow,color] duration-150 duration-200"
                             >
                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                        <h3 className="text-lg font-semibold text-foreground mb-2">
                                             {webinar.title}
                                         </h3>
                                         {webinar.description && (
-                                            <p className="text-gray-600 text-sm mb-4">
+                                            <p className="text-muted-foreground text-sm mb-4">
                                                 {webinar.description}
                                             </p>
                                         )}
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                                             <span className="flex items-center gap-1.5">
                                                 <Calendar className="w-4 h-4" />
                                                 {new Date(webinar.date).toLocaleDateString('en-GB', {
@@ -147,7 +148,7 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
                                             </span>
                                         </div>
                                         {webinar.host && (
-                                            <p className="mt-3 text-sm text-gray-700">
+                                            <p className="mt-3 text-sm text-foreground">
                                                 <span className="font-medium">Hosted by:</span> {webinar.host}
                                             </p>
                                         )}
@@ -155,13 +156,13 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
                                     <div className="flex md:flex-col items-center gap-2">
                                         {webinar.is_registered ? (
                                             <>
-                                                <span className="px-4 py-2 bg-green-50 text-green-600 rounded-xl text-sm font-medium">
+                                                <span className="px-4 py-2 bg-tint-green text-success rounded-control text-sm font-medium">
                                                     ✓ Registered
                                                 </span>
                                                 <button
                                                     onClick={() => handleUnregister(webinar.id)}
                                                     disabled={registering === webinar.id}
-                                                    className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                                                    className="text-xs text-muted-foreground hover:text-destructive transition-colors"
                                                 >
                                                     {registering === webinar.id ? (
                                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -174,7 +175,7 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
                                             <button
                                                 onClick={() => handleRegister(webinar.id)}
                                                 disabled={registering === webinar.id || (webinar.capacity !== null && webinar.registration_count >= webinar.capacity)}
-                                                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                                                className={buttonVariants()}
                                             >
                                                 {registering === webinar.id ? (
                                                     <>
@@ -197,22 +198,22 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
             {/* Past Webinars */}
             {events.past.length > 0 && (
                 <section>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-gray-400" />
+                    <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-muted-foreground" />
                         Past Webinars
                     </h2>
                     <div className="grid gap-3">
                         {events.past.map((webinar) => (
                             <div
                                 key={webinar.id}
-                                className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between"
+                                className="bg-muted/60 border border-border rounded-control p-4 flex items-center justify-between"
                             >
                                 <div>
-                                    <h3 className="font-medium text-gray-900">{webinar.title}</h3>
+                                    <h3 className="font-medium text-foreground">{webinar.title}</h3>
                                     {webinar.description && (
-                                        <p className="text-sm text-gray-500 mt-0.5">{webinar.description}</p>
+                                        <p className="text-sm text-muted-foreground mt-0.5">{webinar.description}</p>
                                     )}
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         {new Date(webinar.date).toLocaleDateString('en-GB', {
                                             day: 'numeric',
                                             month: 'short',
@@ -225,7 +226,7 @@ export default function WebinarsContent({ upcomingWebinars, pastWebinars, userId
                                         href={webinar.recording_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-1.5 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        className="flex items-center gap-1.5 px-4 py-2 text-sm text-brand hover:bg-tint-blue rounded-lg transition-colors"
                                     >
                                         <ExternalLink className="w-4 h-4" />
                                         Watch Recording

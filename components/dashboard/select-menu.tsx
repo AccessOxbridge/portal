@@ -120,10 +120,10 @@ export default function SelectMenu({
                 width: position.width,
                 maxHeight,
             }}
-            className="fixed z-[100] overflow-y-auto overscroll-contain bg-white rounded-xl border border-gray-100 shadow-xl py-1"
+            className="fixed z-[1100] overflow-y-auto overscroll-contain rounded-card border border-transparent bg-popover p-1 text-popover-foreground shadow-overlay animate-in fade-in-0 zoom-in-96 duration-150 ease-snappy motion-reduce:animate-none"
         >
             {options.length === 0 ? (
-                <p className="px-3 py-2 text-sm text-gray-400">No times available</p>
+                <p className="px-3 py-2 text-sm text-muted-foreground">No times available</p>
             ) : (
                 options.map((option) => {
                     const isSelected = option.value === value
@@ -139,10 +139,10 @@ export default function SelectMenu({
                                 setOpen(false)
                             }}
                             className={[
-                                'w-full text-left px-3 py-2 text-sm transition-colors',
+                                'w-full rounded-[8px] px-3 py-2 text-left text-base tabular-nums transition-colors',
                                 isSelected
-                                    ? 'bg-legacy-accent text-white font-medium'
-                                    : 'text-gray-800 hover:bg-legacy-accent/10',
+                                    ? 'bg-primary text-primary-foreground font-medium'
+                                    : 'text-foreground hover:bg-muted',
                             ].join(' ')}
                         >
                             {option.label}
@@ -163,17 +163,17 @@ export default function SelectMenu({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 className={[
-                    'w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all text-sm text-left',
+                    'flex h-11 w-full items-center justify-between gap-2 rounded-control border border-input bg-card px-3.5 text-left text-base outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 tabular-nums',
                     disabled
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'hover:border-gray-300',
+                        ? 'cursor-not-allowed bg-muted opacity-60'
+                        : '',
                 ].join(' ')}
             >
-                <span className={selected ? 'text-gray-900 font-medium' : 'text-gray-400'}>
+                <span className={selected ? 'text-foreground' : 'text-muted-foreground'}>
                     {selected ? selected.label : placeholder}
                 </span>
                 <ChevronDown
-                    className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+                    className={`size-4 shrink-0 text-muted-foreground transition-transform duration-150 ease-out ${open ? 'rotate-180' : ''}`}
                 />
             </button>
 

@@ -65,10 +65,10 @@ export default async function MentorAvailabilityPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    My Availability
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My availability
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View your scheduled sessions and check your availability
                 </p>
             </header>

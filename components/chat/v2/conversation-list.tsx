@@ -46,10 +46,10 @@ export default function ConversationList({
 }: ConversationListProps) {
     if (conversations.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 p-6 text-center">
-                <MessageSquare className="w-12 h-12 mb-3 text-gray-200" strokeWidth={1.5} />
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-6 text-center">
+                <MessageSquare className="size-12 mb-3 text-muted-foreground/60" strokeWidth={1.5} />
                 <p className="text-sm font-medium">No conversations yet</p>
-                <p className="text-xs text-gray-300 mt-1">Your chats will appear here.</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">Your chats will appear here.</p>
             </div>
         )
     }
@@ -80,8 +80,8 @@ export default function ConversationList({
                         className={cn(
                             'w-full flex items-center gap-3 px-3 py-3 text-left transition-colors border-l-2',
                             isSelected
-                                ? 'bg-legacy-accent/[0.06] border-legacy-accent'
-                                : 'border-transparent hover:bg-gray-50'
+                                ? 'bg-primary/[0.06] border-primary'
+                                : 'border-transparent hover:bg-muted/60'
                         )}
                     >
                         <div className="relative shrink-0">
@@ -95,15 +95,15 @@ export default function ConversationList({
                                 <img
                                     src={conversation.other_user.photo_url}
                                     alt={conversation.other_user.full_name || 'User'}
-                                    className="w-11 h-11 rounded-full object-cover"
+                                    className="size-11 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold">
+                                <div className="size-11 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
                                     {conversation.other_user.full_name?.[0]?.toUpperCase() || 'U'}
                                 </div>
                             )}
                             {hasUnread && (
-                                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-legacy-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white">
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-primary rounded-full flex items-center justify-center text-white text-[10px] font-semibold ring-2 ring-white">
                                     {conversation.unread_count}
                                 </span>
                             )}
@@ -115,14 +115,14 @@ export default function ConversationList({
                                     className={cn(
                                         'text-sm',
                                         conversation.type === 'group' ? 'leading-snug' : 'truncate',
-                                        hasUnread ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'
+                                        hasUnread ? 'font-semibold text-foreground' : 'font-semibold text-foreground'
                                     )}
                                 >
                                     {conversation.type === 'group'
                                         ? formatGroupTitle(conversation.members || [], currentUserId)
                                         : conversation.other_user.full_name || 'User'}
                                 </span>
-                                <span className="text-[10px] text-gray-400 shrink-0">
+                                <span className="text-[10px] text-muted-foreground shrink-0">
                                     {formatDistanceToNow(new Date(conversation.last_message_at), {
                                         addSuffix: true,
                                     })}
@@ -130,11 +130,11 @@ export default function ConversationList({
                             </div>
 
                             {conversation.type === 'group' ? (
-                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-legacy-accent/10 text-[10px] font-semibold text-legacy-accent">
+                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
                                     Group
                                 </span>
                             ) : conversation.other_user.role_label ? (
-                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-legacy-accent/10 text-[10px] font-semibold text-legacy-accent">
+                                <span className="inline-block my-0.5 px-1.5 py-0.5 rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
                                     {conversation.other_user.role_label}
                                 </span>
                             ) : null}
@@ -142,10 +142,10 @@ export default function ConversationList({
                             <p
                                 className={cn(
                                     'text-xs truncate',
-                                    hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'
+                                    hasUnread ? 'text-foreground font-medium' : 'text-muted-foreground'
                                 )}
                             >
-                                {isSender && <span className="text-gray-400">You: </span>}
+                                {isSender && <span className="text-muted-foreground">You: </span>}
                                 {preview}
                             </p>
                         </div>
@@ -156,7 +156,7 @@ export default function ConversationList({
             {/* A single conversation leaves a tall white void below. A quiet
                 closing line gives the column a bottom edge and explains what
                 would otherwise appear here. */}
-            <p className="px-4 py-4 text-[11px] leading-relaxed text-gray-300 border-t border-gray-100 mt-1">
+            <p className="px-4 py-4 text-[11px] leading-relaxed text-muted-foreground/60 border-t border-border mt-1">
                 {conversations.length === 1
                     ? 'Your other conversations will appear here as they start.'
                     : `${conversations.length} conversations`}
@@ -177,19 +177,19 @@ function GroupAvatars({
 
     if (shown.length === 0) {
         return (
-            <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold">
+            <div className="size-11 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
                 G
             </div>
         )
     }
 
     return (
-        <div className="relative w-11 h-11">
+        <div className="relative size-11">
             {shown.map((member, index) => (
                 <div
                     key={member.user_id}
                     className={cn(
-                        'absolute w-7 h-7 rounded-full overflow-hidden ring-2 ring-white',
+                        'absolute size-7 rounded-full overflow-hidden ring-2 ring-white',
                         index === 0 ? 'left-0 top-0 z-10' : 'right-0 bottom-0 z-0'
                     )}
                 >
@@ -201,7 +201,7 @@ function GroupAvatars({
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full bg-legacy-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                        <div className="w-full h-full bg-primary flex items-center justify-center text-white text-[10px] font-semibold">
                             {member.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                     )}

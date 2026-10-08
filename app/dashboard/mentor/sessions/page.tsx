@@ -139,10 +139,10 @@ export default async function MentorSessionsPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
-                    My Sessions
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My sessions
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View your scheduled and completed mentorship sessions
                 </p>
             </header>

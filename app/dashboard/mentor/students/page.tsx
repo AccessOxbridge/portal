@@ -152,8 +152,8 @@ export default async function MentorStudentsPage() {
     return (
         <div className="max-w-5xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">My Students</h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">My students</h1>
+                <p className="mt-2 text-lg text-muted-foreground">
                     Track progress and session activity across the students you mentor.
                 </p>
             </header>

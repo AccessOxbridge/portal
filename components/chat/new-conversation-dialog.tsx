@@ -97,33 +97,33 @@ export default function NewConversationDialog({
             />
 
             {/* Dialog */}
-            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md sm:mx-4 max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden">
+            <div className="relative bg-card rounded-t-2xl sm:rounded-card shadow-border w-full max-w-md sm:mx-4 max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden">
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900">Start a Conversation</h2>
-                        <p className="text-sm text-gray-500">
+                        <h2 className="text-lg font-semibold text-foreground">Start a Conversation</h2>
+                        <p className="text-sm text-muted-foreground">
                             Select a {userRole === 'student' ? 'mentor' : 'student'} to chat with
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-muted rounded-full transition-colors"
                     >
-                        <X className="w-5 h-5 text-gray-400" />
+                        <X className="size-5 text-muted-foreground" />
                     </button>
                 </div>
 
                 {/* Search */}
-                <div className="px-6 py-3 border-b border-gray-50">
+                <div className="px-6 py-3 border-b border-border">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder={`Search ${userRole === 'student' ? 'mentors' : 'students'}...`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                         />
                     </div>
                 </div>
@@ -131,8 +131,8 @@ export default function NewConversationDialog({
                 {/* User List */}
                 <div className="max-h-80 overflow-y-auto">
                     {filteredUsers.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                            <Users className="w-12 h-12 mb-3 text-gray-200" />
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <Users className="size-12 mb-3 text-muted-foreground/60" />
                             <p className="text-sm font-medium">
                                 {connectedUsers.length === 0
                                     ? `No connected ${userRole === 'student' ? 'mentors' : 'students'} yet`
@@ -140,7 +140,7 @@ export default function NewConversationDialog({
                                 }
                             </p>
                             {connectedUsers.length === 0 && (
-                                <p className="text-xs text-gray-300 mt-1">
+                                <p className="text-xs text-muted-foreground/60 mt-1">
                                     {userRole === 'student'
                                         ? 'Request a mentor to get started'
                                         : 'Accept a request to connect with students'
@@ -149,38 +149,38 @@ export default function NewConversationDialog({
                             )}
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-50">
+                        <div className="divide-y divide-border">
                             {filteredUsers.map((user) => (
                                 <button
                                     key={user.id}
                                     onClick={() => handleStartConversation(user)}
                                     disabled={isCreating === user.id}
-                                    className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+                                    className="w-full px-6 py-4 flex items-center gap-4 hover:bg-muted/60 transition-colors text-left disabled:opacity-50"
                                 >
                                     {/* Avatar */}
                                     {user.photo_url ? (
                                         <img
                                             src={user.photo_url}
                                             alt={user.full_name || 'User'}
-                                            className="w-12 h-12 rounded-full object-cover"
+                                            className="size-12 rounded-full object-cover"
                                         />
                                     ) : (
-                                        <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-lg">
+                                        <div className="size-12 rounded-full bg-tint-blue flex items-center justify-center text-tint-blue-foreground font-semibold text-lg">
                                             {user.full_name?.[0]?.toUpperCase() || 'U'}
                                         </div>
                                     )}
 
                                     {/* Info */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-gray-900 truncate">
+                                        <p className="font-semibold text-foreground truncate">
                                             {user.full_name || (userRole === 'student' ? 'Mentor' : 'Student')}
                                         </p>
                                         {user.hasExistingConversation ? (
-                                            <p className="text-xs text-green-600 font-medium">
+                                            <p className="text-xs text-success font-medium">
                                                 Existing conversation
                                             </p>
                                         ) : (
-                                            <p className="text-xs text-gray-400">
+                                            <p className="text-xs text-muted-foreground">
                                                 Click to start chatting
                                             </p>
                                         )}
@@ -188,9 +188,9 @@ export default function NewConversationDialog({
 
                                     {/* Action */}
                                     {isCreating === user.id ? (
-                                        <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                        <div className="size-5 border-2 border-brand border-t-transparent rounded-full animate-spin" />
                                     ) : (
-                                        <MessageCircle className={`w-5 h-5 ${user.hasExistingConversation ? 'text-green-500' : 'text-gray-300'}`} />
+                                        <MessageCircle className={`size-5 ${user.hasExistingConversation ? 'text-success' : 'text-muted-foreground/60'}`} />
                                     )}
                                 </button>
                             ))}
@@ -199,8 +199,8 @@ export default function NewConversationDialog({
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                    <p className="text-xs text-gray-400 text-center">
+                <div className="px-6 py-4 border-t border-border bg-muted/60">
+                    <p className="text-xs text-muted-foreground text-center">
                         {connectedUsers.length} connected {userRole === 'student' ? 'mentor' : 'student'}{connectedUsers.length !== 1 ? 's' : ''}
                     </p>
                 </div>

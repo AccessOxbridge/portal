@@ -14,6 +14,9 @@ import {
     Trash,
 } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
+import MessageBubble from '@/components/chat/v2/message-bubble'
+import DateSeparator from '@/components/chat/v2/date-separator'
+import { UnreadDivider } from '@/components/chat/v2/unread'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -388,6 +391,12 @@ export default function UiPreviewContent() {
                 </div>
             </Section>
 
+            <Section title="Chat" note="The real chat components with sample messages. Only your own messages get a filled bubble.">
+                <Card className="max-w-xl p-4">
+                    <ChatSample />
+                </Card>
+            </Section>
+
             <Section title="Colour" note="Navy for the sidebar and main actions, a brighter blue for links and progress, soft tints for status.">
                 <div className="flex flex-wrap gap-3">
                     {[
@@ -426,5 +435,24 @@ function Section({ title, note, children }: { title: string; note?: string; chil
             </div>
             {children}
         </section>
+    )
+}
+
+const NO_URLS = new Map<string, string>()
+const minutesAgo = (m: number) => new Date(Date.now() - m * 60000).toISOString()
+
+function ChatSample() {
+    const noop = () => {}
+    return (
+        <div className="space-y-1">
+            <DateSeparator timestamp={minutesAgo(60 * 26)} />
+            <MessageBubble content="Hi Jamie, I've read your personal statement draft. The opening is strong." isSent={false} timestamp={minutesAgo(60 * 26)} senderName="Eleanor Whitfield" isFirstInGroup isLastInGroup={false} signedUrls={NO_URLS} onOpenImage={noop} />
+            <MessageBubble content="Could you send the latest version before Thursday?" isSent={false} timestamp={minutesAgo(60 * 26 - 1)} senderName="Eleanor Whitfield" isFirstInGroup={false} isLastInGroup signedUrls={NO_URLS} onOpenImage={noop} />
+            <DateSeparator timestamp={minutesAgo(30)} />
+            <MessageBubble content="Thank you! Sending it tonight." isSent timestamp={minutesAgo(30)} isRead isFirstInGroup isLastInGroup status="sent" signedUrls={NO_URLS} onOpenImage={noop} />
+            <UnreadDivider count={1} />
+            <MessageBubble content="Perfect. Let's go through the middle paragraph on Thursday." isSent={false} timestamp={minutesAgo(2)} senderName="Eleanor Whitfield" isFirstInGroup isLastInGroup signedUrls={NO_URLS} onOpenImage={noop} />
+            <MessageBubble content="Will do, see you then" isSent timestamp={minutesAgo(1)} isFirstInGroup isLastInGroup status="sending" signedUrls={NO_URLS} onOpenImage={noop} />
+        </div>
     )
 }

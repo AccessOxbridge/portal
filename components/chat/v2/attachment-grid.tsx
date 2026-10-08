@@ -59,9 +59,9 @@ export default function AttachmentGrid({
                                 disabled={!url}
                                 style={{ aspectRatio: ratio }}
                                 className={cn(
-                                    'relative overflow-hidden rounded-xl bg-gray-100 border border-black/5',
-                                    'transition-transform hover:scale-[1.01] active:scale-100',
-                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-legacy-accent focus-visible:ring-offset-2',
+                                    'relative overflow-hidden rounded-control bg-muted border border-black/5',
+                                    'transition-transform active:scale-100',
+                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                                     single && 'max-h-[280px]'
                                 )}
                             >
@@ -74,8 +74,8 @@ export default function AttachmentGrid({
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <span className="absolute inset-0 flex items-center justify-center text-gray-300">
-                                        <ImageOff className="w-5 h-5" />
+                                    <span className="absolute inset-0 flex items-center justify-center text-muted-foreground/60">
+                                        <ImageOff className="size-5" />
                                     </span>
                                 )}
                             </button>
@@ -95,24 +95,24 @@ export default function AttachmentGrid({
                         rel="noopener noreferrer"
                         download={file.name}
                         className={cn(
-                            'group flex items-center gap-3 max-w-[280px] w-full px-3 py-2.5 rounded-xl border transition-colors',
+                            'group flex items-center gap-3 max-w-[280px] w-full px-3 py-2.5 rounded-control border transition-colors',
                             url
-                                ? 'bg-white border-gray-200 hover:border-legacy-accent/40 hover:bg-legacy-accent/[0.03]'
-                                : 'bg-gray-50 border-gray-100 pointer-events-none opacity-60'
+                                ? 'bg-card border-border hover:border-primary/40 hover:bg-primary/[0.03]'
+                                : 'bg-muted/60 border-border pointer-events-none opacity-60'
                         )}
                     >
-                        <span className="shrink-0 w-9 h-9 rounded-lg bg-legacy-accent/10 flex items-center justify-center">
-                            <FileText className="w-4.5 h-4.5 text-legacy-accent" />
+                        <span className="shrink-0 size-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <FileText className="size-4.5 text-primary" />
                         </span>
                         <span className="min-w-0 flex-1">
-                            <span className="block text-[13px] font-medium text-gray-800 truncate">
+                            <span className="block text-[13px] font-medium text-foreground truncate">
                                 {file.name}
                             </span>
-                            <span className="block text-[11px] text-gray-400">
+                            <span className="block text-[11px] text-muted-foreground">
                                 {formatBytes(file.size)}
                             </span>
                         </span>
-                        <Download className="shrink-0 w-4 h-4 text-gray-300 group-hover:text-legacy-accent transition-colors" />
+                        <Download className="shrink-0 size-4 text-muted-foreground/60 group-hover:text-primary transition-colors" />
                     </a>
                 )
             })}

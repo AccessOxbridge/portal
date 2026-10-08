@@ -22,11 +22,11 @@ const UNIQUE_SUBJECTS = [...new Set(Object.values(SUBJECT_OPTIONS).flat())].sort
 
 // Shared input styling, kept identical to the signup form at /become-a-mentor so
 // the two halves of the application read as one flow.
-const CARD = 'rounded-[24px] border border-gray-100 bg-white shadow-lg shadow-gray-100/50'
+const CARD = 'border border-transparent rounded-card bg-card shadow-border'
 
-const INPUT_BASE = 'w-full rounded-xl border bg-gray-50 px-4 py-3 text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:outline-none focus:ring-2'
-const INPUT_IDLE = 'border-gray-200 focus:border-legacy-accent focus:ring-legacy-accent/20'
-const INPUT_ERROR = 'border-red-300 focus:border-red-400 focus:ring-red-100'
+const INPUT_BASE = 'w-full rounded-control border bg-muted/60 px-4 py-3 text-foreground placeholder:text-muted-foreground transition-[background-color,box-shadow,color] duration-150 duration-200 focus:outline-none focus:ring-2'
+const INPUT_IDLE = 'border-border focus:border-primary focus:ring-primary/20'
+const INPUT_ERROR = 'border-destructive/60 focus:border-destructive focus:ring-destructive/15'
 
 const SECTION_LAYOUT = [
     {
@@ -299,22 +299,22 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
     <div key={question.id} className="group">
       <label
         htmlFor={question.id}
-        className="mb-2 block text-sm font-semibold text-gray-700"
+        className="mb-2 block text-sm font-semibold text-foreground"
       >
         {question.label}{' '}
         {question.required
-          ? <span className="text-red-500">*</span>
-          : <span className="font-normal text-gray-400">(optional)</span>}
+          ? <span className="text-destructive">*</span>
+          : <span className="font-normal text-muted-foreground">(optional)</span>}
       </label>
 
       {question.type === 'phone' && (
         <div className="space-y-1.5">
           {/* Hidden input carries the full number to Supabase */}
           <input type="hidden" name="phone_number" value={`${selectedCountry.dialCode}${phoneDigits}`} />
-          <div className={`flex items-stretch rounded-xl border bg-gray-50 transition-all duration-200 focus-within:ring-2 ${
+          <div className={`flex items-stretch rounded-control border bg-muted/60 transition-[background-color,box-shadow,color] duration-150 duration-200 focus-within:ring-2 ${
             fieldErrors.phone_number
-              ? 'border-red-300 focus-within:ring-red-100'
-              : 'border-gray-200 focus-within:border-legacy-accent focus-within:ring-legacy-accent/20'
+              ? 'border-destructive/60 focus-within:ring-destructive/15'
+              : 'border-border focus-within:border-primary focus-within:ring-primary/20'
           }`}>
             {/* Country code button */}
             <div ref={countryDropdownRef} className="relative shrink-0">
@@ -326,20 +326,20 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                     setTimeout(() => countrySearchInputRef.current?.focus(), 50)
                   }
                 }}
-                className="flex h-full items-center gap-2 rounded-l-xl px-3.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="flex h-full items-center gap-2 rounded-l-xl px-3.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`https://flagcdn.com/w20/${selectedCountry.code.toLowerCase()}.png`} alt={selectedCountry.name} width={20} height={14} className="rounded-[2px] object-cover" />
                 <span>{selectedCountry.dialCode}</span>
-                <ChevronDown className={`h-3.5 w-3.5 text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`size-3.5 text-muted-foreground transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Country dropdown */}
               {isCountryDropdownOpen && (
-                <div className="absolute left-0 top-full z-30 mt-2 w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                  <div className="border-b border-gray-100 p-2">
+                <div className="absolute left-0 top-full z-30 mt-2 w-72 overflow-hidden rounded-control border border-border bg-card shadow-border">
+                  <div className="border-b border-border p-2">
                     <div className="relative">
-                      <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                      <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
                       <input
                         ref={countrySearchInputRef}
                         type="text"
@@ -358,7 +358,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                           }
                         }}
                         placeholder="Search country or code…"
-                        className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-legacy-accent focus:outline-none"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-8"
                       />
                     </div>
                   </div>
@@ -373,18 +373,18 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                           setCountrySearch('')
                           document.getElementById('phone_number_digits')?.focus()
                         }}
-                        className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-gray-50 ${
-                          country.code === selectedCountry.code ? 'bg-legacy-accent/5 font-medium text-legacy-accent' : 'text-gray-700'
+                        className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted/60 ${
+                          country.code === selectedCountry.code ? 'bg-primary/5 font-medium text-primary' : 'text-foreground'
                         }`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={`https://flagcdn.com/w20/${country.code.toLowerCase()}.png`} alt={country.name} width={20} height={14} className="shrink-0 rounded-[2px] object-cover" />
                         <span className="flex-1 truncate">{country.name}</span>
-                        <span className="shrink-0 text-xs text-gray-400">{country.dialCode}</span>
+                        <span className="shrink-0 text-xs text-muted-foreground">{country.dialCode}</span>
                       </button>
                     ))}
                     {filteredCountries.length === 0 && (
-                      <div className="px-3 py-6 text-center text-sm text-gray-400">No country found</div>
+                      <div className="px-3 py-6 text-center text-sm text-muted-foreground">No country found</div>
                     )}
                   </div>
                 </div>
@@ -392,7 +392,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             </div>
 
             {/* Divider */}
-            <span className="my-2.5 w-px shrink-0 bg-gray-200" />
+            <span className="my-2.5 w-px shrink-0 bg-muted" />
 
             {/* Digits input */}
             <input
@@ -407,11 +407,11 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               }}
               placeholder={question.placeholder}
               required={question.required}
-              className="w-full flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
           {fieldErrors.phone_number && (
-            <p className="text-xs font-medium text-red-500">{fieldErrors.phone_number}</p>
+            <p className="text-xs font-medium text-destructive">{fieldErrors.phone_number}</p>
           )}
         </div>
       )}
@@ -435,7 +435,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             className={`${INPUT_BASE} ${fieldErrors[question.id] ? INPUT_ERROR : INPUT_IDLE}`}
           />
           {fieldErrors[question.id] && (
-            <p className="text-xs font-medium text-red-500">{fieldErrors[question.id]}</p>
+            <p className="text-xs font-medium text-destructive">{fieldErrors[question.id]}</p>
           )}
         </div>
       )}
@@ -471,41 +471,41 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                 aria-describedby={`${question.id}-help ${question.id}-error`}
                 className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
               />
-              <div className={`pointer-events-none flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
+              <div className={`pointer-events-none flex items-center gap-3 rounded-control border px-4 py-3 transition-colors ${
                 fileErrors[question.id]
-                  ? 'border-red-300 bg-red-50'
+                  ? 'border-destructive/60 bg-tint-rose'
                   : selectedFiles[question.id]
-                    ? 'border-gray-200 bg-white'
-                    : 'border-dashed border-gray-300 bg-gray-50'
+                    ? 'border-border bg-card'
+                    : 'border-dashed border-border bg-muted/60'
               }`}>
                 {photoPreview && question.id === 'photo' ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photoPreview} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                  <img src={photoPreview} alt="" className="size-10 shrink-0 rounded-full object-cover" />
                 ) : (
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                    selectedFiles[question.id] ? 'bg-legacy-accent/10 text-legacy-accent' : 'bg-gray-100 text-gray-400'
+                  <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
+                    selectedFiles[question.id] ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
                   }`}>
                     {selectedFiles[question.id]
-                      ? <FileText className="h-4 w-4" />
-                      : <Upload className="h-4 w-4" />}
+                      ? <FileText className="size-4" />
+                      : <Upload className="size-4" />}
                   </span>
                 )}
                 <span className="min-w-0 flex-1">
                   {selectedFiles[question.id] ? (
                     <>
-                      <span className="block truncate text-sm font-medium text-gray-900">
+                      <span className="block truncate text-sm font-medium text-foreground">
                         {selectedFiles[question.id].name}
                       </span>
-                      <span className="block text-xs text-gray-400">
+                      <span className="block text-xs text-muted-foreground">
                         {formatFileSize(selectedFiles[question.id].size)} · Click to replace
                       </span>
                     </>
                   ) : (
                     <>
-                      <span className="block text-sm font-medium text-gray-700">
+                      <span className="block text-sm font-medium text-foreground">
                         Click to upload
                       </span>
-                      <span id={`${question.id}-help`} className="block text-xs text-gray-400">
+                      <span id={`${question.id}-help`} className="block text-xs text-muted-foreground">
                         {question.id === 'photo' ? 'JPEG, PNG, WebP or GIF' : 'PDF, DOC or DOCX'} · up to {MAX_FILE_SIZE_MB}MB
                       </span>
                     </>
@@ -518,14 +518,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                 type="button"
                 onClick={() => clearFile(question.id)}
                 aria-label={`Remove ${question.label}`}
-                className="shrink-0 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </button>
             )}
           </div>
           {fileErrors[question.id] && (
-            <p id={`${question.id}-error`} className="text-xs font-medium text-red-500">
+            <p id={`${question.id}-error`} className="text-xs font-medium text-destructive">
               {fileErrors[question.id]}
             </p>
           )}
@@ -540,17 +540,17 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             type="button"
             data-select-id={question.id}
             onClick={() => setOpenSelectId(prev => prev === question.id ? null : question.id)}
-            className={`flex w-full items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 text-left transition-all duration-200 hover:border-gray-300 ${
-              openSelectId === question.id ? 'border-legacy-accent ring-2 ring-legacy-accent/20' : 'border-gray-200'
+            className={`flex w-full items-center justify-between rounded-control border bg-muted/60 px-4 py-3 text-left transition-[background-color,box-shadow,color] duration-150 duration-200 hover:border-border ${
+              openSelectId === question.id ? 'border-primary ring-2 ring-primary/20' : 'border-border'
             }`}
           >
-            <span className={selectValues[question.id] ? 'text-gray-900' : 'text-gray-400'}>
+            <span className={selectValues[question.id] ? 'text-foreground' : 'text-muted-foreground'}>
               {selectValues[question.id] ?? 'Select an option'}
             </span>
-            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${openSelectId === question.id ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform duration-200 ${openSelectId === question.id ? 'rotate-180' : ''}`} />
           </button>
           {openSelectId === question.id && (
-            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
+            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-control border border-border bg-card p-1 shadow-border">
               {question.options?.map((option) => (
                 <button
                   key={option}
@@ -559,12 +559,12 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                     setSelectValues(prev => ({ ...prev, [question.id]: option }))
                     setOpenSelectId(null)
                   }}
-                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-gray-50 ${
-                    selectValues[question.id] === option ? 'bg-legacy-accent/5 font-medium text-legacy-accent' : 'text-gray-700'
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/60 ${
+                    selectValues[question.id] === option ? 'bg-primary/5 font-medium text-primary' : 'text-foreground'
                   }`}
                 >
                   {option}
-                  {selectValues[question.id] === option && <Check className="h-4 w-4" />}
+                  {selectValues[question.id] === option && <Check className="size-4" />}
                 </button>
               ))}
             </div>
@@ -586,16 +586,16 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           <button
             type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className={`flex w-full items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 text-left transition-all duration-200 hover:border-gray-300 ${
-              isDropdownOpen ? 'border-legacy-accent ring-2 ring-legacy-accent/20' : 'border-gray-200'
+            className={`flex w-full items-center justify-between rounded-control border bg-muted/60 px-4 py-3 text-left transition-[background-color,box-shadow,color] duration-150 duration-200 hover:border-border ${
+              isDropdownOpen ? 'border-primary ring-2 ring-primary/20' : 'border-border'
             }`}
           >
-            <span className={selectedSubjects.length === 0 ? 'text-gray-400' : 'text-gray-900'}>
+            <span className={selectedSubjects.length === 0 ? 'text-muted-foreground' : 'text-foreground'}>
               {selectedSubjects.length === 0
                 ? 'Search or browse subjects…'
                 : `${selectedSubjects.length} subject${selectedSubjects.length > 1 ? 's' : ''} selected`}
             </span>
-            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {/* Selected tags */}
@@ -604,16 +604,16 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               {selectedSubjects.map((subject) => (
                 <span
                   key={subject}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-legacy-accent/10 py-1 pl-3 pr-1.5 text-xs font-medium text-legacy-accent"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 py-1 pl-3 pr-1.5 text-xs font-medium text-primary"
                 >
                   <span className="max-w-[180px] truncate">{subject}</span>
                   <button
                     type="button"
                     onClick={() => toggleSubject(subject)}
                     aria-label={`Remove ${subject}`}
-                    className="rounded-full p-0.5 transition-colors hover:bg-legacy-accent/20"
+                    className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="size-3" />
                   </button>
                 </span>
               ))}
@@ -622,17 +622,17 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
 
           {/* Dropdown menu */}
           {isDropdownOpen && (
-            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-control border border-border bg-card shadow-border">
               {/* Search */}
-              <div className="border-b border-gray-100 p-2">
+              <div className="border-b border-border p-2">
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search subjects…"
-                    className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-legacy-accent focus:outline-none"
+                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-8"
                     autoFocus
                   />
                 </div>
@@ -651,7 +651,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                       />
                     ))}
                     {filteredSubjects.length === 0 && (
-                      <div className="px-3 py-6 text-center text-sm text-gray-400">
+                      <div className="px-3 py-6 text-center text-sm text-muted-foreground">
                         No subjects found
                       </div>
                     )}
@@ -659,7 +659,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                 ) : (
                   SUBJECT_GROUPS.map(([groupName, subjects]) => (
                     <div key={groupName} className="mb-1 last:mb-0">
-                      <p className="sticky top-0 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                      <p className="sticky top-0 bg-card px-3 py-1.5 text-[11px] font-semibold text-muted-foreground">
                         {groupName}
                       </p>
                       {subjects.map((subject) => (
@@ -686,8 +686,8 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           exit={{ opacity: 0, height: 0 }}
           className="mt-4"
         >
-          <label htmlFor="custom-expertise" className="mb-2 block text-sm font-semibold text-gray-700">
-            Please specify your expertise <span className="text-red-500">*</span>
+          <label htmlFor="custom-expertise" className="mb-2 block text-sm font-semibold text-foreground">
+            Please specify your expertise <span className="text-destructive">*</span>
           </label>
           <input
             type="text"
@@ -704,7 +704,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
   )
 
   return (
-    <div className="h-full min-h-0 overflow-y-auto bg-[#F9FAFB] text-gray-900">
+    <div className="h-full min-h-0 overflow-y-auto bg-[#F9FAFB] text-foreground">
       <div className="mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
         <div className={`mb-8 flex items-center justify-between gap-3 px-4 py-3 sm:px-5 ${CARD}`}>
           <div className="flex items-center gap-3">
@@ -713,23 +713,23 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               alt="Access Oxbridge"
               width={36}
               height={36}
-              className="shrink-0 rounded-xl"
+              className="shrink-0 rounded-control"
             />
-            <span className="text-lg font-extrabold tracking-tight text-legacy-accent sm:text-xl">
+            <span className="text-lg font-semibold tracking-tight text-primary sm:text-xl">
               Access Oxbridge
             </span>
           </div>
-          <LogoutButton className="shrink-0 whitespace-nowrap rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-gray-600 hover:text-legacy-accent" />
+          <LogoutButton className="shrink-0 whitespace-nowrap rounded-control border border-border bg-card px-3 py-1.5 text-muted-foreground hover:text-primary" />
         </div>
 
         <header className="mb-8">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-legacy-accent/60">
+          <p className="mb-3 text-xs font-semibold text-primary/60">
             Mentor application
           </p>
-          <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-legacy-accent sm:text-4xl">
+          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
             Complete your profile{welcomeName}
           </h1>
-          <p className="max-w-2xl leading-relaxed text-gray-500">
+          <p className="max-w-2xl leading-relaxed text-muted-foreground">
             Share your expertise, experience, and supporting documents. This helps us review your application faster and place you with the right students.
           </p>
         </header>
@@ -741,7 +741,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             className="space-y-6"
           >
             {state?.error && (
-              <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+              <div className="rounded-control border border-border bg-tint-rose p-4 text-sm font-medium text-tint-rose-foreground">
                 {state.error}
               </div>
             )}
@@ -749,12 +749,12 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
             {SECTIONS.map((section) => (
               <section key={section.id} className={`p-6 sm:p-8 ${CARD}`}>
                 <div className="mb-6 flex items-start gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rich-beige-accent text-legacy-accent shadow-inner">
-                    <section.icon className="h-5 w-5" />
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-card bg-rich-beige-accent text-primary shadow-inner">
+                    <section.icon className="size-5" />
                   </span>
                   <div>
-                    <h2 className="text-lg font-bold text-legacy-accent">{section.title}</h2>
-                    <p className="mt-1 text-sm text-gray-500">{section.description}</p>
+                    <h2 className="text-lg font-semibold text-primary">{section.title}</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
                   </div>
                 </div>
                 <div className="space-y-6">
@@ -765,11 +765,11 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
 
             <div className={`p-6 sm:p-8 ${CARD}`}>
               <SubmitButton hasFileErrors={hasFileErrors} />
-              <p className="mt-4 text-center text-xs text-gray-400">
+              <p className="mt-4 text-center text-xs text-muted-foreground">
                 By submitting, you agree to our{' '}
-                <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms of Service</a>
+                <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground">Terms of Service</a>
                 {' '}and{' '}
-                <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Privacy Policy</a>.
+                <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground">Privacy Policy</a>.
               </p>
             </div>
           </form>
@@ -777,14 +777,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
           <aside className="space-y-5 lg:sticky lg:top-8">
             <div className={`p-5 ${CARD}`}>
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-legacy-accent">Your progress</h2>
-                <span className="text-xs font-semibold text-legacy-accent">
+                <h2 className="text-sm font-semibold text-primary">Your progress</h2>
+                <span className="text-xs font-semibold text-primary">
                   {completedCount} of {REQUIRED_QUESTIONS.length}
                 </span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-legacy-accent transition-all duration-300"
+                  className="h-full rounded-full bg-primary transition-[background-color,box-shadow,color] duration-150 duration-300"
                   style={{ width: `${completionPct}%` }}
                 />
               </div>
@@ -794,12 +794,12 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                   const done = isQuestionComplete(question)
                   return (
                     <li key={question.id} className="flex items-center gap-2.5 text-sm">
-                      <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
-                        done ? 'bg-legacy-accent text-white' : 'border border-gray-300'
+                      <span className={`flex size-4 shrink-0 items-center justify-center rounded-full ${
+                        done ? 'bg-primary text-white' : 'border border-border'
                       }`}>
-                        {done && <Check className="h-2.5 w-2.5" />}
+                        {done && <Check className="size-2.5" />}
                       </span>
-                      <span className={done ? 'text-gray-400 line-through' : 'text-gray-600'}>
+                      <span className={done ? 'text-muted-foreground line-through' : 'text-muted-foreground'}>
                         {CHECKLIST_LABELS[question.id] ?? question.label}
                       </span>
                     </li>
@@ -808,8 +808,8 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
               </ul>
             </div>
 
-            <div className="rounded-[24px] bg-rich-beige-accent p-5">
-              <h3 className="mb-4 text-sm font-bold text-legacy-accent">What happens next</h3>
+            <div className="rounded-card bg-rich-beige-accent p-5">
+              <h3 className="mb-4 text-sm font-semibold text-primary">What happens next</h3>
               <ol className="space-y-4">
                 {[
                   { title: 'You submit', detail: 'Takes about 10 minutes.' },
@@ -818,14 +818,14 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
                 ].map((step, index, steps) => (
                   <li key={step.title} className="relative flex gap-3">
                     {index < steps.length - 1 && (
-                      <span className="absolute left-[5px] top-4 h-full w-px bg-legacy-accent/15" />
+                      <span className="absolute left-[5px] top-4 h-full w-px bg-primary/15" />
                     )}
-                    <span className={`relative mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
-                      index === 0 ? 'bg-legacy-accent' : 'bg-legacy-accent/25'
+                    <span className={`relative mt-1 size-2.5 shrink-0 rounded-full ${
+                      index === 0 ? 'bg-primary' : 'bg-primary/25'
                     }`} />
                     <span>
-                      <span className="block text-sm font-medium text-legacy-accent">{step.title}</span>
-                      <span className="block text-xs text-legacy-accent/60">{step.detail}</span>
+                      <span className="block text-sm font-medium text-primary">{step.title}</span>
+                      <span className="block text-xs text-primary/60">{step.detail}</span>
                     </span>
                   </li>
                 ))}
@@ -851,14 +851,14 @@ function SubjectOption({
     <button
       type="button"
       onClick={() => onToggle(subject)}
-      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50 ${
-        selected ? 'font-medium text-legacy-accent' : 'text-gray-700'
+      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-muted/60 ${
+        selected ? 'font-medium text-primary' : 'text-foreground'
       }`}
     >
-      <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
-        selected ? 'border-legacy-accent bg-legacy-accent text-white' : 'border-gray-300'
+      <span className={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${
+        selected ? 'border-primary bg-primary text-white' : 'border-border'
       }`}>
-        {selected && <Check className="h-3 w-3" />}
+        {selected && <Check className="size-3" />}
       </span>
       {subject}
     </button>
@@ -872,15 +872,15 @@ function SubmitButton({ hasFileErrors }: { hasFileErrors: boolean }) {
     <button
       type="submit"
       disabled={pending || hasFileErrors}
-      className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 active:scale-[0.98] ${
+      className={`flex w-full items-center justify-center gap-2 rounded-control px-4 py-4 text-base font-semibold text-white shadow-border transition-[background-color,box-shadow,color] duration-150 duration-300 active:scale-[0.98] ${
         pending || hasFileErrors
-          ? 'cursor-not-allowed bg-gray-300 shadow-none'
-          : 'bg-legacy-accent hover:bg-[#07214d] hover:shadow-legacy-accent/40'
+          ? 'cursor-not-allowed bg-muted shadow-none'
+          : 'bg-primary hover:bg-primary/90 hover:shadow-primary/40'
       }`}
     >
       {pending ? (
         <>
-          <svg className="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="size-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>

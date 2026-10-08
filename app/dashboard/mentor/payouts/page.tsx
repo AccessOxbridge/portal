@@ -90,29 +90,29 @@ export default async function MentorPayoutsPage() {
     return (
         <div className="space-y-12">
             <header>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-primary tracking-tight">
                     Earnings & Payouts
                 </h1>
-                <p className="mt-4 text-gray-500 text-xl font-medium">
+                <p className="mt-4 text-muted-foreground text-xl font-medium">
                     Track your sessions and view your payout history
                 </p>
             </header>
 
             {/* Earnings summary — single card: To Be Paid hero + key stats */}
-            <section className="bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
-                <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+            <section className="border border-transparent bg-card rounded-card shadow-border overflow-hidden">
+                <div className="bg-primary p-6 text-primary-foreground">
                     <div className="flex items-center justify-between gap-4">
                         <div className="min-w-0">
-                            <p className="text-blue-100 text-sm font-medium mb-1">To Be Paid</p>
-                            <p className="text-3xl sm:text-4xl font-bold">
+                            <p className="mb-1 text-sm font-medium text-primary-foreground/70">To be paid</p>
+                            <p className="text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl">
                                 {formatPrice(totalPending)}
                             </p>
-                            <p className="text-blue-200 text-sm mt-2">
+                            <p className="mt-2 text-sm text-primary-foreground/70">
                                 {pendingPayouts.length} payment{pendingPayouts.length !== 1 ? 's' : ''} being processed
                             </p>
                         </div>
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-white/10 rounded-2xl flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="grid size-14 shrink-0 place-items-center rounded-full bg-white/10 sm:size-16">
+                            <svg className="size-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
@@ -120,32 +120,32 @@ export default async function MentorPayoutsPage() {
                 </div>
                 <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1">Total Paid</p>
-                        <p className="text-2xl font-bold text-green-600">{formatPrice(totalPaid)}</p>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Total paid</p>
+                        <p className="text-2xl font-semibold text-success">{formatPrice(totalPaid)}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
                             {paidPayouts.length} completed payment{paidPayouts.length !== 1 ? 's' : ''}
                         </p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1">Hourly Rate</p>
-                        <p className="text-2xl font-bold text-legacy-accent">{formatPrice(hourlyRate)}</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Hourly rate</p>
+                        <p className="text-2xl font-semibold text-primary">{formatPrice(hourlyRate)}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1">Sessions This Month</p>
-                        <p className="text-2xl font-bold text-legacy-accent">{sessionsThisMonth || 0}</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Sessions this month</p>
+                        <p className="text-2xl font-semibold text-primary">{sessionsThisMonth || 0}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500 mb-1">Payment Status</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Payment status</p>
                         <div className="flex items-center gap-2 mt-2">
                             {mentor?.payouts_enabled ? (
                                 <>
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-lg font-semibold text-green-600">Connected</span>
+                                    <div className="size-3 bg-success rounded-full"></div>
+                                    <span className="text-lg font-semibold text-success">Connected</span>
                                 </>
                             ) : (
                                 <>
-                                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                                    <span className="text-lg font-semibold text-amber-600">Setup Required</span>
+                                    <div className="size-3 bg-warning rounded-full"></div>
+                                    <span className="text-lg font-semibold text-warning">Setup required</span>
                                 </>
                             )}
                         </div>
@@ -155,10 +155,10 @@ export default async function MentorPayoutsPage() {
 
             {/* Stripe Dashboard Link */}
             {mentor?.payouts_enabled && (
-                <div className="p-6 bg-gradient-to-r from-[#635BFF] to-[#7B73FF] rounded-[24px] text-white">
+                <div className="rounded-card bg-[#635BFF] p-6 text-white">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h3 className="text-xl font-bold mb-1">Stripe Dashboard</h3>
+                            <h3 className="mb-1 text-lg font-semibold">Stripe dashboard</h3>
                             <p className="text-white/80 text-sm">
                                 View detailed transaction history, download tax documents, and manage your bank account.
                             </p>
@@ -173,7 +173,7 @@ export default async function MentorPayoutsPage() {
 
             {/* Payout History */}
             <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Payout History</h2>
+                <h2 className="text-2xl font-semibold text-foreground mb-6">Payout history</h2>
 
                 {payouts && payouts.length > 0 ? (
                     <>
@@ -183,10 +183,10 @@ export default async function MentorPayoutsPage() {
                         {payouts.map((payout: any) => (
                             <div
                                 key={payout.id}
-                                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4"
+                                className="border border-transparent bg-card rounded-card shadow-border p-4"
                             >
                                 <div className="flex items-start justify-between gap-3">
-                                    <span className="font-semibold text-gray-900 text-sm">
+                                    <span className="font-semibold text-foreground text-sm">
                                         {new Date(payout.period_start).toLocaleDateString('en-GB', {
                                             day: 'numeric', month: 'short'
                                         })} - {new Date(payout.period_end).toLocaleDateString('en-GB', {
@@ -196,10 +196,10 @@ export default async function MentorPayoutsPage() {
                                     <PayoutStatusBadge status={payout.status} />
                                 </div>
                                 <div className="mt-3 flex items-baseline justify-between gap-3">
-                                    <span className="text-2xl font-bold text-gray-900">
+                                    <span className="text-2xl font-semibold text-foreground">
                                         {formatPrice(payout.amount_cents)}
                                     </span>
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-sm text-muted-foreground">
                                         {payout.sessions_count} session{payout.sessions_count !== 1 ? 's' : ''}
                                         {' · '}
                                         {(payout.total_minutes / 60).toFixed(1)}h
@@ -209,22 +209,22 @@ export default async function MentorPayoutsPage() {
                         ))}
                     </div>
 
-                    <div className="hidden md:block bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden">
+                    <div className="border border-transparent hidden md:block bg-card rounded-card shadow-border overflow-hidden">
                         <table className="w-full">
-                            <thead className="bg-gray-50 border-b border-gray-100">
+                            <thead className="bg-muted/60 border-b border-border">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Period</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Sessions</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Hours</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Amount</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Period</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Sessions</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Hours</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Amount</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Status</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-border">
                                 {payouts.map((payout: any) => (
-                                    <tr key={payout.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={payout.id} className="hover:bg-muted/60 transition-colors">
                                         <td className="px-6 py-4">
-                                            <span className="font-medium text-gray-900">
+                                            <span className="font-medium text-foreground">
                                                 {new Date(payout.period_start).toLocaleDateString('en-GB', {
                                                     day: 'numeric', month: 'short'
                                                 })} - {new Date(payout.period_end).toLocaleDateString('en-GB', {
@@ -232,13 +232,13 @@ export default async function MentorPayoutsPage() {
                                                 })}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600">
+                                        <td className="px-6 py-4 text-muted-foreground">
                                             {payout.sessions_count}
                                         </td>
-                                        <td className="px-6 py-4 text-gray-600">
+                                        <td className="px-6 py-4 text-muted-foreground">
                                             {(payout.total_minutes / 60).toFixed(1)}
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-gray-900">
+                                        <td className="px-6 py-4 font-semibold text-foreground">
                                             {formatPrice(payout.amount_cents)}
                                         </td>
                                         <td className="px-6 py-4">
@@ -251,14 +251,14 @@ export default async function MentorPayoutsPage() {
                     </div>
                     </>
                 ) : (
-                    <div className="p-12 bg-gray-50 rounded-[24px] text-center">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-12 bg-muted/60 rounded-card text-center">
+                        <div className="size-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="size-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No payouts yet</h3>
-                        <p className="text-gray-500">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">No payouts yet</h3>
+                        <p className="text-muted-foreground">
                             Complete sessions to start earning. Payouts are processed fortnightly.
                         </p>
                     </div>
@@ -275,10 +275,10 @@ export default async function MentorPayoutsPage() {
 
 function PayoutStatusBadge({ status }: { status: string }) {
     const styles: Record<string, string> = {
-        pending: 'bg-gray-100 text-gray-700',
-        processing: 'bg-blue-100 text-blue-700',
-        paid: 'bg-green-100 text-green-700',
-        failed: 'bg-red-100 text-red-700'
+        pending: 'bg-muted text-foreground',
+        processing: 'bg-tint-blue text-tint-blue-foreground',
+        paid: 'bg-tint-green text-tint-green-foreground',
+        failed: 'bg-tint-rose text-tint-rose-foreground'
     }
 
     return (

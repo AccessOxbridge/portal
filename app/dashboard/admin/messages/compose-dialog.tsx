@@ -188,13 +188,13 @@ export default function ComposeDialog({
                 onClick={onClose}
             />
 
-            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md sm:mx-4 max-h-[92dvh] sm:max-h-[min(36rem,85vh)] flex flex-col overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
+            <div className="relative bg-card rounded-t-2xl sm:rounded-card shadow-border w-full max-w-md sm:mx-4 max-h-[92dvh] sm:max-h-[min(36rem,85vh)] flex flex-col overflow-hidden">
+                <div className="px-6 py-4 border-b border-border flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                        <h2 className="text-lg font-bold text-gray-900">
+                        <h2 className="text-lg font-semibold text-foreground">
                             {mode === 'group' ? 'New group' : 'New message'}
                         </h2>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                             {mode === 'group'
                                 ? 'Claire is always in the group'
                                 : 'Sends as Claire Marlowe · Access Oxbridge'}
@@ -204,14 +204,14 @@ export default function ComposeDialog({
                         type="button"
                         onClick={onClose}
                         aria-label="Close"
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
+                        className="p-2 hover:bg-muted rounded-full transition-colors shrink-0"
                     >
-                        <X className="w-5 h-5 text-gray-400" />
+                        <X className="size-5 text-muted-foreground" />
                     </button>
                 </div>
 
                 <div className="px-6 pt-3">
-                    <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl">
+                    <div className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-control">
                         <button
                             type="button"
                             onClick={() => {
@@ -221,8 +221,8 @@ export default function ComposeDialog({
                             className={cn(
                                 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors',
                                 mode === 'direct'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-card text-foreground shadow-border'
+                                    : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
                             Message one person
@@ -236,8 +236,8 @@ export default function ComposeDialog({
                             className={cn(
                                 'px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors',
                                 mode === 'group'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-card text-foreground shadow-border'
+                                    : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
                             New group
@@ -250,16 +250,16 @@ export default function ComposeDialog({
                         {selected.map((person) => (
                             <span
                                 key={person.id}
-                                className="inline-flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-800"
+                                className="inline-flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-muted text-xs font-medium text-foreground"
                             >
                                 {person.full_name || (person.role === 'student' ? 'Student' : 'Mentor')}
                                 <button
                                     type="button"
                                     onClick={() => toggleGroupMember(person)}
                                     aria-label={`Remove ${person.full_name || 'person'}`}
-                                    className="p-0.5 rounded-full hover:bg-gray-200"
+                                    className="p-0.5 rounded-full hover:bg-muted"
                                 >
-                                    <X className="w-3 h-3 text-gray-500" />
+                                    <X className="size-3 text-muted-foreground" />
                                 </button>
                             </span>
                         ))}
@@ -271,10 +271,10 @@ export default function ComposeDialog({
                         <button
                             type="button"
                             onClick={addSuggestedMentors}
-                            className="w-full text-left px-3 py-2 rounded-xl bg-legacy-accent/[0.06] border border-legacy-accent/20 text-xs text-gray-700 hover:bg-legacy-accent/10 transition-colors"
+                            className="w-full text-left px-3 py-2 rounded-control bg-primary/[0.06] border border-primary/20 text-xs text-foreground hover:bg-primary/10 transition-colors"
                         >
-                            <span className="font-semibold text-legacy-accent">Add their mentors</span>
-                            <span className="text-gray-500">
+                            <span className="font-semibold text-primary">Add their mentors</span>
+                            <span className="text-muted-foreground">
                                 {' '}
                                 · {suggestedMentors.map((m) => m.full_name || 'Mentor').join(', ')}
                             </span>
@@ -282,38 +282,38 @@ export default function ComposeDialog({
                     </div>
                 )}
 
-                <div className="px-6 py-3 border-b border-gray-50">
+                <div className="px-6 py-3 border-b border-border">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         <input
                             ref={inputRef}
                             type="text"
                             placeholder="Search students or mentors…"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/15 focus:border-legacy-accent/30"
+                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                         />
                     </div>
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-y-auto">
                     {error && (
-                        <p className="px-6 py-3 text-sm text-red-600">{error}</p>
+                        <p className="px-6 py-3 text-sm text-destructive">{error}</p>
                     )}
 
                     {isSearching && recipients.length === 0 ? (
                         <div className="flex items-center justify-center py-12">
-                            <Loader2 className="w-5 h-5 text-legacy-accent animate-spin" />
+                            <Loader2 className="size-5 text-primary animate-spin" />
                         </div>
                     ) : recipients.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                            <Users className="w-12 h-12 mb-3 text-gray-200" />
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <Users className="size-12 mb-3 text-muted-foreground/60" />
                             <p className="text-sm font-medium">
                                 {query.trim() ? 'No matches found' : 'No people to message yet'}
                             </p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-50">
+                        <div className="divide-y divide-border">
                             {recipients.map((recipient) => {
                                 const existing = existingClaireThread(conversations, recipient)
                                 const isOpening = openingId === recipient.id
@@ -328,31 +328,31 @@ export default function ComposeDialog({
                                                 : handleSelectDirect(recipient)
                                         }
                                         disabled={mode === 'direct' && openingId !== null}
-                                        className="w-full px-6 py-3.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+                                        className="w-full px-6 py-3.5 flex items-center gap-3 hover:bg-muted/60 transition-colors text-left disabled:opacity-50"
                                     >
                                         {recipient.photo_url ? (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
                                                 src={recipient.photo_url}
                                                 alt=""
-                                                className="w-11 h-11 rounded-full object-cover shrink-0"
+                                                className="size-11 rounded-full object-cover shrink-0"
                                             />
                                         ) : (
-                                            <div className="w-11 h-11 rounded-full bg-legacy-accent flex items-center justify-center text-white font-semibold shrink-0">
+                                            <div className="size-11 rounded-full bg-primary flex items-center justify-center text-white font-semibold shrink-0">
                                                 {recipient.full_name?.[0]?.toUpperCase() || 'U'}
                                             </div>
                                         )}
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2">
-                                                <p className="font-semibold text-sm text-gray-900 truncate">
+                                                <p className="font-semibold text-sm text-foreground truncate">
                                                     {recipient.full_name || (recipient.role === 'student' ? 'Student' : 'Mentor')}
                                                 </p>
                                                 <span
                                                     className={cn(
                                                         'shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded-full',
                                                         recipient.role === 'student'
-                                                            ? 'bg-legacy-accent/10 text-legacy-accent'
+                                                            ? 'bg-primary/10 text-primary'
                                                             : 'bg-rich-green-accent/10 text-rich-green-accent'
                                                     )}
                                                 >
@@ -360,10 +360,10 @@ export default function ComposeDialog({
                                                 </span>
                                             </div>
                                             {recipient.email && (
-                                                <p className="text-xs text-gray-400 truncate">{recipient.email}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{recipient.email}</p>
                                             )}
                                             {mode === 'direct' && existing && (
-                                                <p className="text-xs text-green-600 font-medium">
+                                                <p className="text-xs text-success font-medium">
                                                     Existing conversation
                                                 </p>
                                             )}
@@ -372,21 +372,21 @@ export default function ComposeDialog({
                                         {mode === 'group' ? (
                                             <span
                                                 className={cn(
-                                                    'w-5 h-5 rounded-full border flex items-center justify-center shrink-0',
+                                                    'size-5 rounded-full border flex items-center justify-center shrink-0',
                                                     isPicked
-                                                        ? 'bg-legacy-accent border-legacy-accent text-white'
-                                                        : 'border-gray-300 text-transparent'
+                                                        ? 'bg-primary border-primary text-white'
+                                                        : 'border-border text-transparent'
                                                 )}
                                             >
-                                                <Check className="w-3 h-3" />
+                                                <Check className="size-3" />
                                             </span>
                                         ) : isOpening ? (
-                                            <Loader2 className="w-5 h-5 text-legacy-accent animate-spin shrink-0" />
+                                            <Loader2 className="size-5 text-primary animate-spin shrink-0" />
                                         ) : (
                                             <MessageCircle
                                                 className={cn(
-                                                    'w-5 h-5 shrink-0',
-                                                    existing ? 'text-green-500' : 'text-gray-300'
+                                                    'size-5 shrink-0',
+                                                    existing ? 'text-success' : 'text-muted-foreground/60'
                                                 )}
                                             />
                                         )}
@@ -398,15 +398,15 @@ export default function ComposeDialog({
                 </div>
 
                 {mode === 'group' && (
-                    <div className="px-6 py-3 border-t border-gray-100">
+                    <div className="px-6 py-3 border-t border-border">
                         <button
                             type="button"
                             onClick={handleCreateGroup}
                             disabled={!canCreateGroup || creating}
-                            className="w-full py-2.5 rounded-xl bg-legacy-accent text-white text-sm font-semibold hover:bg-legacy-accent/90 transition-colors disabled:opacity-40 disabled:hover:bg-legacy-accent"
+                            className="w-full py-2.5 rounded-control bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:hover:bg-primary"
                         >
                             {creating ? (
-                                <Loader2 className="w-4 h-4 mx-auto animate-spin" />
+                                <Loader2 className="size-4 mx-auto animate-spin" />
                             ) : canCreateGroup ? (
                                 `Create group · ${selected.length} people`
                             ) : (
@@ -434,11 +434,11 @@ export function ComposeButton({
             aria-label="New message"
             title="New message"
             className={cn(
-                'p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:text-legacy-accent hover:border-legacy-accent/30 hover:bg-legacy-accent/[0.06] transition-colors shrink-0',
+                'p-2.5 rounded-control border border-border text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary/[0.06] transition-colors shrink-0',
                 className
             )}
         >
-            <SquarePen className="w-4 h-4" />
+            <SquarePen className="size-4" />
         </button>
     )
 }

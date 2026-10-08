@@ -151,7 +151,7 @@ export default function MessageInput({
 
     return (
         <div
-            className="shrink-0 border-t border-gray-200/70 bg-white px-4 py-3 md:px-6"
+            className="shrink-0 border-t border-border bg-card px-4 py-3 md:px-6"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
                 e.preventDefault()
@@ -165,8 +165,8 @@ export default function MessageInput({
               separate input is what made this look unfinished. */}
           <div
             className={cn(
-                'w-full rounded-2xl border bg-white transition-colors',
-                isFocused ? 'border-legacy-accent/40 ring-2 ring-legacy-accent/10' : 'border-gray-200'
+                'w-full rounded-card border bg-card transition-colors',
+                isFocused ? 'border-primary/40 ring-2 ring-primary/10' : 'border-border'
             )}
           >
             {/* Chosen files sit inside the box, above the field. */}
@@ -175,18 +175,18 @@ export default function MessageInput({
                     {pending.map((item) => (
                         <div key={item.id} className="relative group">
                             {item.kind === 'image' && item.previewUrl ? (
-                                <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                <div className="size-16 rounded-lg overflow-hidden border border-border bg-muted/60">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={item.previewUrl} alt={item.file.name} className="w-full h-full object-cover" />
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 h-16 px-3 rounded-lg border border-gray-200 bg-gray-50 max-w-[200px]">
-                                    <FileText className="w-4 h-4 text-legacy-accent shrink-0" />
+                                <div className="flex items-center gap-2 h-16 px-3 rounded-lg border border-border bg-muted/60 max-w-[200px]">
+                                    <FileText className="size-4 text-primary shrink-0" />
                                     <span className="min-w-0">
-                                        <span className="block text-[12px] font-medium text-gray-700 truncate">
+                                        <span className="block text-[12px] font-medium text-foreground truncate">
                                             {item.file.name}
                                         </span>
-                                        <span className="block text-[10px] text-gray-400">
+                                        <span className="block text-[10px] text-muted-foreground">
                                             {formatBytes(item.file.size)}
                                         </span>
                                     </span>
@@ -196,22 +196,22 @@ export default function MessageInput({
                                 type="button"
                                 onClick={() => removePending(item.id)}
                                 aria-label={`Remove ${item.file.name}`}
-                                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gray-900 text-white flex items-center justify-center shadow-sm hover:bg-black transition-colors"
+                                className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-foreground text-white flex items-center justify-center shadow-border hover:bg-black transition-colors"
                             >
-                                <X className="w-3 h-3" />
+                                <X className="size-3" />
                             </button>
                         </div>
                     ))}
 
                     {isPreparing && (
-                        <div className="w-16 h-16 rounded-lg border border-dashed border-gray-200 flex items-center justify-center">
-                            <Loader2 className="w-4 h-4 text-gray-300 animate-spin" />
+                        <div className="size-16 rounded-lg border border-dashed border-border flex items-center justify-center">
+                            <Loader2 className="size-4 text-muted-foreground/60 animate-spin" />
                         </div>
                     )}
                 </div>
             )}
 
-            {error && <p className="text-[11px] text-red-500 px-3.5 pt-2.5">{error}</p>}
+            {error && <p className="text-[11px] text-destructive px-3.5 pt-2.5">{error}</p>}
 
             <input
                 ref={fileInputRef}
@@ -247,7 +247,7 @@ export default function MessageInput({
               <div className="flex items-center gap-1 min-w-0">
                 <FormatToolbar onCommand={runCommand} disabled={disabled || isSending} />
 
-                <span className="shrink-0 w-px h-4 bg-gray-200" />
+                <span className="shrink-0 w-px h-4 bg-muted" />
 
                 <button
                     type="button"
@@ -257,7 +257,7 @@ export default function MessageInput({
                     // The standing hint line under the composer is gone; keep
                     // paste/drag discoverable here instead.
                     title="Attach a photo or file. You can also paste or drag one in"
-                    className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-legacy-accent hover:bg-legacy-accent/[0.06] transition-colors disabled:opacity-40"
+                    className="shrink-0 size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/[0.06] transition-colors disabled:opacity-40"
                 >
                     <Paperclip className="w-[18px] h-[18px]" />
                 </button>
@@ -269,16 +269,16 @@ export default function MessageInput({
                   disabled={!canSend}
                   aria-label="Send message"
                   className={cn(
-                      'shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all',
+                      'shrink-0 size-8 rounded-lg flex items-center justify-center transition-[background-color,box-shadow,color] duration-150',
                       canSend
-                          ? 'bg-legacy-accent text-white hover:bg-legacy-accent/90'
-                          : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                          ? 'bg-primary text-white hover:bg-primary/90'
+                          : 'bg-muted text-muted-foreground/60 cursor-not-allowed'
                   )}
               >
                   {isSending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="size-4 animate-spin" />
                   ) : (
-                      <Send className="w-4 h-4" />
+                      <Send className="size-4" />
                   )}
               </button>
             </div>

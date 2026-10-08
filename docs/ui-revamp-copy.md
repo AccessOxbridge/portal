@@ -114,3 +114,75 @@ error messages that start with "Please" in the booking, reschedule, credits and 
 
 `components/dashboard/credit-packages.tsx`
 - Removed the "{n} purchased in the last hour" badge on the 1-1 mentorship card. The number was made up: it started at 11 and drifted by 1 at random every 10 seconds. Its state and timer are gone too.
+
+## Phase 3: mentor and chat
+
+Sentence case (headings, labels, buttons):
+- `app/dashboard/admin/messages/page.tsx`: `Messages Overview` > `Messages overview`
+- `app/dashboard/mentor/availability/page.tsx`: `My Availability` > `My availability`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `Bill To` > `Bill to`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `Invoice Details` > `Invoice details`
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: `TOTAL PAY` > `Total pay`
+- `app/dashboard/mentor/payouts/page.tsx`: `Hourly Rate` > `Hourly rate`
+- `app/dashboard/mentor/payouts/page.tsx`: `Payment Status` > `Payment status`
+- `app/dashboard/mentor/payouts/page.tsx`: `Payout History` > `Payout history`
+- `app/dashboard/mentor/payouts/page.tsx`: `Sessions This Month` > `Sessions this month`
+- `app/dashboard/mentor/payouts/page.tsx`: `Setup Required` > `Setup required`
+- `app/dashboard/mentor/payouts/report-issue-form.tsx`: `Issue Reported Successfully` > `Issue reported`
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `About You` > `About you`
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `Full Name` > `Full name`
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `Your Details` > `Your details`
+- `app/dashboard/mentor/profile/page.tsx`: `My Profile` > `My profile`
+- `app/dashboard/mentor/reports/page.tsx`: `Session Reports` > `Session reports`
+- `app/dashboard/mentor/reports/reports-content.tsx`: `All Caught Up!` > `All caught up`
+- `app/dashboard/mentor/reports/reports-content.tsx`: `No Completed Reports` > `No completed reports`
+- `app/dashboard/mentor/reports/reports-content.tsx`: `Submit Report` > `Submit report`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Academic Interests` > `Academic interests`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Anything Else` > `Anything else`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Available Time Slots` > `Available time slots`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Decline Request?` > `Decline request?`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Decline Reschedule?` > `Decline reschedule?`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `EXPIRES IN` > `Expires in`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `New Request` > `New request`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Reschedule Request` > `Reschedule request`
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Target Universities` > `Target universities`
+- `app/dashboard/mentor/requests/page.tsx`: `Mentorship Requests` > `Mentorship requests`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Awaiting Response` > `Awaiting response`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Report Submitted` > `Report submitted`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Start Session` > `Start session`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Submit Report` > `Submit report`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `View Requests` > `View requests`
+- `app/dashboard/mentor/sessions/page.tsx`: `My Sessions` > `My sessions`
+- `app/dashboard/mentor/students/page.tsx`: `My Students` > `My students`
+- `app/dashboard/mentor/training/training-content.tsx`: `Background Checks` > `Background checks`
+- `app/dashboard/mentor/training/training-content.tsx`: `Complete Profile` > `Complete profile`
+- `app/dashboard/mentor/training/training-content.tsx`: `Complete Your Profile` > `Complete your profile`
+- `app/dashboard/mentor/training/training-content.tsx`: `Contract Signed!` > `Contract signed`
+- `app/dashboard/mentor/training/training-content.tsx`: `Digital Signature (Enter your full name)` > `Digital signature (enter your full name)`
+- `app/dashboard/mentor/training/training-content.tsx`: `Let's Get Started` > `Let's get started`
+- `app/dashboard/mentor/training/training-content.tsx`: `Mentor Contract` > `Mentor contract`
+- `app/dashboard/mentor/training/training-content.tsx`: `Payment Connected!` > `Payment connected`
+- `app/dashboard/mentor/training/training-content.tsx`: `Payment Setup` > `Payment setup`
+- `app/dashboard/mentor/training/training-content.tsx`: `Phone Number` > `Phone number`
+- `app/dashboard/mentor/training/training-content.tsx`: `Profile Completed!` > `Profile completed`
+- `app/dashboard/mentor/training/training-content.tsx`: `Profile Photo *` > `Profile photo *`
+- `app/dashboard/mentor/training/training-content.tsx`: `Questionnaire Completed!` > `Questionnaire completed`
+- `app/dashboard/mentor/training/training-content.tsx`: `Sign Contract` > `Sign contract`
+- `app/dashboard/mentor/training/training-content.tsx`: `Submit Questionnaire` > `Submit questionnaire`
+- `components/dashboard/mentor-request-session-modal.tsx`: `End Time` > `End time`
+- `components/dashboard/mentor-request-session-modal.tsx`: `Send Request` > `Send request`
+- `components/dashboard/mentor-request-session-modal.tsx`: `Start Time` > `Start time`
+- `components/dashboard/mentorship-onboarding.tsx`: `Add Subject` > `Add subject`
+- `components/dashboard/mentorship-onboarding.tsx`: `Add Weekly Slot` > `Add weekly slot`
+- `components/dashboard/mentorship-onboarding.tsx`: `End Time` > `End time`
+- `components/dashboard/mentorship-onboarding.tsx`: `Predicted Grade` > `Predicted grade`
+- `components/dashboard/mentorship-onboarding.tsx`: `School Name` > `School name`
+- `components/dashboard/mentorship-onboarding.tsx`: `Start Time` > `Start time`
+
+Empty values and em dashes:
+- `app/dashboard/mentor/payouts/invoicing-panel.tsx`: draft name `{mentor} [em dash] draft` > `{mentor} (draft)`; empty invoice reference and student name `[em dash]` > `Not set`; `at least 2 hours [em dash] discard it` > `at least 2 hours. Discard it`
+- `app/dashboard/mentor/training/training-content.tsx`: `Upload failed [em dash] {error}` > `Upload failed: {error}`; `🎉 All Done!` > `🎉 All done`; `Go to Dashboard` > `Go to dashboard`
+- `app/dashboard/mentor/payouts/*`: `To Be Paid` > `To be paid`; `Total Paid` > `Total paid`; `Stripe Dashboard` > `Stripe dashboard`; `Contact Finance Team` > `Contact the finance team`
+- `app/dashboard/mentor/page.tsx`: `Application Pending` > `Application pending`; `Student Requests` > `Student requests`; `Active Sessions` > `Active sessions`; `Earnings & Payouts` > `Earnings and payouts`; `View Requests` / `View Payouts` / `Complete Onboarding` / `Go to Training` > sentence case (the `→` characters are now arrow icons); `🎥 Start at` > `Start at` (the camera is now an icon)
+
+Kept as written: names (Access Oxbridge, Claire Marlowe, Stripe), `Privacy Policy`, dropdown options, and the mentor contract's legal wording.

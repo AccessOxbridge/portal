@@ -554,16 +554,16 @@ export default function TrainingContent({
         <div className="space-y-8">
             {/* Header */}
             <header className="text-center">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-legacy-accent tracking-tight">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
                     Training & Onboarding
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Complete all steps to start receiving student allocations
                 </p>
             </header>
 
             {/* Progress Steps */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+            <div className="border border-transparent bg-card rounded-card p-6 shadow-border">
                 <div className="flex items-center justify-between overflow-x-auto overflow-y-visible pt-2 pb-2 px-4 no-scrollbar">
                 {STEPS.map((step, index) => {
                         const stepKey = step.id
@@ -576,22 +576,22 @@ export default function TrainingContent({
                             <button
                                 key={step.id}
                                 onClick={() => setCurrentStep(index)}
-                                className={`flex flex-col items-center gap-2 min-w-[80px] px-2 transition-all ${isCurrent ? 'scale-110' : 'hover:scale-105'
+                                className={`flex flex-col items-center gap-2 min-w-[80px] px-2 transition-[background-color,box-shadow,color] duration-150 ${isCurrent ? 'scale-110' : 'hover:scale-105'
                                     }`}
                             >
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isCompleted
-                                    ? 'bg-green-500 text-white z-10'
+                                <div className={`size-12 rounded-full flex items-center justify-center transition-[background-color,box-shadow,color] duration-150 ${isCompleted
+                                    ? 'bg-success text-white z-10'
                                     : isCurrent
-                                        ? 'bg-legacy-accent text-white blink-slow ring-2 ring-legacy-accent/40 z-10'
-                                        : 'bg-gray-100 text-gray-400'
+                                        ? 'bg-primary text-white blink-slow ring-2 ring-primary/40 z-10'
+                                        : 'bg-muted text-muted-foreground'
                                     }`}>
                                     {isCompleted ? (
-                                        <Check className="w-6 h-6" />
+                                        <Check className="size-6" />
                                     ) : (
-                                        <Icon className="w-5 h-5" />
+                                        <Icon className="size-5" />
                                     )}
                                 </div>
-                                <span className={`text-xs font-medium ${isCurrent ? 'text-legacy-accent' : isCompleted ? 'text-green-600' : 'text-gray-400'
+                                <span className={`text-xs font-medium ${isCurrent ? 'text-primary' : isCompleted ? 'text-success' : 'text-muted-foreground'
                                     }`}>
                                     {step.title}
                                 </span>
@@ -624,41 +624,41 @@ export default function TrainingContent({
 
             {/* Error Message */}
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 text-red-700">
-                    <AlertCircle className="w-5 h-5 shrink-0" />
+                <div className="bg-tint-rose border border-border rounded-control p-4 flex items-center gap-3 text-tint-rose-foreground">
+                    <AlertCircle className="size-5 shrink-0" />
                     <p className="text-sm">{error}</p>
                 </div>
             )}
 
             {/* Step Content */}
-            <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-lg">
+            <div className="border border-transparent bg-card rounded-card p-8 shadow-border">
                 {/* Step 0: Welcome */}
                 {currentStep === 0 && (
                     <div className="space-y-6 text-center max-w-2xl mx-auto">
-                        <div className="w-20 h-20 bg-legacy-accent/10 rounded-full flex items-center justify-center mx-auto">
-                            <GraduationCap className="w-10 h-10 text-legacy-accent" />
+                        <div className="size-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                            <GraduationCap className="size-10 text-primary" />
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900">
+                        <h2 className="text-3xl font-semibold text-foreground">
                             Welcome to the Access Oxbridge Team
                         </h2>
-                        <p className="text-xl text-legacy-accent font-medium">
+                        <p className="text-xl text-primary font-medium">
                             We are so glad to have you, {mentorName}! 🎉
                         </p>
-                        <div className="bg-rich-beige-accent/50 rounded-2xl p-6 text-left space-y-4">
-                            <p className="text-gray-700 leading-relaxed">
+                        <div className="bg-rich-beige-accent/50 rounded-card p-6 text-left space-y-4">
+                            <p className="text-foreground leading-relaxed">
                                 At accessoxbridge we will do everything we possibly can to ensure the success of our students.
                                 We require all of our team members to complete this short onboarding.
                             </p>
-                            <p className="text-legacy-accent font-semibold">
+                            <p className="text-primary font-semibold">
                                 As soon as these few steps are done, you can start receiving allocations immediately!
                             </p>
                         </div>
                         <button
                             onClick={() => setCurrentStep(1)}
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                         >
-                            Let's Get Started
-                            <ChevronRight className="w-5 h-5" />
+                            Let's get started
+                            <ChevronRight className="size-5" />
                         </button>
                     </div>
                 )}
@@ -667,33 +667,33 @@ export default function TrainingContent({
                 {currentStep === 1 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
-                                <ClipboardList className="w-7 h-7 text-legacy-accent" />
+                            <div className="size-14 bg-primary/10 rounded-card flex items-center justify-center">
+                                <ClipboardList className="size-7 text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Getting to Know You</h2>
-                                <p className="text-gray-500">A few questions to help us build your profile</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Getting to Know You</h2>
+                                <p className="text-muted-foreground">A few questions to help us build your profile</p>
                             </div>
                         </div>
 
                         {questionnaireSubmitted ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Questionnaire Completed!</p>
+                            <div className="bg-tint-green border border-border rounded-card p-6 text-center">
+                                <Check className="size-12 text-success mx-auto mb-3" />
+                                <p className="text-tint-green-foreground font-semibold">Questionnaire completed</p>
                                 <button
                                     onClick={() => setCurrentStep(2)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
                                     Continue to Contract
-                                    <ChevronRight className="w-5 h-5" />
+                                    <ChevronRight className="size-5" />
                                 </button>
                             </div>
                         ) : (
                             <>
                                 <div className="space-y-6">
                                     {QUESTIONNAIRE.map((q, index) => (
-                                        <div key={q.id} className="bg-gray-50 rounded-2xl p-6">
-                                            <label htmlFor={q.id} className="block font-semibold text-gray-900 mb-3">
+                                        <div key={q.id} className="bg-muted/60 rounded-card p-6">
+                                            <label htmlFor={q.id} className="block font-semibold text-foreground mb-3">
                                                 {index + 1}. {q.question}
                                             </label>
                                             <textarea
@@ -702,7 +702,7 @@ export default function TrainingContent({
                                                 value={questionnaireAnswers[q.id]}
                                                 onChange={(e) => setQuestionnaireAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                                 placeholder={q.placeholder}
-                                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all resize-none bg-white"
+                                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 py-2.5 px-3.5 leading-relaxed resize-none"
                                             />
                                         </div>
                                     ))}
@@ -712,17 +712,17 @@ export default function TrainingContent({
                                     <button
                                         onClick={handleSubmitQuestionnaire}
                                         disabled={isPending}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                                     >
                                         {isPending ? (
                                             <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <Loader2 className="size-5 animate-spin" />
                                                 Submitting...
                                             </>
                                         ) : (
                                             <>
-                                                Submit Questionnaire
-                                                <ChevronRight className="w-5 h-5" />
+                                                Submit questionnaire
+                                                <ChevronRight className="size-5" />
                                             </>
                                         )}
                                     </button>
@@ -736,73 +736,73 @@ export default function TrainingContent({
                 {currentStep === 2 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
-                                <FileText className="w-7 h-7 text-blue-600" />
+                            <div className="size-14 bg-tint-blue rounded-card flex items-center justify-center">
+                                <FileText className="size-7 text-brand" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Mentor Contract</h2>
-                                <p className="text-gray-500">Review and sign the agreement</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Mentor contract</h2>
+                                <p className="text-muted-foreground">Review and sign the agreement</p>
                             </div>
                         </div>
 
                         {localStatus.contract ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Contract Signed!</p>
-                                <p className="text-green-600 text-sm mt-1">
+                            <div className="bg-tint-green border border-border rounded-card p-6 text-center">
+                                <Check className="size-12 text-success mx-auto mb-3" />
+                                <p className="text-tint-green-foreground font-semibold">Contract signed</p>
+                                <p className="text-success text-sm mt-1">
                                     Signed by: {existingData.contractSignature || signature}
                                 </p>
                                 <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
                                     <button
                                         onClick={handleDownloadContract}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-green-300 text-green-700 font-bold rounded-xl hover:bg-green-50 transition-all"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-card border border-success/40 text-tint-green-foreground font-semibold rounded-control hover:bg-tint-green transition-[background-color,box-shadow,color] duration-150"
                                     >
-                                        <Download className="w-5 h-5" />
+                                        <Download className="size-5" />
                                         Download signed contract
                                     </button>
                                     <button
                                         onClick={() => setCurrentStep(3)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                                     >
                                         Continue to Background Checks
-                                        <ChevronRight className="w-5 h-5" />
+                                        <ChevronRight className="size-5" />
                                     </button>
                                 </div>
                             </div>
                         ) : (
                             <>
                                 {/* Full mentor agreement */}
-                                <div className="bg-gray-50 rounded-2xl p-6 max-h-96 overflow-y-auto border border-gray-200">
-                                    <h3 className="font-bold text-gray-900 text-lg">MENTOR AGREEMENT</h3>
-                                    <p className="text-sm text-gray-600 mt-1">{AGREEMENT_INTRO}</p>
+                                <div className="bg-muted/60 rounded-card p-6 max-h-96 overflow-y-auto border border-border">
+                                    <h3 className="font-semibold text-foreground text-lg">MENTOR AGREEMENT</h3>
+                                    <p className="text-sm text-muted-foreground mt-1">{AGREEMENT_INTRO}</p>
 
                                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                        <div className="rounded-xl border border-gray-200 bg-white p-4">
-                                            <p className="font-semibold text-gray-900 mb-1">The Company</p>
-                                            <p className="text-gray-700">Access Oxbridge</p>
-                                            <p className="text-gray-500">accessoxbridge.io</p>
+                                        <div className="rounded-control border border-border bg-card p-4">
+                                            <p className="font-semibold text-foreground mb-1">The Company</p>
+                                            <p className="text-foreground">Access Oxbridge</p>
+                                            <p className="text-muted-foreground">accessoxbridge.io</p>
                                         </div>
-                                        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-1">
-                                            <p className="font-semibold text-gray-900 mb-1">The Mentor</p>
-                                            <p className="text-gray-700">
-                                                <span className="text-gray-500">Full Name: </span>
+                                        <div className="rounded-control border border-border bg-card p-4 space-y-1">
+                                            <p className="font-semibold text-foreground mb-1">The Mentor</p>
+                                            <p className="text-foreground">
+                                                <span className="text-muted-foreground">Full name: </span>
                                                 {mentorName || '—'}
                                             </p>
-                                            <p className="text-gray-700">
-                                                <span className="text-gray-500">Email: </span>
+                                            <p className="text-foreground">
+                                                <span className="text-muted-foreground">Email: </span>
                                                 {existingData.email || '—'}
                                             </p>
-                                            <p className="text-gray-700">
-                                                <span className="text-gray-500">Institution: </span>
+                                            <p className="text-foreground">
+                                                <span className="text-muted-foreground">Institution: </span>
                                                 {existingData.university || '—'}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="mt-5 space-y-4 text-sm text-gray-600 leading-relaxed">
+                                    <div className="mt-5 space-y-4 text-sm text-muted-foreground leading-relaxed">
                                         {AGREEMENT_SECTIONS.map((section) => (
                                             <div key={section.title}>
-                                                <p className="font-semibold text-gray-900">{section.title}</p>
+                                                <p className="font-semibold text-foreground">{section.title}</p>
                                                 {section.body && <p>{section.body}</p>}
                                                 {section.bullets && (
                                                     <ul className="list-disc pl-5 mt-1 space-y-1">
@@ -818,18 +818,18 @@ export default function TrainingContent({
 
                                 <div className="space-y-4">
                                     <label className="block">
-                                        <span className="text-sm font-medium text-gray-700">
-                                            Digital Signature (Enter your full name)
+                                        <span className="text-sm font-medium text-foreground">
+                                            Digital signature (enter your full name)
                                         </span>
                                         <input
                                             type="text"
                                             value={signature}
                                             onChange={(e) => setSignature(e.target.value)}
                                             placeholder="Your full name"
-                                            className="mt-2 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all font-serif text-lg"
+                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 px-3.5 mt-2"
                                         />
                                     </label>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-muted-foreground">
                                         By typing your name above, you confirm you have read and agree to be bound by the terms of this Mentor Agreement. Your signature and the date will be recorded.
                                     </p>
                                 </div>
@@ -838,17 +838,17 @@ export default function TrainingContent({
                                     <button
                                         onClick={handleSignContract}
                                         disabled={isPending || !signature.trim()}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                                     >
                                         {isPending ? (
                                             <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <Loader2 className="size-5 animate-spin" />
                                                 Signing...
                                             </>
                                         ) : (
                                             <>
-                                                Sign Contract
-                                                <ChevronRight className="w-5 h-5" />
+                                                Sign contract
+                                                <ChevronRight className="size-5" />
                                             </>
                                         )}
                                     </button>
@@ -862,21 +862,21 @@ export default function TrainingContent({
                 {currentStep === 3 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                <Shield className="w-7 h-7 text-purple-600" />
+                            <div className="size-14 bg-tint-violet rounded-card flex items-center justify-center">
+                                <Shield className="size-7 text-tint-violet-foreground" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Background Checks</h2>
-                                <p className="text-gray-500">DBS and confirmation</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Background checks</h2>
+                                <p className="text-muted-foreground">DBS and confirmation</p>
                             </div>
                         </div>
 
                         {localStatus.dbs ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Background checks complete</p>
+                            <div className="bg-tint-green border border-border rounded-card p-6 text-center">
+                                <Check className="size-12 text-success mx-auto mb-3" />
+                                <p className="text-tint-green-foreground font-semibold">Background checks complete</p>
                                 {uploadedFileUrl && (
-                                    <p className="text-green-600 text-sm mt-2">
+                                    <p className="text-success text-sm mt-2">
                                         File:{' '}
                                         <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="underline">
                                             {uploadedFileName ?? uploadedFileUrl}
@@ -884,21 +884,21 @@ export default function TrainingContent({
                                     </p>
                                 )}
                                 {!uploadedFileUrl && (
-                                    <p className="text-green-600 text-sm mt-2">
+                                    <p className="text-success text-sm mt-2">
                                         Confirmation submitted (no DBS file uploaded).
                                     </p>
                                 )}
                                 <button
                                     onClick={() => setCurrentStep(4)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
                                     Continue to Payment Setup
-                                    <ChevronRight className="w-5 h-5" />
+                                    <ChevronRight className="size-5" />
                                 </button>
                             </div>
                         ) : (
                             <>
-                                <p className="text-gray-700">
+                                <p className="text-foreground">
                                     If you have been explicitly required to provide us with a DBS, please attach DBS below.
                                 </p>
 
@@ -925,41 +925,41 @@ export default function TrainingContent({
                 {currentStep === 4 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-[#635BFF]/10 rounded-2xl flex items-center justify-center">
-                                <CreditCard className="w-7 h-7 text-[#635BFF]" />
+                            <div className="size-14 bg-[#635BFF]/10 rounded-card flex items-center justify-center">
+                                <CreditCard className="size-7 text-[#635BFF]" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Payment Setup</h2>
-                                <p className="text-gray-500">Connect your bank account to receive payouts</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Payment setup</h2>
+                                <p className="text-muted-foreground">Connect your bank account to receive payouts</p>
                             </div>
                         </div>
 
                         {localStatus.payment ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold">Payment Connected!</p>
-                                <p className="text-green-600 text-sm mt-1">
+                            <div className="bg-tint-green border border-border rounded-card p-6 text-center">
+                                <Check className="size-12 text-success mx-auto mb-3" />
+                                <p className="text-tint-green-foreground font-semibold">Payment connected</p>
+                                <p className="text-success text-sm mt-1">
                                     Your Stripe account is set up and ready to receive payouts.
                                 </p>
                                 <button
                                     onClick={() => setCurrentStep(5)}
-                                    className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-4"
                                 >
                                     Continue to Profile
-                                    <ChevronRight className="w-5 h-5" />
+                                    <ChevronRight className="size-5" />
                                 </button>
                             </div>
                         ) : (
                             <>
-                                <div className="bg-gray-50 rounded-2xl p-6 text-center">
-                                    <p className="text-gray-600 mb-6">
+                                <div className="bg-muted/60 rounded-card p-6 text-center">
+                                    <p className="text-muted-foreground mb-6">
                                         Connect your bank account through Stripe to receive fortnightly payouts for your mentoring sessions.
                                         Stripe handles all payments securely.
                                     </p>
 
                                     {existingData.stripeConnected ? (
                                         <div className="space-y-4">
-                                            <p className="text-amber-600 font-medium">
+                                            <p className="text-warning font-medium">
                                                 You've started the Stripe setup but it's not complete yet.
                                             </p>
                                             <StripeOnboardingButton variant="continue" />
@@ -972,7 +972,7 @@ export default function TrainingContent({
                                 <div className="text-center">
                                     <button
                                         onClick={() => setCurrentStep(5)}
-                                        className="text-gray-500 text-sm hover:text-gray-700 underline"
+                                        className="text-muted-foreground text-sm hover:text-foreground underline"
                                     >
                                         Skip for now (you can set this up later)
                                     </button>
@@ -986,59 +986,59 @@ export default function TrainingContent({
                 {currentStep === 5 && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-legacy-accent/10 rounded-2xl flex items-center justify-center">
-                                <User className="w-7 h-7 text-legacy-accent" />
+                            <div className="size-14 bg-primary/10 rounded-card flex items-center justify-center">
+                                <User className="size-7 text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Complete Your Profile</h2>
-                                <p className="text-gray-500">Add details to attract more students</p>
+                                <h2 className="text-2xl font-semibold text-foreground">Complete your profile</h2>
+                                <p className="text-muted-foreground">Add details to attract more students</p>
                             </div>
                         </div>
 
                         {localStatus.profile ? (
-                            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-                                <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <p className="text-green-700 font-semibold text-xl">Profile Completed!</p>
-                                <p className="text-green-600 mt-2">
+                            <div className="bg-tint-green border border-border rounded-card p-6 text-center">
+                                <Check className="size-12 text-success mx-auto mb-3" />
+                                <p className="text-tint-green-foreground font-semibold text-xl">Profile completed</p>
+                                <p className="text-success mt-2">
                                     🎉 Congratulations! You've completed all onboarding steps.
                                 </p>
                                 <a
                                     href="/dashboard/mentor"
-                                    className="mt-6 inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-6"
                                 >
-                                    Go to Dashboard
-                                    <ChevronRight className="w-5 h-5" />
+                                    Go to dashboard
+                                    <ChevronRight className="size-5" />
                                 </a>
                             </div>
                         ) : (
                             <form onSubmit={handleCompleteProfile} className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Profile Photo *
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">
+                                        Profile photo *
                                     </label>
                                     <div className="flex items-center gap-4">
                                         {existingData.photo_url ? (
                                             <img
                                                 src={existingData.photo_url}
                                                 alt="Profile"
-                                                className="w-20 h-20 rounded-full object-cover"
+                                                className="size-20 rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
-                                                <User className="w-8 h-8 text-gray-400" />
+                                            <div className="size-20 bg-muted rounded-full flex items-center justify-center">
+                                                <User className="size-8 text-muted-foreground" />
                                             </div>
                                         )}
                                         <input
                                             type="file"
                                             name="photo"
                                             accept={PHOTO_ACCEPT_ATTR}
-                                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-legacy-accent/10 file:text-legacy-accent hover:file:bg-legacy-accent/20"
+                                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">
                                         Bio
                                     </label>
                                     <textarea
@@ -1046,13 +1046,13 @@ export default function TrainingContent({
                                         rows={4}
                                         defaultValue={existingData.bio || ''}
                                         placeholder="Tell students about yourself, your background, and what makes you a great mentor..."
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all resize-none"
+                                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 py-2.5 px-3.5 leading-relaxed resize-none"
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="mb-1.5 block text-sm font-medium text-foreground">
                                             University
                                         </label>
                                         <input
@@ -1060,21 +1060,21 @@ export default function TrainingContent({
                                             name="university"
                                             defaultValue={existingData.university || ''}
                                             placeholder="e.g., University of Oxford"
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all"
+                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 px-3.5"
                                         />
                                     </div>
                                     <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Phone Number
+                                    <label className="mb-1.5 block text-sm font-medium text-foreground">
+                                        Phone number
                                     </label>
-                                    <div className="flex items-stretch gap-0 border border-gray-200 rounded-xl overflow-hidden">
+                                    <div className="flex items-stretch gap-0 border border-border rounded-control overflow-hidden">
                                         {/* Hidden input carries the full number to the server */}
                                         <input type="hidden" name="phone" value={phoneDigits ? `${selectedCountry.dialCode}${phoneDigits}` : (existingData.phone || '')} />
 
                                         <div className="flex items-center gap-2 px-3">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={`https://flagcdn.com/w20/${selectedCountry.code.toLowerCase()}.png`} alt={selectedCountry.name} width={20} height={14} className="rounded-[2px] object-cover" />
-                                            <span className="font-mono text-base text-gray-700">{selectedCountry.dialCode}</span>
+                                            <span className="font-mono text-base text-foreground">{selectedCountry.dialCode}</span>
                                         </div>
 
                                         <input
@@ -1084,10 +1084,10 @@ export default function TrainingContent({
                                             readOnly
                                             aria-readonly
                                             placeholder="7XXX XXXXXX"
-                                            className="flex-1 px-4 py-3 bg-transparent text-gray-700 focus:outline-none"
+                                            className="flex-1 px-4 py-3 bg-transparent text-foreground focus:outline-none"
                                         />
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">Phone number set during onboarding and cannot be changed here.</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Phone number set during onboarding and cannot be changed here.</p>
                                     </div>
                                 </div>
 
@@ -1095,17 +1095,17 @@ export default function TrainingContent({
                                     <button
                                         type="submit"
                                         disabled={isPending}
-                                        className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                                     >
                                         {isPending ? (
                                             <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <Loader2 className="size-5 animate-spin" />
                                                 Saving...
                                             </>
                                         ) : (
                                             <>
-                                                Complete Profile
-                                                <Check className="w-5 h-5" />
+                                                Complete profile
+                                                <Check className="size-5" />
                                             </>
                                         )}
                                     </button>
@@ -1118,17 +1118,17 @@ export default function TrainingContent({
 
             {/* Completion Banner */}
             {isAllCompleted && (
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 text-center text-white">
-                    <h2 className="text-3xl font-bold mb-2">🎉 All Done!</h2>
+                <div className="rounded-card bg-success p-8 text-center text-white">
+                    <h2 className="mb-2 text-3xl font-semibold tracking-tight">🎉 All done</h2>
                     <p className="text-white/90 mb-6">
                         You've completed all onboarding steps and are ready to start mentoring!
                     </p>
                     <a
                         href="/dashboard/mentor"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-600 font-bold rounded-xl hover:bg-green-50 transition-all"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-card text-success font-semibold rounded-control hover:bg-tint-green transition-[background-color,box-shadow,color] duration-150"
                     >
-                        Go to Dashboard
-                        <ChevronRight className="w-5 h-5" />
+                        Go to dashboard
+                        <ChevronRight className="size-5" />
                     </a>
                 </div>
             )}
@@ -1181,22 +1181,22 @@ function BackgroundUploadForm({
         <div className="space-y-4">
             {/* Uploading */}
             {isUploading ? (
-                <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center justify-between gap-4 p-4 bg-muted/60 rounded-control border border-border">
                     <div className="flex items-center gap-3">
-                        <Loader2 className="w-5 h-5 animate-spin text-legacy-accent" />
+                        <Loader2 className="size-5 animate-spin text-primary" />
                         <div>
                             {/* If there is a file, show uploading progress. If user only submitted confirmation (no file),
                                 show an indeterminate submitting state without the progress bar. */}
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-foreground">
                                 {(file || lastSelectedFile) ? 'Uploading…' : 'Submitting confirmation…'}
                             </p>
-                            <p className="text-sm text-gray-500">{file?.name ?? lastSelectedFile?.name ?? ''}</p>
+                            <p className="text-sm text-muted-foreground">{file?.name ?? lastSelectedFile?.name ?? ''}</p>
                             {(file || lastSelectedFile) && (
                                 <>
-                                    <div className="w-48 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                                        <div className="h-2 bg-legacy-accent transition-all" style={{ width: `${uploadProgress}%` }} />
+                                    <div className="w-48 h-2 bg-muted rounded-full mt-2 overflow-hidden">
+                                        <div className="h-2 bg-primary transition-[background-color,box-shadow,color] duration-150" style={{ width: `${uploadProgress}%` }} />
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">{uploadProgress}%</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{uploadProgress}%</p>
                                 </>
                             )}
                         </div>
@@ -1204,7 +1204,7 @@ function BackgroundUploadForm({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={onCancel}
-                            className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50"
+                            className="px-4 py-2 bg-card border rounded-control text-sm hover:bg-muted/60"
                         >
                             Cancel
                         </button>
@@ -1212,10 +1212,10 @@ function BackgroundUploadForm({
                 </div>
             ) : uploadedFileUrl ? (
                 // Success UI (file uploaded). The main step will show the completion panel (localStatus.dbs).
-                <div className="p-4 bg-green-50 rounded-xl border border-green-200 flex items-center justify-between">
+                <div className="p-4 bg-tint-green rounded-control border border-border flex items-center justify-between">
                     <div>
-                        <p className="font-semibold text-green-700">Upload complete</p>
-                        <p className="text-sm text-green-600 mt-1 break-all">
+                        <p className="font-semibold text-tint-green-foreground">Upload complete</p>
+                        <p className="text-sm text-success mt-1 break-all">
                             File:{' '}
                             <a href={uploadedFileUrl} target="_blank" rel="noreferrer" className="underline">
                                 {uploadedFileName ?? uploadedFileUrl}
@@ -1223,8 +1223,8 @@ function BackgroundUploadForm({
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={onRetry} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Retry upload</button>
-                        <button onClick={() => setFile(null)} className="px-4 py-2 bg-white border rounded-xl text-sm hover:bg-gray-50">Remove file</button>
+                        <button onClick={onRetry} className="px-4 py-2 bg-card border rounded-control text-sm hover:bg-muted/60">Retry upload</button>
+                        <button onClick={() => setFile(null)} className="px-4 py-2 bg-card border rounded-control text-sm hover:bg-muted/60">Remove file</button>
                     </div>
                 </div>
             ) : (
@@ -1246,17 +1246,17 @@ function BackgroundUploadForm({
                         className="space-y-4"
                     >
                         <label className="block">
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-medium text-foreground">
                                 Upload DBS certificate (PDF, JPG, PNG, max 10MB) - optional unless requested
                             </span>
                             <div className="mt-2 flex items-center justify-center w-full">
-                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-border border-dashed rounded-control cursor-pointer bg-muted/60 hover:bg-muted transition-colors">
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                                        <p className="text-sm text-gray-500">
+                                        <Upload className="size-8 mb-2 text-muted-foreground" />
+                                        <p className="text-sm text-muted-foreground">
                                             <span className="font-semibold">Click to upload</span> or drag and drop.
                                         </p>
-                                        {file && <p className="text-xs text-gray-500 mt-2 truncate">{file.name}</p>}
+                                        {file && <p className="text-xs text-muted-foreground mt-2 truncate">{file.name}</p>}
                                     </div>
                                     <input
                                         type="file"
@@ -1266,22 +1266,22 @@ function BackgroundUploadForm({
                                         onChange={handleFileChange}
                                     />
                                 </label>
-                                {localError && <p className="text-xs text-red-500 ml-4">{localError}</p>}
+                                {localError && <p className="text-xs text-destructive ml-4">{localError}</p>}
                             </div>
                         </label>
 
-                        {uploadError && <p className="text-sm text-red-500">Upload failed — {uploadError}. Try again or cancel.</p>}
+                        {uploadError && <p className="text-sm text-destructive">Upload failed: {uploadError}. Try again or cancel.</p>}
 
-                        <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-legacy-accent/30 transition-colors cursor-pointer">
+                        <label className="flex items-start gap-3 p-4 rounded-control border-2 border-border hover:border-primary/30 transition-colors cursor-pointer">
                             <input
                                 type="checkbox"
                                 name="background_check_confirm"
                                 checked={backgroundCheckConfirmed}
                                 onChange={(e) => setBackgroundCheckConfirmed(e.target.checked)}
-                                className="mt-1 w-5 h-5 rounded border-gray-300 text-legacy-accent focus:ring-legacy-accent"
+                                className="mt-1 size-5 rounded border-border text-primary focus:ring-primary"
                                 required
                             />
-                            <span className="text-gray-700">
+                            <span className="text-foreground">
                                 I confirm I have no criminal convictions or cautions that would make me unsuitable to work with students.
                             </span>
                         </label>
@@ -1290,10 +1290,10 @@ function BackgroundUploadForm({
                             <button
                                 type="submit"
                                 disabled={isUploading || !backgroundCheckConfirmed}
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                             >
                                 Confirm & Continue
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight className="size-5" />
                             </button>
                         </div>
                     </form>

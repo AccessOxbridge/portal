@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, BookOpen, CalendarCheck, CalendarPlus, CheckCircle as CheckCircle2, Clock } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { cn } from '@/utils/lib'
 import { createClient } from '@/utils/supabase/client'
 import MentorRequestSessionModal, {
     type MentorRequestStudentOption,
@@ -192,10 +194,10 @@ export default function MentorSessionCheckinModal({
                             onChange(option)
                             setError(null)
                         }}
-                        className={`py-3 rounded-2xl border-2 font-bold transition-colors ${
+                        className={`py-3 rounded-card border-2 font-semibold transition-colors ${
                             selected
-                                ? 'border-legacy-accent bg-legacy-accent/10 text-legacy-accent'
-                                : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200'
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border bg-muted/60 text-muted-foreground hover:border-border'
                         }`}
                     >
                         {option ? 'Yes' : 'No'}
@@ -206,9 +208,9 @@ export default function MentorSessionCheckinModal({
     )
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={handleDismiss}
                 aria-hidden
             />
@@ -216,24 +218,24 @@ export default function MentorSessionCheckinModal({
                 role="dialog"
                 aria-modal="true"
                 aria-label="Post-session check-in"
-                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto"
+                className={cn(sheet.panel, 'overflow-y-auto overscroll-contain sm:max-w-md')}
             >
                 <button
                     type="button"
                     onClick={handleDismiss}
-                    className="absolute top-6 right-6 w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors z-10"
+                    className={cn(sheet.close, 'absolute top-5 right-5 z-10')}
                     aria-label="Close"
                 >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="size-5" />
                 </button>
 
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-legacy-accent/10 flex items-center justify-center shrink-0">
-                        <BookOpen className="w-5 h-5 text-legacy-accent" />
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                        <BookOpen weight="duotone" className="size-6" />
                     </div>
                     <div className="pr-10">
-                        <h2 className="text-xl font-extrabold text-gray-900">Quick check-in</h2>
-                        <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">
+                        <h2 className="text-lg font-semibold text-foreground">Quick check-in</h2>
+                        <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">
                             Your session with {checkin.studentName}
                             {sessionDate ? ` on ${sessionDate}` : ''}
                         </p>
@@ -242,7 +244,7 @@ export default function MentorSessionCheckinModal({
 
                 <div className="p-6 space-y-6">
                     <div className="space-y-3">
-                        <p className="font-bold text-gray-900">
+                        <p className="font-semibold text-foreground">
                             Did you set {firstName} some homework?
                         </p>
                         {yesNo(homeworkGiven, setHomeworkGiven, 'Did you set homework?')}
@@ -250,31 +252,31 @@ export default function MentorSessionCheckinModal({
 
                     {askBooking ? (
                         <div className="space-y-3">
-                            <p className="font-bold text-gray-900">
+                            <p className="font-semibold text-foreground">
                                 Is your next session with {firstName} booked in?
                             </p>
                             {yesNo(nextBooked, setNextBooked, 'Is your next session booked?')}
                             {nextBooked === false && !requestSent && (
-                                <p className="text-sm text-gray-500 leading-relaxed">
+                                <p className="text-sm text-muted-foreground leading-relaxed">
                                     Propose a time now and {firstName} can confirm it from their
                                     Pending tab.
                                 </p>
                             )}
                         </div>
                     ) : (
-                        <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                        <div className="flex items-start gap-3 p-4 bg-tint-green border border-border rounded-card">
                             {checkin.nextSessionState === 'scheduled' ? (
                                 <>
-                                    <CalendarCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                                    <p className="text-sm text-emerald-800">
+                                    <CalendarCheck className="size-5 text-success shrink-0 mt-0.5" />
+                                    <p className="text-sm text-tint-green-foreground">
                                         Your next session with {firstName} is booked
                                         {nextSessionLabel ? ` for ${nextSessionLabel}` : ''}.
                                     </p>
                                 </>
                             ) : (
                                 <>
-                                    <Clock className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                                    <p className="text-sm text-emerald-800">
+                                    <Clock className="size-5 text-success shrink-0 mt-0.5" />
+                                    <p className="text-sm text-tint-green-foreground">
                                         You&apos;ve already proposed a time to {firstName} —
                                         waiting on them to confirm.
                                     </p>
@@ -284,9 +286,9 @@ export default function MentorSessionCheckinModal({
                     )}
 
                     {requestSent && (
-                        <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                            <p className="text-sm text-emerald-800">
+                        <div className="flex items-start gap-3 p-4 bg-tint-green border border-border rounded-card">
+                            <CheckCircle2 className="size-5 text-success shrink-0 mt-0.5" />
+                            <p className="text-sm text-tint-green-foreground">
                                 Request sent. {firstName} will see it in their Pending tab.
                             </p>
                         </div>
@@ -298,27 +300,27 @@ export default function MentorSessionCheckinModal({
                     <button
                         type="button"
                         onClick={() => setRequestOpen(true)}
-                        className="w-full py-3 border-2 border-legacy-accent text-legacy-accent font-bold rounded-2xl hover:bg-legacy-accent/5 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 border-2 border-primary text-primary font-semibold rounded-card hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
                     >
-                        <CalendarPlus className="w-4 h-4" />
+                        <CalendarPlus className="size-4" />
                         {requestSent ? 'Request another session' : 'Request a session'}
                     </button>
 
-                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    {error && <p className="text-sm text-destructive">{error}</p>}
 
                     <div className="space-y-2">
                         <button
                             type="button"
                             onClick={handleSubmit}
                             disabled={saving}
-                            className="w-full py-3 bg-legacy-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity disabled:opacity-60"
+                            className="w-full py-3 bg-primary text-white font-semibold rounded-card hover:opacity-95 transition-opacity disabled:opacity-60"
                         >
                             {saving ? 'Saving…' : 'Done'}
                         </button>
                         <button
                             type="button"
                             onClick={handleDismiss}
-                            className="w-full py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors"
+                            className="w-full py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
                         >
                             Not now
                         </button>

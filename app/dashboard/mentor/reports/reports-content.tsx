@@ -28,29 +28,29 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
             <div className="flex gap-2 mb-6">
                 <button
                     onClick={() => setActiveTab('pending')}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${activeTab === 'pending'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-control font-medium text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'pending'
+                            ? 'bg-tint-amber text-tint-amber-foreground border border-border'
+                            : 'bg-muted/60 text-muted-foreground hover:bg-muted border border-transparent'
                         }`}
                 >
-                    <Clock className="w-4 h-4" />
+                    <Clock className="size-4" />
                     To Complete
                     {toComplete.length > 0 && (
-                        <span className="ml-1 px-2 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full">
+                        <span className="ml-1 px-2 py-0.5 bg-warning text-white text-xs font-semibold rounded-full">
                             {toComplete.length}
                         </span>
                     )}
                 </button>
                 <button
                     onClick={() => setActiveTab('completed')}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${activeTab === 'completed'
-                            ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-control font-medium text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'completed'
+                            ? 'bg-tint-green text-tint-green-foreground border border-border'
+                            : 'bg-muted/60 text-muted-foreground hover:bg-muted border border-transparent'
                         }`}
                 >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="size-4" />
                     Completed
-                    <span className="ml-1 px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-bold rounded-full">
+                    <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground text-xs font-semibold rounded-full">
                         {completed.length}
                     </span>
                 </button>
@@ -60,25 +60,25 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
             {activeTab === 'pending' && (
                 <div className="space-y-4">
                     {toComplete.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CheckCircle2 className="w-8 h-8 text-green-400" />
+                        <div className="bg-card rounded-card border border-border p-12 text-center">
+                            <div className="size-16 bg-tint-green rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle2 className="size-8 text-success" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-700 mb-2">All Caught Up!</h3>
-                            <p className="text-gray-500 max-w-sm mx-auto">
+                            <h3 className="text-lg font-semibold text-foreground mb-2">All caught up</h3>
+                            <p className="text-muted-foreground max-w-sm mx-auto">
                                 You have no pending reports. Reports will appear here after your sessions end.
                             </p>
                         </div>
                     ) : (
                         <>
-                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                            <div className="bg-tint-amber border border-border rounded-control p-4 mb-4">
                                 <div className="flex items-start gap-3">
-                                    <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+                                    <AlertCircle className="size-5 text-warning mt-0.5 shrink-0" />
                                     <div>
-                                        <p className="text-sm font-medium text-amber-800">
+                                        <p className="text-sm font-medium text-tint-amber-foreground">
                                             You have {toComplete.length} report{toComplete.length > 1 ? 's' : ''} to complete
                                         </p>
-                                        <p className="text-sm text-amber-600 mt-0.5">
+                                        <p className="text-sm text-warning mt-0.5">
                                             Please submit reports promptly so students can receive their personalised feedback.
                                         </p>
                                     </div>
@@ -95,12 +95,12 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
             {activeTab === 'completed' && (
                 <div className="space-y-4">
                     {completed.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <FileText className="w-8 h-8 text-gray-300" />
+                        <div className="bg-card rounded-card border border-border p-12 text-center">
+                            <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FileText className="size-8 text-muted-foreground/60" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-700 mb-2">No Completed Reports</h3>
-                            <p className="text-gray-500 max-w-sm mx-auto">
+                            <h3 className="text-lg font-semibold text-foreground mb-2">No completed reports</h3>
+                            <p className="text-muted-foreground max-w-sm mx-auto">
                                 Your completed reports will appear here.
                             </p>
                         </div>
@@ -119,20 +119,20 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
     const sessionDate = new Date(session.scheduled_at)
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all">
+        <div className="bg-card rounded-card border border-border p-5 hover:shadow-border transition-[background-color,box-shadow,color] duration-150">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     {/* Student Avatar */}
-                    <div className="w-12 h-12 rounded-full bg-legacy-accent/10 flex items-center justify-center shrink-0">
-                        <User className="w-6 h-6 text-legacy-accent" />
+                    <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <User className="size-6 text-primary" />
                     </div>
 
                     <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-foreground">
                             Session with {session.student_full_name}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                            <Calendar className="w-4 h-4" />
+                        <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                            <Calendar className="size-4" />
                             <span>
                                 {sessionDate.toLocaleDateString('en-US', {
                                     weekday: 'short',
@@ -149,13 +149,13 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
                     {isPending ? (
                         <Link
                             href={`/dashboard/mentor/sessions/${session.id}/report`}
-                            className="px-4 py-2 bg-legacy-accent text-white text-sm font-medium rounded-xl hover:bg-legacy-accent/90 transition-colors"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm"
                         >
-                            Submit Report
+                            Submit report
                         </Link>
                     ) : (
-                        <div className="flex items-center gap-2 text-green-600">
-                            <CheckCircle2 className="w-5 h-5" />
+                        <div className="flex items-center gap-2 text-success">
+                            <CheckCircle2 className="size-5" />
                             <span className="text-sm font-medium">Submitted</span>
                         </div>
                     )}
@@ -164,7 +164,7 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
 
             {/* Submitted timestamp for completed reports */}
             {!isPending && session.submitted_at && (
-                <div className="mt-3 pt-3 border-t border-gray-50 text-xs text-gray-400">
+                <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
                     Submitted on {new Date(session.submitted_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',

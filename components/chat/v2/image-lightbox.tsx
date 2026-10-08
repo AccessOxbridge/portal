@@ -62,18 +62,18 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Download image"
-                            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+                            className="size-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
                         >
-                            <Download className="w-5 h-5" />
+                            <Download className="size-5" />
                         </a>
                     )}
                     <button
                         type="button"
                         onClick={onClose}
                         aria-label="Close"
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+                        className="size-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="size-5" />
                     </button>
                 </div>
             </div>

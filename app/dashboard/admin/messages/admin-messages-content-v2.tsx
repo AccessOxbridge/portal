@@ -461,39 +461,39 @@ export default function AdminMessagesContent({
     return (
         // One surface split by a hairline, matching the student and mentor
         // threads — no floating cards.
-        <div className="flex flex-1 min-h-0 bg-white border-t border-gray-200/70 overflow-hidden">
+        <div className="flex flex-1 min-h-0 bg-card border-t border-border overflow-hidden">
             {/* Conversations */}
-            <div className="w-80 lg:w-96 shrink-0 border-r border-gray-200/70 flex flex-col overflow-hidden">
-                <div className="p-4 border-b border-gray-100">
+            <div className="w-80 lg:w-96 shrink-0 border-r border-border flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-border">
                     <div className="flex items-center gap-2">
                         <div className="relative flex-1 min-w-0">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <input
                                 type="text"
                                 placeholder="Search by name or email…"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-legacy-accent/15 focus:border-legacy-accent/30"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                             />
                         </div>
                         <ComposeButton onClick={() => setIsComposeOpen(true)} />
                     </div>
-                    <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                    <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                         <span>
                             {filteredConversations.length} conversation
                             {filteredConversations.length !== 1 ? 's' : ''}
                         </span>
                         <span className="flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
+                            <MessageCircle className="size-3" />
                             {conversations.reduce((sum, c) => sum + c.message_count, 0)} total
                         </span>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                <div className="flex-1 overflow-y-auto divide-y divide-border">
                     {filteredConversations.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-400 p-6">
-                            <Users className="w-12 h-12 mb-3 text-gray-200" strokeWidth={1.5} />
+                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-6">
+                            <Users className="size-12 mb-3 text-muted-foreground/60" strokeWidth={1.5} />
                             <p className="text-sm">No conversations found</p>
                         </div>
                     ) : (
@@ -511,9 +511,9 @@ export default function AdminMessagesContent({
                                     key={conv.id}
                                     onClick={() => setSelectedConversation(conv)}
                                     className={cn(
-                                        'w-full p-4 text-left transition-colors hover:bg-gray-50 border-l-2',
+                                        'w-full p-4 text-left transition-colors hover:bg-muted/60 border-l-2',
                                         selectedConversation?.id === conv.id
-                                            ? 'bg-legacy-accent/[0.06] border-legacy-accent'
+                                            ? 'bg-primary/[0.06] border-primary'
                                             : 'border-transparent'
                                     )}
                                 >
@@ -521,7 +521,7 @@ export default function AdminMessagesContent({
                                         <div className="min-w-0">
                                             <p
                                                 className={cn(
-                                                    'font-semibold text-sm text-gray-900',
+                                                    'font-semibold text-sm text-foreground',
                                                     conv.type === 'group' ? 'leading-snug' : 'truncate'
                                                 )}
                                             >
@@ -533,8 +533,8 @@ export default function AdminMessagesContent({
                                                 className={cn(
                                                     'text-xs truncate',
                                                     conv.type === 'support' || conv.type === 'group'
-                                                        ? 'text-amber-600 font-medium'
-                                                        : 'text-gray-500'
+                                                        ? 'text-warning font-medium'
+                                                        : 'text-muted-foreground'
                                                 )}
                                             >
                                                 {conv.type === 'group'
@@ -542,7 +542,7 @@ export default function AdminMessagesContent({
                                                     : `↔ ${conv.type === 'support' ? 'Help & Support' : conv.mentor.full_name}`}
                                             </p>
                                         </div>
-                                        <span className="shrink-0 text-[10px] text-gray-400">
+                                        <span className="shrink-0 text-[10px] text-muted-foreground">
                                             {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
                                         </span>
                                     </div>
@@ -550,20 +550,20 @@ export default function AdminMessagesContent({
                                         <p
                                             className={cn(
                                                 'text-xs truncate',
-                                                hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'
+                                                hasUnread ? 'text-foreground font-medium' : 'text-muted-foreground'
                                             )}
                                         >
                                             {preview}
                                         </p>
                                     )}
                                     <div className="mt-2 flex items-center justify-between">
-                                        <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">
+                                        <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
                                             {conv.message_count} msg{conv.message_count !== 1 ? 's' : ''}
                                         </span>
                                         {hasUnread && (
                                             <span
                                                 aria-label={`${conv.unread_count} unread`}
-                                                className="min-w-[20px] h-[20px] px-1.5 bg-legacy-accent rounded-full flex items-center justify-center text-white text-[10px] font-bold tabular-nums"
+                                                className="min-w-[20px] h-[20px] px-1.5 bg-primary rounded-full flex items-center justify-center text-white text-[10px] font-semibold tabular-nums"
                                             >
                                                 {(conv.unread_count ?? 0) > 99 ? '99+' : conv.unread_count}
                                             </span>
@@ -580,11 +580,11 @@ export default function AdminMessagesContent({
             <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                 {selectedConversation ? (
                     <>
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                             <div className="min-w-0">
                                 <h3
                                     className={cn(
-                                        'font-semibold text-gray-900',
+                                        'font-semibold text-foreground',
                                         isGroup ? 'leading-snug' : 'truncate'
                                     )}
                                 >
@@ -594,7 +594,7 @@ export default function AdminMessagesContent({
                                               isSupport ? 'Help & Support' : selectedConversation.mentor.full_name
                                           }`}
                                 </h3>
-                                <p className="text-xs text-gray-400 mt-0.5">
+                                <p className="text-xs text-muted-foreground mt-0.5">
                                     {isGroup
                                         ? 'Group chat · Access Oxbridge team · '
                                         : isSupport
@@ -606,9 +606,9 @@ export default function AdminMessagesContent({
                             <button
                                 onClick={() => setSelectedConversation(null)}
                                 aria-label="Close conversation"
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+                                className="p-2 hover:bg-muted rounded-lg transition-colors shrink-0"
                             >
-                                <X className="w-5 h-5 text-gray-400" />
+                                <X className="size-5 text-muted-foreground" />
                             </button>
                         </div>
 
@@ -620,11 +620,11 @@ export default function AdminMessagesContent({
                         >
                             {isLoadingMessages ? (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="w-6 h-6 border-2 border-legacy-accent border-t-transparent rounded-full animate-spin" />
+                                    <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                 </div>
                             ) : messages.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                                    <MessageCircle className="w-12 h-12 mb-3 text-gray-200" strokeWidth={1.5} />
+                                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                                    <MessageCircle className="size-12 mb-3 text-muted-foreground/60" strokeWidth={1.5} />
                                     <p className="text-sm">No messages in this conversation</p>
                                 </div>
                             ) : (
@@ -662,10 +662,10 @@ export default function AdminMessagesContent({
                                                             className={cn(
                                                                 'text-[11px] font-semibold',
                                                                 role === 'student'
-                                                                    ? 'text-legacy-accent'
+                                                                    ? 'text-primary'
                                                                     : role === 'mentor'
                                                                         ? 'text-rich-green-accent'
-                                                                        : 'text-amber-600'
+                                                                        : 'text-warning'
                                                             )}
                                                         >
                                                             {isTeam && isDirect
@@ -675,11 +675,11 @@ export default function AdminMessagesContent({
                                                                 : name}
                                                         </span>
                                                         {!isTeam && (
-                                                            <span className="text-[10px] text-gray-400">({role})</span>
+                                                            <span className="text-[10px] text-muted-foreground">({role})</span>
                                                         )}
                                                         {isIntervention && (
-                                                            <span className="flex items-center gap-1 text-[10px] font-medium text-amber-600">
-                                                                <AlertTriangle className="w-3 h-3" />
+                                                            <span className="flex items-center gap-1 text-[10px] font-medium text-warning">
+                                                                <AlertTriangle className="size-3" />
                                                                 intervention
                                                             </span>
                                                         )}
@@ -703,10 +703,10 @@ export default function AdminMessagesContent({
                                                         <div
                                                             className={cn(
                                                                 isIntervention
-                                                                    ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-amber-50 border border-amber-200 text-amber-900'
+                                                                    ? 'px-3.5 py-2.5 rounded-card rounded-br-md bg-tint-amber border border-border text-tint-amber-foreground'
                                                                     : alignRight
-                                                                        ? 'px-3.5 py-2.5 rounded-2xl rounded-br-md bg-legacy-accent text-white'
-                                                                        : 'text-gray-700'
+                                                                        ? 'px-3.5 py-2.5 rounded-card rounded-br-md bg-primary text-white'
+                                                                        : 'text-foreground'
                                                             )}
                                                         >
                                                             <CollapsibleText
@@ -714,16 +714,16 @@ export default function AdminMessagesContent({
                                                                 onDark={alignRight && !isIntervention}
                                                                 fadeFrom={
                                                                     isIntervention
-                                                                        ? 'from-amber-50'
+                                                                        ? 'from-tint-amber'
                                                                         : alignRight
-                                                                            ? 'from-legacy-accent'
+                                                                            ? 'from-primary'
                                                                             : 'from-[#FAFBFC]'
                                                                 }
                                                             />
                                                         </div>
                                                     )}
 
-                                                    <p className="text-[10px] text-gray-400 mt-1 px-0.5 tabular-nums">
+                                                    <p className="text-[10px] text-muted-foreground mt-1 px-0.5 tabular-nums">
                                                         {format(new Date(message.created_at), 'h:mm a')}
                                                     </p>
                                                 </div>
@@ -738,19 +738,19 @@ export default function AdminMessagesContent({
                         {!isAtBottom && <JumpToLatestButton unseen={unseen} onClick={jumpToLatest} />}
                         </div>
 
-                        <div className={isDirect ? 'bg-white' : 'bg-amber-50/60'}>
+                        <div className={isDirect ? 'bg-card' : 'bg-tint-amber/60'}>
                             <div className="flex items-center gap-2 px-4 md:px-6 pt-3">
                                 {isDirect ? (
                                     <>
-                                        <MessageCircle className="w-4 h-4 text-legacy-accent" />
-                                        <span className="text-xs font-medium text-legacy-accent">
+                                        <MessageCircle className="size-4 text-primary" />
+                                        <span className="text-xs font-medium text-primary">
                                             {isMentorSupport ? 'Reply as Claire Marlowe' : 'Reply as Help & Support'}
                                         </span>
                                     </>
                                 ) : (
                                     <>
-                                        <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                        <span className="text-xs font-medium text-amber-700">
+                                        <AlertTriangle className="size-4 text-warning" />
+                                        <span className="text-xs font-medium text-tint-amber-foreground">
                                             Send as Access Oxbridge Support — both participants will see this
                                         </span>
                                     </>
@@ -769,14 +769,14 @@ export default function AdminMessagesContent({
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 px-6">
-                        <MessageCircle className="w-16 h-16 mb-4 text-gray-200" strokeWidth={1.5} />
+                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground px-6">
+                        <MessageCircle className="size-16 mb-4 text-muted-foreground/60" strokeWidth={1.5} />
                         <p className="text-lg font-medium">Select a conversation</p>
-                        <p className="text-sm text-gray-300 mt-1">Choose a chat to view, or start a new one</p>
+                        <p className="text-sm text-muted-foreground/60 mt-1">Choose a chat to view, or start a new one</p>
                         <button
                             type="button"
                             onClick={() => setIsComposeOpen(true)}
-                            className="mt-5 px-4 py-2.5 rounded-xl bg-legacy-accent text-white text-sm font-semibold hover:bg-legacy-accent/90 transition-colors"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm mt-5"
                         >
                             New message
                         </button>

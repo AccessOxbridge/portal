@@ -198,7 +198,7 @@ export default async function MentorMessagesPage() {
         // bottom padding survives while the desktop one does not.
         <div className="flex flex-col -mx-4 md:-mx-10 -mt-4 md:-mt-10 md:-mb-10 h-[calc(100dvh-160px)] md:h-screen">
             <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-5 pb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-legacy-accent tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                     Messages
                 </h1>
             </header>

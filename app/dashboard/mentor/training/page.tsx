@@ -72,13 +72,13 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
     if (!mentor) {
         return (
             <div className="max-w-2xl mx-auto text-center py-16 px-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Training & Onboarding</h1>
-                <p className="text-gray-600 mb-8">
+                <h1 className="text-2xl font-semibold text-foreground mb-4">Training & Onboarding</h1>
+                <p className="text-muted-foreground mb-8">
                     Please complete your mentor application first. Once your application is set up, you can access training and onboarding here.
                 </p>
                 <Link
                     href="/dashboard/mentor/onboarding"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-legacy-accent text-white font-bold rounded-xl hover:opacity-90 transition-all"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                 >
                     Go to mentor application
                 </Link>

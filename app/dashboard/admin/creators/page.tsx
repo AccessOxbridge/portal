@@ -43,7 +43,7 @@ export default async function CreatorsPage() {
                     </svg>
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Creator management</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Creator management</h1>
                     <p className="text-muted-foreground mt-1">Manage content creator partnerships</p>
                 </div>
             </header>

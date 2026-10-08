@@ -52,7 +52,7 @@ export default async function AdminSessionsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-semibold text-primary tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
                     Session transcripts
                 </h1>
                 <p className="mt-2 text-lg text-muted-foreground">

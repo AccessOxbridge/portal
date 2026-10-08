@@ -3,6 +3,7 @@
 import { MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useTransition, useEffect, useState } from 'react'
+import { SelectField } from '@/components/ui/select'
 
 export function MentorFilters({ initialSearch, initialStatus }: { initialSearch: string, initialStatus: string }) {
     const router = useRouter()
@@ -56,8 +57,7 @@ export function MentorFilters({ initialSearch, initialStatus }: { initialSearch:
             </div>
             <div className="flex gap-2 w-full md:w-auto">
                 <div className="relative w-full md:w-auto">
-                    <select
-                        className="bg-muted/60 border border-border rounded-control px-4 py-2 text-sm font-medium text-muted-foreground focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10"
+                    <SelectField
                         onChange={(e) => handleStatusChange(e.target.value)}
                         defaultValue={initialStatus}
                     >
@@ -65,12 +65,7 @@ export function MentorFilters({ initialSearch, initialStatus }: { initialSearch:
                         <option value="active">Active</option>
                         <option value="pending_approval">Pending approval</option>
                         <option value="details_required">Details required</option>
-                    </select>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </div>
+                    </SelectField>
                 </div>
             </div>
         </div>

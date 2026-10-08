@@ -149,7 +149,7 @@ export default function MentorProfilePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-col mb-4">
-                            <h1 className="text-2xl font-semibold text-foreground">{mentor.profile?.full_name || 'Unknown'}</h1>
+                            <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">{mentor.profile?.full_name || 'Unknown'}</h1>
                             <div className="flex items-center gap-3 mt-1">
                                 {mentor.university && (
                                     <span className="flex items-center gap-1.5 text-muted-foreground font-medium">

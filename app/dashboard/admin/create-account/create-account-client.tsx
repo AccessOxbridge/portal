@@ -226,7 +226,7 @@ export function CreateAccountClient() {
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Create account</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Create account</h1>
                     <p className="text-muted-foreground mt-1">
                         Provision student and mentor portal accounts and send branded login details.
                     </p>
@@ -419,8 +419,8 @@ export function CreateAccountClient() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm duration-200">
-                    <div className="bg-card w-full max-w-md rounded-[40px] shadow-border overflow-hidden duration-200 relative border border-white/20 max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none max-h-[90vh] overflow-y-auto">
                         <button
                             onClick={closeModal}
                             disabled={isPending}

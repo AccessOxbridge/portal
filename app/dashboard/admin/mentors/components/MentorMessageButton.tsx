@@ -50,10 +50,10 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/40"
+                        className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="border border-transparent relative w-full max-w-lg h-[640px] max-h-[85vh] bg-card rounded-card shadow-border overflow-hidden flex flex-col">
+                    <div className="border border-transparent relative w-full max-w-lg h-[640px] max-h-[85vh] bg-card rounded-sheet overflow-hidden flex flex-col shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         {/* Modal header */}
                         <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/60">
                             <div>

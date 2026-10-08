@@ -281,7 +281,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
-                                                h1: ({ children }) => <h1 className="text-4xl font-semibold text-foreground mb-8 tracking-tight">{children}</h1>,
+                                                h1: ({ children }) => <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance mb-8">{children}</h1>,
                                                 h2: ({ children }) => <h2 className="text-2xl font-semibold text-foreground mb-4 mt-10">{children}</h2>,
                                                 h3: ({ children }) => <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">{children}</h3>,
                                                 p: ({ children }) => <p className="text-muted-foreground leading-loose mb-6 text-lg">{children}</p>,

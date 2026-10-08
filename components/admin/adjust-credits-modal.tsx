@@ -96,8 +96,8 @@ export function AdjustCreditsModal({
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />
-            <div className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-full max-w-lg max-h-[85vh] overflow-y-auto bg-card rounded-card shadow-border p-6">
+            <div className="fixed inset-0 z-30 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none" onClick={onClose} />
+            <div className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto overscroll-contain bg-card rounded-sheet p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                 <div className="flex items-center justify-between mb-1">
                     <h3 className="text-lg font-semibold text-foreground">Adjust hours</h3>
                     <button

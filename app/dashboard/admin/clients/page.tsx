@@ -16,6 +16,7 @@ import {
     Shield,
 } from '@phosphor-icons/react/ssr'
 import { registerPremiumClient } from './actions'
+import { SelectField } from '@/components/ui/select'
 
 interface PremiumClient {
     id: string
@@ -84,7 +85,7 @@ export default function AdminClientsPage() {
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Premium clients</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Premium clients</h1>
                     <p className="text-muted-foreground mt-1">Manage and register your one-to-one premium clients.</p>
                 </div>
                 <button
@@ -189,8 +190,8 @@ export default function AdminClientsPage() {
 
             {/* Registration Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm duration-200">
-                    <div className="bg-card w-full max-w-md rounded-[40px] shadow-border overflow-hidden duration-200 relative border border-white/20">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <button
                             onClick={() => setIsModalOpen(false)}
                             className="absolute top-6 right-6 p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-full transition-[background-color,box-shadow,color] duration-150"
@@ -226,18 +227,12 @@ export default function AdminClientsPage() {
                                     <label className="text-sm font-semibold text-foreground ml-1">Role</label>
                                     <div className="relative">
                                         <Shield className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                                        <select
+                                        <SelectField
                                             name="role"
-                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-11 appearance-none cursor-pointer"
                                         >
                                             <option value="client">Premium client</option>
                                             <option value="admin">Admin</option>
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        </div>
+                                        </SelectField>
                                     </div>
                                 </div>
 

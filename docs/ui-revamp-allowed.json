@@ -64,6 +64,14 @@
                 "app/dashboard/student/page.tsx"
             ],
             "why": "Approved by Raj on 2026-10-08: show mentor photos on the student home (up-next card, week calendar) and in the booking sheet. Read-only: the existing session and assignment queries also select photo_url:mentors(photo_url), the same pattern the sessions, reports and recordings pages use; this helper only reads it."
+        },
+        {
+            "category": "href",
+            "item": "{href}",
+            "files": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "why": "The admin home's Shortcut card forwards its href prop to <Link>. The four destinations are still written out literally on each <Shortcut href=\"...\">, so the gate counts them unchanged."
         }
     ]
 }

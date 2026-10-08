@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { SelectField } from '@/components/ui/select'
 
 // Fixed BILL-TO party (spec §8.1).
 const BILL_TO = {
@@ -184,7 +185,7 @@ export default function AdminPayoutsPage() {
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-semibold text-primary tracking-tight">Mentor payouts</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Mentor payouts</h1>
                 <p className="mt-2 text-muted-foreground text-lg">Pay the invoices mentors have sent to finance</p>
             </header>
 
@@ -296,8 +297,8 @@ export default function AdminPayoutsPage() {
 
             {/* Confirmation dialog */}
             {confirming && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                    <div className="border border-transparent bg-card rounded-card shadow-border max-w-md w-full p-8">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                    <div className="w-full max-w-md rounded-sheet border border-transparent bg-card p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <h3 className="text-xl font-semibold text-foreground mb-2">Confirm payout</h3>
                         <p className="text-muted-foreground text-sm mb-6">This transfers funds to mentors&apos; connected accounts and cannot be undone.</p>
                         <div className="space-y-3 mb-6">
@@ -327,9 +328,9 @@ function FilterSelect({ label, value, onChange, options }: { label: string; valu
     return (
         <div className="flex flex-col">
             <label className="text-xs font-semibold text-muted-foreground mb-1">{label}</label>
-            <select value={value} onChange={e => onChange(e.target.value)} className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5">
+            <SelectField value={value} onChange={e => onChange(e.target.value)}>
                 {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
+            </SelectField>
         </div>
     )
 }

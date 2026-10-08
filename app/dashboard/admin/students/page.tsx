@@ -132,7 +132,7 @@ export default function AdminStudentsPage() {
         <div className="space-y-8 max-w-6xl mx-auto">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Students</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Students</h1>
                     <p className="text-muted-foreground mt-1">Manage all students on the platform.</p>
                 </div>
             </header>

@@ -70,7 +70,7 @@ export default async function FortnightlyReportPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-semibold text-primary tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
                     Fortnightly report
                 </h1>
                 <p className="mt-2 text-lg text-muted-foreground">

@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, CalendarBlank as Calendar, Clock, CalendarPlus } from '@phosphor-icons/react/ssr'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
+import { SelectField } from '@/components/ui/select'
+import DatePicker from '@/components/dashboard/date-picker'
 
 export interface AssignedPair {
     studentId: string
@@ -186,12 +188,12 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
 
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
+                    <div className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none" onClick={closeModal} />
 
-                    <div className="border border-transparent relative bg-card rounded-card shadow-border w-full max-w-xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                    <div className="border border-transparent relative bg-card rounded-sheet w-full max-w-xl mx-4 max-h-[90vh] overflow-hidden flex flex-col shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <div className="p-6 border-b border-border flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-semibold text-foreground">Book a session</h2>
+                                <h2 className="text-lg font-semibold text-foreground">Book a session</h2>
                                 <p className="text-muted-foreground mt-1">Directly confirm a session between an assigned mentor and student</p>
                             </div>
                             <button
@@ -219,10 +221,9 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
 
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-foreground">Student</label>
-                                <select
+                                <SelectField
                                     value={pairKey}
                                     onChange={(e) => setPairKey(e.target.value)}
-                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 >
                                     <option value="">Select a student</option>
                                     {assignedPairs.map((p) => (
@@ -230,7 +231,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                             {p.studentName} — assigned to {p.mentorName}
                                         </option>
                                     ))}
-                                </select>
+                                </SelectField>
                             </div>
 
                             {selectedPair && (
@@ -245,34 +246,30 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                             <div className="bg-muted/60 rounded-card p-5 border border-border space-y-4">
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-foreground">Timezone</label>
-                                    <select
+                                    <SelectField
                                         value={tz}
                                         onChange={(e) => setTimezone(e.target.value)}
-                                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                     >
                                         {getTimezoneOptions(selectedPair?.mentorTimezone ?? null).map((z) => (
                                             <option key={z} value={z}>{z}</option>
                                         ))}
-                                    </select>
+                                    </SelectField>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-3">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-foreground">Date</label>
-                                        <input
-                                            type="date"
+                                        <DatePicker
                                             value={date}
                                             min={getZonedNow(tz).date}
-                                            onChange={(e) => setDate(e.target.value)}
-                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
+                                            onChange={setDate}
                                         />
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-foreground">Start time</label>
-                                        <select
+                                        <SelectField
                                             value={startTime}
                                             onChange={(e) => setStartTime(e.target.value)}
-                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                         >
                                             <option value="">Select start time</option>
                                             {(() => {
@@ -285,15 +282,14 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                                 }
                                                 return nodes
                                             })()}
-                                        </select>
+                                        </SelectField>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-foreground">End time</label>
                                         {startTime ? (
-                                            <select
+                                            <SelectField
                                                 value={endTime}
                                                 onChange={(e) => setEndTime(e.target.value)}
-                                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                             >
                                                 <option value="">Select end time / duration</option>
                                                 {[60, 120].map((d) => {
@@ -304,11 +300,11 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                                         </option>
                                                     )
                                                 })}
-                                            </select>
+                                            </SelectField>
                                         ) : (
-                                            <select disabled className="w-full px-3 py-2.5 rounded-control border border-border bg-card text-sm text-muted-foreground">
+                                            <SelectField disabled>
                                                 <option>Select start time first</option>
-                                            </select>
+                                            </SelectField>
                                         )}
                                     </div>
                                 </div>

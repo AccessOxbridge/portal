@@ -64,7 +64,7 @@ export default async function AdminSatisfactionPage() {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
                     Student satisfaction
                 </h1>
                 <p className="mt-2 text-lg text-muted-foreground">

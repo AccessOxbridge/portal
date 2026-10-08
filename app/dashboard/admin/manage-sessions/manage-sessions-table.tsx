@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { CalendarBlank as Calendar, ArrowCounterClockwise as RefreshCcw, FloppyDisk as Save, VideoCamera as Video, WarningCircle as AlertCircle, CheckCircle as CheckCircle2, MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
+import { SelectField } from '@/components/ui/select'
 
 interface SessionRow {
     id: string
@@ -283,19 +284,18 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                             <label className="block text-xs font-medium text-muted-foreground">
                                                 Mentor
                                             </label>
-                                            <select
+                                            <SelectField
                                                 value={currentMentorId}
                                                 onChange={(e) =>
                                                     handleMentorChange(session.id, e.target.value)
                                                 }
-                                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                             >
                                                 {sortedMentors.map((mentor) => (
                                                     <option key={mentor.id} value={mentor.id}>
                                                         {mentor.name}
                                                     </option>
                                                 ))}
-                                            </select>
+                                            </SelectField>
                                             <p className="text-xs text-muted-foreground">
                                                 Previously: <span className="font-medium">{session.mentorName}</span>
                                             </p>

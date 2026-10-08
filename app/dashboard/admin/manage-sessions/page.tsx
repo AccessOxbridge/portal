@@ -109,7 +109,7 @@ export default async function AdminManageSessionsPage() {
         <div className="max-w-6xl mx-auto">
             <header className="mb-8 flex items-start justify-between gap-6 flex-wrap">
                 <div>
-                    <h1 className="text-4xl font-semibold text-primary tracking-tight">
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
                         Manage sessions
                     </h1>
                     <p className="mt-2 text-lg text-muted-foreground">

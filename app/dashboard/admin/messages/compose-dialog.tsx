@@ -184,11 +184,11 @@ export default function ComposeDialog({
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
                 onClick={onClose}
             />
 
-            <div className="relative bg-card rounded-t-2xl sm:rounded-card shadow-border w-full max-w-md sm:mx-4 max-h-[92dvh] sm:max-h-[min(36rem,85vh)] flex flex-col overflow-hidden">
+            <div className="relative flex max-h-[92dvh] w-full max-w-md flex-col overflow-hidden rounded-t-sheet bg-card sm:mx-4 sm:max-h-[min(36rem,85vh)] sm:rounded-sheet shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                 <div className="px-6 py-4 border-b border-border flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <h2 className="text-lg font-semibold text-foreground">

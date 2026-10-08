@@ -16,6 +16,7 @@ import { MentorActions } from './components/MentorActions'
 import { fetchMentors, Mentor, MentorStatusCounts } from './actions'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { sortBySubjectPriority } from '@/lib/subject-priority'
+import { SelectField } from '@/components/ui/select'
 
 // Flatten subjects for filter
 const ALL_SUBJECTS = Array.from(new Set(Object.values(SUBJECT_OPTIONS).flat())).sort()
@@ -205,7 +206,7 @@ export default function AdminMentorsPage() {
         <div className="space-y-8 max-w-7xl mx-auto">
             <header className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-semibold text-foreground tracking-tight">Mentors</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Mentors</h1>
                     <p className="text-muted-foreground mt-1">Manage all mentors on the platform.</p>
                 </div>
                 <div className="flex gap-3">
@@ -263,8 +264,7 @@ export default function AdminMentorsPage() {
                 <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     {/* University Filter */}
                     <div className="relative w-full md:w-auto">
-                        <select
-                            className="bg-muted/60 border border-border rounded-control px-4 py-2 text-sm font-medium text-muted-foreground focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10"
+                        <SelectField
                             value={universityFilter}
                             onChange={(e) => {
                                 setUniversityFilter(e.target.value)
@@ -274,18 +274,12 @@ export default function AdminMentorsPage() {
                             <option value="all">All universities</option>
                             <option value="oxford">Oxford</option>
                             <option value="cambridge">Cambridge</option>
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </div>
+                        </SelectField>
                     </div>
 
                     {/* Subject Filter */}
                     <div className="relative w-full md:w-auto">
-                        <select
-                            className="bg-muted/60 border border-border rounded-control px-4 py-2 text-sm font-medium text-muted-foreground focus:outline-none appearance-none w-full md:w-auto cursor-pointer pr-10 max-w-[200px]"
+                        <SelectField
                             value={subjectFilter}
                             onChange={(e) => {
                                 setSubjectFilter(e.target.value)
@@ -296,12 +290,7 @@ export default function AdminMentorsPage() {
                             {ALL_SUBJECTS.map(subject => (
                                 <option key={subject} value={subject}>{subject}</option>
                             ))}
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </div>
+                        </SelectField>
                     </div>
                 </div>
             </div>

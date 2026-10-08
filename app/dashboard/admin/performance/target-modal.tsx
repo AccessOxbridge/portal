@@ -68,11 +68,11 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm duration-200"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
             onClick={close}
         >
             <div
-                className="border border-transparent bg-card w-full max-w-md rounded-card shadow-border relative max-h-[90vh] overflow-y-auto duration-200"
+                className="relative max-h-[90vh] w-full max-w-md overflow-y-auto overscroll-contain rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none"
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"

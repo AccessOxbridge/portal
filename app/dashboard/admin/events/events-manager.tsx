@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, VideoCamera as Video, MapPin, CalendarBlank as Calendar, Users, Clock } from '@phosphor-icons/react/ssr'
+import { SelectField } from '@/components/ui/select'
 
 interface Event {
     id: string
@@ -271,19 +272,13 @@ export default function EventsManager({ initialEvents }: Props) {
                         <div>
                             <label className="mb-1.5 block text-sm font-medium text-foreground">Event type</label>
                             <div className="relative">
-                                <select
+                                <SelectField
                                     value={formData.event_type}
                                     onChange={(e) => setFormData({ ...formData, event_type: e.target.value as 'webinar' | 'in_person' })}
-                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5 appearance-none"
                                 >
                                     <option value="webinar">Webinar</option>
                                     <option value="in_person">In person</option>
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </div>
+                                </SelectField>
                             </div>
                         </div>
                         <div>

@@ -353,3 +353,4 @@ Sentence case (headings, labels, buttons, empty states). Kept as written: the Te
 Empty values (`[em dash]` > `Not set` / `None`):
 - `app/dashboard/admin/payouts/page.tsx`: invoice reference, invoice number, student name > `Not set`
 - `app/dashboard/admin/performance/mentor-ratings-table.tsx`, `student-pace-table.tsx`, `satisfaction/satisfaction-overview.tsx`: empty cells > `None`
+- `app/dashboard/admin/page.tsx`: stat labels `Total Mentors`, `Total Students`, `Sessions Taken` > sentence case; the four shortcut cards now say `Manage clients` etc. as a link with an arrow instead of a grey button

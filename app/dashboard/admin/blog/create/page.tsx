@@ -22,7 +22,7 @@ export default async function CreateArticlePage() {
     return (
         <div className="space-y-8">
             <header>
-                <h1 className="text-4xl font-semibold text-primary tracking-tight">Create new article</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Create new article</h1>
                 <p className="mt-2 text-muted-foreground text-lg">Write and publish a new blog article.</p>
             </header>
 

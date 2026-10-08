@@ -43,7 +43,7 @@ export default async function AdminApprovalsPage() {
         <div className="space-y-10">
             <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-primary tracking-tight">Application approvals</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Application approvals</h1>
                     <p className="mt-2 sm:mt-3 text-muted-foreground text-base sm:text-lg font-medium">Review and manage mentor onboarding applications.</p>
                 </div>
                 <div className="flex space-x-2">

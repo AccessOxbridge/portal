@@ -285,8 +285,8 @@ export default function FortnightlyReportContent({ students, defaultEndDate }: F
             )}
 
             {previewStudent && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                    <div className="border border-transparent bg-card rounded-card shadow-border w-full max-w-5xl max-h-[90vh] flex flex-col">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                    <div className="flex max-h-[90vh] w-full max-w-5xl flex-col rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <div className="px-5 py-3 border-b border-border flex items-center justify-between">
                             <div>
                                 <h3 className="font-semibold text-foreground">Fortnightly report preview</h3>

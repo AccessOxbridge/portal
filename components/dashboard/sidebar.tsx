@@ -481,12 +481,14 @@ export default function Sidebar({
                         </DropdownMenuTrigger>
                         {/* Opens beside the sidebar (shadcn's sidebar pattern), lined up
                             with the bottom of the button, so it never covers the nav. */}
-                        <DropdownMenuContent side="right" align="end" sideOffset={12} className="w-60">
+                        <DropdownMenuContent side="right" align="end" sideOffset={12} className="w-max min-w-60 max-w-80">
+                            {/* Grows to fit (up to 320px), then wraps: a long name or
+                                email is never cut off. */}
                             <div className="flex items-center gap-2.5 px-2 py-2">
                                 <Avatar name={userName || 'User'} src={photoUrl} size="sm" />
                                 <div className="min-w-0 leading-tight">
-                                    <p className="truncate text-sm font-medium text-foreground">{userName || 'User'}</p>
-                                    {userEmail && <p className="truncate text-xs text-muted-foreground">{userEmail}</p>}
+                                    <p className="text-sm font-medium text-foreground [overflow-wrap:anywhere]">{userName || 'User'}</p>
+                                    {userEmail && <p className="mt-0.5 text-xs text-muted-foreground [overflow-wrap:anywhere]">{userEmail}</p>}
                                 </div>
                             </div>
                             <DropdownMenuSeparator />

@@ -114,8 +114,11 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                 </div>
             </div>
 
+            {/* Week strip and the chosen day's sessions: side by side on wide
+                screens, stacked on phones. */}
+            <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-start">
             {/* Week Days */}
-            <div className="grid grid-cols-7 gap-1 px-3 pb-4 sm:px-6">
+            <div className="grid grid-cols-7 gap-1 px-3 pb-4 sm:px-6 md:pb-6">
                 {weekDates.map((date, i) => (
                     <button
                         key={i}
@@ -143,7 +146,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
             </div>
 
             {/* Selected Day's Sessions */}
-            <div className="min-h-[260px] border-t border-border p-5 sm:p-6">
+            <div className="min-h-[200px] border-t border-border p-5 sm:p-6 md:min-h-0 md:border-t-0 md:border-s md:pt-0">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <h3 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground">
                         <CalendarIcon weight="duotone" className="size-5 shrink-0 text-brand" />
@@ -157,7 +160,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                 </div>
 
                 {daySessions.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="flex flex-col items-center justify-center py-10 text-center md:py-6">
                         <span className="mb-3 grid size-12 place-items-center rounded-full bg-muted text-muted-foreground">
                             <Clock weight="duotone" className="size-6" />
                         </span>
@@ -209,6 +212,7 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                         ))}
                     </div>
                 )}
+            </div>
             </div>
         </div>
     )

@@ -51,6 +51,8 @@ interface StudentDashboardContentProps {
     userName: string
     greetingName: string
     sessionsThisWeek?: number
+    /** Hours taken off so far; the ring shows hours left out of left + used. */
+    hoursUsed?: number
     timezone?: string | null
 }
 
@@ -66,6 +68,7 @@ export default function StudentDashboardContent({
     userName,
     greetingName,
     sessionsThisWeek = 0,
+    hoursUsed = 0,
     timezone = null
 }: StudentDashboardContentProps) {
     const formatTime = (dateString: string) => formatTimeInTz(dateString, timezone)
@@ -303,16 +306,18 @@ export default function StudentDashboardContent({
                         <div className="flex h-full flex-col items-center justify-center gap-3 rounded-card border border-transparent bg-card p-6 text-center shadow-border">
                             <ProgressRing
                                 value={credits}
-                                max={Math.max(credits, 1)}
+                                max={Math.max(credits + hoursUsed, 1)}
                                 size={104}
                                 stroke={8}
-                                label={`${credits} hours left`}
+                                label={`${credits} of ${credits + hoursUsed} hours left`}
                                 tone={credits > 0 ? 'success' : 'warning'}
                             >
                                 <span className="text-3xl font-semibold tracking-tight text-foreground">{credits}</span>
                             </ProgressRing>
                             <div>
-                                <p className="font-medium text-foreground">{credits === 1 ? 'hour left' : 'hours left'}</p>
+                                <p className="font-medium text-foreground tabular-nums">
+                                    {hoursUsed > 0 ? `of ${credits + hoursUsed} hours left` : credits === 1 ? 'hour left' : 'hours left'}
+                                </p>
                                 <p className="text-sm text-muted-foreground tabular-nums">
                                     {sessionsThisWeek} {sessionsThisWeek === 1 ? 'session' : 'sessions'} booked this week
                                 </p>

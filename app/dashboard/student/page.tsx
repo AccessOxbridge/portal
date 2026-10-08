@@ -87,6 +87,16 @@ export default async function StudentDashboard() {
         .order('scheduled_at', { ascending: false })
         .limit(200)
 
+    // Hours used so far, for the hours ring ("85 of 90 hours left"). Hours
+    // come off the balance when a session takes place, and each deduction is
+    // a 'booking' row in the student's own credit history. Read-only.
+    const { data: usedRows } = await supabase
+        .from('credit_transactions')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('type', 'booking')
+    const hoursUsed = Math.max(0, -(usedRows ?? []).reduce((sum, t) => sum + (t.amount ?? 0), 0))
+
     type CalendarRow = {
         id: string
         scheduled_at: string
@@ -176,6 +186,7 @@ export default async function StudentDashboard() {
             userName={greetingName}
             greetingName={greetingName}
             sessionsThisWeek={sessionsThisWeekCount ?? 0}
+            hoursUsed={hoursUsed}
             timezone={academicProfile?.timezone ?? null}
         />
     )

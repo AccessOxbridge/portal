@@ -127,6 +127,14 @@
             ],
             "files": [],
             "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the mentor home is now MentorOverview (an approved new file). The training link appears once, on the onboarding card shown only while onboarding is unfinished; Start session still goes to /api/sessions/{id}/start, written as ${next.id}."
+        },
+        {
+            "category": "supabase table",
+            "item": "'credit_transactions'",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-08: the student hours ring shows hours left out of left + used ('85 of 90 hours left') instead of always full. One read-only SELECT of the student's own 'booking' rows (hours are deducted when a session takes place); RLS 'Users can view own transactions' already allows it."
         }
     ],
     "newFiles": [

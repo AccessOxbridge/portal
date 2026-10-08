@@ -32,7 +32,8 @@ export default async function MentorReportsPage() {
             status,
             zoom_meeting_status,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -59,6 +60,7 @@ export default async function MentorReportsPage() {
         status: session.status,
         zoom_meeting_status: session.zoom_meeting_status,
         student_full_name: session.student?.full_name || 'Student',
+        student_photo_url: session.student?.photo_url || null,
         has_report: submittedSessionIds.has(session.id),
         submitted_at: submissionDates.get(session.id) || null
     }))

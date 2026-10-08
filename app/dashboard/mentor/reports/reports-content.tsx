@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, CalendarBlank as Calendar, User, CheckCircle as CheckCircle2, Clock, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
+import { FileText, CalendarBlank as Calendar, CheckCircle as CheckCircle2, Clock, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
+import { Avatar } from '@/components/ui/avatar'
 
 interface SessionReport {
     id: string
@@ -10,6 +11,7 @@ interface SessionReport {
     status: string
     zoom_meeting_status: string | null
     student_full_name: string
+    student_photo_url?: string | null
     has_report: boolean
     submitted_at: string | null
 }
@@ -123,9 +125,7 @@ function SessionReportCard({ session, isPending }: { session: SessionReport; isP
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     {/* Student Avatar */}
-                    <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <User className="size-6 text-primary" />
-                    </div>
+                    <Avatar name={session.student_full_name || 'Student'} src={session.student_photo_url} size="lg" />
 
                     <div>
                         <h3 className="font-semibold text-foreground">

@@ -20,9 +20,9 @@ export function LoginForm({ notice }: { notice?: string }) {
                 <div aria-hidden className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand/20 blur-3xl" />
 
                 <div className="absolute inset-0 flex items-center px-12 xl:px-16">
-                    <div className="flex items-center gap-5">
-                        <Image src="/logo.png" alt="" width={88} height={88} priority className="shrink-0 [mix-blend-mode:screen]" />
-                        <span className="text-4xl font-extrabold tracking-tight xl:text-5xl">Access Oxbridge</span>
+                    <div className="flex items-center gap-4 2xl:gap-5">
+                        <Image src="/logo.png" alt="" width={88} height={88} priority className="size-16 shrink-0 [mix-blend-mode:screen] xl:size-[72px] 2xl:size-[88px]" />
+                        <span className="whitespace-nowrap text-3xl font-extrabold tracking-tight xl:text-4xl 2xl:text-5xl">Access Oxbridge</span>
                     </div>
                 </div>
 

@@ -704,7 +704,7 @@ export default function OnboardingForm({ firstName }: { firstName?: string }) {
   )
 
   return (
-    <div className="h-full min-h-0 overflow-y-auto bg-[#F9FAFB] text-foreground">
+    <div className="h-full min-h-0 overflow-y-auto bg-background text-foreground">
       <div className="mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
         <div className={`mb-8 flex items-center justify-between gap-3 px-4 py-3 sm:px-5 ${CARD}`}>
           <div className="flex items-center gap-3">

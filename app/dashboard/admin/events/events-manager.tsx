@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import DateTimePicker from '@/components/dashboard/date-time-picker'
 import { useRouter } from 'next/navigation'
 import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, VideoCamera as Video, MapPin, CalendarBlank as Calendar, Users, Clock } from '@phosphor-icons/react/ssr'
 import { SelectField } from '@/components/ui/select'
@@ -283,11 +284,9 @@ export default function EventsManager({ initialEvents }: Props) {
                         </div>
                         <div>
                             <label className="mb-1.5 block text-sm font-medium text-foreground">Start date & time</label>
-                            <input
-                                type="datetime-local"
+                            <DateTimePicker
                                 value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
+                                onChange={(date) => setFormData({ ...formData, date })}
                             />
                         </div>
                         <div>

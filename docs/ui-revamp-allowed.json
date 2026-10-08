@@ -5,9 +5,10 @@
             "category": "form field name",
             "item": "{name}",
             "files": [
+                "components/dashboard/date-picker.tsx",
                 "components/ui/select.tsx"
             ],
-            "why": "SelectField's hidden input. It carries the same name the replaced native <select> had, so form submissions are unchanged."
+            "why": "SelectField's hidden input. It carries the same name the replaced native <select> had, so form submissions are unchanged. DatePicker does the same for the session-target start date (approved by Raj on 2026-10-08): the field name is still written at the call site, and its input keeps the browser's required check."
         },
         {
             "category": "href",

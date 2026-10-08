@@ -26,6 +26,12 @@ interface DatePickerProps {
     min?: string
     id?: string
     className?: string
+    /**
+     * Form use: the value is submitted under `name`, and `required` blocks an
+     * empty submit with the browser's own message, as <input type="date"> did.
+     */
+    name?: string
+    required?: boolean
 }
 
 /** Parse YYYY-MM-DD as a local calendar date (avoids UTC midnight shift). */
@@ -43,12 +49,13 @@ const POPOVER_GAP = 6
 /** Fallback height used on the first open, before the popover has been measured. */
 const POPOVER_EST_HEIGHT = 340
 
-export default function DatePicker({ value, onChange, min, id, className = '' }: DatePickerProps) {
+export default function DatePicker({ value, onChange, min, id, className = '', name, required }: DatePickerProps) {
     const [open, setOpen] = useState(false)
     const [mounted, setMounted] = useState(false)
     const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
     const rootRef = useRef<HTMLDivElement>(null)
     const popoverRef = useRef<HTMLDivElement>(null)
+    const triggerRef = useRef<HTMLButtonElement>(null)
 
     const selected = value ? parseDateValue(value) : null
     const minDate = min ? startOfDay(parseDateValue(min)) : null
@@ -220,6 +227,7 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
     return (
         <div ref={rootRef} className={`relative ${className}`}>
             <button
+                ref={triggerRef}
                 type="button"
                 id={id}
                 onClick={() => setOpen((v) => !v)}
@@ -232,6 +240,22 @@ export default function DatePicker({ value, onChange, min, id, className = '' }:
                 </span>
                 <Calendar className="size-4 shrink-0 text-muted-foreground" />
             </button>
+
+            {/* Carries the value into a <form> and the browser's required check.
+                It sits invisibly over the trigger so the "please fill in" bubble
+                points at the picker; focusing it hands focus to the trigger. */}
+            {(name || required) && (
+                <input
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    name={name}
+                    required={required}
+                    value={value}
+                    onChange={() => {}}
+                    onFocus={() => triggerRef.current?.focus()}
+                    className="pointer-events-none absolute inset-0 size-full opacity-0"
+                />
+            )}
 
             {mounted && calendar ? createPortal(calendar, document.body) : null}
         </div>

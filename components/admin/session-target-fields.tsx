@@ -1,6 +1,7 @@
 'use client'
 
-import { CalendarDots as CalendarDays, Hash, Repeat } from '@phosphor-icons/react/ssr'
+import { Hash, Repeat } from '@phosphor-icons/react/ssr'
+import DatePicker from '@/components/dashboard/date-picker'
 import {
     describeTarget,
     MAX_TARGET_SESSIONS,
@@ -141,18 +142,13 @@ export function SessionTargetFields({
                 <label className={LABEL_CLASS} htmlFor={`${namePrefix}start_date`}>
                     Start date
                 </label>
-                <div className="relative">
-                    <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                    <input
-                        id={`${namePrefix}start_date`}
-                        name={`${namePrefix}start_date`}
-                        type="date"
-                        required={weeksRequired}
-                        value={value.startDate}
-                        onChange={(e) => onChange({ ...value, startDate: e.target.value })}
-                        className={INPUT_CLASS}
-                    />
-                </div>
+                <DatePicker
+                    id={`${namePrefix}start_date`}
+                    name={`${namePrefix}start_date`}
+                    required={weeksRequired}
+                    value={value.startDate}
+                    onChange={(startDate) => onChange({ ...value, startDate })}
+                />
             </div>
 
             {valid && (

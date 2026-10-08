@@ -5,6 +5,7 @@ import DateTimePicker from '@/components/dashboard/date-time-picker'
 import { useRouter } from 'next/navigation'
 import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, VideoCamera as Video, MapPin, CalendarBlank as Calendar, Users, Clock } from '@phosphor-icons/react/ssr'
 import { SelectField } from '@/components/ui/select'
+import { confirmDialog } from '@/components/ui/confirm'
 
 interface Event {
     id: string
@@ -154,7 +155,7 @@ export default function EventsManager({ initialEvents }: Props) {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this event? This will also remove all registrations.')) return
+        if (!(await confirmDialog({ title: 'Delete this event?', description: 'This will also remove all registrations.', confirmLabel: 'Delete event', destructive: true }))) return
         setLoading(true)
         setError(null)
         try {

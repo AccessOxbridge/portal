@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from '@/components/ui/toaster'
 
 type Creator = {
     id: string
@@ -63,7 +64,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
             router.refresh()
         } catch (error) {
             console.error('Error adding creator:', error)
-            alert('Failed to add creator. Please try again.')
+            toast.error('Failed to add creator. Please try again.')
         } finally {
             setIsLoading(false)
         }

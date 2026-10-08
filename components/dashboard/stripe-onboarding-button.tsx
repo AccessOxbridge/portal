@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from '@/components/ui/toaster'
 
 interface StripeOnboardingButtonProps {
     variant: 'setup' | 'continue'
@@ -30,7 +31,7 @@ export function StripeOnboardingButton({ variant }: StripeOnboardingButtonProps)
             window.location.href = url
         } catch (error: any) {
             console.error('Onboarding error:', error)
-            alert(error.message || 'Failed to start Stripe onboarding')
+            toast.error(error.message || 'Failed to start Stripe onboarding')
             setLoading(false)
         }
     }

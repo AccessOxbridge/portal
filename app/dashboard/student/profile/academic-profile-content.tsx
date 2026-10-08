@@ -12,6 +12,7 @@ import { fieldBase } from '@/components/ui/input'
 import { SelectField } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/utils/lib'
+import { toast } from '@/components/ui/toaster'
 
 interface Subject {
     name: string
@@ -153,7 +154,7 @@ export default function AcademicProfileContent({ userId, userName, existingProfi
             router.refresh()
         } catch (err) {
             console.error('Failed to save profile:', err)
-            alert('Failed to save. Please try again.')
+            toast.error('Failed to save. Please try again.')
         } finally {
             setSaving(false)
         }

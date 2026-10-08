@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, Star } from '@phosphor-icons/react/ssr'
 import { SelectField } from '@/components/ui/select'
+import { confirmDialog } from '@/components/ui/confirm'
 
 interface CreditPackage {
     id: string
@@ -129,7 +130,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this package?')) return
+        if (!(await confirmDialog({ title: 'Delete this package?', confirmLabel: 'Delete package', destructive: true }))) return
         setLoading(true)
         setError(null)
         try {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { MENTOR_REPORT_FORM, FormField } from '@/config/forms.config'
+import { toast } from '@/components/ui/toaster'
 
 interface MentorReportFormProps {
     sessionId: string
@@ -47,7 +48,7 @@ export default function MentorReportForm({ sessionId, onClose }: MentorReportFor
             router.refresh()
         } catch (err) {
             console.error('Failed to submit report:', err)
-            alert('Failed to submit report. Please try again.')
+            toast.error('Failed to submit report. Please try again.')
         } finally {
             setLoading(false)
         }

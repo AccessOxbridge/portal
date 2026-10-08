@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SelectField } from '@/components/ui/select'
+import { confirmDialog } from '@/components/ui/confirm'
 
 // Fixed BILL-TO party (spec §8.1).
 const BILL_TO = {
@@ -170,7 +171,7 @@ export default function AdminPayoutsPage() {
 
     const voidInvoice = async (inv: AdminInvoice) => {
         const label = inv.invoice_number || inv.invoice_reference || 'this invoice'
-        if (!confirm(`Void ${label}? The mentor's sessions return to their unbilled list so they can reissue a corrected invoice. This cannot be undone.`)) return
+        if (!(await confirmDialog({ title: `Void ${label}?`, description: "The mentor's sessions return to their unbilled list so they can reissue a corrected invoice. This cannot be undone.", confirmLabel: 'Void invoice', destructive: true }))) return
         setProcessing(true); setError(null)
         try {
             const res = await fetch(`/api/admin/invoices/${inv.invoice_id}/void`, { method: 'POST' })

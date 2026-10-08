@@ -5,6 +5,7 @@ import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { Info, Warning as AlertTriangle } from '@phosphor-icons/react/ssr'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import { Avatar } from '@/components/ui/avatar'
+import { toast } from '@/components/ui/toaster'
 
 interface TimeSlot {
     date: string
@@ -69,7 +70,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             await handleMentorshipRequest(request.id, 'accept', effective)
         } catch (error) {
             console.error('Failed to accept:', error)
-            alert(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')
+            toast.error(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -82,7 +83,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             setShowRejectDialog(false)
         } catch (error) {
             console.error('Failed to reject:', error)
-            alert('Failed to decline request. Please try again.')
+            toast.error('Failed to decline request. Please try again.')
         } finally {
             setLoading(false)
         }

@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { segmentClass, segmentCount, segmentTrack } from '@/components/ui/segmented'
 import { cn } from '@/utils/lib'
+import { toast } from '@/components/ui/toaster'
 
 interface Session {
     id: string
@@ -283,7 +284,7 @@ export default function StudentSessionsContent({
             if (!res.ok) throw new Error(data.error || 'Failed to cancel')
             router.refresh()
         } catch (e) {
-            alert(e instanceof Error ? e.message : 'Failed to cancel pending requests')
+            toast.error(e instanceof Error ? e.message : 'Failed to cancel pending requests')
         } finally {
             setCancelling(false)
         }

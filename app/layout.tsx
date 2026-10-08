@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../assets/globals.css";
 import NotificationBell from "@/components/dashboard/notification-bell";
 import { Toaster } from "@/components/ui/toaster";
+import { ConfirmHost } from '@/components/ui/confirm'
 import { TooltipProvider } from "@/components/ui/overlay";
 
 // Geist is the portal's font (UI revamp). It replaced Inter in phase 1.
@@ -63,6 +64,7 @@ export default function RootLayout({
           <NotificationBell />
           {children}
           <Toaster />
+          <ConfirmHost />
         </TooltipProvider>
       </body>
     </html>

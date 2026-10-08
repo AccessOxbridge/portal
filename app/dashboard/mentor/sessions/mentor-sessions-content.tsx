@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
+import { toast } from '@/components/ui/toaster'
 
 interface Session {
     /** Present on public.sessions; was missing from this local interface. */
@@ -225,7 +226,7 @@ export default function MentorSessionsContent({
             if (!res.ok) throw new Error(data.error || 'Failed to cancel request')
             router.refresh()
         } catch (e) {
-            alert(e instanceof Error ? e.message : 'Failed to cancel request')
+            toast.error(e instanceof Error ? e.message : 'Failed to cancel request')
         } finally {
             setCancellingId(null)
         }

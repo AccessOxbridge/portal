@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { confirmDialog } from '@/components/ui/confirm'
 
 // Finance won't accept an invoice under 2 hours of sessions.
 const MIN_INVOICE_MINUTES = 120
@@ -173,7 +174,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
 
     // ---- draft actions ----
     const submitInvoice = async (id: string) => {
-        if (!confirm('Send this invoice to Finance? Once sent it is locked and cannot be edited (only voided).')) return
+        if (!(await confirmDialog({ title: 'Send this invoice to Finance?', description: 'Once sent it is locked and cannot be edited (only voided).', confirmLabel: 'Send to Finance' }))) return
         setBusy(true); setNotice(null)
         try {
             const res = await fetch(`/api/mentor/invoices/${id}/submit`, { method: 'POST' })
@@ -184,10 +185,16 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
         } finally { setBusy(false) }
     }
     const discardInvoice = async (id: string, status: Invoice['status']) => {
-        const msg = status === 'submitted'
-            ? 'Void this invoice? It will be withdrawn from Finance and its sessions return to your unbilled list so you can re-invoice them.'
-            : 'Discard this draft? Its sessions return to your unbilled list.'
-        if (!confirm(msg)) return
+        const submitted = status === 'submitted'
+        const ok = await confirmDialog({
+            title: submitted ? 'Void this invoice?' : 'Discard this draft?',
+            description: submitted
+                ? 'It will be withdrawn from Finance and its sessions return to your unbilled list so you can re-invoice them.'
+                : 'Its sessions return to your unbilled list.',
+            confirmLabel: submitted ? 'Void invoice' : 'Discard draft',
+            destructive: true,
+        })
+        if (!ok) return
         setBusy(true); setNotice(null)
         try {
             const res = await fetch(`/api/mentor/invoices/${id}/discard`, { method: 'POST' })

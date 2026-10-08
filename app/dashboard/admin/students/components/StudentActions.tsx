@@ -3,6 +3,7 @@
 import { Envelope as Mail, DotsThree as MoreHorizontal, PencilSimple as Pencil, X } from '@phosphor-icons/react/ssr'
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { toast } from '@/components/ui/toaster'
 
 interface Student {
     id: string
@@ -51,7 +52,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
             onSaved?.()
         } catch (err) {
             console.error(err)
-            alert('Failed to save. Please try again.')
+            toast.error('Failed to save. Please try again.')
         } finally {
             setSaving(false)
         }

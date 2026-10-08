@@ -135,6 +135,124 @@
                 "app/dashboard/student/page.tsx"
             ],
             "why": "Approved by Raj on 2026-10-08: the student hours ring shows hours left out of left + used ('85 of 90 hours left') instead of always full. One read-only SELECT of the student's own 'booking' rows (hours are deducted when a session takes place); RLS 'Users can view own transactions' already allows it."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to add creator. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/admin/creators/creators-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to decline request. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/mentor/requests/mentor-request-card.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to save. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/admin/students/components/StudentActions.tsx",
+                "app/dashboard/student/profile/academic-profile-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to submit report. Please try again.')",
+            "removedFrom": [
+                "components/forms/mentor-report-form.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(e instanceof Error ? e.message : 'Failed to cancel pending requests')",
+            "removedFrom": [
+                "app/dashboard/student/sessions/student-sessions-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(e instanceof Error ? e.message : 'Failed to cancel request')",
+            "removedFrom": [
+                "app/dashboard/mentor/sessions/mentor-sessions-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/mentor/requests/mentor-request-card.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(error.message || 'Failed to start Stripe onboarding')",
+            "removedFrom": [
+                "components/dashboard/stripe-onboarding-button.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Are you sure you want to delete this event? This will also remove all registrations.')",
+            "removedFrom": [
+                "app/dashboard/admin/events/events-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Are you sure you want to delete this package?')",
+            "removedFrom": [
+                "app/dashboard/admin/products/credit-packages-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Send this invoice to Finance? Once sent it is locked and cannot be edited (only voided)",
+            "removedFrom": [
+                "app/dashboard/mentor/payouts/invoicing-panel.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm(`Void ${label}? The mentor's sessions return to their unbilled list so they can reissue a corrected invoice. This cannot be undone.`)",
+            "removedFrom": [
+                "app/dashboard/admin/payouts/page.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm(msg)",
+            "removedFrom": [
+                "app/dashboard/mentor/payouts/invoicing-panel.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
         }
     ],
     "newFiles": [
@@ -153,6 +271,10 @@
         {
             "file": "app/dashboard/mentor/mentor-overview.tsx",
             "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Display only; Start session is the same /api/sessions/{id}/start link the current home uses."
+        },
+        {
+            "file": "components/ui/confirm.tsx",
+            "why": "Phase 5: the on-brand confirm dialog (ConfirmHost in the root layout, confirmDialog() returns a promise). Falls back to window.confirm only if the host is missing."
         }
     ]
 }

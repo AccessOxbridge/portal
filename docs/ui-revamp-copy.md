@@ -397,3 +397,4 @@ Admin labels in code (second sweep). Kept as written: blog categories (saved dat
 - `app/(auth)/reset-password/page.tsx`: `New Password` > `New password`; `Confirm New Password` > `Confirm new password`; new help text `At least 6 characters.` (matches the existing minLength=6); `Back to login` > `Back to sign in`
 - `app/(auth)/verify-email/page.tsx`: `Verification email has been resent!` > `Verification email sent again.`; `Return to Login` > `Back to sign in`
 - `app/error/page.tsx`: `Try Again` > `Try again`
+- `app/(auth)/become-a-mentor/MentorRegisterForm.tsx`: `Creating account...` > `Creating account` (the button also shows a spinner); `Password must include:` no longer upper case; new phone-only line under the title (the brand panel with the steps is hidden on phones): `You'll fill in a short application next. We review it within 24 to 48 hours.`

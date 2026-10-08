@@ -10,7 +10,7 @@ import {
     MagnifyingGlass as Search,
     CheckCircle,
     CaretDown as ChevronDown,
-    CaretLeft as ChevronLeft,
+    SidebarSimple,
     CaretUpDown,
     WarningCircle as AlertCircle,
     User,
@@ -215,34 +215,28 @@ export default function Sidebar({
                 collapsed ? 'w-[4.5rem]' : 'w-64'
             )}
         >
-            {onToggleCollapse && (
-                <button
-                    type="button"
-                    onClick={onToggleCollapse}
-                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                    className={cn(
-                        'absolute z-[60] top-8 -right-3 grid size-6 place-items-center rounded-full outline-none',
-                        'bg-card text-foreground shadow-border',
-                        'transition-[scale,box-shadow] duration-150 ease-out hover:shadow-border-hover enabled:active:scale-[0.96]',
-                        'focus-visible:ring-2 focus-visible:ring-ring/40'
-                    )}
-                >
-                    <ChevronLeft
-                        weight="bold"
-                        className={cn('size-3.5 transition-[rotate] duration-200 ease-snappy', collapsed && 'rotate-180')}
-                    />
-                </button>
-            )}
-
-            {/* Top: brand, search, and the student's main action */}
-            <div className={cn('pb-3', collapsed ? 'px-3 pt-5' : 'px-4 pt-6')}>
-                <div className={cn(collapsed ? 'mb-6 flex justify-center' : 'mb-7 px-1')}>
+            {/* Top: brand and the collapse toggle (the CRM's panel button), then
+                search and the student's main action */}
+            <div className="px-3 pb-3">
+                <div className={cn('flex', collapsed ? 'flex-col items-center gap-1 pt-4 pb-3' : 'h-16 items-center justify-between gap-2 pl-1 mb-1')}>
                     <Logo
-                        size={collapsed ? 'default' : 'lg'}
+                        size="sidebar"
                         iconOnly={collapsed}
                         textColor="text-white"
-                        className={collapsed ? 'justify-center' : 'justify-start'}
+                        className="justify-start"
                     />
+                    {onToggleCollapse && (
+                        <button
+                            type="button"
+                            onClick={onToggleCollapse}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            aria-pressed={collapsed}
+                            className={cn(rowBase, rowState(false), 'shrink-0 justify-center', collapsed ? 'h-10 w-full' : 'size-8')}
+                        >
+                            <SidebarSimple className="size-5 text-white/60 group-hover:text-white" />
+                        </button>
+                    )}
                 </div>
 
                 {!collapsed ? (

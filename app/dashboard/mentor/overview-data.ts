@@ -58,7 +58,9 @@ export async function loadMentorOverview(db: SupabaseClient, mentorId: string): 
             .gte('scheduled_at', startedRecently)
             .order('scheduled_at', { ascending: true })
             .limit(50),
-        db.from('mentorship_requests').select('created_at').eq('mentor_id', mentorId).eq('status', 'pending').order('created_at', { ascending: true }),
+        // Only requests waiting for the mentor: students' requests, not ones the
+        // mentor sent (those wait for the student). Same filter as the Requests page.
+        db.from('mentorship_requests').select('created_at').eq('mentor_id', mentorId).eq('status', 'pending').eq('initiated_by', 'student').order('created_at', { ascending: true }),
         db.from('sessions')
             .select('id, scheduled_at, student_id, duration_minutes, payout_amount_cents, invoice_id')
             .eq('mentor_id', mentorId)

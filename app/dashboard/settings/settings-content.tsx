@@ -1,10 +1,13 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
+import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
 import { updateTimezone, sendPasswordResetLink } from './actions'
 import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
 import LoginHistory, { type LoginEvent } from './login-history'
+import { Button } from '@/components/ui/button'
+import { SelectField } from '@/components/ui/select'
+import { cn } from '@/utils/lib'
 
 interface SettingsContentProps {
     email: string
@@ -124,111 +127,92 @@ export default function SettingsContent({
     ]
 
     return (
-        <div className="max-w-3xl space-y-8">
-            <div>
-                <h1 className="text-4xl font-extrabold text-legacy-accent tracking-tight">Settings</h1>
-                <p className="mt-2 text-gray-500 text-lg">Manage your account, timezone and password.</p>
-            </div>
+        <div className="mx-auto max-w-3xl space-y-6">
+            <header>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Settings</h1>
+                <p className="mt-1 text-muted-foreground">Manage your account, timezone and password.</p>
+            </header>
 
             {/* Account info (read-only) */}
-            <section className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-legacy-accent/10 rounded-xl flex items-center justify-center">
-                        <User className="w-5 h-5 text-legacy-accent" />
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-gray-900">Account</h2>
-                        <p className="text-sm text-gray-500">Your account details</p>
-                    </div>
-                </div>
-                <dl className="divide-y divide-gray-100">
+            <section className={card}>
+                <SectionHead icon={User} tint="bg-tint-blue text-tint-blue-foreground" title="Account" description="Your account details" />
+                <dl className="divide-y divide-border">
                     {accountRows.map(({ icon: Icon, label, value }) => (
-                        <div key={label} className="px-6 py-4 flex items-center gap-4">
-                            <Icon className="w-4 h-4 text-gray-400 shrink-0" />
-                            <dt className="text-sm text-gray-500 w-32 shrink-0">{label}</dt>
-                            <dd className="text-sm font-semibold text-gray-900 truncate">{value}</dd>
+                        <div key={label} className="flex items-center gap-4 px-5 py-3.5 sm:px-6">
+                            <Icon className="size-4 shrink-0 text-muted-foreground" />
+                            <dt className="w-28 shrink-0 text-sm text-muted-foreground sm:w-32">{label}</dt>
+                            <dd className="min-w-0 truncate text-sm font-medium text-foreground">{value}</dd>
                         </div>
                     ))}
                 </dl>
             </section>
 
             {/* Timezone */}
-            <section className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                        <Globe className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-gray-900">Timezone</h2>
-                        <p className="text-sm text-gray-500">Used for scheduling and displaying session times</p>
-                    </div>
-                </div>
-                <div className="p-6 space-y-4">
-                    <select
+            <section className={card}>
+                <SectionHead icon={Globe} tint="bg-tint-violet text-tint-violet-foreground" title="Timezone" description="Used for scheduling and displaying session times" />
+                <div className="space-y-4 p-5 sm:p-6">
+                    <SelectField
                         value={tz}
                         onChange={(e) => { setTz(e.target.value); setTzFeedback(null) }}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-legacy-accent focus:border-transparent outline-none transition-all bg-white"
+                        aria-label="Timezone"
                     >
                         {tz === '' && <option value="">Select your timezone…</option>}
                         {tzOptions.map((option) => (
                             <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
                         ))}
-                    </select>
+                    </SelectField>
 
-                    {tzFeedback && (
-                        <div className={`flex items-center gap-2 text-sm ${tzFeedback.ok ? 'text-green-600' : 'text-red-600'}`}>
-                            {tzFeedback.ok ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                            <span>{tzFeedback.message}</span>
-                        </div>
-                    )}
-
-                    <div className="flex justify-end">
-                        <button
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        {tzFeedback ? (
+                            <p role="status" className={cn('flex items-center gap-2 text-sm', tzFeedback.ok ? 'text-success' : 'text-destructive')}>
+                                {tzFeedback.ok ? <Check weight="bold" className="size-4" /> : <AlertCircle className="size-4" />}
+                                <span>{tzFeedback.message}</span>
+                            </p>
+                        ) : <span />}
+                        <Button
                             type="button"
                             onClick={handleSaveTimezone}
                             disabled={tzPending || tz === savedTz || tz === ''}
-                            className="inline-flex items-center gap-2 bg-legacy-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            loading={tzPending}
                         >
-                            {tzPending && <Loader2 className="w-4 h-4 animate-spin" />}
                             Save timezone
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Password */}
-            <section className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                        <KeyRound className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-gray-900">Password</h2>
-                        <p className="text-sm text-gray-500">Change your password via a secure email link</p>
-                    </div>
-                </div>
-                <div className="p-6 space-y-4">
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                        We'll email a password reset link to <span className="font-semibold text-gray-900">{email}</span>.
+            <section className={card}>
+                <SectionHead icon={KeyRound} tint="bg-tint-amber text-tint-amber-foreground" title="Password" description="Change your password via a secure email link" />
+                <div className="space-y-4 p-5 sm:p-6">
+                    <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
+                        We&apos;ll email a password reset link to <span className="font-medium text-foreground [overflow-wrap:anywhere]">{email}</span>.
                         Open it and choose a new password. The link expires for your security.
                     </p>
 
                     {pwFeedback && (
-                        <div className={`flex items-start gap-2 text-sm rounded-xl p-3 ${pwFeedback.ok ? 'text-green-700 bg-green-50 border border-green-200' : 'text-red-700 bg-red-50 border border-red-200'}`}>
-                            {pwFeedback.ok ? <Check className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
+                        <div
+                            role="status"
+                            className={cn(
+                                'flex items-start gap-2 rounded-control px-3.5 py-3 text-sm ring-1',
+                                pwFeedback.ok ? 'bg-tint-green text-tint-green-foreground ring-success/25' : 'bg-tint-rose text-tint-rose-foreground ring-destructive/20',
+                            )}
+                        >
+                            {pwFeedback.ok ? <Check weight="bold" className="mt-0.5 size-4 shrink-0" /> : <AlertCircle className="mt-0.5 size-4 shrink-0" />}
                             <span>{pwFeedback.message}</span>
                         </div>
                     )}
 
-                    <button
+                    <Button
                         type="button"
+                        variant="secondary"
                         onClick={handleSendResetLink}
                         disabled={pwPending}
-                        className="inline-flex items-center gap-2 bg-legacy-accent text-white font-semibold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                        loading={pwPending}
                     >
-                        {pwPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
+                        {!pwPending && <KeyRound />}
                         Send password reset link
-                    </button>
+                    </Button>
                 </div>
             </section>
 
@@ -238,6 +222,22 @@ export default function SettingsContent({
                 allEvents={allLoginEvents}
                 timezone={timezone}
             />
+        </div>
+    )
+}
+
+const card = 'overflow-hidden rounded-card border border-transparent bg-card shadow-border'
+
+function SectionHead({ icon: Icon, tint, title, description }: { icon: typeof User; tint: string; title: string; description: string }) {
+    return (
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
+            <span className={cn('grid size-10 shrink-0 place-items-center rounded-full', tint)}>
+                <Icon weight="duotone" className="size-5" />
+            </span>
+            <div className="min-w-0">
+                <h2 className="font-semibold text-foreground">{title}</h2>
+                <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
         </div>
     )
 }

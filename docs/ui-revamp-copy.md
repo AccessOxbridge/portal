@@ -398,3 +398,4 @@ Admin labels in code (second sweep). Kept as written: blog categories (saved dat
 - `app/(auth)/verify-email/page.tsx`: `Verification email has been resent!` > `Verification email sent again.`; `Return to Login` > `Back to sign in`
 - `app/error/page.tsx`: `Try Again` > `Try again`
 - `app/(auth)/become-a-mentor/MentorRegisterForm.tsx`: `Creating account...` > `Creating account` (the button also shows a spinner); `Password must include:` no longer upper case; new phone-only line under the title (the brand panel with the steps is hidden on phones): `You'll fill in a short application next. We review it within 24 to 48 hours.`
+- `app/dashboard/settings/login-history.tsx`: `Login History` > `Login history`; `Date &amp; Time` > `Date and time`; `IP Address` > `IP address`; empty account `[em dash]` > `None`; empty IP `[em dash]` > `Unknown`

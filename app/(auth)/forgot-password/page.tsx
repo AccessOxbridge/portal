@@ -1,64 +1,52 @@
 import Link from 'next/link'
+import { EnvelopeSimple, Key } from '@phosphor-icons/react/ssr'
 import { forgotPassword } from '../../auth/actions'
-import { Suspense } from 'react'
+import { AuthCard } from '@/components/auth/auth-card'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Field } from '@/components/ui/field'
+
+const linkClass = 'font-semibold text-brand hover:underline underline-offset-4'
 
 function ForgotPasswordForm() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">
-            <div className="p-8 bg-white shadow-md rounded-lg w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Reset your password</h1>
-                <p className="text-sm text-gray-600 mb-6 text-center">
-                    Enter your email address and we'll send you a link to reset your password.
-                </p>
-                <form className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700" htmlFor="email">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-                    <button
-                        formAction={forgotPassword}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Send reset link
-                    </button>
-                </form>
-                <p className="mt-4 text-center text-sm text-gray-600">
+        <AuthCard
+            icon={Key}
+            title="Reset your password"
+            description="Enter your email address and we'll send you a link to reset your password."
+            footer={
+                <>
                     Remember your password?{' '}
-                    <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                        Back to login
+                    <Link href="/login" className={linkClass}>
+                        Back to sign in
                     </Link>
-                </p>
-            </div>
-        </div>
+                </>
+            }
+        >
+            <form className="space-y-5">
+                <Field label="Email address" htmlFor="email">
+                    <Input id="email" name="email" type="email" required autoComplete="email" placeholder="name@example.com" />
+                </Field>
+                <Button formAction={forgotPassword} size="lg" className="w-full">
+                    Send reset link
+                </Button>
+            </form>
+        </AuthCard>
     )
 }
 
 function SuccessMessage() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">
-            <div className="p-8 bg-white shadow-md rounded-lg w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Check your email</h1>
-                <p className="text-sm text-gray-600 mb-6 text-center">
-                    We've sent you a password reset link. Please check your email and follow the instructions.
-                </p>
-                <div className="text-center">
-                    <Link
-                        href="/login"
-                        className="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Back to login
-                    </Link>
-                </div>
-            </div>
-        </div>
+        <AuthCard
+            icon={EnvelopeSimple}
+            tone="success"
+            title="Check your email"
+            description="We've sent you a password reset link. Open it on this device to choose a new password."
+        >
+            <Link href="/login" className={buttonVariants({ variant: 'secondary', size: 'lg', className: 'w-full' })}>
+                Back to sign in
+            </Link>
+        </AuthCard>
     )
 }
 
@@ -70,6 +58,3 @@ export default async function ForgotPasswordPage({ searchParams }: { searchParam
 
     return <ForgotPasswordForm />
 }
-
-
-

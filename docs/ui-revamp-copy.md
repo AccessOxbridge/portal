@@ -384,3 +384,16 @@ Admin labels in code (second sweep). Kept as written: blog categories (saved dat
 - `app/dashboard/admin/transactions/transactions-tabs.tsx`: `'Total Purchases' : 'Total Payouts'` > `'Total purchases' : 'Total payouts'`
 - `app/dashboard/admin/clients/page.tsx`: `{clients.length === 1 ? 'Client' : 'Clients'} found` > `{clients.length === 1 ? 'client' : 'clients'} found`
 - `app/dashboard/admin/approvals/page.tsx`: `All caught up!` > `All caught up`
+
+## Phase 5: sign-in pages (2026-10-08)
+
+- `app/(auth)/login/LoginForm.tsx`: brand panel `Welcome Back` > `Your Oxbridge journey, all in one place`, plus three new lines: `Book and join sessions with your mentor`, `Message your mentor and the team`, `Follow your road to Oxford or Cambridge`
+- `app/(auth)/login/LoginForm.tsx`: `Login` > `Welcome back`
+- `app/(auth)/login/LoginForm.tsx`: `Please enter your details to sign in.` > `Sign in to your Access Oxbridge account.`
+- `app/(auth)/login/LoginForm.tsx`: `Email Address` > `Email address`
+- `app/(auth)/login/LoginForm.tsx`: `Sign In` > `Sign in`; `Signing in...` > `Signing in` (the button also shows a spinner)
+- `app/(auth)/forgot-password/page.tsx`: `Email` > `Email address`; `Back to login` > `Back to sign in` (both places)
+- `app/(auth)/forgot-password/page.tsx`: `We've sent you a password reset link. Please check your email and follow the instructions.` > `We've sent you a password reset link. Open it on this device to choose a new password.` (the reset link uses PKCE, so it only works in the browser that asked for it)
+- `app/(auth)/reset-password/page.tsx`: `New Password` > `New password`; `Confirm New Password` > `Confirm new password`; new help text `At least 6 characters.` (matches the existing minLength=6); `Back to login` > `Back to sign in`
+- `app/(auth)/verify-email/page.tsx`: `Verification email has been resent!` > `Verification email sent again.`; `Return to Login` > `Back to sign in`
+- `app/error/page.tsx`: `Try Again` > `Try again`

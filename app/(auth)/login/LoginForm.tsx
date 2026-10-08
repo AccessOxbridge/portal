@@ -3,166 +3,124 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
+import { CalendarCheck, ChatsCircle, Path } from '@phosphor-icons/react/ssr'
 import { login } from '../../auth/actions'
-import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/field'
+
+const HIGHLIGHTS = [
+    { icon: CalendarCheck, text: 'Book and join sessions with your mentor' },
+    { icon: ChatsCircle, text: 'Message your mentor and the team' },
+    { icon: Path, text: 'Follow your road to Oxford or Cambridge' },
+]
 
 export function LoginForm({ notice }: { notice?: string }) {
     const [isLoading, setIsLoading] = useState(false)
 
     return (
-        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-legacy-accent/30 selection:text-legacy-accent">
-            {/* Left Section - Decorative Branding */}
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-legacy-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
+        <div className="flex min-h-[100dvh] bg-background">
+            {/* Brand panel (desktop): the sidebar navy, so signing in feels like
+                stepping into the same place. */}
+            <aside className="relative hidden w-[44%] max-w-2xl shrink-0 flex-col justify-between overflow-hidden bg-primary p-12 text-primary-foreground lg:flex xl:p-16">
+                <div aria-hidden className="pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-white/[0.06] blur-3xl" />
+                <div aria-hidden className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand/20 blur-3xl" />
+
+                <div className="relative flex items-center gap-3">
+                    <Image src="/logo.png" alt="" width={44} height={44} className="[mix-blend-mode:screen]" />
+                    <span className="text-xl font-extrabold tracking-tight">Access Oxbridge</span>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="z-10"
-                >
-                    <div className="flex items-center gap-4 mb-12">
-                        <Image
-                            src="/logo.png"
-                            alt="Logo"
-                            width={60}
-                            height={60}
-                            className="[mix-blend-mode:screen]"
-                        />
-                        <motion.span
-                            animate={{
-                                scale: [1, 1.02, 1],
-                                opacity: [0.9, 1, 0.9]
-                            }}
-                            transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                            className="text-3xl font-bold text-white tracking-tight"
-                        >
-                            Access Oxbridge
-                        </motion.span>
-                    </div>
-
-                    <div className="mt-28 xl:mt-32">
-                        <h2 className="text-5xl font-bold text-white mb-2 leading-tight">
-                            Welcome Back
-                        </h2>
-                    </div>
-                </motion.div>
-
-                <div className="z-10 text-white/60 text-sm font-medium">
-                    © 2026 Access Oxbridge. All rights reserved.
+                <div className="relative max-w-md">
+                    <h2 className="text-4xl font-semibold leading-tight tracking-tight text-balance xl:text-5xl">
+                        Your Oxbridge journey, all in one place
+                    </h2>
+                    <ul className="mt-10 space-y-4">
+                        {HIGHLIGHTS.map(({ icon: Icon, text }) => (
+                            <li key={text} className="flex items-center gap-3.5 text-base text-primary-foreground/85">
+                                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-white/15">
+                                    <Icon weight="duotone" className="size-5 text-primary-foreground" />
+                                </span>
+                                {text}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            </div>
 
-            {/* Right Section - Login Form */}
-            <div className="w-full lg:w-1/2 flex items-center lg:items-start justify-center p-6 md:p-12 lg:p-16 lg:pt-16 lg:h-screen lg:overflow-y-auto">
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="w-full max-w-md"
-                >
-                    <div className="lg:hidden mb-8 flex flex-col items-center">
-                        <Image
-                            src="/logo.png"
-                            alt="Logo"
-                            width={50}
-                            height={50}
-                            className="mb-4 rounded-xl shadow-lg"
-                        />
-                        <h1 className="text-2xl font-bold text-legacy-accent">Access Oxbridge</h1>
+                <p className="relative text-sm text-primary-foreground/60">© 2026 Access Oxbridge. All rights reserved.</p>
+            </aside>
+
+            {/* Form */}
+            <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+                <div className="w-full max-w-sm">
+                    <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
+                        <span className="grid size-11 place-items-center rounded-full bg-primary">
+                            <Image src="/logo.png" alt="" width={32} height={32} className="[mix-blend-mode:screen]" />
+                        </span>
+                        <span className="text-xl font-extrabold tracking-tight text-primary">Access Oxbridge</span>
                     </div>
 
-                    <div className="mb-10 text-center lg:text-left">
-                        <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Login</h1>
-                        <p className="text-gray-500 font-medium">Please enter your details to sign in.</p>
+                    <div className="mb-8 text-center lg:text-left">
+                        <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance">Welcome back</h1>
+                        <p className="mt-2 text-muted-foreground text-pretty">Sign in to your Access Oxbridge account.</p>
                     </div>
 
                     {notice && (
-                        <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-xl text-sm font-medium text-amber-800">
+                        <div role="status" className="mb-6 rounded-control bg-tint-amber px-4 py-3 text-sm font-medium text-tint-amber-foreground ring-1 ring-warning/30">
                             {notice}
                         </div>
                     )}
 
-                    <form className="space-y-6" onSubmit={() => setIsLoading(true)}>
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="email">
-                                Email Address
-                            </label>
-                            <input
+                    <form className="space-y-5" onSubmit={() => setIsLoading(true)}>
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="email">Email address</Label>
+                            <Input
                                 id="email"
                                 name="email"
                                 type="email"
                                 required
+                                autoComplete="email"
                                 placeholder="name@example.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center ml-1">
-                                <label className="text-sm font-semibold text-gray-700" htmlFor="password">
-                                    Password
-                                </label>
-                                <Link href="/forgot-password" className="text-xs font-bold text-legacy-accent hover:underline decoration-2 underline-offset-4">
+                        <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center justify-between gap-3">
+                                <Label htmlFor="password">Password</Label>
+                                <Link href="/forgot-password" className="rounded-[4px] text-sm font-medium text-brand outline-none hover:underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring/40">
                                     Forgot password?
                                 </Link>
                             </div>
-                            <input
+                            <Input
                                 id="password"
                                 name="password"
                                 type="password"
                                 required
+                                autoComplete="current-password"
                                 placeholder="••••••••"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
-                        <button
-                            formAction={login}
-                            disabled={isLoading}
-                            className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${!isLoading
-                                ? 'bg-legacy-accent hover:bg-[#07214d] hover:shadow-legacy-accent/40'
-                                : 'bg-gray-300 cursor-not-allowed shadow-none'
-                                } flex items-center justify-center gap-2`}
-                        >
-                            {isLoading ? (
-                                <span className="flex items-center gap-2">
-                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Signing in...
-                                </span>
-                            ) : (
-                                "Sign In"
-                            )}
-                        </button>
+                        <Button formAction={login} disabled={isLoading} loading={isLoading} size="lg" className="w-full">
+                            {isLoading ? 'Signing in' : 'Sign in'}
+                        </Button>
 
-                        <p className="text-center text-xs text-gray-400 mt-4">
+                        <p className="text-center text-xs leading-relaxed text-muted-foreground text-pretty">
                             By continuing, you agree to our{' '}
-                            <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms of Service</a>
+                            <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</a>
                             {' '}and{' '}
-                            <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Privacy Policy</a>.
+                            <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</a>.
                         </p>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-600 font-medium">
-                            Want to become a mentor?{' '}
-                            <Link href="/become-a-mentor" className="text-legacy-accent font-bold hover:underline decoration-2 underline-offset-4">
-                                Apply here
-                            </Link>
-                        </p>
-                    </div>
-                </motion.div>
-            </div>
+                    <p className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+                        Want to become a mentor?{' '}
+                        <Link href="/become-a-mentor" className="font-semibold text-brand hover:underline underline-offset-4">
+                            Apply here
+                        </Link>
+                    </p>
+                </div>
+            </main>
         </div>
     )
 }

@@ -213,7 +213,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                                         disabled={isLoading}
                                         className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3 flex-1"
                                     >
-                                        {isLoading ? 'Creating...' : 'Create Creator'}
+                                        {isLoading ? 'Creating...' : 'Create creator'}
                                     </button>
                                 </div>
                             </form>

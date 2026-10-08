@@ -117,10 +117,10 @@ export default async function AdminReportsPage() {
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
                     <div className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg font-medium">
-                        {tableData.length} Total Reports
+                        {tableData.length} total reports
                     </div>
                     <div className="px-3 py-1.5 bg-tint-green text-success rounded-lg font-medium">
-                        {tableData.filter(r => r.personalized_report).length} With Personalized Reports
+                        {tableData.filter(r => r.personalized_report).length} with personalised reports
                     </div>
                 </div>
             </header>

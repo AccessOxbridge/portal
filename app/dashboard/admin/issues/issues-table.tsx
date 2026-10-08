@@ -264,7 +264,7 @@ export default function IssuesTable({ issues: initialIssues }: IssuesTableProps)
                                                 ) : (
                                                     <Clock className="size-4" />
                                                 )}
-                                                In Progress
+                                                In progress
                                             </button>
                                         )}
                                         {selectedIssue.status !== 'resolved' && (

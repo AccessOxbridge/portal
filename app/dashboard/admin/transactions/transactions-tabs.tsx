@@ -82,7 +82,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                 </div>
                 <div className="bg-card rounded-card border border-border p-6">
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {activeTab === 'inbound' ? 'Credits Sold' : 'Total Payouts'}
+                        {activeTab === 'inbound' ? 'Credits sold' : 'Total payouts'}
                     </p>
                     <p className="text-3xl font-semibold text-primary">
                         {activeTab === 'inbound'
@@ -92,7 +92,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                 </div>
                 <div className="bg-card rounded-card border border-border p-6">
                     <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {activeTab === 'inbound' ? 'Total Purchases' : 'Total Payouts'}
+                        {activeTab === 'inbound' ? 'Total purchases' : 'Total payouts'}
                     </p>
                     <p className="text-3xl font-semibold text-foreground">
                         {activeTab === 'inbound' ? purchases.length : payouts.length}

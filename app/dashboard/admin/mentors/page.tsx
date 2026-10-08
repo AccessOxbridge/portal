@@ -204,7 +204,7 @@ export default function AdminMentorsPage() {
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Mentors</h1>
                     <p className="text-muted-foreground mt-1">Manage all mentors on the platform.</p>

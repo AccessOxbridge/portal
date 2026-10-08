@@ -354,3 +354,33 @@ Empty values (`[em dash]` > `Not set` / `None`):
 - `app/dashboard/admin/payouts/page.tsx`: invoice reference, invoice number, student name > `Not set`
 - `app/dashboard/admin/performance/mentor-ratings-table.tsx`, `student-pace-table.tsx`, `satisfaction/satisfaction-overview.tsx`: empty cells > `None`
 - `app/dashboard/admin/page.tsx`: stat labels `Total Mentors`, `Total Students`, `Sessions Taken` > sentence case; the four shortcut cards now say `Manage clients` etc. as a link with an arrow instead of a grey button
+
+Admin labels in code (second sweep). Kept as written: blog categories (saved data), the fortnightly report email subject, "Help & Support" (a conversation name), names and placeholders.
+- `app/dashboard/admin/blog/components/ArticleForm.tsx`: `'Update Article' : 'Publish Article'` > `'Update article' : 'Publish article'`
+- `app/dashboard/admin/blog/page.tsx`: `{articles?.length || 0} Articles` > `{articles?.length || 0} articles`
+- `app/dashboard/admin/create-account/create-account-client.tsx`: `'Create Mentor' : 'Create Student'` > `'Create mentor' : 'Create student'`
+- `app/dashboard/admin/create-account/create-account-client.tsx`: `: 'Create Account'}` > `: 'Create account'}`
+- `app/dashboard/admin/creators/creators-manager.tsx`: `: 'Create Creator'}` > `: 'Create creator'}`
+- `app/dashboard/admin/events/events-manager.tsx`: `'Create New Event' : 'Edit Event'` > `'Create new event' : 'Edit event'`
+- `app/dashboard/admin/events/events-manager.tsx`: `'Create Event' : 'Save Changes'` > `'Create event' : 'Save changes'`
+- `app/dashboard/admin/events/events-manager.tsx`: `'Webinar' : 'In Person'` > `'Webinar' : 'In person'`
+- `app/dashboard/admin/issues/issues-table.tsx`: `                                                In Progress
+` > `                                                In progress
+`
+- `app/dashboard/admin/issues/page.tsx`: `{inProgressCount} In Progress` > `{inProgressCount} in progress`
+- `app/dashboard/admin/issues/page.tsx`: `{openCount} Open` > `{openCount} open`
+- `app/dashboard/admin/issues/page.tsx`: `{resolvedCount} Resolved` > `{resolvedCount} resolved`
+- `app/dashboard/admin/student-help/page.tsx`: `{inProgressCount} In Progress` > `{inProgressCount} in progress`
+- `app/dashboard/admin/student-help/page.tsx`: `{openCount} Open` > `{openCount} open`
+- `app/dashboard/admin/student-help/page.tsx`: `{resolvedCount} Resolved` > `{resolvedCount} resolved`
+- `app/dashboard/admin/mentors/components/MentorMessageButton.tsx`: `title="Message Mentor"` > `title="Message mentor"`
+- `app/dashboard/admin/students/components/StudentActions.tsx`: `title="Email Student"` > `title="Email student"`
+- `app/dashboard/admin/payouts/page.tsx`: `label="Billing Country"` > `label="Billing country"`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `'Create New Package' : 'Edit Package'` > `'Create new package' : 'Edit package'`
+- `app/dashboard/admin/products/credit-packages-manager.tsx`: `'Create Package' : 'Save Changes'` > `'Create package' : 'Save changes'`
+- `app/dashboard/admin/reports/page.tsx`: `{tableData.length} Total Reports` > `{tableData.length} total reports`
+- `app/dashboard/admin/reports/page.tsx`: `{tableData.filter(r => r.personalized_report).length} With Personalized Reports` > `{tableData.filter(r => r.personalized_report).length} with personalised reports`
+- `app/dashboard/admin/transactions/transactions-tabs.tsx`: `'Credits Sold' : 'Total Payouts'` > `'Credits sold' : 'Total payouts'`
+- `app/dashboard/admin/transactions/transactions-tabs.tsx`: `'Total Purchases' : 'Total Payouts'` > `'Total purchases' : 'Total payouts'`
+- `app/dashboard/admin/clients/page.tsx`: `{clients.length === 1 ? 'Client' : 'Clients'} found` > `{clients.length === 1 ? 'client' : 'clients'} found`
+- `app/dashboard/admin/approvals/page.tsx`: `All caught up!` > `All caught up`

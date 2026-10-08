@@ -29,7 +29,7 @@ export default async function AdminBlogPage() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Blog management</h1>
                     <p className="text-muted-foreground mt-1">Create and manage content for the Oxford-Bridge network.</p>
@@ -42,7 +42,7 @@ export default async function AdminBlogPage() {
                     <div className="flex justify-center items-center">
                         <h2 className="text-lg font-semibold text-foreground">All articles</h2>
                         <span className="bg-card border border-border text-muted-foreground px-3 py-1 rounded-lg text-sm font-semibold">
-                            {articles?.length || 0} Articles
+                            {articles?.length || 0} articles
                         </span>
                     </div>
                 </div>

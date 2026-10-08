@@ -62,7 +62,7 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
             <div className="flex items-center justify-end gap-2">
                 <a
                     className="p-2 text-muted-foreground hover:text-primary transition-colors"
-                    title="Email Student"
+                    title="Email student"
                     href={`mailto:${email}`}
                 >
                     <Mail className="size-4" />

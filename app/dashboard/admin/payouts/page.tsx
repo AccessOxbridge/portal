@@ -214,7 +214,7 @@ export default function AdminPayoutsPage() {
             <div className="flex flex-wrap items-end gap-3">
                 <FilterSelect label="Status" value={fStatus} onChange={setFStatus} options={[['submitted', 'Sent to Finance'], ['paid', 'Paid'], ['all', 'All']]} />
                 <FilterSelect label="Period" value={fPeriod} onChange={setFPeriod} options={[['all', 'All time'], ['30d', 'Last 30 days'], ['year', 'This year']]} />
-                <FilterSelect label="Billing Country" value={fCountry} onChange={setFCountry} options={[['all', 'All'], ['uk', 'United Kingdom']]} />
+                <FilterSelect label="Billing country" value={fCountry} onChange={setFCountry} options={[['all', 'All'], ['uk', 'United Kingdom']]} />
                 <button onClick={resetFilters} className="px-4 py-2.5 rounded-control text-sm font-semibold text-muted-foreground border border-border hover:bg-muted/60">Reset</button>
                 <div className="flex-1" />
                 <button onClick={selectAllVisible} className="px-4 py-2.5 rounded-control text-sm font-semibold text-muted-foreground border border-border hover:bg-muted/60">Select all payable</button>

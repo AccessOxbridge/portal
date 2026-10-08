@@ -42,7 +42,7 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
                 type="button"
                 onClick={openChat}
                 className="p-2 text-muted-foreground hover:text-primary transition-colors"
-                title="Message Mentor"
+                title="Message mentor"
             >
                 <MessageSquare className="size-4" />
             </button>

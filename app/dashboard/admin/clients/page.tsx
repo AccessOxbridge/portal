@@ -83,7 +83,7 @@ export default function AdminClientsPage() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Premium clients</h1>
                     <p className="text-muted-foreground mt-1">Manage and register your one-to-one premium clients.</p>
@@ -110,7 +110,7 @@ export default function AdminClientsPage() {
                     />
                 </div>
                 <div className="text-sm text-muted-foreground font-medium">
-                    {clients.length} {clients.length === 1 ? 'Client' : 'Clients'} found
+                    {clients.length} {clients.length === 1 ? 'client' : 'clients'} found
                 </div>
             </div>
 

@@ -80,13 +80,13 @@ export default async function AdminIssuesPage() {
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
                     <div className="px-3 py-1.5 bg-tint-rose text-destructive rounded-lg font-medium">
-                        {openCount} Open
+                        {openCount} open
                     </div>
                     <div className="px-3 py-1.5 bg-tint-blue text-brand rounded-lg font-medium">
-                        {inProgressCount} In Progress
+                        {inProgressCount} in progress
                     </div>
                     <div className="px-3 py-1.5 bg-tint-green text-success rounded-lg font-medium">
-                        {resolvedCount} Resolved
+                        {resolvedCount} resolved
                     </div>
                 </div>
             </header>

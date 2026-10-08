@@ -54,14 +54,14 @@ export default async function AdminApprovalsPage() {
             </header>
 
             {!mentors || mentors.length === 0 ? (
-                <div className="bg-card border-2 border-dashed border-border rounded-[40px] p-24 text-center">
-                    <div className="size-24 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-8">
-                        <svg className="size-12 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="rounded-card border-2 border-dashed border-border bg-card px-6 py-16 text-center">
+                    <div className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-tint-green text-tint-green-foreground">
+                        <svg className="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                     </div>
-                    <h2 className="text-3xl font-semibold text-foreground">All caught up!</h2>
-                    <p className="text-muted-foreground mt-4 text-lg">No pending applications to review right now.</p>
+                    <h2 className="text-base font-semibold text-foreground">All caught up</h2>
+                    <p className="mt-1.5 text-sm text-muted-foreground">No pending applications to review right now.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-8">

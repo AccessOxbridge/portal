@@ -256,7 +256,7 @@ export default function EventsManager({ initialEvents }: Props) {
             {(isCreating || editingId) && (
                 <div className="border border-transparent bg-card rounded-card p-6 shadow-border">
                     <h3 className="text-xl font-semibold text-foreground mb-6">
-                        {isCreating ? 'Create New Event' : 'Edit Event'}
+                        {isCreating ? 'Create new event' : 'Edit event'}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2">
@@ -382,7 +382,7 @@ export default function EventsManager({ initialEvents }: Props) {
                             className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                         >
                             <Check className="size-5" />
-                            {loading ? 'Saving...' : (isCreating ? 'Create Event' : 'Save Changes')}
+                            {loading ? 'Saving...' : (isCreating ? 'Create event' : 'Save changes')}
                         </button>
                         <button
                             onClick={cancelEdit}
@@ -414,7 +414,7 @@ export default function EventsManager({ initialEvents }: Props) {
                                     <div className="flex items-center gap-2 mb-1">
                                         <h3 className="font-semibold text-foreground truncate">{event.title}</h3>
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${event.event_type === 'webinar' ? 'bg-tint-blue text-tint-blue-foreground' : 'bg-tint-rose text-tint-rose-foreground'}`}>
-                                            {event.event_type === 'webinar' ? 'Webinar' : 'In Person'}
+                                            {event.event_type === 'webinar' ? 'Webinar' : 'In person'}
                                         </span>
                                     </div>
                                     {event.description && (

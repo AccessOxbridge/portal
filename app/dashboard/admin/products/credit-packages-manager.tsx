@@ -194,7 +194,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
             {(isCreating || editingId) && (
                 <div className="border border-transparent bg-card rounded-card p-6 shadow-border">
                     <h3 className="text-xl font-semibold text-foreground mb-6">
-                        {isCreating ? 'Create New Package' : 'Edit Package'}
+                        {isCreating ? 'Create new package' : 'Edit package'}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
@@ -292,7 +292,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                             className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-control hover:bg-primary/90 transition-colors disabled:opacity-50"
                         >
                             <Check className="size-5" />
-                            {loading ? 'Saving...' : (isCreating ? 'Create Package' : 'Save Changes')}
+                            {loading ? 'Saving...' : (isCreating ? 'Create package' : 'Save changes')}
                         </button>
                         <button
                             onClick={cancelEdit}

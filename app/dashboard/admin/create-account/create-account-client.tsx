@@ -224,7 +224,7 @@ export function CreateAccountClient() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Create account</h1>
                     <p className="text-muted-foreground mt-1">
@@ -236,7 +236,7 @@ export function CreateAccountClient() {
                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
                     <Plus className="size-5" />
-                    {isMentorTab ? 'Create Mentor' : 'Create Student'}
+                    {isMentorTab ? 'Create mentor' : 'Create student'}
                 </button>
             </header>
 
@@ -589,7 +589,7 @@ export function CreateAccountClient() {
                                     type="submit"
                                     className="w-full py-4 bg-primary text-white rounded-card font-semibold text-lg hover:opacity-90 transition-[background-color,box-shadow,color] duration-150 shadow-border shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                                 >
-                                    {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Create Account'}
+                                    {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Create account'}
                                 </button>
                             </form>
                         </div>

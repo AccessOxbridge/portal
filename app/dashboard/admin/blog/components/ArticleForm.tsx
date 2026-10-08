@@ -325,7 +325,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                     ) : (
                         <>
                             <ShieldCheck className="size-4" />
-                            <span>{article ? 'Update Article' : 'Publish Article'}</span>
+                            <span>{article ? 'Update article' : 'Publish article'}</span>
                         </>
                     )}
                 </button>

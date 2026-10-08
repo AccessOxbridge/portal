@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { CreditPackage } from '@/utils/stripe'
 import { GraduationCap, ArrowRight, CheckCircle as CheckCircle2, Star, Phone } from '@phosphor-icons/react/ssr'
 import { buttonVariants } from '@/components/ui/button'
@@ -16,17 +16,6 @@ interface CreditPackagesProps {
 export default function CreditPackages({ packages, currentCredits, targetUniversity, targetCourse }: CreditPackagesProps) {
     const [loading, setLoading] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [lastHourCount, setLastHourCount] = useState(11)
-
-    useEffect(() => {
-        // Subtle random update to the "last hour" count to make it feel alive
-        const interval = setInterval(() => {
-            if (Math.random() > 0.7) {
-                setLastHourCount(prev => prev + (Math.random() > 0.5 ? 1 : -1))
-            }
-        }, 10000)
-        return () => clearInterval(interval)
-    }, [])
 
     const formatPrice = (cents: number, currency: string = 'gbp') => {
         return new Intl.NumberFormat('en-GB', {
@@ -142,14 +131,8 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                     </div>
 
                     <div className="flex-1 space-y-5">
-                        <div className="flex items-start justify-between gap-3">
-                            <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
-                                <Star weight="fill" className="size-6" />
-                            </div>
-                            <div className="flex items-center gap-1.5 rounded-full bg-tint-amber px-2.5 py-1 text-xs font-medium text-tint-amber-foreground tabular-nums">
-                                <span className="size-1.5 rounded-full bg-warning"></span>
-                                {lastHourCount} purchased in the last hour
-                            </div>
+                        <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                            <Star weight="fill" className="size-6" />
                         </div>
 
                         <div>

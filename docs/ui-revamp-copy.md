@@ -109,3 +109,8 @@ Popups (`components/dashboard/*-modal.tsx`)
 
 Not changed yet (inside handlers, so they wait for the phase 5 copy pass with your review):
 error messages that start with "Please" in the booking, reschedule, credits and rating flows.
+
+## Removed content (your decision, 2026-10-08)
+
+`components/dashboard/credit-packages.tsx`
+- Removed the "{n} purchased in the last hour" badge on the 1-1 mentorship card. The number was made up: it started at 11 and drifted by 1 at random every 10 seconds. Its state and timer are gone too.

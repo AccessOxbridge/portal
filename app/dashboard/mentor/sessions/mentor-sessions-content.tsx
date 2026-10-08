@@ -21,6 +21,7 @@ interface Session {
     zoom_join_url: string | null
     zoom_meeting_status: string | null
     student_full_name: string
+    student_photo_url?: string | null
     has_report: boolean
 }
 
@@ -28,6 +29,7 @@ interface PendingRequest {
     id: string
     created_at: string
     student_full_name: string
+    student_photo_url?: string | null
     proposed_start: string | null
     proposed_end: string | null
     note: string | null
@@ -350,7 +352,7 @@ export default function MentorSessionsContent({
                             >
                                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                     <div className="flex items-start gap-4">
-                                        <Avatar name={request.student_full_name || 'Student'} size="lg" />
+                                        <Avatar name={request.student_full_name || 'Student'} src={request.student_photo_url} size="lg" />
                                         <div>
                                             <h3 className="text-lg font-semibold text-foreground mb-1">
                                                 {request.reschedule_of_session_id
@@ -430,7 +432,7 @@ export default function MentorSessionsContent({
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div className="flex items-start gap-4">
                                     {/* Student Avatar */}
-                                    <Avatar name={session.student_full_name || 'Student'} size="lg" />
+                                    <Avatar name={session.student_full_name || 'Student'} src={session.student_photo_url} size="lg" />
 
                                     <div>
                                         <h3 className="text-lg font-semibold text-foreground mb-1">

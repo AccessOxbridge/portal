@@ -19,6 +19,7 @@ import {
 import { SelectField } from '@/components/ui/select'
 import { formatDateInTz } from '@/lib/timezone'
 import MentorRequestSessionModal from '@/components/dashboard/mentor-request-session-modal'
+import { Avatar } from '@/components/ui/avatar'
 
 export interface StudentMetric {
     id: string
@@ -173,18 +174,7 @@ export default function MentorStudentsContent({ students, summary, timezone }: P
                                 className="border border-transparent bg-card rounded-card shadow-border hover:shadow-border transition-shadow p-6"
                             >
                                 <div className="flex items-start gap-4">
-                                    <div className="size-12 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-lg shrink-0 overflow-hidden">
-                                        {s.photo_url ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
-                                                src={s.photo_url}
-                                                alt=""
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            (s.full_name?.[0] || 'S').toUpperCase()
-                                        )}
-                                    </div>
+                                    <Avatar name={s.full_name || 'Student'} src={s.photo_url} size="lg" />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <h3 className="font-semibold text-foreground truncate">{s.full_name}</h3>

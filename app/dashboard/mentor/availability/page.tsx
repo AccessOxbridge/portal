@@ -40,7 +40,8 @@ export default async function MentorAvailabilityPage() {
             zoom_meeting_id,
             zoom_start_url,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -59,7 +60,8 @@ export default async function MentorAvailabilityPage() {
         zoom_url: (session.zoom_meeting_id || session.zoom_start_url)
             ? `/api/sessions/${session.id}/start`
             : null,
-        person_name: session.student?.full_name || 'Student'
+        person_name: session.student?.full_name || 'Student',
+        person_photo_url: session.student?.photo_url || null
     }))
 
     return (

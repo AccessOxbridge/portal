@@ -16,7 +16,8 @@ export default async function MentorRequestsPage() {
         .select(`
             *,
             student:profiles!mentorship_requests_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)

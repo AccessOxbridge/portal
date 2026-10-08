@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { Info, Warning as AlertTriangle } from '@phosphor-icons/react/ssr'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import { Avatar } from '@/components/ui/avatar'
 
 interface TimeSlot {
     date: string
@@ -37,6 +38,7 @@ interface Request {
     }
     student: {
         full_name: string
+        photo_url?: string | null
     }
 }
 
@@ -100,9 +102,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
             <div className="border border-transparent bg-card rounded-card shadow-border overflow-hidden p-6 sm:p-10">
                 <div className="flex items-start justify-between gap-6 flex-wrap">
                     <div className="flex items-start gap-4">
-                        <div className="size-16 bg-primary/10 rounded-card flex items-center justify-center text-primary font-semibold text-2xl shadow-inner shrink-0">
-                            {request.student?.full_name?.charAt(0) || 'S'}
-                        </div>
+                        <Avatar name={request.student?.full_name || 'Student'} src={request.student?.photo_url} size="xl" />
                         <div>
                             <span className="text-xs font-semibold text-tint-amber-foreground bg-tint-amber px-3 py-1 rounded-full">
                                 Reschedule request
@@ -181,9 +181,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
         <div className="border border-transparent bg-card rounded-card shadow-border overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
             <div className="p-6 sm:p-10 flex-1">
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="size-16 bg-primary/10 rounded-card flex items-center justify-center text-primary font-semibold text-2xl shadow-inner">
-                        {request.student?.full_name?.charAt(0) || 'S'}
-                    </div>
+                    <Avatar name={request.student?.full_name || 'Student'} src={request.student?.photo_url} size="xl" />
                     <div>
                         <h3 className="text-2xl font-semibold text-foreground">{request.student?.full_name}</h3>
                         <span className="text-xs font-semibold text-primary bg-primary/5 px-3 py-1 rounded-full">New request</span>

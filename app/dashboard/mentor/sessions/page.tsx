@@ -42,7 +42,8 @@ export default async function MentorSessionsPage() {
             zoom_join_url,
             zoom_meeting_status,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -71,6 +72,7 @@ export default async function MentorSessionsPage() {
         zoom_join_url: session.zoom_join_url,
         zoom_meeting_status: session.zoom_meeting_status,
         student_full_name: session.student?.full_name || 'Student',
+        student_photo_url: session.student?.photo_url || null,
         has_report: reportSet.has(session.id)
     }))
 
@@ -83,7 +85,8 @@ export default async function MentorSessionsPage() {
             responses,
             reschedule_of_session_id,
             student:profiles!mentorship_requests_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -106,6 +109,7 @@ export default async function MentorSessionsPage() {
             id: req.id,
             created_at: req.created_at,
             student_full_name: req.student?.full_name || 'Student',
+            student_photo_url: req.student?.photo_url || null,
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,
             note: req.responses?.note || null,

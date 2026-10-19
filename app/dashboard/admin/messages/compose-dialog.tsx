@@ -182,7 +182,7 @@ export default function ComposeDialog({
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center">
             <div
                 className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
                 onClick={onClose}

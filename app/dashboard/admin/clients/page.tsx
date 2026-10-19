@@ -190,7 +190,7 @@ export default function AdminClientsPage() {
 
             {/* Registration Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
                     <div className="relative w-full max-w-md overflow-hidden rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <button
                             onClick={() => setIsModalOpen(false)}

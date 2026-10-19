@@ -547,7 +547,7 @@ export default function MentorSessionsContent({
             />
 
             {reportSessionId && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center">
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         onClick={() => { setReportSessionId(null); setReportError(null) }}

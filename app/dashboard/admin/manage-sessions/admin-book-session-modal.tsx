@@ -187,7 +187,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center">
                     <div className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none" onClick={closeModal} />
 
                     <div className="border border-transparent relative bg-card rounded-sheet w-full max-w-xl mx-4 max-h-[90vh] overflow-hidden flex flex-col shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">

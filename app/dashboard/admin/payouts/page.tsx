@@ -298,7 +298,7 @@ export default function AdminPayoutsPage() {
 
             {/* Confirmation dialog */}
             {confirming && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
                     <div className="w-full max-w-md rounded-sheet border border-transparent bg-card p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <h3 className="text-xl font-semibold text-foreground mb-2">Confirm payout</h3>
                         <p className="text-muted-foreground text-sm mb-6">This transfers funds to mentors&apos; connected accounts and cannot be undone.</p>

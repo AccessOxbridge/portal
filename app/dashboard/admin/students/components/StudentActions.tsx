@@ -79,8 +79,8 @@ export function StudentActions({ student, onSaved }: StudentActionsProps) {
 
             {isEditOpen && (
                 <>
-                    <div className="fixed inset-0 z-30 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none" onClick={closeEdit} />
-                    <div className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-[calc(100%-2rem)] max-w-md bg-card rounded-sheet p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
+                    <div className="fixed inset-0 z-[1000] bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none" onClick={closeEdit} />
+                    <div className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[1001] w-[calc(100%-2rem)] max-w-md bg-card rounded-sheet p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold text-foreground">Edit student</h3>
                             <button

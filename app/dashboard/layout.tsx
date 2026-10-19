@@ -309,9 +309,9 @@ export default async function DashboardLayout({
     // had 22 unrated sessions) from ambushing anyone.
     let rateableSession: RateableSession | null = null
     if (isStudent) {
-        const { data: recentSessions } = await supabase
+        const { data: recentRows } = await supabase
             .from('sessions')
-            .select('id, scheduled_at, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
+            .select('id, scheduled_at, actual_minutes, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
             .eq('student_id', user.id)
             .eq('status', 'completed')
             .gte('scheduled_at', feedbackPromptWindowStart())
@@ -319,7 +319,11 @@ export default async function DashboardLayout({
             .order('scheduled_at', { ascending: false })
             .limit(10)
 
-        const candidateIds = (recentSessions || []).map((s) => s.id)
+        // A session under 15 real Zoom minutes isn't a session, so it is never
+        // offered for rating (the Zoom webhook doesn't ask for feedback either).
+        type RecentRow = { id: string; scheduled_at: string; actual_minutes: number | null; mentor: unknown }
+        const recentSessions = ((recentRows || []) as unknown as RecentRow[]).filter((s) => isBillableLength(s.actual_minutes))
+        const candidateIds = recentSessions.map((s) => s.id)
 
         if (candidateIds.length > 0) {
             // Exclude anything already rated or already dismissed. Two small

@@ -139,13 +139,13 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsAddModalOpen(false)}
-                            className="fixed inset-0 z-40 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+                            className="fixed inset-0 z-[1000] bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card rounded-sheet z-50 p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none"
+                            className="border border-transparent fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card rounded-sheet z-[1001] p-6 shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none"
                         >
                             <h2 className="text-xl font-semibold text-foreground mb-6">Add new creator</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">

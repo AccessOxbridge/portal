@@ -86,12 +86,16 @@ export default async function MentorPayoutsPage() {
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
-    const { count: sessionsThisMonth } = await supabase
+    // Sessions under 15 real Zoom minutes don't count as a session, the same
+    // rule as To Be Paid above (utils/session-billing).
+    const { data: monthRows } = await supabase
         .from('sessions')
-        .select('*', { count: 'exact', head: true })
+        .select('id, actual_minutes')
         .eq('mentor_id', user.id)
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
         .gte('scheduled_at', startOfMonth.toISOString())
+    const sessionsThisMonth = ((monthRows ?? []) as unknown as { actual_minutes: number | null }[])
+        .filter((s) => isBillableLength(s.actual_minutes)).length
 
     return (
         <div className="space-y-12">

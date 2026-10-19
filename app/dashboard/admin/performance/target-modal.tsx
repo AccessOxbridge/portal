@@ -68,7 +68,7 @@ export default function TargetModal({ row, onClose }: { row: StudentPaceRow; onC
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+            className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
             onClick={close}
         >
             <div

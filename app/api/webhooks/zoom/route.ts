@@ -85,12 +85,12 @@ export async function POST(req: Request) {
                 let { data: existing, error: fetchError } = await loadSession(
                     'id, mentor_id, student_id, status, scheduled_at, duration_minutes, zoom_instances, actual_minutes'
                 )
-                // Until migration 20261019120000_sessions_actual_minutes is applied
+                // Until migration 20261019101304_sessions_actual_minutes is applied
                 // the length columns don't exist (42703). Complete and charge as
                 // before (still only once) rather than leave the session stuck.
                 const lengthTracked = fetchError?.code !== '42703'
                 if (!lengthTracked) {
-                    console.error('[ZOOM WEBHOOK] sessions.zoom_instances missing — apply migration 20261019120000. Length rule skipped.')
+                    console.error('[ZOOM WEBHOOK] sessions.zoom_instances missing — apply migration 20261019101304. Length rule skipped.')
                     ;({ data: existing, error: fetchError } = await loadSession(
                         'id, mentor_id, student_id, status, scheduled_at, duration_minutes'
                     ))

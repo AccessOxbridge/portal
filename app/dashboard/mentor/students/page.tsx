@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MentorStudentsContent, { type StudentMetric } from './mentor-students-content'
+import { isBillableLength } from '@/utils/session-billing'
 
 export default async function MentorStudentsPage() {
     const supabase = await createClient()
@@ -52,7 +53,7 @@ export default async function MentorStudentsPage() {
     const { data: sessions } = studentIds.length > 0
         ? await supabase
             .from('sessions')
-            .select('id, student_id, status, scheduled_at')
+            .select('id, student_id, status, scheduled_at, actual_minutes')
             .eq('mentor_id', user.id)
             .in('student_id', studentIds)
         : { data: [] as any[] }
@@ -62,6 +63,7 @@ export default async function MentorStudentsPage() {
         student_id: string
         status: string
         scheduled_at: string | null
+        actual_minutes?: number | null
     }>
 
     // Which of those sessions have a mentor report
@@ -92,7 +94,8 @@ export default async function MentorStudentsPage() {
         const sid = a.student_id
         const theirSessions = sessionRows.filter((s) => s.student_id === sid)
 
-        const completed = theirSessions.filter((s) => s.status === 'completed')
+        // Under 15 real Zoom minutes isn't a session (utils/session-billing).
+        const completed = theirSessions.filter((s) => s.status === 'completed' && isBillableLength(s.actual_minutes))
         const upcoming = theirSessions.filter(
             (s) =>
                 s.status === 'active' &&

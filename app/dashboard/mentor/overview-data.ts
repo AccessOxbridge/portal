@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
+import { isBillableLength } from '@/utils/session-billing'
 
 /**
  * Everything the mentor home shows, for one mentor, from real rows. Read-only.
@@ -62,7 +63,7 @@ export async function loadMentorOverview(db: SupabaseClient, mentorId: string): 
         // mentor sent (those wait for the student). Same filter as the Requests page.
         db.from('mentorship_requests').select('created_at').eq('mentor_id', mentorId).eq('status', 'pending').eq('initiated_by', 'student').order('created_at', { ascending: true }),
         db.from('sessions')
-            .select('id, scheduled_at, student_id, duration_minutes, payout_amount_cents, invoice_id')
+            .select('id, scheduled_at, student_id, duration_minutes, payout_amount_cents, invoice_id, actual_minutes')
             .eq('mentor_id', mentorId)
             .eq('status', 'completed')
             .order('scheduled_at', { ascending: false }),
@@ -73,7 +74,9 @@ export async function loadMentorOverview(db: SupabaseClient, mentorId: string): 
         db.from('mentor_payouts').select('amount_cents, paid_at').eq('mentor_id', mentorId).eq('status', 'paid').order('paid_at', { ascending: false }).limit(1),
     ])
 
-    const completedRows = completed.data ?? []
+    // Sessions under 15 real Zoom minutes don't count as a session: they
+    // aren't charged, invoiced or owed a report (utils/session-billing).
+    const completedRows = (completed.data ?? []).filter((s) => isBillableLength(s.actual_minutes))
     let reportsToWrite = 0
     if (completedRows.length > 0) {
         const { data: reports } = await db

@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import { getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
+import { isBillableLength } from '@/utils/session-billing'
 
 /**
  * Everything the admin home shows, from real rows. Read-only.
@@ -114,7 +115,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
             .gte('scheduled_at', nowIso)
             .lte('scheduled_at', in7Days)
             .order('scheduled_at', { ascending: true }),
-        db.from('sessions').select('id, scheduled_at').eq('status', 'completed').gte('scheduled_at', twelveWeeksAgo < ago90d ? twelveWeeksAgo : ago90d),
+        db.from('sessions').select('id, scheduled_at, actual_minutes').eq('status', 'completed').gte('scheduled_at', twelveWeeksAgo < ago90d ? twelveWeeksAgo : ago90d),
         db.from('student_profiles').select('*', { count: 'exact', head: true }).gte('created_at', monthStart),
         // Hours reach students two ways: a portal purchase or an admin top-up.
         // Both write a credit transaction; the portal holds no revenue figures.
@@ -122,12 +123,15 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         db.from('form_responses').select('rating').eq('form_type', 'student_feedback').gte('created_at', ago30d),
         db.from('login_events').select('user_id, created_at').eq('status', 'success').order('created_at', { ascending: false }).limit(5000),
         db.from('mentors').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+        db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'completed').or('actual_minutes.is.null,actual_minutes.gte.15'),
     ])
 
     // Reports overdue: completed in the last 90 days, more than 48 hours ago,
     // with no mentor report yet.
-    const completedRows = completedRecent.data ?? []
+    // Under 15 real Zoom minutes isn't a session (not charged or invoiced).
+    // (actual_minutes is newer than the generated types, hence the cast.)
+    type CompletedRow = { id: string; scheduled_at: string | null; actual_minutes: number | null }
+    const completedRows = ((completedRecent.data ?? []) as unknown as CompletedRow[]).filter((s) => isBillableLength(s.actual_minutes))
     const reportCandidates = completedRows.filter((s) => s.scheduled_at && s.scheduled_at >= ago90d && s.scheduled_at < ago48h)
     let reportsOverdue = 0
     if (reportCandidates.length > 0) {

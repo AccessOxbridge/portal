@@ -15,6 +15,7 @@ import MentorSessionCheckinModal from '@/components/dashboard/mentor-session-che
 import type { MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
+import { isBillableLength } from '@/utils/session-billing'
 
 export default async function DashboardLayout({
     children,
@@ -167,11 +168,13 @@ export default async function DashboardLayout({
         // Sessions that took place: completed, or ended on Zoom. The same rule
         // as payouts, so cancelled and never-started sessions don't ask for a
         // report. Matches the Reports page's "To complete" list.
-        const { data: sessions } = await supabase
+        const { data: sessionRows } = await supabase
             .from('sessions')
-            .select('id')
+            .select('id, actual_minutes')
             .eq('mentor_id', user.id)
             .or('status.eq.completed,zoom_meeting_status.eq.ended')
+        // actual_minutes is newer than the generated types, hence the cast.
+        const sessions = sessionRows as unknown as { id: string; actual_minutes: number | null }[] | null
 
         if (sessions && sessions.length > 0) {
             const sessionIds = sessions.map(s => s.id)
@@ -187,7 +190,9 @@ export default async function DashboardLayout({
             const submittedSessionIds = new Set(submittedReports?.map(r => r.session_id) || [])
 
             // Count sessions that need reports
-            pendingReportsCount = sessions.filter(session => !submittedSessionIds.has(session.id)).length
+            // Under 15 real Zoom minutes isn't a session, so no report is owed
+            // (the Zoom webhook doesn't ask for one either).
+            pendingReportsCount = sessions.filter(session => isBillableLength(session.actual_minutes) && !submittedSessionIds.has(session.id)).length
         }
 
         // Pending student requests (mentorship_requests awaiting mentor response)

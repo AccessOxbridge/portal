@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MentorReportsContent from './reports-content'
+import { isBillableLength } from '@/utils/session-billing'
 
 export default async function MentorReportsPage() {
     const supabase = await createClient()
@@ -31,6 +32,7 @@ export default async function MentorReportsPage() {
             scheduled_at,
             status,
             zoom_meeting_status,
+            actual_minutes,
             student:profiles!sessions_student_id_fkey (
                 full_name,
                 photo_url
@@ -59,6 +61,7 @@ export default async function MentorReportsPage() {
         scheduled_at: session.scheduled_at,
         status: session.status,
         zoom_meeting_status: session.zoom_meeting_status,
+        actual_minutes: session.actual_minutes ?? null,
         student_full_name: session.student?.full_name || 'Student',
         student_photo_url: session.student?.photo_url || null,
         has_report: submittedSessionIds.has(session.id),
@@ -70,7 +73,7 @@ export default async function MentorReportsPage() {
     // never-started sessions don't need one.
     const toComplete = processedSessions.filter(session => {
         const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
-        return isEnded && !session.has_report
+        return isEnded && isBillableLength(session.actual_minutes) && !session.has_report
     }).sort((a, b) => {
         // Most recent first (they need attention)
         if (!a.scheduled_at) return 1

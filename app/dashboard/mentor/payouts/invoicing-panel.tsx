@@ -52,6 +52,12 @@ interface UnbilledSession {
     student_name: string
     amount_cents: number
 }
+interface TooShortSession {
+    id: string
+    scheduled_at: string | null
+    student_name: string
+    actual_minutes: number
+}
 
 // ---- formatting ----
 const fmtGBP = (cents: number, currency = 'gbp') =>
@@ -78,6 +84,28 @@ const badgeClass = (s: string) => ({
     void: 'bg-tint-rose text-tint-rose-foreground',
 } as Record<string, string>)[s] || 'bg-muted text-foreground'
 
+// Sessions under 15 real minutes on Zoom (e.g. a quick hello before moving the
+// session to later). Shown so the mentor knows why they cannot be picked.
+function TooShortList({ sessions }: { sessions: TooShortSession[] }) {
+    if (sessions.length === 0) return null
+    return (
+        <div className="mt-4">
+            <p className="text-sm text-muted-foreground mb-2">Not billable: these ran under 15 minutes on Zoom, so they don’t count as a session.</p>
+            <div className="divide-y divide-border border border-border rounded-control bg-muted/40">
+                {sessions.map(s => (
+                    <div key={s.id} className="flex items-center gap-3 px-4 py-3 text-muted-foreground">
+                        <div className="flex-1 min-w-0">
+                            <p className="font-medium">{fmtDate(s.scheduled_at)} <span className="text-sm">{fmtTimeRange(s.scheduled_at)}</span></p>
+                            <p className="text-sm truncate">{s.student_name} · {s.actual_minutes} min on Zoom</p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">Not billable</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
 function StatusBadge({ status }: { status: string }) {
     return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeClass(status)}`}>{statusLabel(status)}</span>
 }
@@ -97,6 +125,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
     // create flow
     const [creating, setCreating] = useState(false)
     const [unbilled, setUnbilled] = useState<UnbilledSession[]>([])
+    const [tooShort, setTooShort] = useState<TooShortSession[]>([])
     const [unbilledLoading, setUnbilledLoading] = useState(false)
     const [picked, setPicked] = useState<Set<string>>(new Set())
 
@@ -140,6 +169,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
             const res = await fetch('/api/mentor/invoices/unbilled')
             const json = await res.json()
             setUnbilled(json.sessions || [])
+            setTooShort(json.too_short || [])
         } finally { setUnbilledLoading(false) }
     }
     const togglePick = (id: string) => setPicked(prev => {
@@ -252,7 +282,10 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                     {unbilledLoading ? (
                         <p className="text-muted-foreground py-6 text-center">Loading unbilled sessions…</p>
                     ) : unbilled.length === 0 ? (
-                        <p className="text-muted-foreground py-6 text-center">No unbilled sessions. Complete sessions to invoice them.</p>
+                        <>
+                            <p className="text-muted-foreground py-6 text-center">No unbilled sessions. Complete sessions to invoice them.</p>
+                            <TooShortList sessions={tooShort} />
+                        </>
                     ) : (
                         <>
                             <div className="max-h-72 overflow-y-auto divide-y divide-border border border-border rounded-control">
@@ -267,6 +300,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                                     </label>
                                 ))}
                             </div>
+                            <TooShortList sessions={tooShort} />
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
                                 <p className="text-sm text-muted-foreground">
                                     {picked.size} selected · <span className="font-semibold text-foreground">{fmtDur(pickedMinutes)}</span> · <span className="font-semibold text-foreground">{fmtGBP(pickedTotal)}</span>

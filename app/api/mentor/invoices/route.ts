@@ -7,6 +7,7 @@ import {
     computeInvoiceTotals,
     DEFAULT_HOURLY_RATE_CENTS,
 } from '@/utils/invoices'
+import { isBillableLength, isMissingLengthColumn, MIN_BILLABLE_MINUTES } from '@/utils/session-billing'
 
 /**
  * GET /api/mentor/invoices
@@ -107,7 +108,8 @@ export async function GET() {
  *
  * Create a DRAFT invoice from a set of the mentor's own unbilled sessions
  * (spec §4.3 / §5.2). Flow:
- *   1. Verify every requested session belongs to this mentor and is finished.
+ *   1. Verify every requested session belongs to this mentor, is finished, and
+ *      ran at least MIN_BILLABLE_MINUTES of real Zoom time.
  *   2. Atomically CLAIM them (UPDATE sessions SET invoice_id = <new> WHERE
  *      id = ANY(ids) AND invoice_id IS NULL RETURNING id). Only claimed rows go
  *      on the invoice; anything lost to a race is dropped and reported.
@@ -162,14 +164,26 @@ export async function POST(req: Request) {
 
         // 1. Verify ownership + eligibility. Fetch only the requested ids that are
         //    actually this mentor's; anything missing was not theirs.
-        const { data: candidates, error: candErr } = await db
+        const columns = 'id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, invoice_id'
+        const loadCandidates = (cols: string) => db
             .from('sessions')
-            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, invoice_id')
+            .select(cols)
             .in('id', requestedIds)
             .eq('mentor_id', user.id)
+        let { data: candidates, error: candErr } = await loadCandidates(`${columns}, actual_minutes`)
+        if (isMissingLengthColumn(candErr)) {
+            ;({ data: candidates, error: candErr } = await loadCandidates(columns))
+        }
         if (candErr) throw candErr
+        const candidateRows = (candidates || []) as unknown as {
+            id: string
+            status: string | null
+            zoom_meeting_status: string | null
+            invoice_id: string | null
+            actual_minutes?: number | null
+        }[]
 
-        const ownedById = new Map((candidates || []).map(s => [s.id, s]))
+        const ownedById = new Map(candidateRows.map(s => [s.id, s]))
         const notOwned = requestedIds.filter(id => !ownedById.has(id))
         if (notOwned.length > 0) {
             return NextResponse.json(
@@ -179,7 +193,7 @@ export async function POST(req: Request) {
         }
 
         const isFinished = (s: any) => s.status === 'completed' || s.zoom_meeting_status === 'ended'
-        const notFinished = (candidates || []).filter(s => !isFinished(s)).map(s => s.id)
+        const notFinished = candidateRows.filter(s => !isFinished(s)).map(s => s.id)
         if (notFinished.length > 0) {
             return NextResponse.json(
                 { error: 'Some sessions are not completed yet', session_ids: notFinished },
@@ -187,10 +201,19 @@ export async function POST(req: Request) {
             )
         }
 
+        // The unbilled list already hides these; this stops a hand-made POST.
+        const tooShort = candidateRows.filter(s => !isBillableLength(s.actual_minutes)).map(s => s.id)
+        if (tooShort.length > 0) {
+            return NextResponse.json(
+                { error: `Some sessions ran under ${MIN_BILLABLE_MINUTES} minutes and cannot be invoiced`, session_ids: tooShort },
+                { status: 400 }
+            )
+        }
+
         // Sessions already on another invoice (pre-check; the atomic claim is the
         // real guard against the race).
-        const alreadyInvoiced = (candidates || []).filter(s => s.invoice_id != null).map(s => s.id)
-        const eligibleIds = (candidates || []).filter(s => s.invoice_id == null).map(s => s.id)
+        const alreadyInvoiced = candidateRows.filter(s => s.invoice_id != null).map(s => s.id)
+        const eligibleIds = candidateRows.filter(s => s.invoice_id == null).map(s => s.id)
         if (eligibleIds.length === 0) {
             return NextResponse.json(
                 { error: 'All selected sessions are already invoiced', already_invoiced_session_ids: alreadyInvoiced },

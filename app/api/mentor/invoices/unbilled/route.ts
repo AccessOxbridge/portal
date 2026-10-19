@@ -3,7 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { sessionAmountCents, DEFAULT_HOURLY_RATE_CENTS } from '@/utils/invoices'
-import { isBillableLength } from '@/utils/session-billing'
+import { isBillableLength, isMissingLengthColumn } from '@/utils/session-billing'
 
 /**
  * GET /api/mentor/invoices/unbilled
@@ -58,17 +58,29 @@ export async function GET() {
         const hourlyRateCents = mentor?.hourly_rate_cents || DEFAULT_HOURLY_RATE_CENTS
 
         // Unbilled + finished sessions for this mentor.
-        const { data: sessions, error: sessionsError } = await db
+        const columns = 'id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, payout_amount_cents'
+        const loadUnbilled = (cols: string) => db
             .from('sessions')
-            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, payout_amount_cents, actual_minutes')
+            .select(cols)
             .eq('mentor_id', user.id)
             .is('invoice_id', null)
             .or('status.eq.completed,zoom_meeting_status.eq.ended')
             .order('scheduled_at', { ascending: true })
+        let { data: sessions, error: sessionsError } = await loadUnbilled(`${columns}, actual_minutes`)
+        if (isMissingLengthColumn(sessionsError)) {
+            ;({ data: sessions, error: sessionsError } = await loadUnbilled(columns))
+        }
 
         if (sessionsError) throw sessionsError
 
-        const rows = sessions || []
+        const rows = (sessions || []) as unknown as {
+            id: string
+            scheduled_at: string | null
+            duration_minutes: number | null
+            student_id: string
+            payout_amount_cents: number | null
+            actual_minutes?: number | null
+        }[]
 
         // Resolve student names in one batched lookup.
         const studentIds = [...new Set(rows.map(s => s.student_id).filter(Boolean))]

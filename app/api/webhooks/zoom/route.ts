@@ -70,6 +70,7 @@ export async function POST(req: Request) {
                     id: string
                     mentor_id: string
                     student_id: string
+                    status: string | null
                     scheduled_at: string | null
                     duration_minutes: number | null
                     zoom_instances?: ZoomInstances | null
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
                     .maybeSingle<EndedSession>()
 
                 let { data: existing, error: fetchError } = await loadSession(
-                    'id, mentor_id, student_id, scheduled_at, duration_minutes, zoom_instances, actual_minutes'
+                    'id, mentor_id, student_id, status, scheduled_at, duration_minutes, zoom_instances, actual_minutes'
                 )
                 // Until migration 20261019120000_sessions_actual_minutes is applied
                 // the length columns don't exist (42703). Complete and charge as
@@ -91,7 +92,7 @@ export async function POST(req: Request) {
                 if (!lengthTracked) {
                     console.error('[ZOOM WEBHOOK] sessions.zoom_instances missing — apply migration 20261019120000. Length rule skipped.')
                     ;({ data: existing, error: fetchError } = await loadSession(
-                        'id, mentor_id, student_id, scheduled_at, duration_minutes'
+                        'id, mentor_id, student_id, status, scheduled_at, duration_minutes'
                     ))
                 }
 
@@ -100,8 +101,14 @@ export async function POST(req: Request) {
                 } else if (!existing) {
                     console.warn(`[ZOOM WEBHOOK] meeting.ended: no session found with zoom_meeting_id=${meetingIdStr}. Check that the webhook meeting id matches sessions.zoom_meeting_id.`)
                 } else {
+                    // A session that completed before length tracking existed has
+                    // meetings we never saw. Leave its length unknown (billable, as
+                    // before) rather than judge it on a later reopen alone.
+                    const untrackedHistory = existing.status === 'completed' && existing.zoom_instances == null
+                    const trackLength = lengthTracked && !untrackedHistory
+
                     const instances: ZoomInstances = { ...(existing.zoom_instances || {}) }
-                    const instanceUuid = lengthTracked && meetingObject?.uuid ? String(meetingObject.uuid) : null
+                    const instanceUuid = trackLength && meetingObject?.uuid ? String(meetingObject.uuid) : null
                     const isRepeat = !!instanceUuid && !!instances[instanceUuid]
 
                     if (instanceUuid && !isRepeat) {
@@ -121,7 +128,7 @@ export async function POST(req: Request) {
                         .update({
                             zoom_meeting_status: 'ended',
                             status: 'completed',
-                            ...(lengthTracked && {
+                            ...(trackLength && {
                                 zoom_instances: Object.keys(instances).length > 0 ? instances : null,
                                 actual_minutes: actualMinutes,
                             }),

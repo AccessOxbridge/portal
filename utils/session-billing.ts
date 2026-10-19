@@ -25,6 +25,15 @@ export interface ZoomInstance {
 export type ZoomInstances = Record<string, ZoomInstance>
 
 /**
+ * Postgres "undefined column": code deployed before migration
+ * 20261019120000_sessions_actual_minutes. Callers retry without the length
+ * columns so nothing breaks, and the 15-minute rule simply doesn't apply yet.
+ */
+export function isMissingLengthColumn(error: { code?: string } | null | undefined): boolean {
+    return error?.code === '42703'
+}
+
+/**
  * NULL means the length is unknown (sessions from before this was recorded,
  * or a webhook without times). Unknown stays billable, exactly as before.
  */

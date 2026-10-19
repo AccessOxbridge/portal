@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { formatPrice } from '@/utils/stripe'
 import { sessionAmountCents, DEFAULT_HOURLY_RATE_CENTS } from '@/utils/invoices'
+import { isBillableLength, isMissingLengthColumn } from '@/utils/session-billing'
 import { StripeDashboardButton } from '@/components/dashboard/stripe-dashboard-button'
 import ReportIssueForm from './report-issue-form'
 import InvoicingPanel from './invoicing-panel'
@@ -56,15 +57,20 @@ export default async function MentorPayoutsPage() {
             .filter(Boolean)
     )
 
-    const { data: eligibleSessions } = await supabase
+    const sessionColumns = 'id, duration_minutes, status, zoom_meeting_status, payout_amount_cents'
+    const loadEligible = (cols: string) => supabase
         .from('sessions')
-        .select('id, duration_minutes, status, zoom_meeting_status, payout_amount_cents')
+        .select(cols)
         .eq('mentor_id', user.id)
         .or('status.eq.completed,zoom_meeting_status.eq.ended')
+    let { data: eligibleSessions, error: eligibleError } = await loadEligible(`${sessionColumns}, actual_minutes`)
+    if (isMissingLengthColumn(eligibleError)) {
+        ;({ data: eligibleSessions, error: eligibleError } = await loadEligible(sessionColumns))
+    }
 
     const hourlyRate = mentor?.hourly_rate_cents || DEFAULT_HOURLY_RATE_CENTS
     const unbatchedPending = (eligibleSessions || [])
-        .filter((s: any) => !paidOrBatchedSessionIds.has(s.id))
+        .filter((s: any) => !paidOrBatchedSessionIds.has(s.id) && isBillableLength(s.actual_minutes))
         .reduce((sum: number, s: any) => {
             return sum + sessionAmountCents(
                 s.duration_minutes,

@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server'
+import { SupabaseClient } from '@supabase/supabase-js'
 import { createAdminClient } from '@/utils/supabase/admin'
+import {
+    MIN_BILLABLE_MINUTES,
+    buildInstance,
+    isBillableLength,
+    sumCountedMinutes,
+    type ZoomInstances,
+} from '@/utils/session-billing'
 import { verifyZoomWebhook } from '@/utils/zoom-webhooks'
 import { processTranscript, pollAndProcessTranscript } from '@/utils/reports'
 
@@ -43,30 +51,84 @@ export async function POST(req: Request) {
         }
 
         else if (event === 'meeting.ended') {
-            const meetingId = payload?.object?.id ?? payload?.payload?.object?.id
+            const meetingObject = payload?.object ?? payload?.payload?.object
+            const meetingId = meetingObject?.id
             const meetingIdStr = meetingId != null ? String(meetingId) : ''
             console.log(`[ZOOM WEBHOOK] meeting.ended — zoom_meeting_id: ${meetingIdStr}`)
             let session: { id: string; mentor_id: string; student_id: string } | null = null
+            // Charge and prompt for feedback only the first time a session
+            // reaches a billable length. Repeats (Zoom resends unacknowledged
+            // webhooks after 5, 25 and 85 minutes) and too-short meetings skip it.
+            let deliverNow = false
             if (!meetingIdStr) {
                 console.error('[ZOOM WEBHOOK] meeting.ended missing payload.object.id. Payload:', JSON.stringify(payload).slice(0, 500))
             } else {
-                const result = await supabase
+                // `db` is untyped because the generated types don't yet include
+                // sessions.zoom_instances / actual_minutes.
+                const db = supabase as unknown as SupabaseClient
+                const { data: existing, error: fetchError } = await db
                     .from('sessions')
-                    .update({ zoom_meeting_status: 'ended', status: 'completed' })
+                    .select('id, mentor_id, student_id, scheduled_at, duration_minutes, zoom_instances, actual_minutes')
                     .eq('zoom_meeting_id', meetingIdStr)
-                    .select('id, mentor_id, student_id')
                     .maybeSingle()
-                session = result.data
-                const updateError = result.error
 
-                if (updateError) {
-                    console.error(`[ZOOM WEBHOOK] Failed to mark meeting ended for ${meetingIdStr}:`, updateError)
-                } else if (!session) {
+                if (fetchError) {
+                    console.error(`[ZOOM WEBHOOK] Failed to load session for ${meetingIdStr}:`, fetchError)
+                } else if (!existing) {
                     console.warn(`[ZOOM WEBHOOK] meeting.ended: no session found with zoom_meeting_id=${meetingIdStr}. Check that the webhook meeting id matches sessions.zoom_meeting_id.`)
+                } else {
+                    const instances: ZoomInstances = { ...(existing.zoom_instances || {}) }
+                    const instanceUuid = meetingObject?.uuid ? String(meetingObject.uuid) : null
+                    const isRepeat = !!instanceUuid && !!instances[instanceUuid]
+
+                    if (instanceUuid && !isRepeat) {
+                        instances[instanceUuid] = buildInstance(
+                            meetingObject?.start_time,
+                            meetingObject?.end_time,
+                            existing.scheduled_at,
+                            existing.duration_minutes
+                        )
+                    }
+                    const actualMinutes = instanceUuid ? sumCountedMinutes(instances) : existing.actual_minutes
+
+                    const { error: updateError } = await db
+                        .from('sessions')
+                        .update({
+                            zoom_meeting_status: 'ended',
+                            status: 'completed',
+                            zoom_instances: Object.keys(instances).length > 0 ? instances : null,
+                            actual_minutes: actualMinutes,
+                        })
+                        .eq('id', existing.id)
+
+                    if (updateError) {
+                        console.error(`[ZOOM WEBHOOK] Failed to mark meeting ended for ${meetingIdStr}:`, updateError)
+                    } else {
+                        session = { id: existing.id, mentor_id: existing.mentor_id, student_id: existing.student_id }
+
+                        // One charge per session, ever, whatever Zoom sends.
+                        const { data: priorCharge } = await db
+                            .from('credit_transactions')
+                            .select('id')
+                            .eq('reference_id', existing.id)
+                            .eq('type', 'booking')
+                            .limit(1)
+                            .maybeSingle()
+
+                        if (isRepeat) {
+                            console.log(`[ZOOM WEBHOOK] meeting.ended repeat for instance ${instanceUuid} — ignored`)
+                        } else if (priorCharge) {
+                            console.log(`[ZOOM WEBHOOK] session ${existing.id} already charged — not charging again`)
+                        } else if (!isBillableLength(actualMinutes)) {
+                            console.log(`[ZOOM WEBHOOK] session ${existing.id} ran ${actualMinutes} min, under ${MIN_BILLABLE_MINUTES} — not charged, not invoiceable`)
+                        } else {
+                            deliverNow = true
+                        }
+                    }
                 }
             }
 
-            if (session) {
+            if (session && deliverNow) {
                     await supabase.from('notifications').insert({
                     recipient_id: session.mentor_id,
                     recipient_email: '',

@@ -3,6 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { sessionAmountCents, DEFAULT_HOURLY_RATE_CENTS } from '@/utils/invoices'
+import { isBillableLength } from '@/utils/session-billing'
 
 /**
  * GET /api/mentor/invoices/unbilled
@@ -11,6 +12,9 @@ import { sessionAmountCents, DEFAULT_HOURLY_RATE_CENTS } from '@/utils/invoices'
  * generate an invoice (spec §5.1 / §4.3):
  *   mentor_id = me AND (status='completed' OR zoom_meeting_status='ended')
  *   AND invoice_id IS NULL
+ *
+ * Sessions that ran under MIN_BILLABLE_MINUTES of real Zoom time are returned
+ * separately as `too_short` so the mentor can see why they cannot be picked.
  *
  * Each row carries the amount computed server-side at the mentor's *current*
  * hourly rate (this is a preview; the rate is snapshotted at invoice generation).
@@ -56,7 +60,7 @@ export async function GET() {
         // Unbilled + finished sessions for this mentor.
         const { data: sessions, error: sessionsError } = await db
             .from('sessions')
-            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, payout_amount_cents')
+            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, payout_amount_cents, actual_minutes')
             .eq('mentor_id', user.id)
             .is('invoice_id', null)
             .or('status.eq.completed,zoom_meeting_status.eq.ended')
@@ -77,7 +81,7 @@ export async function GET() {
             for (const s of students || []) nameById[s.id] = s.full_name || 'Student'
         }
 
-        const unbilled = rows.map(s => ({
+        const unbilled = rows.filter(s => isBillableLength(s.actual_minutes)).map(s => ({
             id: s.id,
             scheduled_at: s.scheduled_at,
             duration_minutes: s.duration_minutes ?? 60,
@@ -89,9 +93,17 @@ export async function GET() {
             ),
         }))
 
+        const tooShort = rows.filter(s => !isBillableLength(s.actual_minutes)).map(s => ({
+            id: s.id,
+            scheduled_at: s.scheduled_at,
+            student_name: nameById[s.student_id] || 'Student',
+            actual_minutes: s.actual_minutes as number,
+        }))
+
         return NextResponse.json({
             hourly_rate_cents: hourlyRateCents,
             sessions: unbilled,
+            too_short: tooShort,
         })
     } catch (error: any) {
         console.error('[invoices/unbilled]', error)

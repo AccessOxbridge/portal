@@ -7,6 +7,7 @@ import {
     computeInvoiceTotals,
     DEFAULT_HOURLY_RATE_CENTS,
 } from '@/utils/invoices'
+import { isBillableLength, MIN_BILLABLE_MINUTES } from '@/utils/session-billing'
 
 /**
  * GET /api/mentor/invoices
@@ -107,7 +108,8 @@ export async function GET() {
  *
  * Create a DRAFT invoice from a set of the mentor's own unbilled sessions
  * (spec §4.3 / §5.2). Flow:
- *   1. Verify every requested session belongs to this mentor and is finished.
+ *   1. Verify every requested session belongs to this mentor, is finished, and
+ *      ran at least MIN_BILLABLE_MINUTES of real Zoom time.
  *   2. Atomically CLAIM them (UPDATE sessions SET invoice_id = <new> WHERE
  *      id = ANY(ids) AND invoice_id IS NULL RETURNING id). Only claimed rows go
  *      on the invoice; anything lost to a race is dropped and reported.
@@ -164,7 +166,7 @@ export async function POST(req: Request) {
         //    actually this mentor's; anything missing was not theirs.
         const { data: candidates, error: candErr } = await db
             .from('sessions')
-            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, invoice_id')
+            .select('id, scheduled_at, duration_minutes, student_id, status, zoom_meeting_status, invoice_id, actual_minutes')
             .in('id', requestedIds)
             .eq('mentor_id', user.id)
         if (candErr) throw candErr
@@ -183,6 +185,15 @@ export async function POST(req: Request) {
         if (notFinished.length > 0) {
             return NextResponse.json(
                 { error: 'Some sessions are not completed yet', session_ids: notFinished },
+                { status: 400 }
+            )
+        }
+
+        // The unbilled list already hides these; this stops a hand-made POST.
+        const tooShort = (candidates || []).filter(s => !isBillableLength(s.actual_minutes)).map(s => s.id)
+        if (tooShort.length > 0) {
+            return NextResponse.json(
+                { error: `Some sessions ran under ${MIN_BILLABLE_MINUTES} minutes and cannot be invoiced`, session_ids: tooShort },
                 { status: 400 }
             )
         }

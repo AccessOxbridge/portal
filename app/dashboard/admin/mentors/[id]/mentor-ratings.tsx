@@ -116,7 +116,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
                 </div>
                 <div className="bg-muted/60 border border-border rounded-card p-5">
                     <span className="text-3xl font-semibold text-foreground">
-                        {responseRate !== null ? `${responseRate}%` : '—'}
+                        {responseRate !== null ? `${responseRate}%` : 'None'}
                     </span>
                     <p className="text-xs font-semibold text-muted-foreground mt-2">
                         Response rate

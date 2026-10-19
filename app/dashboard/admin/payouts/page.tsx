@@ -62,9 +62,9 @@ interface PayResult {
 const fmtGBP = (cents: number, currency = 'gbp') =>
     new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format((cents || 0) / 100)
 const fmtDate = (v?: string | null) => {
-    if (!v) return '—'
+    if (!v) return 'Not set'
     const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(v) ? `${v}T00:00:00Z` : v)
-    return isNaN(d.getTime()) ? '—' : new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' }).format(d)
+    return isNaN(d.getTime()) ? 'Not set' : new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' }).format(d)
 }
 const fmtTimeRange = (scheduledAt?: string | null, dur?: number) => {
     if (!scheduledAt) return ''
@@ -201,7 +201,7 @@ export default function AdminPayoutsPage() {
                         const label = inv?.invoice_number || inv?.mentor_name || r.invoice_id.slice(0, 8)
                         return (
                             <div key={r.invoice_id} className={`text-sm px-3 py-2 rounded-lg ${r.success ? (r.bank_payout_pending ? 'bg-tint-amber text-tint-amber-foreground' : 'bg-tint-green text-tint-green-foreground') : 'bg-tint-rose text-tint-rose-foreground'}`}>
-                                <span className="font-semibold">{label}</span>{' — '}
+                                <span className="font-semibold">{label}</span>{': '}
                                 {r.success
                                     ? (r.bank_payout_pending ? `paid (transfer ok) ⚠️ bank payout pending: ${r.warning}` : 'paid ✓')
                                     : `failed: ${r.error}`}

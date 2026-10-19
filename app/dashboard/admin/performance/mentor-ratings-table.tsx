@@ -87,7 +87,7 @@ export default function MentorRatingsTable({ rows }: { rows: MentorRatingRow[] }
                                 <td className="px-6 py-4 align-top text-foreground tabular-nums">{row.currentStudents}</td>
                                 <td className="px-6 py-4 align-top text-foreground tabular-nums">{row.completedSessions}</td>
                                 <td className="px-6 py-4 align-top text-sm text-muted-foreground">
-                                    {rating.lastRatedAt ? format(new Date(rating.lastRatedAt), 'd MMM yyyy') : '—'}
+                                    {rating.lastRatedAt ? format(new Date(rating.lastRatedAt), 'd MMM yyyy') : 'None'}
                                 </td>
                             </tr>
                         )

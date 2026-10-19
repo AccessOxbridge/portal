@@ -177,7 +177,7 @@ export default function AdminRecordingsContent({ batches }: Props) {
                                                 </button>
                                             ) : (
                                                 <span className="text-sm text-muted-foreground shrink-0">
-                                                    —
+                                                    None
                                                 </span>
                                             )}
                                         </li>

@@ -72,14 +72,14 @@ export default function FeedbackOverview({
                 <div className="bg-card rounded-card border border-border p-6">
                     <p className="text-sm font-medium text-muted-foreground mb-1">Average rating</p>
                     <p className="text-3xl font-semibold text-warning flex items-center gap-2">
-                        {overallAverage !== null ? overallAverage.toFixed(1) : '—'}
+                        {overallAverage !== null ? overallAverage.toFixed(1) : 'None'}
                         <span className="text-lg text-muted-foreground">/ 5</span>
                     </p>
                 </div>
                 <div className="bg-card rounded-card border border-border p-6">
                     <p className="text-sm font-medium text-muted-foreground mb-1">Response rate</p>
                     <p className="text-3xl font-semibold text-foreground">
-                        {responseRate !== null ? `${responseRate}%` : '—'}
+                        {responseRate !== null ? `${responseRate}%` : 'None'}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                         {totalResponses} of {completedSessions} completed sessions rated

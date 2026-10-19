@@ -149,7 +149,7 @@ export function AdjustCreditsModal({
                 </div>
                 {currentCredits + delta < 0 && (
                     <p className="mt-2 text-xs text-warning">
-                        That would go below zero — the balance will be floored at 0 and the ledger
+                        That would go below zero. The balance will be floored at 0 and the ledger
                         will record the requested amount.
                     </p>
                 )}

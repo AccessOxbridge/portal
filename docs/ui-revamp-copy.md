@@ -439,3 +439,12 @@ Student and mentor error fallbacks only (shown when the server sends no message 
 - `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `Save Changes` > `Save changes`
 - `app/dashboard/student/resources/page.tsx`: `Learning Resources` > `Learning resources`; `All Articles` > `All articles`
 - `app/dashboard/student/events/in-person/in-person-content.tsx`: `In Person Events` > `In-person events`
+
+## Phase 6: final em dash sweep (2026-10-19)
+
+Visible em dashes removed everywhere except the mentor contract's legal text (kept, as agreed) and dev-only preview pages:
+- Empty values `[em dash]` > `None` in admin feedbacks (average, response rate), mentor ratings (response rate, last rated), satisfaction overview and admin recordings; > `Not set` for empty dates in admin payouts and the mentor invoicing panel, and the empty name, email and university fields on the mentor training page.
+- `app/dashboard/admin/manage-sessions/admin-book-session-modal.tsx`: `confirmed session [em dash] no accept/decline step` > `confirmed session, with no accept or decline step`; `{student} [em dash] assigned to {mentor}` > `{student}, assigned to {mentor}`
+- `app/dashboard/admin/payouts/page.tsx`: `{label} [em dash] ` > `{label}: `
+- `components/admin/adjust-credits-modal.tsx`: `That would go below zero [em dash] the balance` > `That would go below zero. The balance`
+- `components/dashboard/mentor-session-checkin-modal.tsx`: `proposed a time to {name} [em dash] waiting on them` > `proposed a time to {name}. Waiting on them`

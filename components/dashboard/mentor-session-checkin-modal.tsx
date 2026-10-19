@@ -277,8 +277,8 @@ export default function MentorSessionCheckinModal({
                                 <>
                                     <Clock className="size-5 text-success shrink-0 mt-0.5" />
                                     <p className="text-sm text-tint-green-foreground">
-                                        You&apos;ve already proposed a time to {firstName} —
-                                        waiting on them to confirm.
+                                        You&apos;ve already proposed a time to {firstName}.
+                                        Waiting on them to confirm.
                                     </p>
                                 </>
                             )}

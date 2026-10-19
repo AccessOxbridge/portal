@@ -786,15 +786,15 @@ export default function TrainingContent({
                                             <p className="font-semibold text-foreground mb-1">The Mentor</p>
                                             <p className="text-foreground">
                                                 <span className="text-muted-foreground">Full name: </span>
-                                                {mentorName || '—'}
+                                                {mentorName || 'Not set'}
                                             </p>
                                             <p className="text-foreground">
                                                 <span className="text-muted-foreground">Email: </span>
-                                                {existingData.email || '—'}
+                                                {existingData.email || 'Not set'}
                                             </p>
                                             <p className="text-foreground">
                                                 <span className="text-muted-foreground">Institution: </span>
-                                                {existingData.university || '—'}
+                                                {existingData.university || 'Not set'}
                                             </p>
                                         </div>
                                     </div>

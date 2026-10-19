@@ -212,7 +212,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                     </div>
                                     <div>
                                         <p className="text-sm text-foreground leading-relaxed">
-                                            This immediately creates a confirmed session — no accept/decline step for either party.
+                                            This immediately creates a confirmed session, with no accept or decline step for either party.
                                             Both will receive the standard session-confirmed email.
                                         </p>
                                     </div>
@@ -228,7 +228,7 @@ export default function AdminBookSessionModal({ assignedPairs }: { assignedPairs
                                     <option value="">Select a student</option>
                                     {assignedPairs.map((p) => (
                                         <option key={`${p.studentId}:${p.mentorId}`} value={`${p.studentId}:${p.mentorId}`}>
-                                            {p.studentName} — assigned to {p.mentorName}
+                                            {p.studentName}, assigned to {p.mentorName}
                                         </option>
                                     ))}
                                 </SelectField>

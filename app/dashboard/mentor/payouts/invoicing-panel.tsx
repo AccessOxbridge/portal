@@ -63,9 +63,9 @@ interface TooShortSession {
 const fmtGBP = (cents: number, currency = 'gbp') =>
     new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format((cents || 0) / 100)
 const fmtDate = (v?: string | null) => {
-    if (!v) return '—'
+    if (!v) return 'Not set'
     const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(v) ? `${v}T00:00:00Z` : v)
-    return isNaN(d.getTime()) ? '—' : new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' }).format(d)
+    return isNaN(d.getTime()) ? 'Not set' : new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' }).format(d)
 }
 const fmtTimeRange = (scheduledAt?: string | null, dur?: number) => {
     if (!scheduledAt) return ''

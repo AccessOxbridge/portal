@@ -146,7 +146,7 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
                             <p
                                 className={`text-3xl font-semibold flex items-center gap-2 ${scoreColour(value)}`}
                             >
-                                {value !== null ? value.toFixed(1) : '—'}
+                                {value !== null ? value.toFixed(1) : 'None'}
                                 <span className="text-lg text-muted-foreground">/ 5</span>
                                 {delta !== null && <TrendArrow delta={delta} />}
                             </p>

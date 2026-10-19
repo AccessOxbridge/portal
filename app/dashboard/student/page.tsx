@@ -44,6 +44,9 @@ export default async function StudentDashboard() {
         `)
         .eq('student_id', user.id)
         .eq('status', 'active')
+        // Upcoming or unscheduled only, in the query itself: past sessions stuck
+        // on 'active' used to fill the 20 rows and hide the real next session.
+        .or(`scheduled_at.gte.${new Date().toISOString()},scheduled_at.is.null`)
         .order('scheduled_at', { ascending: true })
         .limit(20)
 

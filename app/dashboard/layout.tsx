@@ -201,6 +201,9 @@ export default async function DashboardLayout({
             .select('*', { count: 'exact', head: true })
             .eq('mentor_id', user.id)
             .eq('status', 'pending')
+            // Requests the mentor sent wait on the student, not on them. Same
+            // filter as the Requests page and the mentor home.
+            .eq('initiated_by', 'student')
         pendingRequestsCount = requestsCount ?? 0
     }
 

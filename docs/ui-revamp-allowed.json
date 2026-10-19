@@ -265,6 +265,14 @@
                 "app/dashboard/mentor/students/page.tsx"
             ],
             "why": "After merging PR #18 (2026-10-19): a session under 15 real Zoom minutes is not a session (not charged, not invoiceable, no report requested by the webhook). The revamp's counts of completed sessions (mentor and admin homes, the reports badge, the Reports page list, My students) now apply the same isBillableLength filter so they agree with To Be Paid and the invoice picker. Read-only; also selects sessions.actual_minutes."
+        },
+        {
+            "category": "global key listener",
+            "item": "document:keydown",
+            "files": [
+                "components/dashboard/book-session-modal.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-19 ('fix all 3'): the booking sheet closes on Escape like every other popup. It skips the key while a date or time menu inside is open (those close on Escape themselves) and while a request is submitting."
         }
     ],
     "newFiles": [

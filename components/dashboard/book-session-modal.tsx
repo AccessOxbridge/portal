@@ -243,6 +243,19 @@ export default function BookSessionModal({ isOpen, onClose, studentProfile, ment
         }
     }
 
+    // Escape closes the sheet, like every other popup. When a date or time
+    // menu inside is open, Escape closes only that menu (it listens too).
+    useEffect(() => {
+        if (!isOpen) return
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape' || loading) return
+            if (document.querySelector('[role="dialog"] [aria-expanded="true"]')) return
+            onClose()
+        }
+        document.addEventListener('keydown', onKeyDown)
+        return () => document.removeEventListener('keydown', onKeyDown)
+    }, [isOpen, loading, onClose])
+
     if (!isOpen) return null
 
     const canSubmit =

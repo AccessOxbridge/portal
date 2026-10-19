@@ -108,7 +108,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
                     </>
                 ) : (
                     <>
-                        <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">Learning Resources</h1>
+                        <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">Learning resources</h1>
                         <p className="mt-2 text-muted-foreground text-xl font-medium">
                             Expert guides to help you get into Oxford or Cambridge.
                         </p>
@@ -163,7 +163,7 @@ export default async function StudentResourcesPage({ searchParams }: PageProps) 
             {(categorySlug || (!categorySlug && articles && articles.length > 0)) && (
                 <div className="space-y-4">
                     {!categorySlug && (
-                        <h2 className="text-2xl font-semibold text-foreground">All Articles</h2>
+                        <h2 className="text-2xl font-semibold text-foreground">All articles</h2>
                     )}
                     {!articles || articles.length === 0 ? (
                         <div className="py-20 flex flex-col items-center gap-4 bg-card rounded-card border border-border">

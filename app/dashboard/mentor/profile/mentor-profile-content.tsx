@@ -48,7 +48,7 @@ function SaveButton({ dirty }: { dirty: boolean }) {
             className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
         >
             <Save className="size-5" />
-            {pending ? 'Saving…' : 'Save Changes'}
+            {pending ? 'Saving…' : 'Save changes'}
         </button>
     )
 }

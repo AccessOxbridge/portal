@@ -33,7 +33,7 @@ export default function MentorOverview({ data }: { data: Data }) {
                         <p className="font-semibold">Finish your onboarding</p>
                         <p className="mt-0.5 text-sm text-primary-foreground/70">Training, contract and profile come first, then you can receive students.</p>
                     </div>
-                    <Link href="/dashboard/mentor/training" className={cn(buttonVariants(), 'bg-rich-amber-accent text-legacy-accent hover:bg-rich-amber-accent/90')}>
+                    <Link href="/dashboard/mentor/training" className={cn(buttonVariants(), 'bg-rich-amber-accent text-primary hover:bg-rich-amber-accent/90')}>
                         Go to training
                     </Link>
                 </div>

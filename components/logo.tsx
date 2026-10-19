@@ -4,7 +4,7 @@ import { cn } from "@/utils/lib";
 
 export function Logo({
   className,
-  textColor = "text-gray-900",
+  textColor = "text-foreground",
   size = "default",
   iconOnly = false,
 }: {

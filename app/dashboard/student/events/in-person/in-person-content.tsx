@@ -93,7 +93,7 @@ export default function InPersonEventsContent({ upcomingEvents, pastEvents, user
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-semibold text-foreground">In Person Events</h1>
+                <h1 className="text-2xl font-semibold text-foreground">In-person events</h1>
                 <p className="text-muted-foreground mt-1">
                     Attend exclusive in-person meetups, tours, and workshops
                 </p>

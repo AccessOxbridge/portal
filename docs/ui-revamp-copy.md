@@ -431,3 +431,11 @@ Student and mentor error fallbacks only (shown when the server sends no message 
 - `app/dashboard/mentor/payouts/report-issue-form.tsx`: `Failed to submit issue` > `Couldn't send your report. Try again in a moment.`
 - `components/dashboard/stripe-onboarding-button.tsx`: `Failed to start Stripe onboarding` > `Couldn't open Stripe. Try again in a moment.`
 - `components/dashboard/stripe-onboarding-button.tsx`: `Failed to start onboarding` > `Couldn't open Stripe. Try again in a moment.`
+
+## Phase 6 polish (2026-10-19)
+
+- `components/forms/mentor-report-form.tsx`: `Submit Report` > `Submit report`; `Next Step` > `Next`; `Submitting...` > `Submitting` (the button also spins); step label no longer upper case. The field labels come from config/forms.config and are unchanged.
+- `app/dashboard/mentor/requests/mentor-request-card.tsx`: `Confirm & Accept` > `Confirm and accept`; `Confirming...` > `Confirming`; `Yes, Decline Request` > `Yes, decline request`; `Declining...` > `Declining`
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: `Save Changes` > `Save changes`
+- `app/dashboard/student/resources/page.tsx`: `Learning Resources` > `Learning resources`; `All Articles` > `All articles`
+- `app/dashboard/student/events/in-person/in-person-content.tsx`: `In Person Events` > `In-person events`

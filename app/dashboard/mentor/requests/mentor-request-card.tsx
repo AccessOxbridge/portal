@@ -142,7 +142,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                 </div>
 
                 {showRejectDialog && (
-                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+                    <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
                         <div
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                             onClick={() => !loading && setShowRejectDialog(false)}
@@ -324,7 +324,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                             disabled={!selectedSlot || loading}
                             className="w-full py-4 bg-success text-white font-semibold rounded-card shadow-border active:scale-[0.98] transition-[background-color,box-shadow,color] duration-150 disabled:opacity-50 disabled:hover:scale-100"
                         >
-                            {loading ? 'Confirming...' : 'Confirm & Accept'}
+                            {loading ? 'Confirming' : 'Confirm and accept'}
                         </button>
 
                         <button
@@ -342,7 +342,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
 
             {/* Reject Confirmation Dialog */}
             {showRejectDialog && (
-                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+                <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm duration-300"
                         onClick={() => !loading && setShowRejectDialog(false)}
@@ -361,7 +361,7 @@ export function MentorRequestCard({ request }: { request: Request }) {
                                 disabled={loading}
                                 className="w-full py-5 bg-destructive text-white font-semibold rounded-card shadow-[0_8px_30px_rgb(220,38,38,0.2)] hover:bg-destructive/90 active:scale-[0.98] transition-[background-color,box-shadow,color] duration-150 disabled:opacity-50 disabled:hover:scale-100"
                             >
-                                {loading ? 'Declining...' : 'Yes, Decline Request'}
+                                {loading ? 'Declining' : 'Yes, decline request'}
                             </button>
                             <button
                                 onClick={() => setShowRejectDialog(false)}

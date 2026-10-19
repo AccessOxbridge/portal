@@ -59,7 +59,7 @@ function renderInline(nodes: InlineNode[], onDark: boolean): ReactNode {
                             'underline underline-offset-2 font-medium transition-colors',
                             onDark
                                 ? 'decoration-white/40 hover:decoration-white'
-                                : 'text-legacy-accent decoration-legacy-accent/30 hover:decoration-legacy-accent'
+                                : 'text-brand decoration-brand/30 hover:decoration-brand'
                         )}
                     >
                         {displayText(node.raw)}
@@ -74,7 +74,7 @@ function renderInline(nodes: InlineNode[], onDark: boolean): ReactNode {
                             'px-1 py-0.5 rounded text-[0.85em] font-mono',
                             onDark
                                 ? 'bg-white/15 text-white'
-                                : 'bg-gray-100 text-gray-800 border border-gray-200/80'
+                                : 'bg-muted text-foreground border border-border'
                         )}
                     >
                         {node.value}
@@ -118,7 +118,7 @@ function renderBlock(block: Block, key: number, onDark: boolean): ReactNode {
                     key={key}
                     className={cn(
                         'pl-2.5 border-l-2 whitespace-pre-wrap [overflow-wrap:anywhere]',
-                        onDark ? 'border-white/40 text-white/85' : 'border-gray-300 text-gray-500'
+                        onDark ? 'border-white/40 text-white/85' : 'border-border text-muted-foreground'
                     )}
                 >
                     {renderInline(block.children, onDark)}
@@ -133,7 +133,7 @@ function renderBlock(block: Block, key: number, onDark: boolean): ReactNode {
                         'px-2.5 py-2 rounded-lg text-[13px] font-mono overflow-x-auto',
                         onDark
                             ? 'bg-black/20 text-white/95'
-                            : 'bg-gray-50 text-gray-800 border border-gray-200'
+                            : 'bg-muted/60 text-foreground border border-border'
                     )}
                 >
                     <code>{block.value}</code>

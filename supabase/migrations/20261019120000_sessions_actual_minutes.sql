@@ -17,7 +17,7 @@ ALTER TABLE public.sessions
     ADD COLUMN IF NOT EXISTS actual_minutes INTEGER;
 
 COMMENT ON COLUMN public.sessions.zoom_instances IS
-    'Zoom meeting instances seen on meeting.ended, keyed by instance uuid: {start, end, minutes, counted}. A repeated webhook for the same uuid is ignored.';
+    'Zoom meeting instances seen on meeting.ended, keyed by instance uuid: {start, end, minutes, counted_minutes}. A repeated webhook for the same uuid is ignored.';
 COMMENT ON COLUMN public.sessions.actual_minutes IS
     'Real meeting minutes summed across counted instances. NULL = unknown (all rows predating this column). Under 15 = not charged, not invoiceable.';
 

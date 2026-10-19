@@ -66,11 +66,34 @@ export async function POST(req: Request) {
                 // `db` is untyped because the generated types don't yet include
                 // sessions.zoom_instances / actual_minutes.
                 const db = supabase as unknown as SupabaseClient
-                const { data: existing, error: fetchError } = await db
+                type EndedSession = {
+                    id: string
+                    mentor_id: string
+                    student_id: string
+                    scheduled_at: string | null
+                    duration_minutes: number | null
+                    zoom_instances?: ZoomInstances | null
+                    actual_minutes?: number | null
+                }
+                const loadSession = (columns: string) => db
                     .from('sessions')
-                    .select('id, mentor_id, student_id, scheduled_at, duration_minutes, zoom_instances, actual_minutes')
+                    .select(columns)
                     .eq('zoom_meeting_id', meetingIdStr)
-                    .maybeSingle()
+                    .maybeSingle<EndedSession>()
+
+                let { data: existing, error: fetchError } = await loadSession(
+                    'id, mentor_id, student_id, scheduled_at, duration_minutes, zoom_instances, actual_minutes'
+                )
+                // Until migration 20261019120000_sessions_actual_minutes is applied
+                // the length columns don't exist (42703). Complete and charge as
+                // before (still only once) rather than leave the session stuck.
+                const lengthTracked = fetchError?.code !== '42703'
+                if (!lengthTracked) {
+                    console.error('[ZOOM WEBHOOK] sessions.zoom_instances missing — apply migration 20261019120000. Length rule skipped.')
+                    ;({ data: existing, error: fetchError } = await loadSession(
+                        'id, mentor_id, student_id, scheduled_at, duration_minutes'
+                    ))
+                }
 
                 if (fetchError) {
                     console.error(`[ZOOM WEBHOOK] Failed to load session for ${meetingIdStr}:`, fetchError)
@@ -78,7 +101,7 @@ export async function POST(req: Request) {
                     console.warn(`[ZOOM WEBHOOK] meeting.ended: no session found with zoom_meeting_id=${meetingIdStr}. Check that the webhook meeting id matches sessions.zoom_meeting_id.`)
                 } else {
                     const instances: ZoomInstances = { ...(existing.zoom_instances || {}) }
-                    const instanceUuid = meetingObject?.uuid ? String(meetingObject.uuid) : null
+                    const instanceUuid = lengthTracked && meetingObject?.uuid ? String(meetingObject.uuid) : null
                     const isRepeat = !!instanceUuid && !!instances[instanceUuid]
 
                     if (instanceUuid && !isRepeat) {
@@ -89,15 +112,19 @@ export async function POST(req: Request) {
                             existing.duration_minutes
                         )
                     }
-                    const actualMinutes = instanceUuid ? sumCountedMinutes(instances) : existing.actual_minutes
+                    const actualMinutes: number | null = instanceUuid
+                        ? sumCountedMinutes(instances)
+                        : existing.actual_minutes ?? null
 
                     const { error: updateError } = await db
                         .from('sessions')
                         .update({
                             zoom_meeting_status: 'ended',
                             status: 'completed',
-                            zoom_instances: Object.keys(instances).length > 0 ? instances : null,
-                            actual_minutes: actualMinutes,
+                            ...(lengthTracked && {
+                                zoom_instances: Object.keys(instances).length > 0 ? instances : null,
+                                actual_minutes: actualMinutes,
+                            }),
                         })
                         .eq('id', existing.id)
 

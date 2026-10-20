@@ -78,7 +78,7 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
                         )}
                     </span>
                     <div className="min-w-0">
-                        <p className="truncate text-base font-semibold text-foreground">
+                        <p className="text-base font-semibold text-foreground text-balance">
                             {isIncomplete ? 'Complete your profile' : 'Academic profile'}
                         </p>
                         {isIncomplete && (

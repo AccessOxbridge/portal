@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, CalendarBlank as Calendar, Clock, CalendarPlus } from '@phosphor-icons/react/ssr'
-import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
+import { addMinutesToWallTime, getTimezoneOptions, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import { SelectField } from '@/components/ui/select'
 import DatePicker from '@/components/dashboard/date-picker'
 
@@ -13,49 +13,6 @@ export interface AssignedPair {
     mentorId: string
     mentorName: string
     mentorTimezone: string | null
-}
-
-// Common IANA timezones, plus whatever the selected pair's mentor already has.
-const COMMON_TIMEZONES = [
-    'Europe/London',
-    'Europe/Dublin',
-    'Europe/Paris',
-    'Europe/Berlin',
-    'Europe/Madrid',
-    'Europe/Athens',
-    'Africa/Lagos',
-    'Africa/Cairo',
-    'Africa/Johannesburg',
-    'Asia/Dubai',
-    'Asia/Karachi',
-    'Asia/Kolkata',
-    'Asia/Dhaka',
-    'Asia/Singapore',
-    'Asia/Hong_Kong',
-    'Asia/Shanghai',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'America/Toronto',
-    'America/Sao_Paulo',
-]
-
-function getTimezoneOptions(current: string | null): string[] {
-    let list = COMMON_TIMEZONES
-    try {
-        const supported = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] })
-            .supportedValuesOf?.('timeZone')
-        if (supported && supported.length) list = supported
-    } catch {
-        // fall back to COMMON_TIMEZONES
-    }
-    if (current && !list.includes(current)) {
-        return [current, ...list]
-    }
-    return list
 }
 
 const durationLabel = (minutes: number) => {

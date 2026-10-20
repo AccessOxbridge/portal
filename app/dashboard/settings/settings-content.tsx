@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
 import { updateTimezone, sendPasswordResetLink } from './actions'
-import { getDefaultTimezone, rememberTimezone } from '@/lib/timezone'
+import { getDefaultTimezone, getTimezoneOptions, rememberTimezone } from '@/lib/timezone'
 import LoginHistory, { type LoginEvent } from './login-history'
 import { Button } from '@/components/ui/button'
 import { SelectField } from '@/components/ui/select'
@@ -18,50 +18,6 @@ interface SettingsContentProps {
     loginEvents: LoginEvent[]
     /** Every user's events — admins only; null for everyone else. */
     allLoginEvents: LoginEvent[] | null
-}
-
-// Common IANA timezones, plus whatever the user already has saved.
-const COMMON_TIMEZONES = [
-    'Europe/London',
-    'Europe/Dublin',
-    'Europe/Paris',
-    'Europe/Berlin',
-    'Europe/Madrid',
-    'Europe/Athens',
-    'Africa/Lagos',
-    'Africa/Cairo',
-    'Africa/Johannesburg',
-    'Asia/Dubai',
-    'Asia/Karachi',
-    'Asia/Kolkata',
-    'Asia/Dhaka',
-    'Asia/Singapore',
-    'Asia/Hong_Kong',
-    'Asia/Shanghai',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'America/Toronto',
-    'America/Sao_Paulo',
-]
-
-function getTimezoneOptions(current: string | null): string[] {
-    let list = COMMON_TIMEZONES
-    // Prefer the full browser-provided list when available (modern browsers).
-    try {
-        const supported = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] })
-            .supportedValuesOf?.('timeZone')
-        if (supported && supported.length) list = supported
-    } catch {
-        // fall back to COMMON_TIMEZONES
-    }
-    if (current && !list.includes(current)) {
-        return [current, ...list]
-    }
-    return list
 }
 
 const roleLabel = (role: string) => {

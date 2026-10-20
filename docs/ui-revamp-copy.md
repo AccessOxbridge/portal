@@ -448,3 +448,15 @@ Visible em dashes removed everywhere except the mentor contract's legal text (ke
 - `app/dashboard/admin/payouts/page.tsx`: `{label} [em dash] ` > `{label}: `
 - `components/admin/adjust-credits-modal.tsx`: `That would go below zero [em dash] the balance` > `That would go below zero. The balance`
 - `components/dashboard/mentor-session-checkin-modal.tsx`: `proposed a time to {name} [em dash] waiting on them` > `proposed a time to {name}. Waiting on them`
+
+## Older issues batch (2026-10-20)
+
+- `app/dashboard/admin/manage-sessions/manage-sessions-table.tsx`: empty date `TBD` > `Not set`; times now carry their zone, e.g. `14:00 BST`.
+- `app/dashboard/mentor/profile/mentor-profile-content.tsx`: timezone text box replaced by the Settings dropdown (first option `Not set`); help text `Use an IANA timezone like Europe/London or America/New_York. Used to show your session times.` > `Used to show your session times.`, or, for an unrecognised saved value, `Your saved timezone "{value}" isn't one we recognise, so UK time is used. Pick yours from the list.`
+- `app/dashboard/mentor/profile/actions.ts`: new error `Choose your timezone from the list.`
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: tab `Completed` > `Past` (matches the student page); past cards gain a `Cancelled` or `Not completed` label.
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: past cards gain a `Cancelled` or `Not completed` label.
+- `app/dashboard/mentor/reports/reports-content.tsx`: tabs lose their icons and use the shared pill tabs; the `Completed` count is hidden at 0, like every other tab count.
+- `app/dashboard/student/sessions/journey-timeline.tsx`: once a student has had a session, every step stays ticked and the subtitle reads `Your next session is booked.`, `Waiting for your mentor to confirm your next session.`, `Your mentor is setting a time for your next session.` or `Book your next session whenever you’re ready.`
+- `app/dashboard/student/sessions/student-sessions-content.tsx`: `Leave feedback` and `Report pending` no longer show on cancelled or not completed sessions.
+- `app/dashboard/mentor/sessions/mentor-sessions-content.tsx`: `Submit report` no longer shows on cancelled sessions.

@@ -58,6 +58,13 @@ interface StudentSessionsContentProps {
     timezone?: string | null
 }
 
+/** Label for a past card whose session never ran: cancelled, or still open with no Zoom ending. */
+function pastSessionLabel(session: { status: string | null; zoom_meeting_status: string | null }): string | null {
+    if (session.status === 'cancelled') return 'Cancelled'
+    if (session.status !== 'completed' && session.zoom_meeting_status !== 'ended') return 'Not completed'
+    return null
+}
+
 export default function StudentSessionsContent({
     sessions,
     pendingRequests,
@@ -584,6 +591,9 @@ export default function StudentSessionsContent({
                                                     Starting soon
                                                 </Badge>
                                             )}
+                                            {activeTab === 'past' && pastSessionLabel(session) && (
+                                                <Badge className="mt-2.5">{pastSessionLabel(session)}</Badge>
+                                            )}
                                         </div>
                                     </div>
 
@@ -659,7 +669,8 @@ export default function StudentSessionsContent({
                                                         View report
                                                     </Link>
                                                 )}
-                                                {!session.has_feedback && (
+                                                {/* Feedback only for sessions that actually ran. */}
+                                                {!session.has_feedback && !pastSessionLabel(session) && (
                                                     <Link
                                                         href={`/dashboard/student/sessions/${session.id}/feedback`}
                                                         className={cn(buttonVariants({ variant: 'secondary' }), 'bg-tint-amber text-tint-amber-foreground hover:bg-tint-amber/70')}
@@ -668,7 +679,7 @@ export default function StudentSessionsContent({
                                                         Leave feedback
                                                     </Link>
                                                 )}
-                                                {session.has_feedback && !session.has_report && (
+                                                {session.has_feedback && !session.has_report && !pastSessionLabel(session) && (
                                                     <span className={mutedPill}>
                                                         Report pending
                                                     </span>

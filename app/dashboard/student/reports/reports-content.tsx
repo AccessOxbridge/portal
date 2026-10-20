@@ -120,10 +120,10 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                         className="overflow-hidden rounded-card bg-card shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover"
                     >
                         {/* Report Header */}
-                        <button
-                            onClick={() => toggleReport(item.report.id)}
-                            className="flex w-full items-center justify-between gap-3 p-4 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring/40 sm:p-5"
-                        >
+                        {/* The title button stretches over the whole header, so the
+                            header still opens the report while "Chat with mentor"
+                            stays a separate button rather than one nested inside it. */}
+                        <div className="relative flex w-full items-center justify-between gap-3 p-4 text-left sm:p-5">
                             <div className="flex min-w-0 items-center gap-3.5">
                                 {/* Mentor Avatar */}
                                 <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-tint-blue outline-1 -outline-offset-1 outline-black/10">
@@ -140,7 +140,14 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
 
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-medium text-foreground">
-                                        Session with {item.mentor_full_name}
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleReport(item.report.id)}
+                                            aria-expanded={isExpanded}
+                                            className="text-left outline-none after:absolute after:inset-0 focus-visible:after:ring-[3px] focus-visible:after:ring-inset focus-visible:after:ring-ring/40"
+                                        >
+                                            Session with {item.mentor_full_name}
+                                        </button>
                                     </h3>
                                     <div className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
                                         <Calendar className="size-4 shrink-0" />
@@ -166,7 +173,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                     type="button"
                                     onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                     disabled={chatLoadingMentorId === item.mentor_id}
-                                    className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-tint-blue px-3 py-1.5 text-xs font-medium text-tint-blue-foreground transition-colors duration-150 hover:bg-tint-blue/70 disabled:opacity-50"
+                                    className="relative z-10 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-tint-blue px-3 py-1.5 text-xs font-medium text-tint-blue-foreground transition-colors duration-150 hover:bg-tint-blue/70 disabled:opacity-50"
                                 >
                                     <MessageCircle weight="fill" className="size-3.5" />
                                     {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}
@@ -182,7 +189,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                     <ChevronDown className="size-5 text-muted-foreground" />
                                 )}
                             </div>
-                        </button>
+                        </div>
 
                         {/* Expanded Report Content — only the personalized report (what was written) */}
                         {isExpanded && (

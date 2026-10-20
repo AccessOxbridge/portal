@@ -1,7 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { Button } from '@/components/ui/button'
 import { confirmDialog } from '@/components/ui/confirm'
+import { SelectField } from '@/components/ui/select'
 
 // Finance won't accept an invoice under 2 hours of sessions.
 const MIN_INVOICE_MINUTES = 120
@@ -269,7 +271,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                 <FilterSelect label="Status" value={fStatus} onChange={setFStatus} options={[['all', 'All'], ['draft', 'Draft'], ['submitted', 'Sent to Finance'], ['paid', 'Paid'], ['void', 'Void']]} />
                 <FilterSelect label="Period" value={fPeriod} onChange={setFPeriod} options={[['all', 'All time'], ['30d', 'Last 30 days'], ['year', 'This year']]} />
                 <FilterSelect label="Billing country" value={fCountry} onChange={setFCountry} options={[['all', 'All'], ['uk', 'United Kingdom']]} />
-                <button onClick={resetFilters} className="px-4 py-2.5 rounded-control text-sm font-semibold text-muted-foreground border border-border hover:bg-muted/60">Reset</button>
+                <Button variant="outline" onClick={resetFilters}>Reset</Button>
             </div>
 
             {/* Create panel */}
@@ -371,12 +373,13 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
 }
 
 function FilterSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
+    const id = useId()
     return (
-        <div className="flex flex-col">
-            <label className="text-xs font-semibold text-muted-foreground mb-1">{label}</label>
-            <select value={value} onChange={e => onChange(e.target.value)} className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 px-3.5">
+        <div className="flex w-full flex-col sm:w-52">
+            <label htmlFor={id} className="text-xs font-semibold text-muted-foreground mb-1">{label}</label>
+            <SelectField id={id} value={value} onChange={e => onChange(e.target.value)}>
                 {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
+            </SelectField>
         </div>
     )
 }

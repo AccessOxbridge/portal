@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { CalendarBlank as Calendar, ArrowCounterClockwise as RefreshCcw, FloppyDisk as Save, VideoCamera as Video, WarningCircle as AlertCircle, CheckCircle as CheckCircle2, MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
 import { SelectField } from '@/components/ui/select'
+import { DEFAULT_TIMEZONE, formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface SessionRow {
     id: string
@@ -100,20 +101,11 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
             })
     }, [sessions, filter, search])
 
+    // Always UK time with its zone (BST or GMT), whatever the admin's computer
+    // is set to, so everyone reads the same hour for a session.
     const formatDateTime = (dateStr: string | null) => {
-        if (!dateStr) return 'TBD'
-        const date = new Date(dateStr)
-        const datePart = date.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-        })
-        const timePart = date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-        })
-        return `${datePart} • ${timePart}`
+        if (!dateStr) return 'Not set'
+        return `${formatDateInTz(dateStr, DEFAULT_TIMEZONE)} • ${formatTimeInTz(dateStr, DEFAULT_TIMEZONE)}`
     }
 
     const handleMentorChange = (sessionId: string, mentorId: string) => {

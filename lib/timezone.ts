@@ -183,12 +183,14 @@ export function formatTimeInTz(
     if (!iso) return ''
     const d = iso instanceof Date ? iso : new Date(iso)
     if (Number.isNaN(d.getTime())) return ''
+    // Some browsers name UK winter time "GMT+0" where others say "GMT"; settle
+    // on "GMT" so the label reads the same everywhere (and on the server).
     return d.toLocaleTimeString('en-GB', {
         hour: '2-digit',
         minute: '2-digit',
         timeZone: resolveTz(timeZone),
         ...(withZone ? { timeZoneName: 'short' } : {}),
-    })
+    }).replace(/\bGMT\+0$/, 'GMT')
 }
 
 /** Convenience: "Mon, 16 Jun 2026, 14:00 BST" in `timeZone`. */
@@ -200,4 +202,52 @@ export function formatDateTimeInTz(
     const date = formatDateInTz(iso, timeZone)
     const time = formatTimeInTz(iso, timeZone, { withZone: true })
     return date && time ? `${date}, ${time}` : date || time
+}
+
+/** Common IANA timezones, the fallback list where the browser cannot list them all. */
+export const COMMON_TIMEZONES = [
+    'Europe/London',
+    'Europe/Dublin',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'Europe/Madrid',
+    'Europe/Athens',
+    'Africa/Lagos',
+    'Africa/Cairo',
+    'Africa/Johannesburg',
+    'Asia/Dubai',
+    'Asia/Karachi',
+    'Asia/Kolkata',
+    'Asia/Dhaka',
+    'Asia/Singapore',
+    'Asia/Hong_Kong',
+    'Asia/Shanghai',
+    'Asia/Tokyo',
+    'Australia/Sydney',
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'America/Toronto',
+    'America/Sao_Paulo',
+]
+
+/**
+ * Timezones for a picker: every zone the runtime knows (or the common list),
+ * with `current` first when it is not already in the list.
+ */
+export function getTimezoneOptions(current: string | null): string[] {
+    let list = COMMON_TIMEZONES
+    // Prefer the full browser-provided list when available (modern browsers).
+    try {
+        const supported = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] })
+            .supportedValuesOf?.('timeZone')
+        if (supported && supported.length) list = supported
+    } catch {
+        // fall back to COMMON_TIMEZONES
+    }
+    if (current && !list.includes(current)) {
+        return [current, ...list]
+    }
+    return list
 }

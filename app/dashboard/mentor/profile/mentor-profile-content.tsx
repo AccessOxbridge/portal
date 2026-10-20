@@ -8,7 +8,6 @@ import {
     Envelope as Mail,
     Phone,
     Buildings as School,
-    Clock,
     Sparkle as Sparkles,
     Users,
     CalendarCheck,
@@ -17,6 +16,8 @@ import {
 } from '@phosphor-icons/react/ssr'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
+import { SelectField } from '@/components/ui/select'
+import { getTimezoneOptions, isValidTimezone } from '@/lib/timezone'
 import { updateMentorProfile } from './actions'
 
 interface MentorRow {
@@ -61,12 +62,18 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
         return [...new Set(flat)].sort()
     }, [])
 
+    // A saved value the picker cannot show (typed by hand before it was a
+    // dropdown, e.g. "London") reads as not set until a real zone is picked.
+    const savedTimezone = isValidTimezone(mentor.timezone?.trim()) ? mentor.timezone!.trim() : ''
+    const unrecognisedTimezone = !!mentor.timezone?.trim() && !savedTimezone
+    const timezoneOptions = useMemo(() => getTimezoneOptions(savedTimezone || null), [savedTimezone])
+
     const [form, setForm] = useState({
         full_name: fullName || '',
         bio: mentor.bio || '',
         phone: mentor.phone || '',
         university: mentor.university || '',
-        timezone: mentor.timezone || '',
+        timezone: savedTimezone,
     })
     const [expertise, setExpertise] = useState<string[]>(mentor.expertise || [])
     const [photoPreview, setPhotoPreview] = useState<string | null>(mentor.photo_url || null)
@@ -87,10 +94,10 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
             bio: mentor.bio || '',
             phone: mentor.phone || '',
             university: mentor.university || '',
-            timezone: mentor.timezone || '',
+            timezone: savedTimezone,
             expertise: (mentor.expertise || []).slice().sort().join('|'),
         }),
-        [fullName, mentor]
+        [fullName, mentor, savedTimezone]
     )
 
     const dirty =
@@ -241,20 +248,21 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
 
                     <div>
                         <label className="mb-1.5 block text-sm font-medium text-foreground">Timezone</label>
-                        <div className="relative">
-                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                            <input
-                                type="text"
-                                name="timezone"
-                                value={form.timezone}
-                                onChange={(e) => setForm({ ...form, timezone: e.target.value })}
-                                placeholder="e.g., Europe/London"
-                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
-                            />
-                        </div>
+                        <SelectField
+                            name="timezone"
+                            value={form.timezone}
+                            onChange={(e) => setForm({ ...form, timezone: e.target.value })}
+                            aria-label="Timezone"
+                        >
+                            <option value="">Not set</option>
+                            {timezoneOptions.map((option) => (
+                                <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
+                            ))}
+                        </SelectField>
                         <p className="text-xs text-muted-foreground mt-2">
-                            Use an IANA timezone like <span className="font-semibold">Europe/London</span> or{' '}
-                            <span className="font-semibold">America/New_York</span>. Used to show your session times.
+                            {unrecognisedTimezone
+                                ? <>Your saved timezone &quot;{mentor.timezone}&quot; isn&apos;t one we recognise, so UK time is used. Pick yours from the list.</>
+                                : 'Used to show your session times.'}
                         </p>
                     </div>
                 </div>

@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, CalendarBlank as Calendar, CheckCircle as CheckCircle2, Clock, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
+import { FileText, CalendarBlank as Calendar, CheckCircle as CheckCircle2, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
 import { Avatar } from '@/components/ui/avatar'
+import { segmentClass, segmentCount, segmentTrack } from '@/components/ui/segmented'
+import { cn } from '@/utils/lib'
 
 interface SessionReport {
     id: string
@@ -27,34 +29,30 @@ export default function MentorReportsContent({ toComplete, completed }: MentorRe
     return (
         <div>
             {/* Tab Navigation */}
-            <div className="flex gap-2 mb-6">
+            <div className={cn(segmentTrack, 'mb-6')}>
                 <button
                     onClick={() => setActiveTab('pending')}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-control font-medium text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'pending'
-                            ? 'bg-tint-amber text-tint-amber-foreground border border-border'
-                            : 'bg-muted/60 text-muted-foreground hover:bg-muted border border-transparent'
-                        }`}
+                    aria-pressed={activeTab === 'pending'}
+                    className={segmentClass(activeTab === 'pending')}
                 >
-                    <Clock className="size-4" />
                     To complete
                     {toComplete.length > 0 && (
-                        <span className="ml-1 px-2 py-0.5 bg-warning text-white text-xs font-semibold rounded-full">
+                        <span className={cn(segmentCount, 'bg-tint-amber text-tint-amber-foreground')}>
                             {toComplete.length}
                         </span>
                     )}
                 </button>
                 <button
                     onClick={() => setActiveTab('completed')}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-control font-medium text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'completed'
-                            ? 'bg-tint-green text-tint-green-foreground border border-border'
-                            : 'bg-muted/60 text-muted-foreground hover:bg-muted border border-transparent'
-                        }`}
+                    aria-pressed={activeTab === 'completed'}
+                    className={segmentClass(activeTab === 'completed')}
                 >
-                    <CheckCircle2 className="size-4" />
                     Completed
-                    <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground text-xs font-semibold rounded-full">
-                        {completed.length}
-                    </span>
+                    {completed.length > 0 && (
+                        <span className={cn(segmentCount, 'bg-card text-muted-foreground')}>
+                            {completed.length}
+                        </span>
+                    )}
                 </button>
             </div>
 

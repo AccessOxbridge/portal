@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarBlank as Calendar, VideoCamera as Video, FileText, Clock, ArrowRight, Users, ChatCentered as MessageSquare, Hourglass, XCircle, CalendarPlus, CalendarDots as CalendarClock } from '@phosphor-icons/react/ssr'
 import { Avatar } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { segmentClass, segmentCount, segmentTrack } from '@/components/ui/segmented'
+import { cn } from '@/utils/lib'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
@@ -45,6 +48,13 @@ interface MentorSessionsContentProps {
     assignedStudents?: MentorRequestStudentOption[]
     mentorId: string
     timezone: string | null
+}
+
+/** Label for a past card whose session never ran: cancelled, or still open with no Zoom ending. */
+function pastSessionLabel(session: { status: string | null; zoom_meeting_status: string | null }): string | null {
+    if (session.status === 'cancelled') return 'Cancelled'
+    if (session.status !== 'completed' && session.zoom_meeting_status !== 'ended') return 'Not completed'
+    return null
 }
 
 export default function MentorSessionsContent({
@@ -254,59 +264,51 @@ export default function MentorSessionsContent({
             )}
             {/* Tab Switcher + Request a Session */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
-                <div className="flex gap-2 p-1.5 bg-muted rounded-card w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
+                <div className={segmentTrack}>
                     <button
                         onClick={() => setActiveTab('pending')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'pending'
-                            ? 'bg-card text-warning shadow-border'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
+                        aria-pressed={activeTab === 'pending'}
+                        className={segmentClass(activeTab === 'pending')}
                     >
                         Pending
                         {pendingRequests.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-tint-amber text-warning rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-amber text-tint-amber-foreground')}>
                                 {pendingRequests.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('upcoming')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'upcoming'
-                            ? 'bg-card text-primary shadow-border'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
+                        aria-pressed={activeTab === 'upcoming'}
+                        className={segmentClass(activeTab === 'upcoming')}
                     >
                         Upcoming
                         {upcomingSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-blue text-tint-blue-foreground')}>
                                 {upcomingSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('current')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'current'
-                            ? 'bg-card text-primary shadow-border'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
+                        aria-pressed={activeTab === 'current'}
+                        className={segmentClass(activeTab === 'current')}
                     >
                         Current
                         {currentSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-tint-green text-tint-green-foreground rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-tint-green text-tint-green-foreground')}>
                                 {currentSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('past')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'past'
-                            ? 'bg-card text-primary shadow-border'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
+                        aria-pressed={activeTab === 'past'}
+                        className={segmentClass(activeTab === 'past')}
                     >
-                        Completed
+                        Past
                         {pastSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-muted text-muted-foreground rounded-full text-xs">
+                            <span className={cn(segmentCount, 'bg-card text-muted-foreground')}>
                                 {pastSessions.length}
                             </span>
                         )}
@@ -459,6 +461,9 @@ export default function MentorSessionsContent({
                                                 Starting soon
                                             </span>
                                         )}
+                                        {activeTab === 'past' && pastSessionLabel(session) && (
+                                            <Badge className="mt-3">{pastSessionLabel(session)}</Badge>
+                                        )}
                                     </div>
                                 </div>
 
@@ -507,7 +512,9 @@ export default function MentorSessionsContent({
                                         </>
                                     ) : (
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            {!session.has_report ? (
+                                            {/* No report for a cancelled session. "Not completed" ones keep
+                                                the option: some ran outside the portal's Zoom link. */}
+                                            {session.status === 'cancelled' && !session.has_report ? null : !session.has_report ? (
                                                 <Link
                                                     href={`/dashboard/mentor/sessions/${session.id}/report`}
                                                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-tint-amber text-tint-amber-foreground font-semibold rounded-control hover:bg-tint-amber transition-colors"

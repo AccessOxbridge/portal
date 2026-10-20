@@ -177,11 +177,16 @@ export function useLiveConversations<T extends LiveConversation>(
         }
     }, [currentUserId])
 
-    /** Clear the unread pill when a conversation is opened. */
+    /**
+     * Clear the unread pill when a conversation is opened. Returns the same
+     * list when there is nothing to clear: callers run this from effects that
+     * depend on `conversations`, so a fresh array every time loops forever.
+     */
     const markRead = useCallback((conversationId: string) => {
-        setConversations((prev) =>
-            prev.map((c) => (c.id === conversationId ? { ...c, unread_count: 0 } : c))
-        )
+        setConversations((prev) => {
+            if (!prev.some((c) => c.id === conversationId && c.unread_count)) return prev
+            return prev.map((c) => (c.id === conversationId ? { ...c, unread_count: 0 } : c))
+        })
     }, [])
 
     return { conversations, markRead }

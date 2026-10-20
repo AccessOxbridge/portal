@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
+import { getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import { isBillableLength } from '@/utils/session-billing'
 
 /**
@@ -44,7 +44,9 @@ export async function loadMentorOverview(db: SupabaseClient, mentorId: string): 
             .single(),
     ])
 
-    const timezone = mentor?.timezone || 'Europe/London'
+    // resolveTz, not the raw value: an unrecognised saved zone ("London")
+    // would make every date formatter on the home page throw.
+    const timezone = resolveTz(mentor?.timezone)
     const today = getZonedNow(timezone).date
     const monthStart = zonedTimeToUtcISO(`${today.slice(0, 7)}-01`, '00:00', timezone)
     const rate = mentor?.hourly_rate_cents ?? 0

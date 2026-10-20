@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { validatePhotoUpload, extForMime } from '@/lib/image-upload'
+import { isValidTimezone } from '@/lib/timezone'
 import type { TablesUpdate } from '@/utils/supabase/types'
 
 export async function updateMentorProfile(prevState: any, formData: FormData) {
@@ -32,6 +33,12 @@ export async function updateMentorProfile(prevState: any, formData: FormData) {
     const phone = (formData.get('phone') as string | null)?.trim() || ''
     const university = (formData.get('university') as string | null)?.trim() || ''
     const timezone = (formData.get('timezone') as string | null)?.trim() || ''
+    // The form offers a picker, but check here too so a hand-typed or stale
+    // value can never be saved (an unknown zone breaks date formatting).
+    if (timezone && !isValidTimezone(timezone)) {
+        return { error: 'Choose your timezone from the list.' }
+    }
+
     const expertiseRaw = formData.getAll('expertise').map((v) => String(v)).filter(Boolean)
     const expertise = Array.from(new Set(expertiseRaw))
 

@@ -29,11 +29,16 @@ export default function JourneyTimeline({
     completedSessionsCount
 }: JourneyTimelineProps) {
     const isIdle = !hasPendingRequests && !hasActiveMentorship && !hasScheduledSession
+    // Once a session has happened the setup steps are done for good: the bar
+    // stays ticked and only the line underneath follows the next booking.
+    const isReturning = hasProfile && hasCompletedSession
 
     // Reflect current status: one "current" step at a time.
     // When idle (no pending/active/scheduled session), treat this as the start of a new cycle:
     // show profile/request only, and keep later steps gray even if they've completed sessions before.
     const getStageStatus = (stageId: string): 'completed' | 'current' | 'pending' => {
+        if (isReturning) return 'completed'
+
         if (isIdle) {
             switch (stageId) {
                 case 'profile':
@@ -78,6 +83,11 @@ export default function JourneyTimeline({
     let subtitle: string | null = null
     if (!hasProfile) {
         subtitle = 'Complete your profile to start booking sessions.'
+    } else if (isReturning) {
+        if (hasScheduledSession) subtitle = 'Your next session is booked.'
+        else if (hasPendingRequests) subtitle = 'Waiting for your mentor to confirm your next session.'
+        else if (hasActiveMentorship) subtitle = 'Your mentor is setting a time for your next session.'
+        else subtitle = 'Book your next session whenever you’re ready.'
     } else if (isIdle) {
         subtitle = 'Next: book a session below to get matched with a mentor.'
     } else if (hasPendingRequests) {

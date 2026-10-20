@@ -219,8 +219,8 @@ export default function EventsManager({ initialEvents }: Props) {
             )}
 
             {/* Filter Tabs & Create Button */}
-            <div className="flex items-center justify-between">
-                <div className="flex gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
                     <button
                         onClick={() => setFilter('all')}
                         className={`px-4 py-2 rounded-control text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`}

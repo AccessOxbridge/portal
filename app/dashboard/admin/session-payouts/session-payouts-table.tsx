@@ -591,7 +591,7 @@ export default function SessionPayoutsTable({ sessions: initial }: Props) {
                             />
                         </label>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex flex-wrap items-center gap-1">
                             <button
                                 type="button"
                                 onClick={() => setPage(Math.max(1, safePage - 1))}

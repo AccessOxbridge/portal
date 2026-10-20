@@ -306,7 +306,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
             )}
 
             {/* Packages Table */}
-            <div className="bg-card rounded-card border border-border overflow-hidden">
+            <div className="bg-card rounded-card border border-border overflow-x-auto">
                 <table className="w-full">
                     <thead className="bg-muted/60 border-b border-border">
                         <tr>

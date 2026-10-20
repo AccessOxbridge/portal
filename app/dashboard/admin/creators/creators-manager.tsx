@@ -93,7 +93,7 @@ export default function CreatorsManager({ initialCreators }: { initialCreators: 
 
             <div className="grid grid-cols-1 gap-4">
                 {creators.map((creator) => (
-                    <div key={creator.id} className="border border-transparent bg-card p-6 rounded-card shadow-border flex items-center justify-between hover:border-border transition-colors">
+                    <div key={creator.id} className="border border-transparent bg-card p-6 rounded-card shadow-border flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between hover:border-border transition-colors">
                         <div className="flex items-center gap-4">
                             <div className="size-12 rounded-full bg-tint-violet flex items-center justify-center text-lg font-semibold text-primary">
                                 {creator.name.charAt(0)}

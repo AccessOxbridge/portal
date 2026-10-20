@@ -39,7 +39,7 @@ export default function MentorOverview({ data }: { data: Data }) {
                 </div>
             )}
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
                 {/* Up next: the same warm card students see. */}
                 <section className="flex flex-col gap-5 rounded-card bg-tint-amber p-6 ring-1 ring-warning/30 sm:p-7 lg:col-span-2">
                     {next ? (
@@ -124,7 +124,7 @@ export default function MentorOverview({ data }: { data: Data }) {
                 </section>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
                 <section className={cn(card, 'p-5')}>
                     <h2 className="text-base font-semibold text-foreground">This month</h2>
                     <dl className="mt-3 grid grid-cols-2 gap-4">

@@ -89,7 +89,7 @@ export default function CreditPackages({ packages, currentCredits, targetUnivers
                             </p>
                         </div>
 
-                        <button className={cn(buttonVariants({ size: 'lg' }), 'group w-full sm:w-auto')}>
+                        <button className={cn(buttonVariants({ size: 'lg' }), 'group h-auto min-h-12 w-full py-3 text-center whitespace-normal sm:w-auto')}>
                             <span>Speak to {strategistText} Strategist</span>
                             <ArrowRight weight="bold" className="transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
                         </button>

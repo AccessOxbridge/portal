@@ -188,7 +188,7 @@ export default function StudentMentorProfileContent({
                     <h2 className="mb-3 text-base font-semibold text-foreground">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
                         {mentor.expertise.map((exp) => (
-                            <Badge key={exp} tone="blue" size="lg">
+                            <Badge key={exp} tone="blue" size="lg" className="max-w-full whitespace-normal">
                                 {exp}
                             </Badge>
                         ))}

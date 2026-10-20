@@ -96,10 +96,10 @@ export default async function AdminSessionPayoutsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-8">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Session Payouts
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Session payouts
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Finished sessions only. Default payout is duration × mentor hourly rate.
                     Set a one-off flat amount when needed; sessions already on an invoice are locked.
                 </p>

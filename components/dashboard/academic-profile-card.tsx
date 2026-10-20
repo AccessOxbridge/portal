@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { GraduationCap, AlertCircle, ChevronRight } from 'lucide-react'
+import { GraduationCap, WarningCircle as AlertCircle, CaretRight as ChevronRight } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/utils/lib'
 
 interface StudentProfile {
     school_name: string | null
@@ -39,12 +41,12 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
 
     if (loading) {
         return (
-            <div className="p-4 bg-gray-50 rounded-2xl animate-pulse">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-xl" />
-                    <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-24 mb-1" />
-                        <div className="h-3 bg-gray-200 rounded w-32" />
+            <div className="rounded-card bg-card p-5 shadow-border" role="status" aria-label="Loading your profile">
+                <div className="flex items-center gap-3.5">
+                    <Skeleton className="size-11 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3.5 w-44" />
                     </div>
                 </div>
             </div>
@@ -56,46 +58,49 @@ export default function AcademicProfileCard({ userId, userName }: AcademicProfil
     return (
         <Link
             href="/dashboard/student/profile"
-            className={`block p-6 bg-white rounded-[32px] border shadow-xl shadow-gray-200/50 transition-all group hover:shadow-indigo-100 ${isIncomplete
-                ? 'border-amber-200 bg-amber-50/50 hover:border-amber-300'
-                : 'border-gray-100 hover:border-accent/30'
-                }`}
+            className={cn(
+                'group block rounded-card border border-transparent p-5 outline-none transition-[box-shadow,background-color] duration-150 ease-out focus-visible:ring-[3px] focus-visible:ring-ring/40',
+                isIncomplete
+                    ? 'bg-tint-amber ring-1 ring-tint-amber-foreground/20 hover:ring-tint-amber-foreground/40'
+                    : 'bg-card shadow-border hover:shadow-border-hover',
+            )}
         >
             <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isIncomplete ? 'bg-amber-100' : 'bg-accent/10'
-                        }`}>
+                <div className="flex items-center gap-3.5 min-w-0">
+                    <span className={cn(
+                        'grid size-11 shrink-0 place-items-center rounded-full',
+                        isIncomplete ? 'bg-card text-tint-amber-foreground' : 'bg-tint-blue text-tint-blue-foreground',
+                    )}>
                         {isIncomplete ? (
-                            <AlertCircle className="w-6 h-6 text-amber-600" />
+                            <AlertCircle weight="duotone" className="size-6" />
                         ) : (
-                            <GraduationCap className="w-6 h-6 text-accent" />
+                            <GraduationCap weight="duotone" className="size-6" />
                         )}
-                    </div>
+                    </span>
                     <div className="min-w-0">
-                        <p className={`text-base font-bold truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-900'}`}>
-                            {isIncomplete ? 'Complete Your Profile' : 'Academic Profile'}
+                        <p className="truncate text-base font-semibold text-foreground">
+                            {isIncomplete ? 'Complete your profile' : 'Academic profile'}
                         </p>
                         {isIncomplete && (
-                            <p className="text-sm truncate mt-0.5 text-amber-600/80">
+                            <p className="mt-0.5 truncate text-sm text-tint-amber-foreground">
                                 Required for matching
                             </p>
                         )}
                     </div>
                 </div>
-                <ChevronRight className={`w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1 ${isIncomplete ? 'text-amber-500' : 'text-gray-400'
-                    }`} />
+                <ChevronRight className="size-5 shrink-0 text-muted-foreground transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
             </div>
 
             {isIncomplete && (
-                <div className="mt-4 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-amber-100 rounded-full overflow-hidden">
+                <div className="mt-4 flex items-center gap-3">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-card">
                         <div
-                            className="h-full bg-amber-500 rounded-full transition-all"
+                            className="h-full rounded-full bg-warning transition-[width] duration-300 ease-snappy"
                             style={{ width: profile ? '30%' : '5%' }}
                         />
                     </div>
-                    <span className="text-xs text-amber-600 font-semibold">
-                        {profile ? 'In Progress' : 'Not Started'}
+                    <span className="text-xs font-medium text-tint-amber-foreground">
+                        {profile ? 'In progress' : 'Not started'}
                     </span>
                 </div>
             )}

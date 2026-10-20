@@ -85,10 +85,10 @@ export default async function AdminRecordingsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Session Recordings
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Session recordings
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Completed sessions grouped by student–mentor pair, with video when available
                 </p>
             </header>

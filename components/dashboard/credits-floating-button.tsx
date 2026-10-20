@@ -1,6 +1,6 @@
 'use client'
 
-import { Clock, Plus } from 'lucide-react'
+import { Clock, Plus } from '@phosphor-icons/react/ssr'
 
 interface Props {
     credits: number
@@ -14,37 +14,22 @@ export default function CreditsFloatingButton({ credits, onClick }: Props) {
             onClick={onClick}
             aria-label={`${credits} session hours remaining. Request more hours.`}
             // Positioned by its parent's fixed cluster (StudentCreditsProvider),
-            // which sits beside the bell. Matching height, radius, blur, border
-            // and shadow are what make the cluster read as one.
-            className="group flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2 rounded-2xl
-            bg-white/70 backdrop-blur-md border border-white/40 transition-all duration-300 hover:scale-[1.02]
-            active:scale-[0.98] shadow-2xl shadow-black/5 cursor-pointer"
+            // beside the bell: same 44px height, white chip and ring.
+            className="group flex h-11 items-center gap-2 rounded-full border border-transparent bg-card ps-1.5 pe-3 text-foreground shadow-border outline-none transition-[box-shadow,scale] duration-150 ease-out hover:shadow-border-hover active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 sm:pe-4"
         >
-            <div className="flex items-center justify-center p-2 rounded-xl bg-accent text-white shadow-lg shadow-accent/20 transition-colors duration-300 group-hover:bg-accent/90">
-                <Clock className="w-5 h-5" />
-            </div>
-
-            <div className="flex flex-col text-left">
-                <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-extrabold tracking-tight text-gray-900">
-                        {credits}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider font-bold opacity-60 text-gray-500">
-                        {credits === 1 ? 'Hour' : 'Hours'}
-                    </span>
-                </div>
-                {/* Supporting detail is dropped on phones so the pill doesn't
-                    span half the viewport. */}
-                <p className="hidden sm:block text-[9px] font-semibold tracking-wide text-gray-400 opacity-70 transition-opacity duration-300 group-hover:opacity-100">
-                    REMAINING
-                </p>
-            </div>
-
-            <div className="hidden sm:block h-8 w-px mx-1 bg-gray-200" />
-
-            <div className="hidden sm:block p-1 rounded-full text-accent transition-transform group-hover:translate-x-1">
-                <Plus className="w-4 h-4" />
-            </div>
+            <span className="grid size-8 place-items-center rounded-full bg-tint-green text-tint-green-foreground">
+                <Clock weight="bold" className="size-4" />
+            </span>
+            <span className="flex items-baseline gap-1">
+                <span className="text-base font-semibold tabular-nums">{credits}</span>
+                <span className="text-sm text-muted-foreground">
+                    {credits === 1 ? 'hour' : 'hours'}
+                    {/* Phones keep it short so the pill fits beside the bell. */}
+                    <span className="hidden sm:inline"> remaining</span>
+                </span>
+            </span>
+            <span aria-hidden="true" className="ms-1 hidden h-5 w-px bg-border sm:block" />
+            <Plus weight="bold" className="hidden size-4 text-brand transition-transform duration-150 ease-out group-hover:translate-x-0.5 sm:block" />
         </button>
     )
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@phosphor-icons/react/ssr'
 import SessionRatingCard from '@/components/feedback/session-rating-card'
 
 interface FeedbackContentProps {
@@ -35,13 +35,13 @@ export default function FeedbackContent({
             <div className="w-full max-w-md">
                 <Link
                     href="/dashboard/student/sessions"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors mb-4"
+                    className="mb-4 inline-flex items-center gap-1.5 rounded-full py-1 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
                 >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="size-4" />
                     Back to my sessions
                 </Link>
 
-                <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="overflow-hidden rounded-sheet bg-card shadow-border">
                     <SessionRatingCard
                         sessionId={sessionId}
                         mentorName={mentorName}
@@ -60,9 +60,9 @@ export default function FeedbackContent({
                 <button
                     type="button"
                     onClick={() => window.dispatchEvent(new Event('open-help-support'))}
-                    className="mt-4 w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                    className="mt-4 w-full text-center text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
                 >
-                    Something go wrong? <span className="font-semibold underline">Contact support</span>
+                    Something go wrong? <span className="font-medium text-brand underline underline-offset-2">Contact support</span>
                 </button>
             </div>
         </div>

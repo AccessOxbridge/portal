@@ -30,11 +30,11 @@ export default async function AdminCreditsPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Manage Products
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Manage products
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
-                    Create, edit, and manage Products that students can purchase
+                <p className="mt-2 text-lg text-muted-foreground">
+                    Create, edit, and manage products that students can purchase
                 </p>
             </header>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X, Download } from 'lucide-react'
+import { X, DownloadSimple as Download } from '@phosphor-icons/react/ssr'
 import { formatBytes, type ChatAttachment } from '@/lib/chat-attachments'
 
 interface ImageLightboxProps {
@@ -44,7 +44,7 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
             // Above the notification bell (z-999) as a second line of defence,
             // so the viewer is never buried even if some chrome lacks the
             // [data-floating-ui] marker.
-            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex flex-col animate-in fade-in duration-150"
+            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex flex-col duration-150"
         >
             <div
                 className="flex items-center justify-between gap-4 px-4 py-3 text-white/90"
@@ -62,18 +62,18 @@ export default function ImageLightbox({ attachment, url, onClose }: ImageLightbo
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Download image"
-                            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+                            className="size-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
                         >
-                            <Download className="w-5 h-5" />
+                            <Download className="size-5" />
                         </a>
                     )}
                     <button
                         type="button"
                         onClick={onClose}
                         aria-label="Close"
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+                        className="size-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="size-5" />
                     </button>
                 </div>
             </div>

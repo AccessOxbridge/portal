@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { PlayCircle, X, Film, Clock } from 'lucide-react'
+import { PlayCircle, X, FilmStrip as Film, Clock } from '@phosphor-icons/react/ssr'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 
 interface Recording {
@@ -60,7 +60,7 @@ function RecordingCard({
             onClick={onOpen}
             onMouseEnter={handleEnter}
             onMouseLeave={handleLeave}
-            className="group text-left bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/30 transition-all overflow-hidden"
+            className="group overflow-hidden rounded-card bg-card text-left shadow-border outline-none transition-[box-shadow,scale] duration-150 ease-out hover:shadow-border-hover active:scale-[0.99] focus-visible:ring-[3px] focus-visible:ring-ring/40"
         >
             <div className="relative aspect-video bg-black overflow-hidden">
                 <video
@@ -72,24 +72,24 @@ function RecordingCard({
                     preload="metadata"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
-                {/* Dark gradient + centered play affordance */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-90 group-hover:opacity-0 transition-opacity">
-                    <span className="w-14 h-14 rounded-full bg-black/55 backdrop-blur flex items-center justify-center text-white shadow-lg">
-                        <PlayCircle className="w-8 h-8" />
+                {/* Soft scrim + centred play affordance */}
+                <div className="absolute inset-0 bg-black/15 transition-colors duration-200 group-hover:bg-transparent" />
+                <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-200 group-hover:opacity-0">
+                    <span className="grid size-14 place-items-center rounded-full bg-white/90 text-primary shadow-overlay backdrop-blur">
+                        <PlayCircle weight="fill" className="size-8" />
                     </span>
                 </div>
                 {/* Duration badge (YouTube-style) */}
-                <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/75 text-white text-[11px] font-semibold">
-                    <Clock className="w-3 h-3" />
+                <span className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium text-white tabular-nums">
+                    <Clock className="size-3" />
                     {recording.duration_minutes} min
                 </span>
             </div>
             <div className="p-4">
-                <p className="font-bold text-gray-900 truncate">
+                <p className="truncate font-medium text-foreground">
                     Session with {recording.mentor_full_name}
                 </p>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="mt-0.5 text-sm text-muted-foreground tabular-nums">
                     {formatDate(recording.scheduled_at)}
                     {formatTime(recording.scheduled_at) && ` · ${formatTime(recording.scheduled_at)}`}
                 </p>
@@ -106,12 +106,12 @@ export default function StudentRecordingsContent({
 
     if (recordings.length === 0) {
         return (
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-12 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <Film className="w-7 h-7 text-gray-400" />
+            <div className="rounded-card bg-card px-6 py-12 text-center shadow-border">
+                <div className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-tint-violet text-tint-violet-foreground">
+                    <Film weight="duotone" className="size-7" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-900">No recordings yet</h2>
-                <p className="mt-2 text-gray-500 max-w-md mx-auto">
+                <h2 className="text-base font-semibold text-foreground">No recordings yet</h2>
+                <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground text-pretty">
                     Recordings of your sessions will appear here a few minutes after each
                     session ends.
                 </p>
@@ -121,7 +121,7 @@ export default function StudentRecordingsContent({
 
     return (
         <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {recordings.map((rec) => (
                     <RecordingCard
                         key={rec.id}
@@ -133,19 +133,19 @@ export default function StudentRecordingsContent({
             </div>
 
             {activeId && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center">
                     <div
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
                         onClick={() => setActiveId(null)}
                     />
-                    <div className="relative z-[61] w-full max-w-4xl mx-4 bg-black rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="relative z-[61] mx-4 w-full max-w-4xl overflow-hidden rounded-card bg-black shadow-overlay">
                         <button
                             type="button"
                             onClick={() => setActiveId(null)}
                             aria-label="Close recording"
-                            className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                            className="absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition-[background-color,scale] duration-150 ease-out hover:bg-white/20 active:scale-[0.96]"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="size-5" />
                         </button>
                         <video
                             key={activeId}

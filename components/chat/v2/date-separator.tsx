@@ -21,9 +21,9 @@ export default function DateSeparator({ timestamp }: { timestamp: string }) {
 
     return (
         <div className="flex items-center gap-3 py-3" role="separator" aria-label={label}>
-            <span className="flex-1 h-px bg-gray-200/70" />
-            <span className="text-[11px] font-medium text-gray-400 tracking-wide">{label}</span>
-            <span className="flex-1 h-px bg-gray-200/70" />
+            <span className="flex-1 h-px bg-border" />
+            <span className="text-[11px] font-medium text-muted-foreground tracking-wide">{label}</span>
+            <span className="flex-1 h-px bg-border" />
         </div>
     )
 }

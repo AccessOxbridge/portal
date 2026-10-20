@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "../assets/globals.css";
 import NotificationBell from "@/components/dashboard/notification-bell";
+import { Toaster } from "@/components/ui/toaster";
+import { ConfirmHost } from '@/components/ui/confirm'
+import { TooltipProvider } from "@/components/ui/overlay";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Geist is the portal's font (UI revamp). It replaced Inter in phase 1.
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -31,7 +41,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#092c68",
+  themeColor: "#13275a",
 };
 
 export default function RootLayout({
@@ -40,12 +50,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body
-        className="font-sans antialiased"
-      >
-        <NotificationBell />
-        {children}
+    // data-density: "comfortable" for students, mentors and public pages;
+    // DashboardShell switches it to "compact" on admin pages. It lives on
+    // <html> so dialogs and menus (rendered at the end of <body>) follow it.
+    <html
+      lang="en"
+      data-density="comfortable"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="bg-background font-sans text-foreground antialiased">
+        <TooltipProvider>
+          <NotificationBell />
+          {children}
+          <Toaster />
+          <ConfirmHost />
+        </TooltipProvider>
       </body>
     </html>
   );

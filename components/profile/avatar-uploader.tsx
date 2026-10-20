@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, Loader2, Trash2 } from 'lucide-react'
+import { Camera, CircleNotch as Loader2, Trash as Trash2 } from '@phosphor-icons/react/ssr'
+import { buttonVariants } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/client'
 import {
     PHOTO_ACCEPT_ATTR,
@@ -111,7 +112,7 @@ export default function AvatarUploader({ userId, photoUrl, name }: AvatarUploade
 
     return (
         <div className="flex items-center gap-5">
-            <div className="relative w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
+            <div className="relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-full bg-tint-blue text-2xl font-semibold text-tint-blue-foreground outline-1 -outline-offset-1 outline-black/10">
                 {preview ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={preview} alt="" className="w-full h-full object-cover" />
@@ -120,8 +121,8 @@ export default function AvatarUploader({ userId, photoUrl, name }: AvatarUploade
                 )}
 
                 {busy && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    <div className="absolute inset-0 grid place-items-center bg-black/40">
+                        <Loader2 className="size-5 animate-spin text-white [animation-duration:600ms]" />
                     </div>
                 )}
             </div>
@@ -132,9 +133,9 @@ export default function AvatarUploader({ userId, photoUrl, name }: AvatarUploade
                         type="button"
                         disabled={busy}
                         onClick={() => fileInputRef.current?.click()}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
+                        className={buttonVariants({ size: 'sm' })}
                     >
-                        <Camera className="w-4 h-4" />
+                        <Camera weight="fill" />
                         {preview ? 'Change photo' : 'Upload photo'}
                     </button>
 
@@ -143,18 +144,18 @@ export default function AvatarUploader({ userId, photoUrl, name }: AvatarUploade
                             type="button"
                             disabled={busy}
                             onClick={handleRemove}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                            className={buttonVariants({ variant: 'destructive-ghost', size: 'sm' })}
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 />
                             Remove
                         </button>
                     )}
                 </div>
 
                 {error ? (
-                    <p className="text-xs text-red-600 mt-2 max-w-sm">{error}</p>
+                    <p role="alert" className="mt-2 max-w-sm text-sm text-destructive">{error}</p>
                 ) : (
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         JPG, PNG, WebP or GIF up to 5MB. Square works best.
                     </p>
                 )}

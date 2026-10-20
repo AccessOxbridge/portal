@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, CheckCircle2, XCircle } from 'lucide-react'
+import { CalendarBlank as Calendar, CheckCircle as CheckCircle2, XCircle } from '@phosphor-icons/react/ssr'
 import { handleMentorshipRequest } from '@/lib/actions/mentorship-requests'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorAvatar from '@/components/dashboard/mentor-avatar'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/utils/lib'
 
 interface Props {
     request: {
@@ -40,7 +42,7 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
             await handleMentorshipRequest(request.id, 'accept')
             router.refresh()
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to accept request')
+            setError(err instanceof Error ? err.message : "Couldn't accept the request. Try again in a moment.")
         } finally {
             setLoading(null)
         }
@@ -53,43 +55,43 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
             await handleMentorshipRequest(request.id, 'reject')
             router.refresh()
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to decline request')
+            setError(err instanceof Error ? err.message : "Couldn't decline the request. Try again in a moment.")
         } finally {
             setLoading(null)
         }
     }
 
     return (
-        <div className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all">
+        <div className="rounded-card bg-card p-5 shadow-border ring-1 ring-tint-amber-foreground/15 sm:p-6">
             <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3.5">
                     <MentorAvatar
                         name={request.mentor_full_name}
                         photoUrl={request.mentor_photo_url}
-                        fallbackClassName="bg-amber-100 text-amber-600"
+                        fallbackClassName="bg-tint-amber text-tint-amber-foreground"
                     />
-                    <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <div className="min-w-0">
+                        <h3 className="text-base font-semibold text-foreground text-pretty">
                             {request.is_reschedule
                                 ? `${request.mentor_full_name} wants to reschedule`
                                 : `${request.mentor_full_name} requested a session`}
                         </h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <div className="mt-1 flex items-center gap-3 text-sm text-muted-foreground tabular-nums">
                             <span className="flex items-center gap-1.5">
-                                <Calendar className="w-4 h-4" />
+                                <Calendar className="size-4" />
                                 {request.is_reschedule ? `New time: ${formattedTime}` : formattedTime}
                             </span>
                         </div>
                         {request.is_reschedule && originalTime && (
-                            <p className="mt-1 text-xs text-gray-400">
+                            <p className="mt-1 text-sm text-muted-foreground tabular-nums">
                                 Current session: {originalTime}
                             </p>
                         )}
                         {request.note && (
-                            <p className="mt-2 text-sm text-gray-600 italic">&ldquo;{request.note}&rdquo;</p>
+                            <p className="mt-2 rounded-control bg-muted px-3 py-2 text-sm text-foreground text-pretty">&ldquo;{request.note}&rdquo;</p>
                         )}
                         {error && (
-                            <p className="mt-2 text-sm text-red-600">{error}</p>
+                            <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>
                         )}
                     </div>
                 </div>
@@ -99,18 +101,18 @@ export function MentorSessionRequestCard({ request, timezone = null }: Props) {
                         type="button"
                         onClick={handleDecline}
                         disabled={loading !== null}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-semibold hover:bg-red-100 transition-colors disabled:opacity-50"
+                        className={buttonVariants({ variant: 'destructive-ghost' })}
                     >
-                        <XCircle className="w-4 h-4" />
+                        <XCircle />
                         {loading === 'decline' ? 'Declining…' : 'Decline'}
                     </button>
                     <button
                         type="button"
                         onClick={handleAccept}
                         disabled={loading !== null}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                        className={cn(buttonVariants(), 'bg-success hover:bg-success/90')}
                     >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 weight="fill" />
                         {loading === 'accept' ? 'Accepting…' : 'Accept'}
                     </button>
                 </div>

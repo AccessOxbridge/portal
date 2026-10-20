@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { CaretDown as ChevronDown, CaretUp as ChevronUp } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import RichText from './rich-text'
 
@@ -69,18 +69,18 @@ export default function CollapsibleText({
                 onClick={() => setExpanded((current) => !current)}
                 className={cn(
                     'mt-1 inline-flex items-center gap-1 text-[13px] font-semibold transition-colors',
-                    onDark ? 'text-white/80 hover:text-white' : 'text-accent hover:text-accent/80'
+                    onDark ? 'text-white/80 hover:text-white' : 'text-primary hover:text-primary/80'
                 )}
             >
                 {expanded ? (
                     <>
                         Show less
-                        <ChevronUp className="w-3.5 h-3.5" />
+                        <ChevronUp className="size-3.5" />
                     </>
                 ) : (
                     <>
                         Read more
-                        <ChevronDown className="w-3.5 h-3.5" />
+                        <ChevronDown className="size-3.5" />
                     </>
                 )}
             </button>

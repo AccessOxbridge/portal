@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Calendar, RefreshCcw, Save, Video, AlertCircle, CheckCircle2, Search } from 'lucide-react'
+import { CalendarBlank as Calendar, ArrowCounterClockwise as RefreshCcw, FloppyDisk as Save, VideoCamera as Video, WarningCircle as AlertCircle, CheckCircle as CheckCircle2, MagnifyingGlass as Search } from '@phosphor-icons/react/ssr'
+import { SelectField } from '@/components/ui/select'
 
 interface SessionRow {
     id: string
@@ -28,13 +29,13 @@ type FilterTab = 'upcoming' | 'past' | 'all'
 const getStatusClasses = (status: string) => {
     switch (status) {
         case 'active':
-            return 'bg-emerald-50 text-emerald-700'
+            return 'bg-tint-green text-tint-green-foreground'
         case 'completed':
-            return 'bg-blue-50 text-blue-700'
+            return 'bg-tint-blue text-tint-blue-foreground'
         case 'cancelled':
-            return 'bg-red-50 text-red-700'
+            return 'bg-tint-rose text-tint-rose-foreground'
         default:
-            return 'bg-gray-100 text-gray-700'
+            return 'bg-muted text-foreground'
     }
 }
 
@@ -169,12 +170,12 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
 
     if (sessions.length === 0) {
         return (
-            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Video className="w-8 h-8 text-gray-300" />
+            <div className="bg-card rounded-card border border-border p-12 text-center">
+                <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Video className="size-8 text-muted-foreground/60" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Sessions Found</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">
+                <h3 className="text-lg font-semibold text-foreground mb-2">No sessions found</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">
                     Once students start booking mentorship sessions, you&apos;ll be able to manage them here.
                 </p>
             </div>
@@ -184,14 +185,14 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-fit">
+                <div className="flex gap-2 p-1.5 bg-muted rounded-card w-fit">
                     <button
                         type="button"
                         onClick={() => setFilter('upcoming')}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                        className={`px-4 py-2 rounded-control text-sm font-semibold transition-[background-color,box-shadow,color] duration-150 ${
                             filter === 'upcoming'
-                                ? 'bg-white text-accent shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-card text-primary shadow-border'
+                                : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         Upcoming
@@ -199,10 +200,10 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                     <button
                         type="button"
                         onClick={() => setFilter('past')}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                        className={`px-4 py-2 rounded-control text-sm font-semibold transition-[background-color,box-shadow,color] duration-150 ${
                             filter === 'past'
-                                ? 'bg-white text-accent shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-card text-primary shadow-border'
+                                : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         Past
@@ -210,10 +211,10 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                     <button
                         type="button"
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                        className={`px-4 py-2 rounded-control text-sm font-semibold transition-[background-color,box-shadow,color] duration-150 ${
                             filter === 'all'
-                                ? 'bg-white text-accent shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-card text-primary shadow-border'
+                                : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                         All
@@ -221,39 +222,39 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                 </div>
 
                 <div className="relative max-w-md w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search by student or mentor..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none text-sm"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-10"
                     />
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-card rounded-card border border-border overflow-hidden">
                 <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-muted/60 border-b border-border">
                         <tr>
-                            <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground">
                                 Student
                             </th>
-                            <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground">
                                 Mentor
                             </th>
-                            <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
-                                Session Time
+                            <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground">
+                                Session time
                             </th>
-                            <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground">
                                 Status
                             </th>
-                            <th className="text-right px-6 py-3 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            <th className="text-right px-6 py-3 text-xs font-semibold text-muted-foreground">
                                 Actions
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border">
                         {filteredSessions.map((session) => {
                             const currentMentorId = selectedMentors[session.id] ?? session.mentorId
                             const hasChanged = currentMentorId !== session.mentorId
@@ -262,17 +263,17 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                             const isSuccess = !!success[session.id]
 
                             return (
-                                <tr key={session.id} className="hover:bg-gray-50 transition-colors align-top">
+                                <tr key={session.id} className="hover:bg-muted/60 transition-colors align-top">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center text-sm font-semibold">
+                                            <div className="size-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold">
                                                 {session.studentName?.[0] || 'S'}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-semibold text-gray-900">
+                                                <span className="text-sm font-semibold text-foreground">
                                                     {session.studentName}
                                                 </span>
-                                                <span className="text-xs text-gray-400">
+                                                <span className="text-xs text-muted-foreground">
                                                     Student ID: {session.studentId}
                                                 </span>
                                             </div>
@@ -280,33 +281,32 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="space-y-1">
-                                            <label className="block text-xs font-medium text-gray-500">
+                                            <label className="block text-xs font-medium text-muted-foreground">
                                                 Mentor
                                             </label>
-                                            <select
+                                            <SelectField
                                                 value={currentMentorId}
                                                 onChange={(e) =>
                                                     handleMentorChange(session.id, e.target.value)
                                                 }
-                                                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/60"
                                             >
                                                 {sortedMentors.map((mentor) => (
                                                     <option key={mentor.id} value={mentor.id}>
                                                         {mentor.name}
                                                     </option>
                                                 ))}
-                                            </select>
-                                            <p className="text-xs text-gray-400">
+                                            </SelectField>
+                                            <p className="text-xs text-muted-foreground">
                                                 Previously: <span className="font-medium">{session.mentorName}</span>
                                             </p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-start gap-2 text-sm text-gray-700">
-                                            <Calendar className="w-4 h-4 mt-0.5 text-gray-400" />
+                                        <div className="flex items-start gap-2 text-sm text-foreground">
+                                            <Calendar className="size-4 mt-0.5 text-muted-foreground" />
                                             <div className="flex flex-col">
                                                 <span>{formatDateTime(session.scheduledAt)}</span>
-                                                <span className="text-xs text-gray-400">
+                                                <span className="text-xs text-muted-foreground">
                                                     Session ID: {session.id}
                                                 </span>
                                             </div>
@@ -327,33 +327,33 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
                                                 type="button"
                                                 disabled={!hasChanged || isSaving}
                                                 onClick={() => handleSave(session)}
-                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-control text-sm font-semibold border transition-[background-color,box-shadow,color] duration-150 ${
                                                     !hasChanged || isSaving
-                                                        ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed'
-                                                        : 'border-accent/20 bg-accent text-white hover:bg-accent/90 shadow-sm'
+                                                        ? 'border-border text-muted-foreground bg-muted/60 cursor-not-allowed'
+                                                        : 'border-primary/20 bg-primary text-white hover:bg-primary/90 shadow-border'
                                                 }`}
                                             >
                                                 {isSaving ? (
                                                     <>
-                                                        <RefreshCcw className="w-4 h-4 animate-spin" />
+                                                        <RefreshCcw className="size-4 animate-spin" />
                                                         Saving...
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Save className="w-4 h-4" />
+                                                        <Save className="size-4" />
                                                         Save
                                                     </>
                                                 )}
                                             </button>
                                             {hasError && (
-                                                <div className="flex items-center gap-1 text-xs text-red-600 max-w-xs text-right">
-                                                    <AlertCircle className="w-3 h-3 shrink-0" />
+                                                <div className="flex items-center gap-1 text-xs text-destructive max-w-xs text-right">
+                                                    <AlertCircle className="size-3 shrink-0" />
                                                     <span>{errors[session.id]}</span>
                                                 </div>
                                             )}
                                             {isSuccess && !hasError && (
-                                                <div className="flex items-center gap-1 text-xs text-emerald-600">
-                                                    <CheckCircle2 className="w-3 h-3" />
+                                                <div className="flex items-center gap-1 text-xs text-success">
+                                                    <CheckCircle2 className="size-3" />
                                                     <span>Mentor updated &amp; notified</span>
                                                 </div>
                                             )}
@@ -367,7 +367,7 @@ export default function ManageSessionsTable({ sessions, mentors }: Props) {
             </div>
 
             {filteredSessions.length === 0 && (
-                <p className="text-center text-gray-500 py-8 text-sm">
+                <p className="text-center text-muted-foreground py-8 text-sm">
                     No sessions match your current filters.
                 </p>
             )}

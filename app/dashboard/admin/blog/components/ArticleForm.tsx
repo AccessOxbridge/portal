@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import '@uiw/react-md-editor/markdown-editor.css'
-import { XCircle, ShieldAlert, Clock, ShieldCheck } from 'lucide-react'
+import { XCircle, ShieldWarning as ShieldAlert, Clock, ShieldCheck } from '@phosphor-icons/react/ssr'
 
 type Article = Database['public']['Tables']['articles']['Row']
 
@@ -95,9 +95,9 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
     return (
         <form onSubmit={handleSubmit} className="space-y-10 max-w-5xl mx-auto pb-8">
             {errors.general && (
-                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                    <XCircle className="w-5 h-5 text-red-500" />
-                    <p className="text-red-700 text-sm font-medium">{errors.general}</p>
+                <div className="bg-tint-rose border border-border rounded-card p-4 flex items-center gap-3">
+                    <XCircle className="size-5 text-destructive" />
+                    <p className="text-tint-rose-foreground text-sm font-medium">{errors.general}</p>
                 </div>
             )}
 
@@ -106,25 +106,25 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                 <div className="md:col-span-2 space-y-10">
                     {/* Title & Slug Info */}
                     <div className="space-y-4">
-                        <label htmlFor="title" className="block text-sm font-bold text-gray-900 ml-1">
-                            Article Title
+                        <label htmlFor="title" className="block text-sm font-semibold text-foreground ml-1">
+                            Article title
                         </label>
                         <input
                             type="text"
                             id="title"
                             value={formData.title}
                             onChange={(e) => handleChange('title', e.target.value)}
-                            className="w-full px-6 py-4 bg-white border border-gray-200 rounded-[20px] text-lg font-semibold text-gray-900 placeholder:text-gray-300 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             placeholder="e.g. How to Ace Your Oxford Interview"
                             disabled={isPending}
                         />
-                        {errors.title && <p className="text-red-500 text-xs font-medium ml-1">{errors.title}</p>}
+                        {errors.title && <p className="text-destructive text-xs font-medium ml-1">{errors.title}</p>}
                     </div>
 
                     {/* Metadata Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-8 rounded-[32px] border border-gray-100">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/60 p-8 rounded-card border border-border">
                         <div className="md:col-span-2 space-y-4">
-                            <label className="block text-sm font-bold text-gray-900 ml-1">
+                            <label className="block text-sm font-semibold text-foreground ml-1">
                                 Categories
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -142,9 +142,9 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                                     handleChange('categories', newCategories)
                                                 }
                                             }}
-                                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${isSelected
-                                                ? 'bg-accent text-white border-accent shadow-lg shadow-accent/20'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-accent/30'
+                                            className={`px-4 py-2 rounded-full text-xs font-semibold transition-[background-color,box-shadow,color] duration-150 border ${isSelected
+                                                ? 'bg-primary text-white border-primary shadow-border shadow-primary/20'
+                                                : 'bg-card text-muted-foreground border-border hover:border-primary/30'
                                                 }`}
                                             disabled={isPending}
                                         >
@@ -156,7 +156,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="block text-sm font-bold text-gray-900 ml-1">
+                            <label className="block text-sm font-semibold text-foreground ml-1">
                                 Visibility
                             </label>
                             <div className="flex items-center h-[46px]">
@@ -168,30 +168,30 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                         className="sr-only peer"
                                         disabled={isPending}
                                     />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
-                                    <span className="ml-3 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Featured Article</span>
+                                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-[background-color,box-shadow,color] duration-150 peer-checked:bg-primary"></div>
+                                    <span className="ml-3 text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">Featured article</span>
                                 </label>
                             </div>
                         </div>
 
                         <div className="md:col-span-2 space-y-4">
-                            <label htmlFor="description" className="block text-sm font-bold text-gray-900 ml-1">
-                                Short Summary
+                            <label htmlFor="description" className="block text-sm font-semibold text-foreground ml-1">
+                                Short summary
                             </label>
                             <textarea
                                 id="description"
                                 value={formData.description}
                                 onChange={(e) => handleChange('description', e.target.value)}
                                 rows={2}
-                                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 placeholder:text-gray-300 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm resize-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm py-2.5 px-3.5 leading-relaxed resize-none"
                                 placeholder="A brief hook to get readers interested..."
                                 disabled={isPending}
                             />
-                            {errors.description && <p className="text-red-500 text-xs font-medium ml-1">{errors.description}</p>}
+                            {errors.description && <p className="text-destructive text-xs font-medium ml-1">{errors.description}</p>}
                         </div>
 
                         <div className="space-y-4">
-                            <label htmlFor="tags" className="block text-sm font-bold text-gray-900 ml-1">
+                            <label htmlFor="tags" className="block text-sm font-semibold text-foreground ml-1">
                                 Tags
                             </label>
                             <input
@@ -199,42 +199,42 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                 id="tags"
                                 value={formData.tags}
                                 onChange={(e) => handleChange('tags', e.target.value)}
-                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="interview, oxford, tips"
                                 disabled={isPending}
                             />
                         </div>
 
                         <div className="space-y-4">
-                            <label htmlFor="image" className="block text-sm font-bold text-gray-900 ml-1">
-                                Cover Image URL
+                            <label htmlFor="image" className="block text-sm font-semibold text-foreground ml-1">
+                                Cover image URL
                             </label>
                             <input
                                 type="url"
                                 id="image"
                                 value={formData.image}
                                 onChange={(e) => handleChange('image', e.target.value)}
-                                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all shadow-sm"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="https://unsplash.com/..."
                                 disabled={isPending}
                             />
-                            {errors.image && <p className="text-red-500 text-xs font-medium ml-1">{errors.image}</p>}
+                            {errors.image && <p className="text-destructive text-xs font-medium ml-1">{errors.image}</p>}
                         </div>
                     </div>
 
                     {/* Content Editor */}
                     <div className="space-y-6">
                         <div className="flex items-center justify-between px-1">
-                            <label className="block text-sm font-bold text-gray-900">
-                                Article Content
+                            <label className="block text-sm font-semibold text-foreground">
+                                Article content
                             </label>
-                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                            <div className="flex bg-muted p-1 rounded-lg">
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('edit')}
-                                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'edit'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'edit'
+                                        ? 'bg-card text-foreground shadow-border'
+                                        : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     disabled={isPending}
                                 >
@@ -243,9 +243,9 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab('preview')}
-                                    className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'preview'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'preview'
+                                        ? 'bg-card text-foreground shadow-border'
+                                        : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     disabled={isPending}
                                 >
@@ -254,7 +254,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                             </div>
                         </div>
 
-                        <div className="bg-white border border-gray-200 rounded-[24px] overflow-hidden focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/5 transition-all shadow-sm min-h-[600px] flex flex-col">
+                        <div className="border border-transparent bg-card rounded-card overflow-hidden focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 transition-[background-color,box-shadow,color] duration-150 shadow-border min-h-[600px] flex flex-col">
                             {activeTab === 'edit' ? (
                                 <div data-color-mode="light" className="flex-1 flex flex-col">
                                     <MDEditor
@@ -281,13 +281,13 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
-                                                h1: ({ children }) => <h1 className="text-4xl font-extrabold text-gray-900 mb-8 tracking-tight">{children}</h1>,
-                                                h2: ({ children }) => <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-10">{children}</h2>,
-                                                h3: ({ children }) => <h3 className="text-xl font-bold text-gray-900 mb-3 mt-8">{children}</h3>,
-                                                p: ({ children }) => <p className="text-gray-600 leading-loose mb-6 text-lg">{children}</p>,
-                                                li: ({ children }) => <li className="text-gray-600 leading-relaxed mb-2 text-lg">{children}</li>,
+                                                h1: ({ children }) => <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance mb-8">{children}</h1>,
+                                                h2: ({ children }) => <h2 className="text-2xl font-semibold text-foreground mb-4 mt-10">{children}</h2>,
+                                                h3: ({ children }) => <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">{children}</h3>,
+                                                p: ({ children }) => <p className="text-muted-foreground leading-loose mb-6 text-lg">{children}</p>,
+                                                li: ({ children }) => <li className="text-muted-foreground leading-relaxed mb-2 text-lg">{children}</li>,
                                                 blockquote: ({ children }) => (
-                                                    <blockquote className="border-l-4 border-accent bg-accent/5 px-8 py-6 italic text-gray-700 rounded-r-2xl my-8 text-xl">
+                                                    <blockquote className="border-l-4 border-primary bg-primary/5 px-8 py-6 italic text-foreground rounded-r-2xl my-8 text-xl">
                                                         {children}
                                                     </blockquote>
                                                 ),
@@ -296,9 +296,9 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                             {formData.body}
                                         </ReactMarkdown>
                                     ) : (
-                                        <div className="h-full flex flex-col items-center justify-center text-gray-400 italic py-32">
-                                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                                                <ShieldAlert className="w-8 h-8 text-gray-200" />
+                                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground italic py-32">
+                                            <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mb-4">
+                                                <ShieldAlert className="size-8 text-muted-foreground/60" />
                                             </div>
                                             Nothing to preview yet
                                         </div>
@@ -306,7 +306,7 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                                 </div>
                             )}
                         </div>
-                        {errors.body && <p className="text-red-500 text-xs font-semibold ml-1">{errors.body}</p>}
+                        {errors.body && <p className="text-destructive text-xs font-semibold ml-1">{errors.body}</p>}
                     </div>
                 </div>
             </div>
@@ -315,17 +315,17 @@ export function ArticleForm({ author, article }: ArticleFormProps) {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className={`px-8 py-3 bg-accent text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-accent/40 transition-all flex items-center gap-2 ${isPending ? 'opacity-70 scale-95' : 'hover:-translate-y-1'}`}
+                    className={`px-8 py-3 bg-primary text-white rounded-control font-semibold hover:shadow-border hover:shadow-primary/40 transition-[background-color,box-shadow,color] duration-150 flex items-center gap-2 ${isPending ? 'opacity-70 scale-95' : 'hover:-translate-y-1'}`}
                 >
                     {isPending ? (
                         <>
-                            <Clock className="w-4 h-4 animate-spin" />
+                            <Clock className="size-4 animate-spin" />
                             <span>Saving...</span>
                         </>
                     ) : (
                         <>
-                            <ShieldCheck className="w-4 h-4" />
-                            <span>{article ? 'Update Article' : 'Publish Article'}</span>
+                            <ShieldCheck className="size-4" />
+                            <span>{article ? 'Update article' : 'Publish article'}</span>
                         </>
                     )}
                 </button>

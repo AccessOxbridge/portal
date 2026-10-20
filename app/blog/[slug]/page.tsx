@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Clock } from 'lucide-react'
+import { ArrowLeft, Clock } from '@phosphor-icons/react/ssr'
 import { ArticleMarkdown } from '@/components/blog/article-markdown'
 import type { Metadata } from 'next'
 
@@ -49,7 +49,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
             <div className="max-w-3xl mx-auto px-6 py-10 md:py-14">
                 <Link
                     href="/dashboard/student/resources"
-                    className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-accent transition-colors mb-8"
+                    className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-legacy-accent transition-colors mb-8"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Back to resources
@@ -60,14 +60,14 @@ export default async function BlogArticlePage({ params }: PageProps) {
                         {article.categories?.map((cat) => (
                             <span
                                 key={cat}
-                                className="px-2.5 py-0.5 bg-accent/10 text-accent rounded-lg text-xs font-bold uppercase tracking-wider"
+                                className="px-2.5 py-0.5 bg-legacy-accent/10 text-legacy-accent rounded-lg text-xs font-bold uppercase tracking-wider"
                             >
                                 {cat}
                             </span>
                         ))}
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-accent tracking-tight leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-legacy-accent tracking-tight leading-tight">
                         {article.title}
                     </h1>
                     <p className="mt-4 text-xl text-gray-500 font-medium leading-relaxed">{article.description}</p>

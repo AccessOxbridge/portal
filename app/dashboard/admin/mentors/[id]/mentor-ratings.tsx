@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { format } from 'date-fns'
-import { Star, MessageSquare } from 'lucide-react'
+import { Star, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import {
     Bar,
     BarChart,
@@ -73,9 +73,9 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
 
     if (ratings.length === 0) {
         return (
-            <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-2">Feedback &amp; Ratings</h2>
-                <p className="text-gray-400 text-sm">
+            <div className="border border-transparent bg-card rounded-card p-8 shadow-border">
+                <h2 className="text-lg font-semibold text-foreground mb-2">Feedback &amp; ratings</h2>
+                <p className="text-muted-foreground text-sm">
                     No student ratings yet
                     {sessionsCompleted > 0
                         ? ` across ${sessionsCompleted} completed session${sessionsCompleted === 1 ? '' : 's'}.`
@@ -86,39 +86,39 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
     }
 
     return (
-        <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm space-y-8">
+        <div className="border border-transparent bg-card rounded-card p-8 shadow-border space-y-8">
             <div>
-                <h2 className="text-lg font-bold text-gray-900">Feedback &amp; Ratings</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <h2 className="text-lg font-semibold text-foreground">Feedback &amp; ratings</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                     What students said after their sessions. Visible to admins only.
                 </p>
             </div>
 
             {/* Headline numbers */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
+                <div className="bg-tint-amber border border-border rounded-card p-5">
                     <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                        <span className="text-3xl font-bold text-gray-900">
+                        <Star weight="fill" className="size-5 text-amber-400 fill-amber-400" />
+                        <span className="text-3xl font-semibold text-foreground">
                             {average!.toFixed(1)}
                         </span>
-                        <span className="text-sm text-gray-500">/5</span>
+                        <span className="text-sm text-muted-foreground">/5</span>
                     </div>
-                    <p className="text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
+                    <p className="text-xs font-semibold text-muted-foreground mt-2">
                         Average rating
                     </p>
                 </div>
-                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
-                    <span className="text-3xl font-bold text-gray-900">{ratings.length}</span>
-                    <p className="text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
+                <div className="bg-muted/60 border border-border rounded-card p-5">
+                    <span className="text-3xl font-semibold text-foreground">{ratings.length}</span>
+                    <p className="text-xs font-semibold text-muted-foreground mt-2">
                         Ratings received
                     </p>
                 </div>
-                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
-                    <span className="text-3xl font-bold text-gray-900">
-                        {responseRate !== null ? `${responseRate}%` : '—'}
+                <div className="bg-muted/60 border border-border rounded-card p-5">
+                    <span className="text-3xl font-semibold text-foreground">
+                        {responseRate !== null ? `${responseRate}%` : 'None'}
                     </span>
-                    <p className="text-xs font-semibold text-gray-500 mt-2 uppercase tracking-wide">
+                    <p className="text-xs font-semibold text-muted-foreground mt-2">
                         Response rate
                     </p>
                 </div>
@@ -127,7 +127,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Distribution */}
                 <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Rating distribution</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Rating distribution</h3>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={distribution} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
@@ -165,7 +165,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
 
                 {/* Trend */}
                 <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Rating over time</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Rating over time</h3>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={trend} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
@@ -208,30 +208,31 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
             {/* Written comments */}
             {comments.length > 0 && (
                 <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-gray-400" />
+                    <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <MessageSquare className="size-4 text-muted-foreground" />
                         What students wrote ({comments.length})
                     </h3>
                     <div className="space-y-3">
                         {comments.map((c) => (
                             <div
                                 key={c.sessionId}
-                                className="border border-gray-100 rounded-2xl p-4 bg-gray-50/60"
+                                className="border border-border rounded-card p-4 bg-muted/60"
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="flex">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
                                                 key={star}
-                                                className={`w-3.5 h-3.5 ${
+                                                weight="fill"
+                                                className={`size-3.5 ${
                                                     star <= c.rating
                                                         ? 'text-amber-400 fill-amber-400'
-                                                        : 'text-gray-200 fill-gray-200'
+                                                        : 'text-muted-foreground/25'
                                                 }`}
                                             />
                                         ))}
                                     </div>
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-muted-foreground">
                                         {format(new Date(c.submittedAt), 'd MMM yyyy')}
                                     </span>
                                 </div>
@@ -240,7 +241,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
                                         {c.tags.map((tag) => (
                                             <span
                                                 key={tag}
-                                                className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100 text-xs font-medium"
+                                                className="px-2 py-0.5 rounded-full bg-tint-rose text-tint-rose-foreground border border-border text-xs font-medium"
                                             >
                                                 {tag}
                                             </span>
@@ -248,7 +249,7 @@ export default function MentorRatings({ ratings, sessionsCompleted }: MentorRati
                                     </div>
                                 )}
                                 {c.comment && (
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{c.comment}</p>
+                                    <p className="text-sm text-foreground whitespace-pre-wrap">{c.comment}</p>
                                 )}
                             </div>
                         ))}

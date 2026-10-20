@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import DateTimePicker from '@/components/dashboard/date-time-picker'
 import { useRouter } from 'next/navigation'
-import { Pencil, Trash2, Plus, X, Check, Video, MapPin, Calendar, Users, Clock } from 'lucide-react'
+import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, VideoCamera as Video, MapPin, CalendarBlank as Calendar, Users, Clock } from '@phosphor-icons/react/ssr'
+import { SelectField } from '@/components/ui/select'
+import { confirmDialog } from '@/components/ui/confirm'
 
 interface Event {
     id: string
@@ -152,7 +155,7 @@ export default function EventsManager({ initialEvents }: Props) {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this event? This will also remove all registrations.')) return
+        if (!(await confirmDialog({ title: 'Delete this event?', description: 'This will also remove all registrations.', confirmLabel: 'Delete event', destructive: true }))) return
         setLoading(true)
         setError(null)
         try {
@@ -207,10 +210,10 @@ export default function EventsManager({ initialEvents }: Props) {
     return (
         <div className="space-y-8">
             {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm flex items-center justify-between">
+                <div className="p-4 bg-tint-rose border border-border rounded-card text-tint-rose-foreground text-sm flex items-center justify-between">
                     {error}
-                    <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
-                        <X className="w-4 h-4" />
+                    <button onClick={() => setError(null)} className="text-destructive hover:text-tint-rose-foreground">
+                        <X className="size-4" />
                     </button>
                 </div>
             )}
@@ -220,141 +223,133 @@ export default function EventsManager({ initialEvents }: Props) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'all' ? 'bg-accent text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-control text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`}
                     >
-                        All Events
+                        All events
                     </button>
                     <button
                         onClick={() => setFilter('webinar')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'webinar' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-control text-sm font-medium transition-colors ${filter === 'webinar' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'}`}
                     >
-                        <Video className="w-4 h-4" />
+                        <Video className="size-4" />
                         Webinars
                     </button>
                     <button
                         onClick={() => setFilter('in_person')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${filter === 'in_person' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-control text-sm font-medium transition-colors ${filter === 'in_person' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted'}`}
                     >
-                        <MapPin className="w-4 h-4" />
-                        In Person
+                        <MapPin className="size-4" />
+                        In person
                     </button>
                 </div>
 
                 {!isCreating && !editingId && (
                     <button
                         onClick={() => { setIsCreating(true); resetForm(); }}
-                        className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors"
+                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                     >
-                        <Plus className="w-5 h-5" />
-                        Add Event
+                        <Plus className="size-5" />
+                        Add event
                     </button>
                 )}
             </div>
 
             {/* Create/Edit Form */}
             {(isCreating || editingId) && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
-                    <h3 className="text-xl font-bold text-gray-900 mb-6">
-                        {isCreating ? 'Create New Event' : 'Edit Event'}
+                <div className="border border-transparent bg-card rounded-card p-6 shadow-border">
+                    <h3 className="text-xl font-semibold text-foreground mb-6">
+                        {isCreating ? 'Create new event' : 'Edit event'}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Title</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Title</label>
                             <input
                                 type="text"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="e.g., Mastering the Oxbridge Interview"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Event Type</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Event type</label>
                             <div className="relative">
-                                <select
+                                <SelectField
                                     value={formData.event_type}
                                     onChange={(e) => setFormData({ ...formData, event_type: e.target.value as 'webinar' | 'in_person' })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
                                 >
                                     <option value="webinar">Webinar</option>
-                                    <option value="in_person">In Person</option>
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </div>
+                                    <option value="in_person">In person</option>
+                                </SelectField>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Start Date & Time</label>
-                            <input
-                                type="datetime-local"
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Start date & time</label>
+                            <DateTimePicker
                                 value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                onChange={(date) => setFormData({ ...formData, date })}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Duration (minutes)</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Duration (minutes)</label>
                             <input
                                 type="number"
                                 min="15"
                                 value={formData.duration_minutes}
                                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 60 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Capacity</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Capacity</label>
                             <input
                                 type="number"
                                 min="1"
                                 value={formData.capacity}
                                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 50 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Host</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Host</label>
                             <input
                                 type="text"
                                 value={formData.host}
                                 onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="e.g., Dr. Sarah Mitchell"
                             />
                         </div>
                         {formData.event_type === 'webinar' ? (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Meeting URL</label>
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">Meeting URL</label>
                                 <input
                                     type="url"
                                     value={formData.meeting_url}
                                     onChange={(e) => setFormData({ ...formData, meeting_url: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                     placeholder="https://zoom.us/..."
                                 />
                             </div>
                         ) : (
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Location</label>
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">Location</label>
                                 <input
                                     type="text"
                                     value={formData.location}
                                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                     placeholder="e.g., Oxford University, Broad Street"
                                 />
                             </div>
                         )}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Recording URL (optional)</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Recording URL (optional)</label>
                             <input
                                 type="url"
                                 value={formData.recording_url}
                                 onChange={(e) => setFormData({ ...formData, recording_url: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="For past events"
                             />
                         </div>
@@ -364,17 +359,17 @@ export default function EventsManager({ initialEvents }: Props) {
                                     type="checkbox"
                                     checked={formData.is_active}
                                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="size-5 rounded border-border text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm font-medium text-gray-700">Active (visible to students)</span>
+                                <span className="text-sm font-medium text-foreground">Active (visible to students)</span>
                             </label>
                         </div>
                         <div className="md:col-span-2 lg:col-span-3">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Description</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none resize-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm py-2.5 px-3.5 leading-relaxed resize-none"
                                 rows={3}
                                 placeholder="Brief description of the event"
                             />
@@ -384,14 +379,14 @@ export default function EventsManager({ initialEvents }: Props) {
                         <button
                             onClick={isCreating ? handleCreate : handleUpdate}
                             disabled={loading || !formData.title || !formData.date}
-                            className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-50"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                         >
-                            <Check className="w-5 h-5" />
-                            {loading ? 'Saving...' : (isCreating ? 'Create Event' : 'Save Changes')}
+                            <Check className="size-5" />
+                            {loading ? 'Saving...' : (isCreating ? 'Create event' : 'Save changes')}
                         </button>
                         <button
                             onClick={cancelEdit}
-                            className="px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                         >
                             Cancel
                         </button>
@@ -404,44 +399,44 @@ export default function EventsManager({ initialEvents }: Props) {
                 {filteredEvents.map((event) => (
                     <div
                         key={event.id}
-                        className={`bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-md transition-all ${!event.is_active ? 'opacity-60' : ''}`}
+                        className={`bg-card rounded-card border border-border p-6 hover:shadow-border transition-[background-color,box-shadow,color] duration-150 ${!event.is_active ? 'opacity-60' : ''}`}
                     >
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-4 flex-1">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${event.event_type === 'webinar' ? 'bg-blue-100' : 'bg-rose-100'}`}>
+                                <div className={`size-12 rounded-control flex items-center justify-center shrink-0 ${event.event_type === 'webinar' ? 'bg-tint-blue' : 'bg-tint-rose'}`}>
                                     {event.event_type === 'webinar' ? (
-                                        <Video className="w-6 h-6 text-blue-600" />
+                                        <Video className="size-6 text-brand" />
                                     ) : (
-                                        <MapPin className="w-6 h-6 text-rose-500" />
+                                        <MapPin className="size-6 text-destructive" />
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-bold text-gray-900 truncate">{event.title}</h3>
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${event.event_type === 'webinar' ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}`}>
-                                            {event.event_type === 'webinar' ? 'Webinar' : 'In Person'}
+                                        <h3 className="font-semibold text-foreground truncate">{event.title}</h3>
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${event.event_type === 'webinar' ? 'bg-tint-blue text-tint-blue-foreground' : 'bg-tint-rose text-tint-rose-foreground'}`}>
+                                            {event.event_type === 'webinar' ? 'Webinar' : 'In person'}
                                         </span>
                                     </div>
                                     {event.description && (
-                                        <p className="text-sm text-gray-500 truncate mb-2">{event.description}</p>
+                                        <p className="text-sm text-muted-foreground truncate mb-2">{event.description}</p>
                                     )}
-                                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                                         <span className="flex items-center gap-1">
-                                            <Calendar className="w-4 h-4" />
+                                            <Calendar className="size-4" />
                                             {formatDate(event.date)}
                                         </span>
                                         {event.duration_minutes && (
                                             <span className="flex items-center gap-1">
-                                                <Clock className="w-4 h-4" />
+                                                <Clock className="size-4" />
                                                 {event.duration_minutes} mins
                                             </span>
                                         )}
                                         <span className="flex items-center gap-1">
-                                            <Users className="w-4 h-4" />
+                                            <Users className="size-4" />
                                             {event.registration_count}/{event.capacity || '∞'} registered
                                         </span>
                                         {event.host && (
-                                            <span className="text-gray-600">Host: {event.host}</span>
+                                            <span className="text-muted-foreground">Host: {event.host}</span>
                                         )}
                                     </div>
                                 </div>
@@ -450,9 +445,9 @@ export default function EventsManager({ initialEvents }: Props) {
                                 <button
                                     onClick={() => toggleActive(event)}
                                     disabled={loading}
-                                    className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${event.is_active
-                                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${event.is_active
+                                        ? 'bg-tint-green text-tint-green-foreground hover:bg-tint-green/70'
+                                        : 'bg-muted text-muted-foreground hover:bg-muted'
                                         }`}
                                 >
                                     {event.is_active ? 'Active' : 'Inactive'}
@@ -460,24 +455,24 @@ export default function EventsManager({ initialEvents }: Props) {
                                 <button
                                     onClick={() => startEdit(event)}
                                     disabled={loading || isCreating || !!editingId}
-                                    className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50"
+                                    className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:opacity-50"
                                 >
-                                    <Pencil className="w-4 h-4" />
+                                    <Pencil className="size-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(event.id)}
                                     disabled={loading || isCreating || !!editingId}
-                                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-tint-rose rounded-lg transition-colors disabled:opacity-50"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="size-4" />
                                 </button>
                             </div>
                         </div>
                     </div>
                 ))}
                 {filteredEvents.length === 0 && (
-                    <div className="bg-gray-50 rounded-2xl p-12 text-center text-gray-500">
-                        <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <div className="bg-muted/60 rounded-card p-12 text-center text-muted-foreground">
+                        <Calendar className="size-12 mx-auto mb-4 text-muted-foreground/60" />
                         <p className="font-medium">No events yet</p>
                         <p className="text-sm mt-1">Create your first event to get started!</p>
                     </div>

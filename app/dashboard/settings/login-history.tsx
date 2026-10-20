@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldCheck, Monitor } from 'lucide-react'
+import { ShieldCheck, Monitor } from '@phosphor-icons/react/ssr'
+import { cn } from '@/utils/lib'
+import { segmentClass, segmentTrack } from '@/components/ui/segmented'
 
 export interface LoginEvent {
     id: string
@@ -76,14 +78,14 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
     const rows = scope === 'all' && allEvents ? allEvents : events
 
     return (
-        <section className="bg-white rounded-[28px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div className="min-w-0">
-                    <h2 className="font-bold text-gray-900">Login History</h2>
-                    <p className="text-sm text-gray-500">
+        <section className="overflow-hidden rounded-card border border-transparent bg-card shadow-border">
+            <div className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-green text-tint-green-foreground">
+                    <ShieldCheck weight="duotone" className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                    <h2 className="font-semibold text-foreground">Login history</h2>
+                    <p className="text-sm text-muted-foreground">
                         {scope === 'all'
                             ? 'Recent sign-in attempts across all accounts'
                             : 'Recent sign-in attempts on your account'}
@@ -91,17 +93,14 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
                 </div>
 
                 {isAdmin && (
-                    <div className="ml-auto shrink-0 flex rounded-xl bg-gray-100 p-1">
+                    <div className={cn(segmentTrack, 'w-fit')}>
                         {(['mine', 'all'] as const).map((value) => (
                             <button
                                 key={value}
                                 type="button"
                                 onClick={() => setScope(value)}
-                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                                    scope === value
-                                        ? 'bg-white text-accent shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                }`}
+                                aria-pressed={scope === value}
+                                className={segmentClass(scope === value)}
                             >
                                 {value === 'mine' ? 'Mine' : 'All users'}
                             </button>
@@ -111,7 +110,7 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
             </div>
 
             {rows.length === 0 ? (
-                <p className="px-6 py-8 text-sm text-gray-500 text-center">
+                <p className="px-6 py-8 text-center text-sm text-muted-foreground">
                     No sign-ins recorded yet.
                 </p>
             ) : (
@@ -120,43 +119,44 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="text-left text-gray-500 border-b border-gray-100">
-                                <th className="px-6 py-3 font-semibold whitespace-nowrap">Date &amp; Time</th>
+                            <tr className="border-b border-border bg-muted/50 text-left text-xs text-muted-foreground">
+                                <th className="whitespace-nowrap px-5 py-2.5 font-medium sm:px-6">Date and time</th>
                                 {scope === 'all' && (
-                                    <th className="px-6 py-3 font-semibold whitespace-nowrap">Account</th>
+                                    <th className="whitespace-nowrap px-5 py-2.5 font-medium sm:px-6">Account</th>
                                 )}
-                                <th className="px-6 py-3 font-semibold whitespace-nowrap">Device</th>
-                                <th className="px-6 py-3 font-semibold whitespace-nowrap">IP Address</th>
-                                <th className="px-6 py-3 font-semibold whitespace-nowrap">Status</th>
+                                <th className="whitespace-nowrap px-5 py-2.5 font-medium sm:px-6">Device</th>
+                                <th className="whitespace-nowrap px-5 py-2.5 font-medium sm:px-6">IP address</th>
+                                <th className="whitespace-nowrap px-5 py-2.5 font-medium sm:px-6">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-border">
                             {rows.map((event) => (
                                 <tr key={event.id}>
-                                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                                    <td className="whitespace-nowrap px-5 py-3 text-foreground tabular-nums sm:px-6">
                                         {formatWhen(event.created_at, timezone)}
                                     </td>
                                     {scope === 'all' && (
-                                        <td className="px-6 py-4 text-gray-600 max-w-[220px] truncate">
-                                            {event.email || '—'}
+                                        <td className="max-w-[220px] truncate px-5 py-3 text-muted-foreground sm:px-6">
+                                            {event.email || 'None'}
                                         </td>
                                     )}
-                                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                                    <td className="whitespace-nowrap px-5 py-3 text-muted-foreground sm:px-6">
                                         <span className="inline-flex items-center gap-2">
-                                            <Monitor className="w-4 h-4 text-gray-400 shrink-0" />
+                                            <Monitor className="size-4 shrink-0" />
                                             {formatDevice(event.user_agent)}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-600 font-mono text-xs whitespace-nowrap">
-                                        {event.ip || '—'}
+                                    <td className="whitespace-nowrap px-5 py-3 font-mono text-xs text-muted-foreground sm:px-6">
+                                        {event.ip || 'Unknown'}
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-5 py-3 sm:px-6">
                                         <span
-                                            className={`inline-flex px-3 py-1 rounded-lg text-xs font-medium ${
+                                            className={cn(
+                                                'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium',
                                                 event.status === 'success'
-                                                    ? 'bg-green-50 text-green-700'
-                                                    : 'bg-red-50 text-red-700'
-                                            }`}
+                                                    ? 'bg-tint-green text-tint-green-foreground'
+                                                    : 'bg-tint-rose text-tint-rose-foreground',
+                                            )}
                                         >
                                             {event.status === 'success' ? 'Success' : 'Failed'}
                                         </span>
@@ -168,7 +168,7 @@ export default function LoginHistory({ events, allEvents, timezone }: LoginHisto
                 </div>
             )}
 
-            <p className="px-6 py-4 border-t border-gray-100 text-xs text-gray-400">
+            <p className="border-t border-border px-5 py-3.5 text-xs text-muted-foreground text-pretty sm:px-6">
                 Sign-in records are kept for 90 days. If you see activity you don&apos;t recognise,
                 change your password and contact support.
             </p>

@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Calendar, Clock } from 'lucide-react'
+import { X, CalendarBlank as Calendar, Clock, WarningCircle } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { buttonVariants } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/utils/lib'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO, formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'
 import SelectMenu from '@/components/dashboard/select-menu'
@@ -127,7 +132,7 @@ export default function RescheduleSessionModal({
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to send reschedule request.')
+                throw new Error(result.error || "Couldn't send your reschedule request. Try again in a moment.")
             }
 
             router.refresh()
@@ -142,46 +147,46 @@ export default function RescheduleSessionModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className={sheet.root}>
+            <div className={sheet.overlay} onClick={onClose} />
 
-            <div className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-xl sm:mx-4 max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between gap-3">
+            <div role="dialog" aria-modal="true" aria-labelledby="reschedule-title" className={cn(sheet.panel, 'sm:max-w-xl')}>
+                <div className={sheet.handle}><span className={sheet.handleBar} /></div>
+                <div className={sheet.header}>
                     <div>
-                        <h2 className="text-2xl font-extrabold text-gray-900">Reschedule Session</h2>
-                        <p className="text-gray-500 mt-1">Propose a new time with {counterpartName}</p>
+                        <h2 id="reschedule-title" className={sheet.title}>Reschedule session</h2>
+                        <p className={sheet.description}>Propose a new time with {counterpartName}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        aria-label="Close"
+                        className={sheet.close}
                     >
-                        <X className="w-5 h-5 text-gray-600" />
+                        <X className="size-5" />
                     </button>
                 </div>
 
-                <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
-                    <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                <div className={cn(sheet.body, 'space-y-5')}>
+                    <div className="rounded-card bg-tint-blue p-4">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
-                                <Calendar className="w-4 h-4 text-accent" />
-                            </div>
+                            <Calendar weight="duotone" className="mt-0.5 size-5 shrink-0 text-tint-blue-foreground" />
                             <div>
-                                <p className="text-sm text-gray-700 leading-relaxed">
+                                <p className="text-sm leading-relaxed text-foreground text-pretty">
                                     Your current session stays booked until they accept. Propose one new time below.
                                 </p>
-                                <p className="text-xs text-gray-500 mt-2">
-                                    <strong>Current:</strong> {currentDisplay}
+                                <p className="mt-2 text-sm text-tint-blue-foreground tabular-nums">
+                                    <strong className="font-medium">Current:</strong> {currentDisplay}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Timezone: <strong>{tz}</strong>
+                                <p className="mt-0.5 text-sm text-tint-blue-foreground">
+                                    Timezone: <strong className="font-medium">{tz}</strong>
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 space-y-4">
+                    <div className="space-y-4 rounded-card bg-muted/60 p-4 sm:p-5">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Date</label>
+                            <label className={sheet.label}>Date</label>
                             <DatePicker
                                 value={date}
                                 min={todayDate}
@@ -190,7 +195,7 @@ export default function RescheduleSessionModal({
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Start Time</label>
+                                <label className={sheet.label}>Start time</label>
                                 <SelectMenu
                                     value={startTime}
                                     onChange={setStartTime}
@@ -200,7 +205,7 @@ export default function RescheduleSessionModal({
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">End Time</label>
+                                <label className={sheet.label}>End time</label>
                                 <SelectMenu
                                     value={endTime}
                                     onChange={setEndTime}
@@ -224,55 +229,49 @@ export default function RescheduleSessionModal({
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Message (optional)</label>
-                        <textarea
+                        <label htmlFor="reschedule-note" className={sheet.label}>Message <span className="font-normal text-muted-foreground">(optional)</span></label>
+                        <Textarea
+                            id="reschedule-note"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             rows={3}
                             placeholder="Let them know why you need to reschedule…"
-                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm resize-none"
+                            className="resize-none"
                         />
                     </div>
 
                     {error && (
-                        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <p className="flex-1 text-red-700 text-sm leading-6">{error}</p>
-                            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 p-1 flex items-center justify-center">
-                                <X className="w-4 h-4" />
+                        <div role="alert" className="flex items-start gap-3 rounded-card bg-tint-rose p-4">
+                            <WarningCircle weight="fill" className="mt-0.5 size-5 shrink-0 text-destructive" />
+                            <p className="flex-1 text-sm leading-6 text-tint-rose-foreground">{error}</p>
+                            <button onClick={() => setError(null)} aria-label="Dismiss" className="grid size-8 shrink-0 place-items-center rounded-full text-tint-rose-foreground transition-colors hover:bg-white/60">
+                                <X className="size-4" />
                             </button>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                <div className={sheet.footer}>
                     <button
                         onClick={onClose}
-                        className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:text-gray-700 transition-colors"
+                        className={buttonVariants({ variant: 'ghost' })}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !date || !startTime || !endTime}
-                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
+                        className={buttonVariants()}
                     >
                         {loading ? (
-                            <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                            <>
+                                <Spinner className="size-4" />
                                 Sending...
-                            </span>
+                            </>
                         ) : (
                             <>
-                                <Clock className="w-4 h-4" />
-                                Send Reschedule Request
+                                <Clock weight="bold" />
+                                Send reschedule request
                             </>
                         )}
                     </button>

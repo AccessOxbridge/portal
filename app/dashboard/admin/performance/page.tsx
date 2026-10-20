@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, CircleDashed, CheckCircle2, Flag, TrendingDown } from 'lucide-react'
+import { Warning as AlertTriangle, CircleDashed, CheckCircle as CheckCircle2, Flag, TrendDown as TrendingDown } from '@phosphor-icons/react/ssr'
 import { MENTOR_FLAG_THRESHOLD, MENTOR_RECENT_DAYS, ONGOING_WINDOW_WEEKS } from '@/lib/session-frequency'
 import { loadPerformanceData } from './data'
 import StudentPaceTable from './student-pace-table'
@@ -46,32 +46,32 @@ export default async function AdminPerformancePage() {
     const flaggedMentors = mentorRows.filter((m) => m.rating.flagged).length
 
     const cards = [
-        { label: 'Behind', value: behind, icon: TrendingDown, tone: 'text-red-600', bg: 'bg-red-50' },
-        { label: 'Slipping', value: slipping, icon: AlertTriangle, tone: 'text-amber-600', bg: 'bg-amber-50' },
-        { label: 'On track', value: onTrack, icon: CheckCircle2, tone: 'text-green-600', bg: 'bg-green-50' },
-        { label: 'No target set', value: noTarget, icon: CircleDashed, tone: 'text-gray-500', bg: 'bg-gray-50' },
-        { label: 'Mentors flagged', value: flaggedMentors, icon: Flag, tone: 'text-red-600', bg: 'bg-red-50' },
+        { label: 'Behind', value: behind, icon: TrendingDown, tone: 'text-destructive', bg: 'bg-tint-rose' },
+        { label: 'Slipping', value: slipping, icon: AlertTriangle, tone: 'text-warning', bg: 'bg-tint-amber' },
+        { label: 'On track', value: onTrack, icon: CheckCircle2, tone: 'text-success', bg: 'bg-tint-green' },
+        { label: 'No target set', value: noTarget, icon: CircleDashed, tone: 'text-muted-foreground', bg: 'bg-muted/60' },
+        { label: 'Mentors flagged', value: flaggedMentors, icon: Flag, tone: 'text-destructive', bg: 'bg-tint-rose' },
     ]
 
     return (
         <div className="max-w-7xl mx-auto space-y-10">
             <header>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">Performance</h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Performance</h1>
+                <p className="mt-2 text-lg text-muted-foreground">
                     Students against their target session pace, and mentor ratings.
                 </p>
             </header>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {cards.map((card) => (
-                    <div key={card.label} className="bg-white rounded-2xl border border-gray-200 p-5">
+                    <div key={card.label} className="bg-card rounded-card border border-border p-5">
                         <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm font-medium text-gray-500">{card.label}</p>
-                            <span className={`w-8 h-8 rounded-xl ${card.bg} flex items-center justify-center`}>
-                                <card.icon className={`w-4 h-4 ${card.tone}`} />
+                            <p className="text-sm font-medium text-muted-foreground">{card.label}</p>
+                            <span className={`size-8 rounded-control ${card.bg} flex items-center justify-center`}>
+                                <card.icon className={`size-4 ${card.tone}`} />
                             </span>
                         </div>
-                        <p className={`mt-2 text-3xl font-black tabular-nums ${card.value > 0 ? card.tone : 'text-gray-900'}`}>
+                        <p className={`mt-2 text-3xl font-semibold tabular-nums ${card.value > 0 ? card.tone : 'text-foreground'}`}>
                             {card.value}
                         </p>
                     </div>
@@ -80,11 +80,11 @@ export default async function AdminPerformancePage() {
 
             <section className="space-y-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900">Students</h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                        <span className="font-semibold text-red-600">Behind</span>: no completed session for twice
+                    <h2 className="text-xl font-semibold text-foreground">Students</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        <span className="font-semibold text-destructive">Behind</span>: no completed session for twice
                         their interval (e.g. 2 weeks on a weekly plan), or 2+ sessions short of pace.{' '}
-                        <span className="font-semibold text-amber-600">Slipping</span>: 1 session short, or the gap
+                        <span className="font-semibold text-warning">Slipping</span>: 1 session short, or the gap
                         is past 1.5× the interval. Packages count every session since the start date; ongoing plans
                         count the last {ONGOING_WINDOW_WEEKS} weeks. Only sessions Zoom marked as completed count.
                     </p>
@@ -94,8 +94,8 @@ export default async function AdminPerformancePage() {
 
             <section className="space-y-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900">Mentors</h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <h2 className="text-xl font-semibold text-foreground">Mentors</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
                         Average of students&apos; after-session ratings. Flagged for follow-up when the average is
                         below {MENTOR_FLAG_THRESHOLD}, or any rating in the last {MENTOR_RECENT_DAYS} days is below{' '}
                         {MENTOR_FLAG_THRESHOLD}.

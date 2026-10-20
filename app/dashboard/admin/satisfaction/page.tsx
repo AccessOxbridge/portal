@@ -64,10 +64,10 @@ export default async function AdminSatisfactionPage() {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
-                    Student Satisfaction
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Student satisfaction
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     The check-in students answer every 4 completed sessions.
                 </p>
             </div>

@@ -34,12 +34,14 @@ export default async function MentorProfilePage() {
     }
 
     // ---- Stats ----------------------------------------------------------
-    // Sessions completed
+    // Sessions completed. Under 15 real Zoom minutes isn't a session
+    // (utils/session-billing), the same count as My students.
     const { count: sessionsCompleted } = await supabase
         .from('sessions')
         .select('*', { count: 'exact', head: true })
         .eq('mentor_id', user.id)
         .eq('status', 'completed')
+        .or('actual_minutes.is.null,actual_minutes.gte.15')
 
     // Active students (current assignments)
     const { count: activeStudents } = await supabase
@@ -56,9 +58,9 @@ export default async function MentorProfilePage() {
     return (
         <div className="max-w-3xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">My Profile</h1>
-                <p className="mt-3 text-gray-500 text-lg">
-                    Keep your details up to date — this is what students and the team see.
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">My profile</h1>
+                <p className="mt-2 text-lg text-muted-foreground">
+                    Keep your details up to date. This is what students and the team see.
                 </p>
             </header>
 

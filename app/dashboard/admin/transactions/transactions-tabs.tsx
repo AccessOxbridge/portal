@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight } from '@phosphor-icons/react/ssr'
 import { formatPrice } from '@/utils/stripe'
 
 interface Purchase {
@@ -76,99 +76,99 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
         <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Total Revenue</p>
-                    <p className="text-3xl font-black text-green-600">{formatPrice(totalRevenue)}</p>
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Total revenue</p>
+                    <p className="text-3xl font-semibold text-success">{formatPrice(totalRevenue)}</p>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                        {activeTab === 'inbound' ? 'Credits Sold' : 'Total Payouts'}
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                        {activeTab === 'inbound' ? 'Credits sold' : 'Total payouts'}
                     </p>
-                    <p className="text-3xl font-black text-accent">
+                    <p className="text-3xl font-semibold text-primary">
                         {activeTab === 'inbound'
                             ? totalCredits
                             : formatPrice(totalPayoutAmount)}
                     </p>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                        {activeTab === 'inbound' ? 'Total Purchases' : 'Total Payouts'}
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                        {activeTab === 'inbound' ? 'Total purchases' : 'Total payouts'}
                     </p>
-                    <p className="text-3xl font-black text-gray-900">
+                    <p className="text-3xl font-semibold text-foreground">
                         {activeTab === 'inbound' ? purchases.length : payouts.length}
                     </p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 border-b border-gray-200">
+            <div className="flex gap-2 border-b border-border">
                 <button
                     onClick={() => setActiveTab('inbound')}
-                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${activeTab === 'inbound'
-                        ? 'text-green-600 border-green-600'
-                        : 'text-gray-500 border-transparent hover:text-gray-700'
+                    className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${activeTab === 'inbound'
+                        ? 'text-success border-success'
+                        : 'text-muted-foreground border-transparent hover:text-foreground'
                         }`}
                 >
-                    <ArrowDownLeft className="w-4 h-4" />
+                    <ArrowDownLeft className="size-4" />
                     Inbound (Purchases)
                 </button>
                 <button
                     onClick={() => setActiveTab('outbound')}
-                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${activeTab === 'outbound'
-                        ? 'text-red-600 border-red-600'
-                        : 'text-gray-500 border-transparent hover:text-gray-700'
+                    className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${activeTab === 'outbound'
+                        ? 'text-destructive border-destructive'
+                        : 'text-muted-foreground border-transparent hover:text-foreground'
                         }`}
                 >
-                    <ArrowUpRight className="w-4 h-4" />
+                    <ArrowUpRight className="size-4" />
                     Outbound (Payouts)
                 </button>
             </div>
 
             {/* Tab Content */}
             {activeTab === 'inbound' ? (
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="bg-card rounded-card border border-border overflow-hidden">
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
+                        <thead className="bg-muted/60 border-b border-border">
                             <tr>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Student</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Package</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Credits</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Amount</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Date</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Student</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Package</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Credits</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Amount</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-border">
                             {purchases.map((purchase) => (
-                                <tr key={purchase.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={purchase.id} className="hover:bg-muted/60 transition-colors">
                                     <td className="px-6 py-4">
                                         <div>
-                                            <p className="font-medium text-gray-900">
+                                            <p className="font-medium text-foreground">
                                                 {purchase.profiles?.full_name || 'Unknown'}
                                             </p>
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-sm text-muted-foreground">
                                                 {purchase.profiles?.email || ''}
                                             </p>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-700">
+                                    <td className="px-6 py-4 text-foreground">
                                         {purchase.credit_packages?.name || 'Custom'}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-accent/10 text-accent">
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-primary/10 text-primary">
                                             +{purchase.credits_purchased}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 font-bold text-green-600">
+                                    <td className="px-6 py-4 font-semibold text-success">
                                         {formatPrice(purchase.amount_paid_cents, purchase.currency)}
                                     </td>
-                                    <td className="px-6 py-4 text-gray-500 text-sm">
+                                    <td className="px-6 py-4 text-muted-foreground text-sm">
                                         {purchase.completed_at ? formatDateTime(purchase.completed_at) : '-'}
                                     </td>
                                 </tr>
                             ))}
                             {purchases.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                                         No purchases yet
                                     </td>
                                 </tr>
@@ -177,52 +177,52 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                     </table>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="bg-card rounded-card border border-border overflow-hidden">
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
+                        <thead className="bg-muted/60 border-b border-border">
                             <tr>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Mentor</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Period</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Amount</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Status</th>
-                                <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Paid At</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Mentor</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Period</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Amount</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Status</th>
+                                <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Paid at</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-border">
                             {payouts.map((payout) => (
-                                <tr key={payout.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={payout.id} className="hover:bg-muted/60 transition-colors">
                                     <td className="px-6 py-4">
                                         <div>
-                                            <p className="font-medium text-gray-900">
+                                            <p className="font-medium text-foreground">
                                                 {payout.profiles?.full_name || 'Unknown'}
                                             </p>
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-sm text-muted-foreground">
                                                 {payout.profiles?.email || ''}
                                             </p>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-700">
+                                    <td className="px-6 py-4 text-foreground">
                                         {formatDateRange(payout.period_start, payout.period_end)}
                                     </td>
-                                    <td className="px-6 py-4 font-bold text-red-600">
+                                    <td className="px-6 py-4 font-semibold text-destructive">
                                         {formatPrice(payout.amount_cents, payout.currency)}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
                                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                                                 payout.status === 'paid'
-                                                    ? 'bg-green-100 text-green-700'
+                                                    ? 'bg-tint-green text-tint-green-foreground'
                                                     : payout.status === 'processing'
-                                                    ? 'bg-blue-100 text-blue-700'
+                                                    ? 'bg-tint-blue text-tint-blue-foreground'
                                                     : payout.status === 'failed'
-                                                    ? 'bg-red-100 text-red-700'
-                                                    : 'bg-gray-100 text-gray-700'
+                                                    ? 'bg-tint-rose text-tint-rose-foreground'
+                                                    : 'bg-muted text-foreground'
                                             }`}
                                         >
                                             {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-500 text-sm">
+                                    <td className="px-6 py-4 text-muted-foreground text-sm">
                                         {payout.paid_at
                                             ? formatDateTime(payout.paid_at)
                                             : payout.created_at
@@ -233,7 +233,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                             ))}
                             {payouts.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                                         No payouts yet
                                     </td>
                                 </tr>

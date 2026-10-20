@@ -1,8 +1,9 @@
 'use client'
 
 import { format, isToday, isYesterday } from 'date-fns'
-import { Check, CheckCheck, AlertCircle, RotateCw } from 'lucide-react'
+import { Check, Checks as CheckCheck, WarningCircle as AlertCircle, ArrowClockwise as RotateCw } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
+import { Avatar } from '@/components/ui/avatar'
 import CollapsibleText from './collapsible-text'
 import AttachmentGrid from './attachment-grid'
 import type { ChatAttachment } from '@/lib/chat-attachments'
@@ -64,14 +65,14 @@ export default function MessageBubble({
         <button
             type="button"
             onClick={onRetry}
-            className="flex items-center gap-1 text-[11px] font-medium text-red-500 hover:text-red-600 transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-destructive hover:text-destructive transition-colors"
         >
-            <AlertCircle className="w-3 h-3" />
+            <AlertCircle className="size-3" />
             Not sent
             {onRetry && (
                 <>
-                    <span className="text-red-300">·</span>
-                    <RotateCw className="w-3 h-3" />
+                    <span className="text-destructive/40">·</span>
+                    <RotateCw className="size-3" />
                     Retry
                 </>
             )}
@@ -83,28 +84,16 @@ export default function MessageBubble({
         return (
             <div className="flex gap-2.5">
                 <div className="w-8 shrink-0">
-                    {isFirstInGroup &&
-                        (avatarUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={avatarUrl}
-                                alt={senderName || 'User'}
-                                className="w-8 h-8 rounded-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent text-xs font-semibold">
-                                {senderName?.[0]?.toUpperCase() || 'U'}
-                            </div>
-                        ))}
+                    {isFirstInGroup && <Avatar name={senderName || 'User'} src={avatarUrl} size="sm" />}
                 </div>
 
                 <div className="min-w-0 max-w-[85%]">
                     {isFirstInGroup && (
                         <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-[13px] font-semibold text-gray-900">
+                            <span className="text-[13px] font-semibold text-foreground">
                                 {senderName || 'User'}
                             </span>
-                            <span className="text-[11px] text-gray-400 tabular-nums">
+                            <span className="text-[11px] text-muted-foreground tabular-nums">
                                 {formatTime(timestamp)}
                             </span>
                         </div>
@@ -122,7 +111,7 @@ export default function MessageBubble({
                     )}
 
                     {hasText && (
-                        <div className="text-gray-700">
+                        <div className="text-foreground">
                             <CollapsibleText content={content} />
                         </div>
                     )}
@@ -148,13 +137,13 @@ export default function MessageBubble({
             {hasText && (
                 <div
                     className={cn(
-                        'max-w-[75%] sm:max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-accent text-white transition-opacity',
+                        'max-w-[75%] sm:max-w-[70%] px-3.5 py-2.5 rounded-card bg-primary text-white transition-opacity',
                         isLastInGroup && 'rounded-br-md',
                         status === 'sending' && 'opacity-70',
-                        failed && 'bg-accent/70'
+                        failed && 'bg-primary/70'
                     )}
                 >
-                    <CollapsibleText content={content} onDark fadeFrom="from-accent" />
+                    <CollapsibleText content={content} onDark fadeFrom="from-primary" />
                 </div>
             )}
 
@@ -164,17 +153,17 @@ export default function MessageBubble({
                         failureNotice
                     ) : (
                         <>
-                            <span className="text-[11px] text-gray-400 tabular-nums">
+                            <span className="text-[11px] text-muted-foreground tabular-nums">
                                 {formatTime(timestamp)}
                             </span>
                             {status === 'sent' && (
                                 // Icons rather than '✓✓' text, which renders as
                                 // different glyphs across platforms.
-                                <span className={isRead ? 'text-accent' : 'text-gray-300'}>
+                                <span className={isRead ? 'text-primary' : 'text-muted-foreground/60'}>
                                     {isRead ? (
-                                        <CheckCheck className="w-3.5 h-3.5" />
+                                        <CheckCheck className="size-3.5" />
                                     ) : (
-                                        <Check className="w-3.5 h-3.5" />
+                                        <Check className="size-3.5" />
                                     )}
                                 </span>
                             )}

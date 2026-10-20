@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreHorizontal, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { DotsThree as MoreHorizontal, CheckCircle as CheckCircle2, Clock, XCircle } from '@phosphor-icons/react/ssr'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { MentorMessageButton } from './MentorMessageButton'
@@ -35,43 +35,43 @@ export function MentorActions({ mentorId, currentStatus, mentorName, photoUrl }:
                 <div className="relative">
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className={`p-2 transition-colors rounded-lg ${isMenuOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`p-2 transition-colors rounded-lg ${isMenuOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-muted-foreground'}`}
                     >
-                        {isPending ? <Clock className="w-4 h-4 animate-spin" /> : <MoreHorizontal className="w-4 h-4" />}
+                        {isPending ? <Clock className="size-4 animate-spin" /> : <MoreHorizontal className="size-4" />}
                     </button>
 
                     {isMenuOpen && (
                         <>
                             <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)}></div>
-                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
-                                <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
-                                    Change Status
+                            <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-control shadow-border z-20 py-1 overflow-hidden">
+                                <div className="px-4 py-2 text-[10px] font-semibold text-muted-foreground border-b border-border">
+                                    Change status
                                 </div>
                                 {currentStatus !== 'active' && (
                                     <button
                                         onClick={() => updateStatus('active')}
-                                        className="w-full text-left px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2 transition-colors font-medium"
+                                        className="w-full text-left px-4 py-2.5 text-sm text-success hover:bg-tint-green flex items-center gap-2 transition-colors font-medium"
                                     >
-                                        <CheckCircle2 className="w-4 h-4" />
-                                        Set Active
+                                        <CheckCircle2 className="size-4" />
+                                        Set active
                                     </button>
                                 )}
                                 {currentStatus !== 'pending_approval' && (
                                     <button
                                         onClick={() => updateStatus('pending_approval')}
-                                        className="w-full text-left px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 transition-colors font-medium"
+                                        className="w-full text-left px-4 py-2.5 text-sm text-warning hover:bg-tint-amber flex items-center gap-2 transition-colors font-medium"
                                     >
-                                        <Clock className="w-4 h-4" />
-                                        Set Pending
+                                        <Clock className="size-4" />
+                                        Set pending
                                     </button>
                                 )}
                                 {currentStatus !== 'details_required' && (
                                     <button
                                         onClick={() => updateStatus('details_required')}
-                                        className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2 transition-colors font-medium"
+                                        className="w-full text-left px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted/60 flex items-center gap-2 transition-colors font-medium"
                                     >
-                                        <XCircle className="w-4 h-4" />
-                                        Request Details
+                                        <XCircle className="size-4" />
+                                        Request details
                                     </button>
                                 )}
                             </div>

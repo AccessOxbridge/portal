@@ -65,11 +65,11 @@ export function SignupForm() {
     const showValidation = isTouched && password.length > 0 && !isPasswordValid
 
     return (
-        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-accent/30 selection:text-accent">
+        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-legacy-accent/30 selection:text-legacy-accent">
             {/* Left Section - Decorative Branding */}
             <div
                 ref={leftPanelRef}
-                className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen"
+                className="hidden lg:flex flex-col justify-between w-1/2 bg-legacy-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen"
             >
                 {/* Background Pattern/Effect */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -138,7 +138,7 @@ export function SignupForm() {
                             height={50}
                             className="mb-4 rounded-xl shadow-lg"
                         />
-                        <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
+                        <h1 className="text-2xl font-bold text-legacy-accent">Access Oxbridge</h1>
                     </div>
 
                     <div className="mb-10 text-center lg:text-left">
@@ -157,7 +157,7 @@ export function SignupForm() {
                                 type="text"
                                 required
                                 placeholder="John Doe"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
@@ -176,7 +176,7 @@ export function SignupForm() {
                                 onFocus={() => setIsEmailTouched(true)}
                                 className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showEmailError
                                     ? 'border-red-300 focus:ring-red-100'
-                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
+                                    : 'border-gray-200 focus:ring-legacy-accent/20 focus:border-legacy-accent'
                                     }`}
                             />
                             {showEmailError && (
@@ -201,7 +201,7 @@ export function SignupForm() {
                                 onFocus={() => setIsTouched(true)}
                                 className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showValidation
                                     ? 'border-red-300 focus:ring-red-100'
-                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
+                                    : 'border-gray-200 focus:ring-legacy-accent/20 focus:border-legacy-accent'
                                     }`}
                             />
                             {showValidation && (
@@ -246,7 +246,7 @@ export function SignupForm() {
                                     id="role"
                                     name="role"
                                     required
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent appearance-none transition-all duration-200 text-gray-900"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent appearance-none transition-all duration-200 text-gray-900"
                                 >
                                     <option value="student">Student / Parent</option>
                                     <option value="mentor">Mentor</option>
@@ -288,7 +288,7 @@ export function SignupForm() {
                                 placeholder="e.g. SCHOOL2025 or partner code"
                                 value={memberCode}
                                 onChange={(e) => setMemberCode(e.target.value.toUpperCase())}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900 uppercase placeholder:normal-case"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-legacy-accent/20 focus:border-legacy-accent transition-all duration-200 text-gray-900 uppercase placeholder:normal-case"
                             />
                         </div>
 
@@ -296,7 +296,7 @@ export function SignupForm() {
                             formAction={signup}
                             disabled={!isPasswordValid || !isEmailValid || isLoading}
                             className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${isPasswordValid && isEmailValid && !isLoading
-                                ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
+                                ? 'bg-legacy-accent hover:bg-[#07214d] hover:shadow-legacy-accent/40'
                                 : 'bg-gray-300 cursor-not-allowed shadow-none'
                                 } flex items-center justify-center gap-2`}
                         >
@@ -317,7 +317,7 @@ export function SignupForm() {
                     <div className="mt-8 text-center">
                         <p className="text-gray-600 font-medium">
                             Already have an account?{' '}
-                            <Link href="/login" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
+                            <Link href="/login" className="text-legacy-accent font-bold hover:underline decoration-2 underline-offset-4">
                                 Log in
                             </Link>
                         </p>

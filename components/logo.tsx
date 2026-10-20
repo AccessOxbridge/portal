@@ -4,20 +4,22 @@ import { cn } from "@/utils/lib";
 
 export function Logo({
   className,
-  textColor = "text-gray-900",
+  textColor = "text-foreground",
   size = "default",
   iconOnly = false,
 }: {
   className?: string
   textColor?: string
-  size?: "default" | "lg"
+  size?: "default" | "lg" | "sidebar"
   iconOnly?: boolean
 }) {
-  const iconSize = size === "lg" ? 44 : 32
+  const iconSize = size === "lg" ? 44 : size === "sidebar" ? 36 : 32
   const textClass =
     size === "lg"
       ? "text-xl flex font-extrabold"
-      : "text-lg hidden md:flex sm:text-2xl font-extrabold"
+      : size === "sidebar"
+        ? "text-lg flex font-extrabold"
+        : "text-lg hidden md:flex sm:text-2xl font-extrabold"
 
   return (
     <Link

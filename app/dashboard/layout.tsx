@@ -15,6 +15,7 @@ import MentorSessionCheckinModal from '@/components/dashboard/mentor-session-che
 import type { MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 import type { StudentMilestone } from '@/components/dashboard/milestone-modal'
 import { headers } from 'next/headers'
+import { isBillableLength } from '@/utils/session-billing'
 
 export default async function DashboardLayout({
     children,
@@ -164,15 +165,16 @@ export default async function DashboardLayout({
     let pendingRequestsCount = 0
 
     if (isMentor && showSidebar) {
-        const nowIso = new Date().toISOString()
-        const now = new Date()
-
-        // Get all past/ended sessions for this mentor (for reports)
-        const { data: sessions } = await supabase
+        // Sessions that took place: completed, or ended on Zoom. The same rule
+        // as payouts, so cancelled and never-started sessions don't ask for a
+        // report. Matches the Reports page's "To complete" list.
+        const { data: sessionRows } = await supabase
             .from('sessions')
-            .select('id, scheduled_at, status, zoom_meeting_status')
+            .select('id, actual_minutes')
             .eq('mentor_id', user.id)
-            .or(`scheduled_at.lt.${nowIso},zoom_meeting_status.eq.ended,status.eq.completed`)
+            .or('status.eq.completed,zoom_meeting_status.eq.ended')
+        // actual_minutes is newer than the generated types, hence the cast.
+        const sessions = sessionRows as unknown as { id: string; actual_minutes: number | null }[] | null
 
         if (sessions && sessions.length > 0) {
             const sessionIds = sessions.map(s => s.id)
@@ -188,11 +190,9 @@ export default async function DashboardLayout({
             const submittedSessionIds = new Set(submittedReports?.map(r => r.session_id) || [])
 
             // Count sessions that need reports
-            pendingReportsCount = sessions.filter(session => {
-                const isPast = session.scheduled_at && new Date(session.scheduled_at) < now
-                const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
-                return (isPast || isEnded) && !submittedSessionIds.has(session.id)
-            }).length
+            // Under 15 real Zoom minutes isn't a session, so no report is owed
+            // (the Zoom webhook doesn't ask for one either).
+            pendingReportsCount = sessions.filter(session => isBillableLength(session.actual_minutes) && !submittedSessionIds.has(session.id)).length
         }
 
         // Pending student requests (mentorship_requests awaiting mentor response)
@@ -201,6 +201,9 @@ export default async function DashboardLayout({
             .select('*', { count: 'exact', head: true })
             .eq('mentor_id', user.id)
             .eq('status', 'pending')
+            // Requests the mentor sent wait on the student, not on them. Same
+            // filter as the Requests page and the mentor home.
+            .eq('initiated_by', 'student')
         pendingRequestsCount = requestsCount ?? 0
     }
 
@@ -253,7 +256,7 @@ export default async function DashboardLayout({
     // sessions page: a complete profile AND an admin-assigned mentor.
     let bookingProfile: StudentBookingProfile | null = null
     let canBook = false
-    let bookingMentors: { id: string; name: string }[] = []
+    let bookingMentors: { id: string; name: string; photoUrl: string | null }[] = []
     if (isStudent) {
         const { data: academicProfile } = await supabase
             .from('student_profiles')
@@ -263,13 +266,14 @@ export default async function DashboardLayout({
 
         const { data: currentAssignments } = await supabase
             .from('student_mentor_assignments')
-            .select('mentor_id, mentor:profiles!student_mentor_assignments_mentor_id_fkey (full_name)')
+            .select('mentor_id, mentor:profiles!student_mentor_assignments_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
             .eq('student_id', user.id)
             .eq('is_current', true)
 
         bookingMentors = (currentAssignments || []).map((a: any) => ({
             id: a.mentor_id,
             name: a.mentor?.full_name || 'Mentor',
+            photoUrl: getMentorPhotoUrl(a.mentor),
         }))
         const hasMentors = bookingMentors.length > 0
         const profileComplete = !!(
@@ -308,9 +312,9 @@ export default async function DashboardLayout({
     // had 22 unrated sessions) from ambushing anyone.
     let rateableSession: RateableSession | null = null
     if (isStudent) {
-        const { data: recentSessions } = await supabase
+        const { data: recentRows } = await supabase
             .from('sessions')
-            .select('id, scheduled_at, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
+            .select('id, scheduled_at, actual_minutes, mentor:profiles!sessions_mentor_id_fkey (full_name, photo_url:mentors(photo_url))')
             .eq('student_id', user.id)
             .eq('status', 'completed')
             .gte('scheduled_at', feedbackPromptWindowStart())
@@ -318,7 +322,11 @@ export default async function DashboardLayout({
             .order('scheduled_at', { ascending: false })
             .limit(10)
 
-        const candidateIds = (recentSessions || []).map((s) => s.id)
+        // A session under 15 real Zoom minutes isn't a session, so it is never
+        // offered for rating (the Zoom webhook doesn't ask for feedback either).
+        type RecentRow = { id: string; scheduled_at: string; actual_minutes: number | null; mentor: unknown }
+        const recentSessions = ((recentRows || []) as unknown as RecentRow[]).filter((s) => isBillableLength(s.actual_minutes))
+        const candidateIds = recentSessions.map((s) => s.id)
 
         if (candidateIds.length > 0) {
             // Exclude anything already rated or already dismissed. Two small
@@ -385,6 +393,8 @@ export default async function DashboardLayout({
                       'User'
                   )
                 : profile.full_name || user.email?.split('@')[0] || 'User',
+        // Shown in the student's profile menu, so it's clear which account is signed in.
+        userEmail: user.email ?? '',
         userId: user.id,
         // Mentors keep their photo on `mentors`; everyone else — students,
         // admins — carries it on `profiles`.

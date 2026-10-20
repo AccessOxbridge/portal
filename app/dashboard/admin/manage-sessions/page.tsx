@@ -109,10 +109,10 @@ export default async function AdminManageSessionsPage() {
         <div className="max-w-6xl mx-auto">
             <header className="mb-8 flex items-start justify-between gap-6 flex-wrap">
                 <div>
-                    <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                        Manage Sessions
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                        Manage sessions
                     </h1>
-                    <p className="mt-3 text-gray-500 text-lg">
+                    <p className="mt-2 text-lg text-muted-foreground">
                         View all mentorship sessions and manually reassign mentors when needed.
                         Students remain fixed; you can only change the assigned mentor.
                     </p>

@@ -3,18 +3,18 @@
 import { useState, useMemo, useRef, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import {
-    Save,
+    FloppyDisk as Save,
     User,
-    Mail,
+    Envelope as Mail,
     Phone,
-    School,
+    Buildings as School,
     Clock,
-    Sparkles,
+    Sparkle as Sparkles,
     Users,
     CalendarCheck,
     Camera,
-    CheckCircle2,
-} from 'lucide-react'
+    CheckCircle as CheckCircle2,
+} from '@phosphor-icons/react/ssr'
 import { SUBJECT_OPTIONS } from '@/config/mentor-onboarding.config'
 import { PHOTO_ACCEPT_ATTR } from '@/lib/image-upload'
 import { updateMentorProfile } from './actions'
@@ -45,10 +45,10 @@ function SaveButton({ dirty }: { dirty: boolean }) {
         <button
             type="submit"
             disabled={pending || !dirty}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
         >
-            <Save className="w-5 h-5" />
-            {pending ? 'Saving…' : 'Save Changes'}
+            <Save className="size-5" />
+            {pending ? 'Saving…' : 'Save changes'}
         </button>
     )
 }
@@ -119,41 +119,41 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
         <form action={formAction} className="space-y-8">
             {/* Stats */}
             <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                        <CalendarCheck className="w-5 h-5 text-blue-600" />
+                <div className="border border-transparent bg-card rounded-card shadow-border p-5 flex items-center gap-4">
+                    <div className="size-11 bg-tint-blue rounded-control flex items-center justify-center shrink-0">
+                        <CalendarCheck className="size-5 text-brand" />
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-gray-900 leading-none">{stats.sessionsCompleted}</p>
-                        <p className="text-sm text-gray-500 mt-1">Sessions completed</p>
+                        <p className="text-2xl font-semibold text-foreground leading-none">{stats.sessionsCompleted}</p>
+                        <p className="text-sm text-muted-foreground mt-1">Sessions completed</p>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
-                        <Users className="w-5 h-5 text-green-600" />
+                <div className="border border-transparent bg-card rounded-card shadow-border p-5 flex items-center gap-4">
+                    <div className="size-11 bg-tint-green rounded-control flex items-center justify-center shrink-0">
+                        <Users className="size-5 text-success" />
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-gray-900 leading-none">{stats.activeStudents}</p>
-                        <p className="text-sm text-gray-500 mt-1">Active students</p>
+                        <p className="text-2xl font-semibold text-foreground leading-none">{stats.activeStudents}</p>
+                        <p className="text-sm text-muted-foreground mt-1">Active students</p>
                     </div>
                 </div>
             </section>
 
             {/* Identity */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                        <User className="w-5 h-5 text-accent" />
+            <section className="border border-transparent bg-card rounded-card shadow-border overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                    <div className="size-10 bg-primary/10 rounded-control flex items-center justify-center">
+                        <User className="size-5 text-primary" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">Your Details</h3>
-                        <p className="text-sm text-gray-500">Name, photo and contact information</p>
+                        <h3 className="font-semibold text-foreground">Your details</h3>
+                        <p className="text-sm text-muted-foreground">Name, photo and contact information</p>
                     </div>
                 </div>
                 <div className="p-6 space-y-5">
                     {/* Photo */}
                     <div className="flex items-center gap-5">
-                        <div className="relative w-20 h-20 rounded-full bg-accent text-white flex items-center justify-center font-bold text-2xl shrink-0 overflow-hidden border border-gray-100">
+                        <div className="relative size-20 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-2xl shrink-0 overflow-hidden border border-border">
                             {photoPreview ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={photoPreview} alt="" className="w-full h-full object-cover" />
@@ -165,12 +165,12 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
+                                className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm"
                             >
-                                <Camera className="w-4 h-4" />
+                                <Camera className="size-4" />
                                 {photoPreview ? 'Change photo' : 'Upload photo'}
                             </button>
-                            <p className="text-xs text-gray-500 mt-2">JPG or PNG, square works best.</p>
+                            <p className="text-xs text-muted-foreground mt-2">JPG or PNG, square works best.</p>
                         </div>
                         <input
                             ref={fileInputRef}
@@ -184,25 +184,25 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Full name</label>
                             <input
                                 type="text"
                                 name="full_name"
                                 value={form.full_name}
                                 onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                                 placeholder="Your full name"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 px-3.5"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                 <input
                                     type="email"
                                     value={email}
                                     disabled
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 outline-none cursor-not-allowed"
+                                    className="w-full pl-10 pr-4 py-3 rounded-control border border-border bg-muted/60 text-muted-foreground outline-none cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -210,49 +210,49 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Phone</label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={form.phone}
                                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                     placeholder="e.g., +44 7700 900000"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">University</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">University</label>
                             <div className="relative">
-                                <School className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <School className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                 <input
                                     type="text"
                                     name="university"
                                     value={form.university}
                                     onChange={(e) => setForm({ ...form, university: e.target.value })}
                                     placeholder="e.g., University of Oxford"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                    className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                                 />
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Timezone</label>
                         <div className="relative">
-                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                             <input
                                 type="text"
                                 name="timezone"
                                 value={form.timezone}
                                 onChange={(e) => setForm({ ...form, timezone: e.target.value })}
                                 placeholder="e.g., Europe/London"
-                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 h-11 pe-3.5 pl-10"
                             />
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-muted-foreground mt-2">
                             Use an IANA timezone like <span className="font-semibold">Europe/London</span> or{' '}
                             <span className="font-semibold">America/New_York</span>. Used to show your session times.
                         </p>
@@ -261,14 +261,14 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
             </section>
 
             {/* Bio */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-purple-600" />
+            <section className="border border-transparent bg-card rounded-card shadow-border overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                    <div className="size-10 bg-tint-violet rounded-control flex items-center justify-center">
+                        <Sparkles className="size-5 text-tint-violet-foreground" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">About You</h3>
-                        <p className="text-sm text-gray-500">A short bio students will see</p>
+                        <h3 className="font-semibold text-foreground">About you</h3>
+                        <p className="text-sm text-muted-foreground">A short bio students will see</p>
                     </div>
                 </div>
                 <div className="p-6">
@@ -278,20 +278,20 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                         onChange={(e) => setForm({ ...form, bio: e.target.value })}
                         rows={5}
                         placeholder="Tell students about your background, achievements, and how you like to mentor…"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all resize-y"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 py-2.5 px-3.5 leading-relaxed resize-y"
                     />
                 </div>
             </section>
 
             {/* Expertise */}
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <section className="border border-transparent bg-card rounded-card shadow-border overflow-hidden">
+                <div className="p-6 border-b border-border flex items-center gap-3">
+                    <div className="size-10 bg-tint-green rounded-control flex items-center justify-center">
+                        <CheckCircle2 className="size-5 text-success" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">Areas of Expertise</h3>
-                        <p className="text-sm text-gray-500">Subjects you can mentor students in</p>
+                        <h3 className="font-semibold text-foreground">Areas of expertise</h3>
+                        <p className="text-sm text-muted-foreground">Subjects you can mentor students in</p>
                     </div>
                 </div>
                 <div className="p-6">
@@ -307,10 +307,10 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                                     key={subject}
                                     type="button"
                                     onClick={() => toggleExpertise(subject)}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-[background-color,box-shadow,color] duration-150 ${
                                         selected
-                                            ? 'bg-accent text-white border-accent'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:border-accent/40 hover:text-accent'
+                                            ? 'bg-primary text-white border-primary'
+                                            : 'bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-primary'
                                     }`}
                                 >
                                     {subject}
@@ -319,7 +319,7 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
                         })}
                     </div>
                     {expertise.length === 0 && (
-                        <p className="text-xs text-gray-400 mt-3">Select at least one subject.</p>
+                        <p className="text-xs text-muted-foreground mt-3">Select at least one subject.</p>
                     )}
                 </div>
             </section>
@@ -327,10 +327,10 @@ export default function MentorProfileContent({ email, fullName, mentor, stats }:
             {/* Footer / Save */}
             <div className="flex items-center justify-between gap-4 pb-4">
                 <div className="min-h-[1.5rem]">
-                    {state?.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
+                    {state?.error && <p className="text-sm font-medium text-destructive">{state.error}</p>}
                     {state?.success && !dirty && (
-                        <p className="text-sm font-medium text-green-600 inline-flex items-center gap-1.5">
-                            <CheckCircle2 className="w-4 h-4" /> Profile saved
+                        <p className="text-sm font-medium text-success inline-flex items-center gap-1.5">
+                            <CheckCircle2 className="size-4" /> Profile saved
                         </p>
                     )}
                 </div>

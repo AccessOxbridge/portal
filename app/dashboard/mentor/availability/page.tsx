@@ -40,7 +40,8 @@ export default async function MentorAvailabilityPage() {
             zoom_meeting_id,
             zoom_start_url,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -59,16 +60,17 @@ export default async function MentorAvailabilityPage() {
         zoom_url: (session.zoom_meeting_id || session.zoom_start_url)
             ? `/api/sessions/${session.id}/start`
             : null,
-        person_name: session.student?.full_name || 'Student'
+        person_name: session.student?.full_name || 'Student',
+        person_photo_url: session.student?.photo_url || null
     }))
 
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
-                    My Availability
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My availability
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View your scheduled sessions and check your availability
                 </p>
             </header>

@@ -1,7 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Clock, Send, CheckCircle2 } from 'lucide-react'
+import { X, Clock, PaperPlaneRight as Send, CheckCircle as CheckCircle2 } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { buttonVariants } from '@/components/ui/button'
+import { fieldBase } from '@/components/ui/input'
+import { cn } from '@/utils/lib'
 
 export type CreditsRequestReason = 'booking' | 'topup'
 
@@ -68,20 +72,20 @@ export default function CreditsRequestModal({
             })
             const data = await res.json()
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to send request')
+                throw new Error(data.error || "Couldn't send your request. Try again in a moment.")
             }
             setSuccess(true)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+            setError(err instanceof Error ? err.message : "Something went wrong. Try again in a moment.")
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={onClose}
                 aria-hidden
             />
@@ -89,35 +93,36 @@ export default function CreditsRequestModal({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="credits-request-title"
-                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-md max-h-[92dvh] sm:max-h-none overflow-y-auto sm:overflow-hidden"
+                className={cn(sheet.panel, 'overflow-y-auto overscroll-contain sm:max-w-md')}
             >
-                <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                            <Clock className="w-5 h-5 text-amber-700" />
+                <div className={sheet.handle}><span className={sheet.handleBar} /></div>
+                <div className={sheet.header}>
+                    <div className="flex items-start gap-3.5">
+                        <div className="grid size-11 shrink-0 place-items-center rounded-full bg-tint-green text-tint-green-foreground">
+                            <Clock weight="duotone" className="size-6" />
                         </div>
                         <div>
-                            <h2 id="credits-request-title" className="text-xl font-extrabold text-gray-900">
+                            <h2 id="credits-request-title" className={sheet.title}>
                                 {title}
                             </h2>
-                            <p className="text-sm text-gray-500 mt-1 leading-relaxed">{subtitle}</p>
+                            <p className={sheet.description}>{subtitle}</p>
                         </div>
                     </div>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors shrink-0"
+                        className={sheet.close}
                         aria-label="Close"
                     >
-                        <X className="w-5 h-5 text-gray-600" />
+                        <X className="size-5" />
                     </button>
                 </div>
 
                 {success ? (
-                    <div className="p-6 space-y-4">
-                        <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                            <p className="text-sm text-emerald-800">
+                    <div className="space-y-4 px-6 pb-6">
+                        <div role="status" className="flex items-start gap-3 rounded-card bg-tint-green p-4">
+                            <CheckCircle2 weight="fill" className="mt-0.5 size-5 shrink-0 text-success" />
+                            <p className="text-sm text-tint-green-foreground text-pretty">
                                 Your message was sent to the Access Oxbridge team. We will email you once your
                                 credits are updated.
                             </p>
@@ -125,15 +130,15 @@ export default function CreditsRequestModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                            className={cn(buttonVariants(), 'w-full')}
                         >
                             Done
                         </button>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
                         <div>
-                            <label htmlFor="credits-request-message" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="credits-request-message" className={sheet.label}>
                                 Message for admins
                             </label>
                             <textarea
@@ -143,20 +148,20 @@ export default function CreditsRequestModal({
                                 placeholder="e.g. I would like to purchase 5 more session hours for this term."
                                 rows={4}
                                 maxLength={2000}
-                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                                className={cn(fieldBase, 'resize-none px-3.5 py-2.5 leading-relaxed')}
                             />
                         </div>
                         {error && (
-                            <p className="text-sm text-red-600 font-medium" role="alert">
+                            <p className="text-sm text-destructive" role="alert">
                                 {error}
                             </p>
                         )}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                            className={cn(buttonVariants(), 'w-full')}
                         >
-                            <Send className="w-4 h-4" />
+                            <Send weight="fill" />
                             {loading ? 'Sending…' : 'Send to admins'}
                         </button>
                     </form>

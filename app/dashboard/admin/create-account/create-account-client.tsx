@@ -3,22 +3,22 @@
 import { createClient } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 import {
-    AlertCircle,
+    WarningCircle as AlertCircle,
     BookOpen,
-    CheckCircle2,
+    CheckCircle as CheckCircle2,
     Clock,
     GraduationCap,
-    KeyRound,
-    Loader2,
-    Mail,
+    Key as KeyRound,
+    CircleNotch as Loader2,
+    Envelope as Mail,
     Plus,
-    RefreshCw,
-    Search,
+    ArrowClockwise as RefreshCw,
+    MagnifyingGlass as Search,
     User,
     UserPlus,
     Users,
     X,
-} from 'lucide-react'
+} from '@phosphor-icons/react/ssr'
 import { useEffect, useState, useTransition } from 'react'
 import { createMentorAccount, createStudentAccount } from './actions'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
@@ -48,9 +48,9 @@ const DIGITS = '0123456789'
 const ALL = UPPER + LOWER + DIGITS
 
 const STATUS_COLORS: Record<string, string> = {
-    active: 'bg-green-50 text-green-700 border-green-100',
-    pending_approval: 'bg-amber-50 text-amber-700 border-amber-100',
-    details_required: 'bg-gray-50 text-gray-700 border-gray-100',
+    active: 'bg-tint-green text-tint-green-foreground border-border',
+    pending_approval: 'bg-tint-amber text-tint-amber-foreground border-border',
+    details_required: 'bg-muted/60 text-foreground border-border',
 }
 
 function randomChar(alphabet: string): string {
@@ -224,23 +224,23 @@ export function CreateAccountClient() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create Account</h1>
-                    <p className="text-gray-500 mt-1">
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Create account</h1>
+                    <p className="text-muted-foreground mt-1">
                         Provision student and mentor portal accounts and send branded login details.
                     </p>
                 </div>
                 <button
                     onClick={openModal}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-2xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
-                    <Plus className="w-5 h-5" />
-                    {isMentorTab ? 'Create Mentor' : 'Create Student'}
+                    <Plus className="size-5" />
+                    {isMentorTab ? 'Create mentor' : 'Create student'}
                 </button>
             </header>
 
-            <div className="flex gap-2 border-b border-gray-200">
+            <div className="flex gap-2 border-b border-border">
                 <button
                     onClick={() => {
                         if (isPending) return
@@ -250,13 +250,13 @@ export function CreateAccountClient() {
                         setMessage(null)
                         setPassword('')
                     }}
-                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${
+                    className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
                         tab === 'student'
-                            ? 'text-accent border-accent'
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
+                            ? 'text-primary border-primary'
+                            : 'text-muted-foreground border-transparent hover:text-foreground'
                     }`}
                 >
-                    <BookOpen className="w-4 h-4" />
+                    <BookOpen className="size-4" />
                     Students
                 </button>
                 <button
@@ -268,49 +268,49 @@ export function CreateAccountClient() {
                         setMessage(null)
                         setPassword('')
                     }}
-                    className={`flex items-center gap-2 px-6 py-3 font-bold text-sm transition-colors border-b-2 -mb-px ${
+                    className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
                         tab === 'mentor'
-                            ? 'text-accent border-accent'
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
+                            ? 'text-primary border-primary'
+                            : 'text-muted-foreground border-transparent hover:text-foreground'
                     }`}
                 >
-                    <GraduationCap className="w-4 h-4" />
+                    <GraduationCap className="size-4" />
                     Mentors
                 </button>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
+            <div className="border border-transparent flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-card shadow-border">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 size-4 ${isLoading ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
                     <input
                         type="text"
                         placeholder="Search by name or email..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-10"
                     />
                 </div>
-                <div className="text-sm text-gray-400 font-medium">
+                <div className="text-sm text-muted-foreground font-medium">
                     {isMentorTab
                         ? `${mentors.length} ${mentors.length === 1 ? 'Mentor' : 'Mentors'} found`
                         : `${students.length} ${students.length === 1 ? 'Student' : 'Students'} found`}
                 </div>
             </div>
 
-            <div className="bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
+            <div className="border border-transparent bg-card rounded-card overflow-hidden shadow-border">
                 {isLoading && empty ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                        <Loader2 className="size-8 text-primary animate-spin" />
                     </div>
                 ) : empty ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                            <Users className="w-10 h-10 text-gray-300" />
+                        <div className="size-20 bg-muted/60 rounded-full flex items-center justify-center mb-6">
+                            <Users className="size-10 text-muted-foreground/60" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
                             {isMentorTab ? 'No mentor accounts yet' : 'No student accounts yet'}
                         </h3>
-                        <p className="text-gray-500 max-w-sm">
+                        <p className="text-muted-foreground max-w-sm">
                             {searchTerm
                                 ? `No ${isMentorTab ? 'mentors' : 'students'} matching "${searchTerm}"`
                                 : isMentorTab
@@ -320,7 +320,7 @@ export function CreateAccountClient() {
                         {!searchTerm && (
                             <button
                                 onClick={openModal}
-                                className="mt-6 text-accent font-semibold hover:underline"
+                                className="mt-6 text-primary font-semibold hover:underline"
                             >
                                 Create your first account
                             </button>
@@ -330,26 +330,26 @@ export function CreateAccountClient() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Last updated</th>
+                                <tr className="bg-muted/60 border-b border-border">
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Mentor</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Status</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Last updated</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-border">
                                 {mentors.map((mentor) => (
-                                    <tr key={mentor.id} className="hover:bg-gray-50/30 transition-colors group">
+                                    <tr key={mentor.id} className="hover:bg-muted/60 transition-colors group">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                <div className="size-12 rounded-card bg-tint-green text-tint-green-foreground flex items-center justify-center font-semibold text-lg shrink-0 shadow-border group-hover:scale-105 transition-transform">
                                                     {mentor.full_name?.[0] || 'M'}
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="font-bold text-gray-900 truncate text-base">
+                                                    <span className="font-semibold text-foreground truncate text-base">
                                                         {mentor.full_name || 'Unnamed mentor'}
                                                     </span>
-                                                    <span className="text-sm text-gray-400 truncate flex items-center gap-1.5">
-                                                        <Mail className="w-3.5 h-3.5" />
+                                                    <span className="text-sm text-muted-foreground truncate flex items-center gap-1.5">
+                                                        <Mail className="size-3.5" />
                                                         {mentor.email}
                                                     </span>
                                                 </div>
@@ -357,12 +357,12 @@ export function CreateAccountClient() {
                                         </td>
                                         <td className="px-8 py-5">
                                             <span
-                                                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${STATUS_COLORS[mentor.status] || STATUS_COLORS.details_required}`}
+                                                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${STATUS_COLORS[mentor.status] || STATUS_COLORS.details_required}`}
                                             >
                                                 {mentor.status.replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-5 text-sm text-gray-500 font-medium">
+                                        <td className="px-8 py-5 text-sm text-muted-foreground font-medium">
                                             {format(new Date(mentor.updated_at), 'd MMM yyyy')}
                                         </td>
                                     </tr>
@@ -374,26 +374,26 @@ export function CreateAccountClient() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Student</th>
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Hours</th>
-                                    <th className="px-8 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Last updated</th>
+                                <tr className="bg-muted/60 border-b border-border">
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Student</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Hours</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Last updated</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-border">
                                 {students.map((student) => (
-                                    <tr key={student.id} className="hover:bg-gray-50/30 transition-colors group">
+                                    <tr key={student.id} className="hover:bg-muted/60 transition-colors group">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                <div className="size-12 rounded-card bg-tint-blue text-tint-blue-foreground flex items-center justify-center font-semibold text-lg shrink-0 shadow-border group-hover:scale-105 transition-transform">
                                                     {student.full_name?.[0] || 'S'}
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="font-bold text-gray-900 truncate text-base">
+                                                    <span className="font-semibold text-foreground truncate text-base">
                                                         {student.full_name || 'Unnamed student'}
                                                     </span>
-                                                    <span className="text-sm text-gray-400 truncate flex items-center gap-1.5">
-                                                        <Mail className="w-3.5 h-3.5" />
+                                                    <span className="text-sm text-muted-foreground truncate flex items-center gap-1.5">
+                                                        <Mail className="size-3.5" />
                                                         {student.email}
                                                     </span>
                                                 </div>
@@ -407,7 +407,7 @@ export function CreateAccountClient() {
                                                 credits={student.credits ?? 0}
                                             />
                                         </td>
-                                        <td className="px-8 py-5 text-sm text-gray-500 font-medium">
+                                        <td className="px-8 py-5 text-sm text-muted-foreground font-medium">
                                             {format(new Date(student.updated_at), 'd MMM yyyy')}
                                         </td>
                                     </tr>
@@ -419,25 +419,25 @@ export function CreateAccountClient() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 relative border border-white/20 max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-sheet border border-transparent bg-card shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none max-h-[90vh] overflow-y-auto">
                         <button
                             onClick={closeModal}
                             disabled={isPending}
-                            className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all disabled:opacity-50"
+                            className="absolute top-6 right-6 p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted rounded-full transition-[background-color,box-shadow,color] duration-150 disabled:opacity-50"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="size-5" />
                         </button>
 
                         <div className="p-10">
                             <div className="mb-8">
-                                <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-6">
-                                    <UserPlus className="w-7 h-7 text-accent" />
+                                <div className="size-14 bg-primary/10 rounded-card flex items-center justify-center mb-6">
+                                    <UserPlus className="size-7 text-primary" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900">
+                                <h2 className="text-2xl font-semibold text-foreground">
                                     {isMentorTab ? 'Create mentor account' : 'Create student account'}
                                 </h2>
-                                <p className="text-gray-500 mt-2">
+                                <p className="text-muted-foreground mt-2">
                                     {isMentorTab
                                         ? 'A welcome email with login details and the mentor onboarding guide will be sent automatically.'
                                         : 'A welcome email with login details and the onboarding guide will be sent automatically.'}
@@ -446,11 +446,11 @@ export function CreateAccountClient() {
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="full_name">
-                                        Full Name
+                                    <label className="text-sm font-semibold text-foreground ml-1" htmlFor="full_name">
+                                        Full name
                                     </label>
                                     <div className="relative">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                         <input
                                             required
                                             id="full_name"
@@ -459,35 +459,35 @@ export function CreateAccountClient() {
                                             minLength={2}
                                             maxLength={100}
                                             placeholder="Jane Doe"
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-11"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="email">
+                                    <label className="text-sm font-semibold text-foreground ml-1" htmlFor="email">
                                         Email
                                     </label>
                                     <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                         <input
                                             required
                                             id="email"
                                             name="email"
                                             type="email"
                                             placeholder="jane@example.com"
-                                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-11"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="password">
+                                    <label className="text-sm font-semibold text-foreground ml-1" htmlFor="password">
                                         Password
                                     </label>
                                     <div className="flex gap-2">
                                         <div className="relative flex-1">
-                                            <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                            <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                             <input
                                                 required
                                                 id="password"
@@ -499,16 +499,16 @@ export function CreateAccountClient() {
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder="12+ characters"
-                                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all font-mono text-sm"
+                                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-11 font-mono"
                                             />
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => setPassword(generatePassword())}
-                                            className="shrink-0 px-3 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-gray-700 hover:bg-gray-100 transition-all flex items-center gap-2 text-sm font-semibold"
+                                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                                             title="Generate a 12-character password"
                                         >
-                                            <RefreshCw className="w-4 h-4" />
+                                            <RefreshCw className="size-4" />
                                             Generate
                                         </button>
                                     </div>
@@ -516,11 +516,11 @@ export function CreateAccountClient() {
 
                                 {!isMentorTab && (
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-700 ml-1" htmlFor="total_hours">
-                                            Total Hours
+                                        <label className="text-sm font-semibold text-foreground ml-1" htmlFor="total_hours">
+                                            Total hours
                                         </label>
                                         <div className="relative">
-                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                                             <input
                                                 required
                                                 id="total_hours"
@@ -531,17 +531,17 @@ export function CreateAccountClient() {
                                                 step={1}
                                                 value={hours}
                                                 onChange={(e) => setHours(e.target.value)}
-                                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-11 pr-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all"
+                                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-11"
                                             />
                                         </div>
                                     </div>
                                 )}
 
                                 {!isMentorTab && (
-                                    <div className="space-y-3 pt-2 border-t border-gray-100">
+                                    <div className="space-y-3 pt-2 border-t border-border">
                                         <div className="ml-1 pt-4">
-                                            <p className="text-sm font-bold text-gray-700">Session plan</p>
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-sm font-semibold text-foreground">Session plan</p>
+                                            <p className="text-xs text-muted-foreground mt-1">
                                                 Optional. Used to flag the student on the Performance page if they
                                                 fall behind. Leave weeks blank to skip.
                                             </p>
@@ -567,18 +567,18 @@ export function CreateAccountClient() {
 
                                 {message && (
                                     <div
-                                        className={`flex items-start gap-3 p-4 rounded-2xl animate-in slide-in-from-top-2 ${
+                                        className={`flex items-start gap-3 p-4 rounded-card ${
                                             message.type === 'success'
-                                                ? 'bg-green-50 text-green-700 border border-green-100'
+                                                ? 'bg-tint-green text-tint-green-foreground border border-border'
                                                 : message.type === 'warning'
-                                                  ? 'bg-amber-50 text-amber-800 border border-amber-100'
-                                                  : 'bg-red-50 text-red-700 border border-red-100'
+                                                  ? 'bg-tint-amber text-tint-amber-foreground border border-border'
+                                                  : 'bg-tint-rose text-tint-rose-foreground border border-border'
                                         }`}
                                     >
                                         {message.type === 'success' ? (
-                                            <CheckCircle2 className="w-5 h-5 shrink-0" />
+                                            <CheckCircle2 className="size-5 shrink-0" />
                                         ) : (
-                                            <AlertCircle className="w-5 h-5 shrink-0" />
+                                            <AlertCircle className="size-5 shrink-0" />
                                         )}
                                         <span className="text-sm font-medium">{message.text}</span>
                                     </div>
@@ -587,9 +587,9 @@ export function CreateAccountClient() {
                                 <button
                                     disabled={isPending}
                                     type="submit"
-                                    className="w-full py-4 bg-accent text-white rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                    className="w-full py-4 bg-primary text-white rounded-card font-semibold text-lg hover:opacity-90 transition-[background-color,box-shadow,color] duration-150 shadow-border shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                                 >
-                                    {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Account'}
+                                    {isPending ? <Loader2 className="size-5 animate-spin" /> : 'Create account'}
                                 </button>
                             </form>
                         </div>

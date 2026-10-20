@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import { buttonVariants } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { CheckCircle2, AlertCircle, ArrowRight, LayoutDashboard } from 'lucide-react'
+import { CheckCircle as CheckCircle2, WarningCircle as AlertCircle, ArrowRight, SquaresFour as LayoutDashboard } from '@phosphor-icons/react/ssr'
 
 export default async function SuccessPage({
     searchParams,
@@ -33,19 +35,19 @@ export default async function SuccessPage({
     if (error || !purchase) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
-                <div className="h-16 w-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
-                    <AlertCircle className="h-8 w-8" />
+                <div className="mb-5 grid size-16 place-items-center rounded-full bg-tint-rose text-destructive">
+                    <AlertCircle weight="duotone" className="size-8" />
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Purchase Not Found</h1>
-                <p className="text-gray-600 mb-8 max-w-md">
+                <h1 className="mb-2 text-2xl font-semibold tracking-tight text-foreground">Purchase not found</h1>
+                <p className="mb-8 max-w-md text-muted-foreground text-pretty">
                     We couldn't find the purchase details for this session. It might have already been processed or the ID is invalid.
                 </p>
                 <Link
                     href="/dashboard/student"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                    className={buttonVariants()}
                 >
-                    <LayoutDashboard className="mr-2 h-5 w-5" />
-                    Return to Dashboard
+                    <LayoutDashboard />
+                    Return to dashboard
                 </Link>
             </div>
         )
@@ -57,56 +59,56 @@ export default async function SuccessPage({
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
-            <div className={`h-20 w-20 rounded-full flex items-center justify-center mb-6 ${isCompleted ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600 animate-pulse'
+            <div className={`mb-6 grid size-20 place-items-center rounded-full ${isCompleted ? 'bg-success text-white ring-8 ring-tint-green animate-in zoom-in-50 fade-in-0 duration-500 ease-snappy motion-reduce:animate-none' : 'bg-tint-blue text-brand'
                 }`}>
                 {isCompleted ? (
-                    <CheckCircle2 className="h-10 w-10" />
+                    <CheckCircle2 weight="fill" className="size-10" />
                 ) : (
-                    <div className="h-10 w-10 border-4 border-current border-t-transparent rounded-full animate-spin" />
+                    <Spinner className="size-9" />
                 )}
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {isCompleted ? 'Payment Successful!' : 'Processing Payment...'}
+            <h1 className="mb-2 text-3xl font-semibold tracking-tight text-foreground text-balance">
+                {isCompleted ? 'Payment successful' : 'Processing payment...'}
             </h1>
 
-            <p className="text-gray-600 mb-8 max-w-lg text-lg">
+            <p className="mb-8 max-w-lg text-lg text-muted-foreground text-pretty">
                 {isCompleted
                     ? `You've successfully purchased ${credit_packages?.credits} credits. They have been added to your account.`
                     : 'We have received your payment and are verifying the transaction. Your credits will be added shortly.'}
             </p>
 
             {isCompleted && (
-                <div className="mb-10 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm max-w-md w-full">
-                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                        <span className="text-gray-500">Package</span>
-                        <span className="font-semibold text-gray-900">{credit_packages?.name}</span>
+                <div className="mb-8 w-full max-w-md rounded-card bg-card p-5 text-sm shadow-border">
+                    <div className="mb-3 flex items-center justify-between border-b border-border pb-3">
+                        <span className="text-muted-foreground">Package</span>
+                        <span className="font-medium text-foreground tabular-nums">{credit_packages?.name}</span>
                     </div>
-                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                        <span className="text-gray-500">Credits</span>
-                        <span className="font-semibold text-gray-900">+{credit_packages?.credits}</span>
+                    <div className="mb-3 flex items-center justify-between border-b border-border pb-3">
+                        <span className="text-muted-foreground">Credits</span>
+                        <span className="font-medium text-foreground tabular-nums">+{credit_packages?.credits}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-gray-500">Order ID</span>
-                        <span className="font-mono text-sm text-gray-400">#{purchase.id.slice(0, 8)}</span>
+                        <span className="text-muted-foreground">Order ID</span>
+                        <span className="font-mono text-sm text-muted-foreground">#{purchase.id.slice(0, 8)}</span>
                     </div>
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-2 sm:flex-row">
                 <Link
                     href="/dashboard/student"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                    className={buttonVariants()}
                 >
-                    <LayoutDashboard className="mr-2 h-5 w-5" />
-                    Go to Dashboard
+                    <LayoutDashboard />
+                    Go to dashboard
                 </Link>
                 <Link
                     href="/dashboard/student/mentors"
-                    className="inline-flex items-center px-6 py-3 border border-gray-200 text-base font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                    className={buttonVariants({ variant: 'outline' })}
                 >
-                    Find a Mentor
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    Find a mentor
+                    <ArrowRight />
                 </Link>
             </div>
         </div>

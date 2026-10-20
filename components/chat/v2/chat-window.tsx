@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { isSameDay } from 'date-fns'
-import { ChevronLeft, MessageSquare } from 'lucide-react'
+import { CaretLeft as ChevronLeft, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import MessageBubble, { type MessageStatus } from './message-bubble'
 import MessageInput from './message-input'
@@ -432,8 +432,8 @@ export default function ChatWindow({
         return (
             <div className="flex-1 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
-                    <div className="w-7 h-7 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm text-gray-400">Loading messages…</span>
+                    <div className="size-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading messages…</span>
                 </div>
             </div>
         )
@@ -442,26 +442,26 @@ export default function ChatWindow({
     return (
         <div className="flex flex-col h-full">
             {/* Header. Full pane width, like the thread below it. */}
-            <div className="shrink-0 border-b border-gray-200/70 bg-white px-4 md:px-6 py-3">
+            <div className="shrink-0 border-b border-border bg-card px-4 md:px-6 py-3">
                 <div className="flex items-center gap-3">
                 {onBack && (
                     <button
                         type="button"
                         onClick={onBack}
                         aria-label="Back to conversations"
-                        className="md:hidden -ml-1 shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-gray-600 active:bg-gray-100 transition-colors"
+                        className="md:hidden -ml-1 shrink-0 size-9 rounded-full flex items-center justify-center text-muted-foreground active:bg-muted transition-colors"
                     >
-                        <ChevronLeft className="w-5 h-5" />
+                        <ChevronLeft className="size-5" />
                     </button>
                 )}
 
                 <div className="relative shrink-0">
                     {isGroup ? (
-                        <div className="relative w-10 h-10">
+                        <div className="relative size-10">
                             {groupOthers.slice(0, 2).map((member, index) => (
                                 <div
                                     key={member.user_id}
-                                    className={`absolute w-6 h-6 rounded-full overflow-hidden ring-2 ring-white ${
+                                    className={`absolute size-6 rounded-full overflow-hidden ring-2 ring-white ${
                                         index === 0 ? 'left-0 top-0 z-10' : 'right-0 bottom-0'
                                     }`}
                                 >
@@ -473,7 +473,7 @@ export default function ChatWindow({
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full bg-accent flex items-center justify-center text-white text-[10px] font-semibold">
+                                        <div className="w-full h-full bg-primary flex items-center justify-center text-white text-[10px] font-semibold">
                                             {member.full_name?.[0]?.toUpperCase() || 'U'}
                                         </div>
                                     )}
@@ -485,30 +485,30 @@ export default function ChatWindow({
                         <img
                             src={otherUser.photo_url}
                             alt={otherUser.full_name || 'User'}
-                            className="w-10 h-10 rounded-full object-cover"
+                            className="size-10 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-semibold">
+                        <div className="size-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
                             {otherUser.full_name?.[0]?.toUpperCase() || 'U'}
                         </div>
                     )}
                     {!isGroup && isOtherUserOnline && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                        <div className="absolute bottom-0 right-0 size-3 bg-success border-2 border-white rounded-full" />
                     )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <h3 className={cn('font-semibold text-gray-900', isGroup ? 'leading-snug' : 'truncate')}>
+                    <h3 className={cn('font-semibold text-foreground', isGroup ? 'leading-snug' : 'truncate')}>
                         {isGroup
                             ? formatGroupTitle(members || [], currentUserId)
                             : otherUser.full_name || 'Mentor'}
                     </h3>
                     {isGroup || adminUser ? (
-                        <p className="text-xs text-gray-400">Group chat · Access Oxbridge team</p>
+                        <p className="text-xs text-muted-foreground">Group chat · Access Oxbridge team</p>
                     ) : otherUser.role_label ? (
-                        <p className="text-xs font-medium text-accent">{otherUser.role_label}</p>
+                        <p className="text-xs font-medium text-primary">{otherUser.role_label}</p>
                     ) : (
-                        <p className={`text-xs ${isOtherUserOnline ? 'text-green-500' : 'text-gray-400'}`}>
+                        <p className={`text-xs ${isOtherUserOnline ? 'text-success' : 'text-muted-foreground'}`}>
                             {isOtherUserOnline ? 'Online' : 'Offline'}
                         </p>
                     )}
@@ -527,10 +527,10 @@ export default function ChatWindow({
             >
               <div className="w-full h-full">
                 {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
-                        <MessageSquare className="w-12 h-12 mb-3 text-gray-200" strokeWidth={1.5} />
+                    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                        <MessageSquare className="size-12 mb-3 text-muted-foreground/60" strokeWidth={1.5} />
                         <p className="text-sm font-medium">No messages yet</p>
-                        <p className="text-xs text-gray-300 mt-1">Say hello to start the conversation.</p>
+                        <p className="text-xs text-muted-foreground/60 mt-1">Say hello to start the conversation.</p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-0.5">

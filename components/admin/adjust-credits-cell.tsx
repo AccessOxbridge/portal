@@ -29,11 +29,11 @@ export function AdjustCreditsCell({
                 title="Adjust hours"
             >
                 <span
-                    className={`text-sm font-bold ${balance > 0 ? 'text-gray-900' : 'text-red-500'}`}
+                    className={`text-sm font-semibold ${balance > 0 ? 'text-foreground' : 'text-destructive'}`}
                 >
                     {balance}
                 </span>
-                <span className="text-[10px] font-medium text-gray-400 group-hover:text-accent transition-colors">
+                <span className="text-[10px] font-medium text-muted-foreground group-hover:text-primary transition-colors">
                     Adjust
                 </span>
             </button>

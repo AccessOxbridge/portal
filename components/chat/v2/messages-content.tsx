@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, MessageSquare } from 'lucide-react'
+import { Plus, ChatCentered as MessageSquare } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
 import ConversationList, { type ConversationSummary } from './conversation-list'
 import ChatWindow from './chat-window'
@@ -102,21 +102,21 @@ export default function MessagesContent({
                 the panes edge to edge and separate them with a hairline; a
                 floating rounded box on grey is what made this read as a widget
                 rather than a workspace. */}
-            <div className="flex flex-1 min-h-0 bg-white border-t border-gray-200/70 overflow-hidden">
+            <div className="flex flex-1 min-h-0 bg-card border-t border-border overflow-hidden">
                 <div
                     className={cn(
-                        'w-full md:w-80 shrink-0 md:border-r border-gray-200/70 bg-white flex-col',
+                        'w-full md:w-80 shrink-0 md:border-r border-border bg-card flex-col',
                         mobilePane === 'list' ? 'flex' : 'hidden md:flex'
                     )}
                 >
-                    <div className="shrink-0 px-4 py-3 border-b border-gray-50 flex items-center justify-between">
-                        <h2 className="font-semibold text-gray-700 text-sm">Conversations</h2>
+                    <div className="shrink-0 px-4 py-3 border-b border-border flex items-center justify-between">
+                        <h2 className="font-semibold text-foreground text-sm">Conversations</h2>
                         {allowNewConversation && (
                             <button
                                 onClick={() => setIsNewConversationOpen(true)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                                className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm"
                             >
-                                <Plus className="w-3.5 h-3.5" />
+                                <Plus className="size-3.5" />
                                 New
                             </button>
                         )}
@@ -154,17 +154,17 @@ export default function MessagesContent({
                             onBack={() => setMobilePane('list')}
                         />
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-gray-400 text-center px-6">
-                            <MessageSquare className="w-14 h-14 mb-4 text-gray-200" strokeWidth={1.5} />
+                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground text-center px-6">
+                            <MessageSquare className="size-14 mb-4 text-muted-foreground/60" strokeWidth={1.5} />
                             <p className="text-lg font-medium">Select a conversation</p>
-                            <p className="text-sm text-gray-300 mt-1">{placeholderText}</p>
+                            <p className="text-sm text-muted-foreground/60 mt-1">{placeholderText}</p>
                             {allowNewConversation && (
                                 <button
                                     onClick={() => setIsNewConversationOpen(true)}
-                                    className="mt-4 flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-semibold rounded-xl hover:bg-accent/90 transition-colors"
+                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm mt-4"
                                 >
-                                    <Plus className="w-4 h-4" />
-                                    Start a New Conversation
+                                    <Plus className="size-4" />
+                                    Start a new conversation
                                 </button>
                             )}
                         </div>

@@ -1,14 +1,21 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Video, Clock, Calendar as CalendarIcon, ExternalLink } from 'lucide-react'
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, VideoCamera as Video, Clock, CalendarBlank as CalendarIcon, ArrowSquareOut as ExternalLink, Check } from '@phosphor-icons/react/ssr'
 import { formatTimeInTz } from '@/lib/timezone'
+import { Avatar } from '@/components/ui/avatar'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/utils/lib'
 
 interface Session {
     id: string
     scheduled_at: string
     zoom_url: string | null
     person_name: string
+    /** The other person's photo, when known; initials otherwise. */
+    person_photo_url?: string | null
+    /** Used to tell when a past session has ended (60 minutes if unknown). */
+    duration_minutes?: number | null
 }
 
 interface WeeklyCalendarProps {
@@ -23,6 +30,8 @@ interface WeeklyCalendarProps {
 export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomButtonLabel = 'Join Zoom', credits, timezone = null }: WeeklyCalendarProps) {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [weekDates, setWeekDates] = useState<Date[]>([])
+    // Read once on load: used to mark sessions that have already ended.
+    const [loadedAt] = useState(() => Date.now())
     // Mentors omit `credits`; only students pass a balance and need the top-up gate.
     const creditsRequired = typeof credits === 'number'
     const canJoinZoom = !creditsRequired || credits > 0
@@ -84,83 +93,100 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
     const daySessions = getSessionsForDate(selectedDate)
 
     return (
-        <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+        <div className="overflow-hidden rounded-card bg-card shadow-border">
             {/* Header */}
-            <div className="p-4 sm:p-6 border-b border-gray-50 flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 sm:px-6 sm:pt-6">
                 <div className="min-w-0">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                    <h2 className="truncate text-lg font-semibold text-foreground sm:text-xl">
                         {selectedDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
                     </h2>
-                    <p className="text-gray-500 text-sm font-medium">Your schedule for the week</p>
+                    <p className="text-sm text-muted-foreground">Your schedule for the week</p>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex shrink-0 gap-1">
                     <button
                         onClick={handlePrevWeek}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        aria-label="Previous week"
+                        className={iconButton}
                     >
-                        <ChevronLeft className="w-6 h-6 text-gray-600" />
+                        <ChevronLeft className="size-5" />
                     </button>
                     <button
                         onClick={handleNextWeek}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        aria-label="Next week"
+                        className={iconButton}
                     >
-                        <ChevronRight className="w-6 h-6 text-gray-600" />
+                        <ChevronRight className="size-5" />
                     </button>
                 </div>
             </div>
 
+            {/* Week strip and the chosen day's sessions: side by side on wide
+                screens, stacked on phones. */}
+            <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-start">
             {/* Week Days */}
-            <div className="px-2 sm:px-6 py-4 flex justify-between bg-gray-50/50">
+            <div className="grid grid-cols-7 gap-1 px-3 pb-4 sm:px-6 md:pb-6">
                 {weekDates.map((date, i) => (
                     <button
                         key={i}
                         onClick={() => setSelectedDate(date)}
-                        className={`flex flex-col items-center gap-1 group transition-all shrink-0 ${isSelected(date) ? 'scale-110' : 'hover:scale-105'
-                            }`}
+                        aria-pressed={isSelected(date)}
+                        className="group flex flex-col items-center gap-1.5 rounded-control py-1 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40"
                     >
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isSelected(date) ? 'text-accent' : 'text-gray-400'
-                            }`}>
+                        <span className={cn('text-xs font-medium', isSelected(date) ? 'text-foreground' : 'text-muted-foreground')}>
                             {date.toLocaleDateString('en-GB', { weekday: 'short' })}
                         </span>
-                        <div className={`w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold transition-all ${isToday(date)
-                            ? isSelected(date) ? 'bg-red-500 text-white' : 'bg-red-50 text-red-500 border border-red-200'
-                            : isSelected(date) ? 'bg-accent text-white' : 'text-gray-600 group-hover:bg-gray-100'
-                            }`}>
+                        <span className={cn(
+                            'grid size-10 place-items-center rounded-full text-base font-medium tabular-nums transition-[background-color,color,scale] duration-150 ease-out group-active:scale-[0.96]',
+                            isSelected(date)
+                                ? 'bg-primary text-primary-foreground'
+                                : isToday(date)
+                                    ? 'text-brand ring-2 ring-inset ring-brand/40 group-hover:bg-tint-blue'
+                                    : 'text-foreground group-hover:bg-muted',
+                        )}>
                             {date.getDate()}
-                        </div>
+                        </span>
+                        {/* A dot under days that have a session. */}
+                        <span className={cn('size-1 rounded-full', getSessionsForDate(date).length > 0 ? 'bg-brand' : 'bg-transparent')} />
                     </button>
                 ))}
             </div>
 
             {/* Selected Day's Sessions */}
-            <div className="p-4 sm:p-6 min-h-[300px]">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
-                    <h3 className="font-bold text-base sm:text-lg text-gray-800 flex items-center gap-2 min-w-0">
-                        <CalendarIcon className="w-5 h-5 text-accent shrink-0" />
+            <div className="min-h-[200px] border-t border-border p-5 sm:p-6 md:min-h-0 md:border-t-0 md:border-s md:pt-0">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="flex min-w-0 items-center gap-2 text-base font-semibold text-foreground">
+                        <CalendarIcon weight="duotone" className="size-5 shrink-0 text-brand" />
                         <span className="truncate">
                             {selectedDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
                         </span>
                     </h3>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">
-                        {daySessions.length} {daySessions.length === 1 ? 'Session' : 'Sessions'}
+                    <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+                        {daySessions.length} {daySessions.length === 1 ? 'session' : 'sessions'}
                     </span>
                 </div>
 
                 {daySessions.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center opacity-40">
-                        <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-                            <Clock className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <p className="font-medium text-gray-500">No sessions scheduled for this day</p>
+                    <div className="flex flex-col items-center justify-center py-10 text-center md:py-6">
+                        <span className="mb-3 grid size-12 place-items-center rounded-full bg-muted text-muted-foreground">
+                            <Clock weight="duotone" className="size-6" />
+                        </span>
+                        <p className="text-sm text-muted-foreground">No sessions scheduled for this day</p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {daySessions.map((session) => (
+                    <div className="space-y-3">
+                        {daySessions.map((session) => {
+                            // A session that has finished stays visible but can't be
+                            // joined: its Zoom room is closed.
+                            const ended = new Date(session.scheduled_at).getTime() + (session.duration_minutes ?? 60) * 60000 < loadedAt
+                            return (
                             <div
                                 key={session.id}
-                                className="group relative bg-white border border-gray-100 p-4 sm:p-5 rounded-2xl hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 transition-all cursor-pointer"
+                                className={cn(
+                                    'group relative rounded-card border border-transparent bg-card p-4 shadow-border',
+                                    !ended && 'cursor-pointer transition-shadow duration-150 ease-out hover:shadow-border-hover',
+                                )}
                                 onClick={() => {
-                                    if (session.zoom_url) {
+                                    if (session.zoom_url && !ended) {
                                         window.open(
                                             canJoinZoom ? session.zoom_url : '/dashboard/student/services',
                                             canJoinZoom ? '_blank' : '_self'
@@ -168,17 +194,15 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                     }
                                 }}
                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                                    <div className="flex items-center gap-4 min-w-0">
-                                        <div className="w-12 h-12 shrink-0 bg-accent/10 rounded-xl flex items-center justify-center text-accent font-bold text-xl">
-                                            {session.person_name?.[0] || personLabel[0]}
-                                        </div>
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                                    <div className="flex min-w-0 items-center gap-3.5">
+                                        <Avatar name={session.person_name || personLabel} src={session.person_photo_url} size="md" />
                                         <div className="min-w-0">
-                                            <h4 className="font-bold text-gray-900 group-hover:text-accent transition-colors">
+                                            <h4 className="truncate font-medium text-foreground">
                                                 Session with {session.person_name}
                                             </h4>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 font-medium">
-                                                <Clock className="w-3.5 h-3.5" />
+                                            <div className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums">
+                                                <Clock className="size-3.5" />
                                                 <span>
                                                     {formatTimeInTz(session.scheduled_at, timezone)}
                                                 </span>
@@ -186,22 +210,31 @@ export default function WeeklyCalendar({ sessions, personLabel = 'Mentor', zoomB
                                         </div>
                                     </div>
 
-                                    {session.zoom_url ? (
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <button className={`${canJoinZoom ? 'bg-accent' : 'bg-amber-500'} text-white w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:scale-[1.05] transition-transform`}>
-                                                <Video className="w-4 h-4" />
-                                                {canJoinZoom ? zoomButtonLabel : 'Top up to Join'}
+                                    {ended ? (
+                                        <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground sm:self-auto">
+                                            <Check weight="bold" className="size-3" />
+                                            Ended
+                                        </span>
+                                    ) : session.zoom_url ? (
+                                        <div className="flex shrink-0 items-center gap-2">
+                                            <button className={cn(buttonVariants({ size: 'sm' }), 'w-full sm:w-auto', !canJoinZoom && 'bg-warning hover:bg-warning/90')}>
+                                                <Video weight="fill" />
+                                                {canJoinZoom ? zoomButtonLabel : 'Top up to join'}
                                             </button>
                                         </div>
                                     ) : (
-                                        <span className="text-xs font-bold text-gray-400 italic">Zoom link pending</span>
+                                        <span className="text-sm text-muted-foreground">Zoom link pending</span>
                                     )}
                                 </div>
                             </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
+            </div>
             </div>
         </div>
     )
 }
+
+const iconButton = 'grid size-10 place-items-center rounded-full text-muted-foreground outline-none transition-[background-color,color,scale] duration-150 ease-out hover:bg-muted hover:text-foreground active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40'

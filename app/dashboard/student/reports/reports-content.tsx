@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Calendar, User, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react'
+import { FileText, CalendarBlank as Calendar, User, CaretDown as ChevronDown, CaretUp as ChevronUp, ChatCircle as MessageCircle } from '@phosphor-icons/react/ssr'
+import { buttonVariants } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase/client'
 import { sanitizeReportContent, normalizeReportMarkdown } from '@/lib/report-utils'
 
@@ -93,12 +94,12 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
 
     if (reports.length === 0) {
         return (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="w-8 h-8 text-gray-300" />
+            <div className="rounded-card bg-card px-6 py-12 text-center shadow-border">
+                <div className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                    <FileText weight="duotone" className="size-7" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Reports Yet</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">
+                <h3 className="text-base font-semibold text-foreground">No reports yet</h3>
+                <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground text-pretty">
                     Reports will appear here after your mentorship sessions are completed
                     and your mentor submits their feedback.
                 </p>
@@ -107,7 +108,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3">
             {reports.map((item) => {
                 const isExpanded = expandedReports.has(item.report.id)
                 const sessionDate = new Date(item.scheduled_at)
@@ -116,16 +117,16 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                 return (
                     <div
                         key={item.report.id}
-                        className="bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-md"
+                        className="overflow-hidden rounded-card bg-card shadow-border transition-shadow duration-150 ease-out hover:shadow-border-hover"
                     >
                         {/* Report Header */}
                         <button
                             onClick={() => toggleReport(item.report.id)}
-                            className="w-full p-5 flex items-center justify-between text-left"
+                            className="flex w-full items-center justify-between gap-3 p-4 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring/40 sm:p-5"
                         >
-                            <div className="flex items-center gap-4">
+                            <div className="flex min-w-0 items-center gap-3.5">
                                 {/* Mentor Avatar */}
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-tint-blue outline-1 -outline-offset-1 outline-black/10">
                                     {item.mentor_photo_url ? (
                                         <img
                                             src={item.mentor_photo_url}
@@ -133,16 +134,16 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <User className="w-6 h-6 text-accent" />
+                                        <User weight="duotone" className="size-6 text-tint-blue-foreground" />
                                     )}
                                 </div>
 
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="font-semibold text-gray-900">
+                                    <h3 className="font-medium text-foreground">
                                         Session with {item.mentor_full_name}
                                     </h3>
-                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                                        <Calendar className="w-4 h-4 flex-shrink-0" />
+                                    <div className="mt-0.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                                        <Calendar className="size-4 shrink-0" />
                                         <span>
                                             {sessionDate.toLocaleDateString('en-US', {
                                                 weekday: 'long',
@@ -153,48 +154,48 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                         </span>
                                     </div>
                                     {!isExpanded && item.report.personalized_report && (
-                                        <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                                        <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground text-pretty">
                                             {reportPreviewText(sanitizeReportContent(item.report.personalized_report))}
                                         </p>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="flex shrink-0 items-center gap-2">
                                 <button
                                     type="button"
                                     onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                     disabled={chatLoadingMentorId === item.mentor_id}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent hover:bg-accent/20 text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-tint-blue px-3 py-1.5 text-xs font-medium text-tint-blue-foreground transition-colors duration-150 hover:bg-tint-blue/70 disabled:opacity-50"
                                 >
-                                    <MessageCircle className="w-3.5 h-3.5" />
+                                    <MessageCircle weight="fill" className="size-3.5" />
                                     {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}
                                 </button>
                                 {item.report.personalized_report && (
-                                    <span className="px-2.5 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full">
+                                    <span className="hidden rounded-full bg-tint-green px-2.5 py-1 text-xs font-medium text-tint-green-foreground sm:inline">
                                         Personalised
                                     </span>
                                 )}
                                 {isExpanded ? (
-                                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                                    <ChevronUp className="size-5 text-muted-foreground" />
                                 ) : (
-                                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                                    <ChevronDown className="size-5 text-muted-foreground" />
                                 )}
                             </div>
                         </button>
 
                         {/* Expanded Report Content — only the personalized report (what was written) */}
                         {isExpanded && (
-                            <div className="px-5 pb-6 border-t border-gray-100">
+                            <div className="border-t border-border px-4 pb-5 animate-in fade-in-0 duration-200 motion-reduce:animate-none sm:px-5">
                                 {item.report.personalized_report ? (
                                     <>
-                                        <div className="mt-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                                            <div className="text-gray-700 leading-relaxed space-y-6">
+                                        <div className="mt-4 rounded-card bg-muted/50 p-5 sm:p-6">
+                                            <div className="max-w-prose space-y-6 leading-relaxed text-foreground">
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{
                                                         h2: ({ children }) => (
-                                                            <h2 className="text-base font-semibold text-gray-900 mt-6 mb-3 first:mt-0 pb-2 border-b border-gray-200">
+                                                            <h2 className="mt-6 mb-3 border-b border-border pb-2 text-base font-semibold text-foreground first:mt-0">
                                                                 {children}
                                                             </h2>
                                                         ),
@@ -202,7 +203,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                                             const raw = String(children ?? '').trim()
                                                             const isBestRegards = raw.toLowerCase().startsWith('best regards')
                                                             const isNameLine = !isBestRegards && raw.length > 0 && !raw.endsWith('.')
-                                                            const base = 'text-[15px]'
+                                                            const base = 'text-base text-pretty'
                                                             // First paragraph greeting: prepend "Hi {FirstName}," if not present
                                                             if (isFirstParagraph) {
                                                                 isFirstParagraph = false
@@ -246,7 +247,7 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                                             <ol className="my-4 list-decimal pl-6 space-y-2">{children}</ol>
                                                         ),
                                                         li: ({ children }) => (
-                                                            <li className="text-[15px] pl-1">{children}</li>
+                                                            <li className="pl-1 text-base">{children}</li>
                                                         ),
                                                     }}
                                                 >
@@ -254,9 +255,9 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                                 </ReactMarkdown>
                                             </div>
                                         </div>
-                                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
+                                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
                                             {item.report.personalized_report_generated_at && (
-                                                <span className="text-xs text-gray-400">
+                                                <span className="text-sm text-muted-foreground">
                                                     Report generated on {new Date(item.report.personalized_report_generated_at).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'long',
@@ -270,15 +271,15 @@ export default function ReportsContent({ reports, studentFirstName }: ReportsCon
                                                 type="button"
                                                 onClick={(e) => handleChatWithMentor(e, item.mentor_id)}
                                                 disabled={chatLoadingMentorId === item.mentor_id}
-                                                className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 shadow-sm"
+                                                className={buttonVariants()}
                                             >
-                                                <MessageCircle className="w-4 h-4" />
+                                                <MessageCircle weight="fill" />
                                                 {chatLoadingMentorId === item.mentor_id ? 'Opening…' : 'Chat with mentor'}
                                             </button>
                                         </div>
                                     </>
                                 ) : (
-                                    <p className="mt-4 text-sm text-gray-500">No personalised report for this session yet.</p>
+                                    <p className="mt-4 text-sm text-muted-foreground">No personalised report for this session yet.</p>
                                 )}
                             </div>
                         )}

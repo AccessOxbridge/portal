@@ -1,13 +1,16 @@
 'use client'
 
-import { FileText, PenTool, Users, Calendar } from 'lucide-react'
+import { FileText, PenNib as PenTool, Users, CalendarBlank as Calendar, Check } from '@phosphor-icons/react/ssr'
+import { cn } from '@/utils/lib'
 
 interface ApplicationTimelineProps {
     applicationYear?: number | null
     entranceExamDate?: string | null
+    /** Display only: titles the card "Road to Cambridge" when set. */
+    targetUniversity?: string | null
 }
 
-export default function ApplicationTimeline({ applicationYear, entranceExamDate }: ApplicationTimelineProps) {
+export default function ApplicationTimeline({ applicationYear, entranceExamDate, targetUniversity }: ApplicationTimelineProps) {
     const now = new Date()
     const currentYear = applicationYear || now.getFullYear()
 
@@ -28,14 +31,14 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
         },
         {
             id: 'personal_statement',
-            label: 'Personal Statement',
+            label: 'Personal statement',
             date: new Date(currentYear, 8, 30), // September 30
             icon: FileText,
             description: 'Complete & submit'
         },
         {
             id: 'entrance_exam',
-            label: 'Entrance Exam',
+            label: 'Entrance exam',
             date: entranceExamMilestoneDate,
             icon: PenTool,
             description: 'UCAT/BMAT/MAT/etc'
@@ -80,21 +83,21 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Application Timeline</h3>
-                <span className="text-xs font-medium text-gray-400">{currentYear} Entry</span>
+        <div className="rounded-card bg-card p-5 shadow-border sm:p-6">
+            <div className="mb-6 flex items-center justify-between gap-3">
+                <h3 className="text-base font-semibold text-foreground">{targetUniversity ? `Road to ${targetUniversity}` : 'Application timeline'}</h3>
+                <span className="text-sm text-muted-foreground tabular-nums">{currentYear} entry</span>
             </div>
 
             {/* Timeline Container */}
-            <div className="relative pt-2 pb-8">
-                {/* Background Track */}
-                <div className="absolute top-8 left-0 right-0 h-1 bg-gray-200 rounded-full" />
+            <div className="relative pt-1 pb-2">
+                {/* Background Track: dashed, because what's ahead isn't done yet */}
+                <div className="absolute top-6 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-input sm:top-7" />
 
                 {/* Progress Fill */}
                 <div
-                    className="absolute top-8 left-0 h-1 bg-gradient-to-r from-accent to-green-500 rounded-full transition-all duration-1000"
-                    style={{ width: `${currentProgress}%` }}
+                    className="absolute top-6 left-[12.5%] h-0.5 -translate-y-px rounded-full bg-brand transition-[width] duration-1000 ease-snappy motion-reduce:transition-none sm:top-7"
+                    style={{ width: `${currentProgress * 0.75}%` }}
                 />
 
                 {/* Milestones */}
@@ -107,52 +110,51 @@ export default function ApplicationTimeline({ applicationYear, entranceExamDate 
                         return (
                             <div
                                 key={milestone.id}
-                                className="flex flex-col items-center text-center"
+                                className="flex flex-col items-center px-1 text-center"
                                 style={{ width: `${100 / sortedMilestones.length}%` }}
                             >
-                                {/* Icon Circle */}
-                                <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${status === 'completed'
-                                        ? 'bg-green-500 text-white'
-                                        : status === 'current'
-                                            ? 'bg-accent text-white ring-4 ring-accent/20'
-                                            : status === 'upcoming'
-                                                ? 'bg-amber-500 text-white ring-4 ring-amber-200'
-                                                : 'bg-white text-gray-400 border-2 border-gray-200'
-                                    }`}>
-                                    <Icon className="w-5 h-5" />
+                                {/* Done: solid check. Today: blue ring. Soon: amber. Later: dashed. */}
+                                <div className={cn(
+                                    'relative z-10 grid size-10 place-items-center rounded-full sm:size-12',
+                                    status === 'completed' && 'bg-success text-white',
+                                    status === 'current' && 'bg-brand text-white ring-4 ring-tint-blue',
+                                    status === 'upcoming' && 'bg-tint-amber text-tint-amber-foreground ring-2 ring-warning',
+                                    status === 'future' && 'border-2 border-dashed border-input bg-card text-muted-foreground',
+                                )}>
+                                    {status === 'completed'
+                                        ? <Check weight="bold" className="size-5" />
+                                        : <Icon weight={status === 'future' ? 'regular' : 'fill'} className="size-5" />}
                                 </div>
 
                                 {/* Label */}
-                                <span className={`mt-3 text-sm font-semibold ${status === 'completed'
-                                        ? 'text-green-600'
-                                        : status === 'current'
-                                            ? 'text-accent'
-                                            : status === 'upcoming'
-                                                ? 'text-amber-600'
-                                                : 'text-gray-500'
-                                    }`}>
+                                <span className={cn(
+                                    'mt-2.5 text-sm font-medium leading-tight text-balance',
+                                    status === 'current' ? 'text-brand' : status === 'future' ? 'text-muted-foreground' : 'text-foreground',
+                                )}>
                                     {milestone.label}
                                 </span>
 
                                 {/* Date */}
-                                <span className="text-xs text-gray-400 mt-1">
+                                <span className="mt-1 text-xs text-muted-foreground tabular-nums">
                                     {formatDate(milestone.date)}
                                 </span>
 
                                 {/* Days until badge */}
                                 {milestone.id !== 'today' && daysUntil > 0 && (
-                                    <span className={`mt-2 px-2 py-0.5 rounded-full text-xs font-bold ${daysUntil <= 7
-                                            ? 'bg-red-100 text-red-600'
+                                    <span className={cn(
+                                        'mt-2 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium tabular-nums',
+                                        daysUntil <= 7
+                                            ? 'bg-tint-rose text-tint-rose-foreground'
                                             : daysUntil <= 14
-                                                ? 'bg-amber-100 text-amber-600'
-                                                : 'bg-gray-100 text-gray-500'
-                                        }`}>
+                                                ? 'bg-tint-amber text-tint-amber-foreground'
+                                                : 'bg-muted text-muted-foreground',
+                                    )}>
                                         {daysUntil} days
                                     </span>
                                 )}
                                 {milestone.id !== 'today' && daysUntil <= 0 && (
-                                    <span className="mt-2 px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-600">
-                                        ✓ Done
+                                    <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-tint-green px-2 py-0.5 text-xs font-medium text-tint-green-foreground">
+                                        <Check weight="bold" className="size-3" /> Done
                                     </span>
                                 )}
                             </div>

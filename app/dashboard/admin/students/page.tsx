@@ -4,10 +4,10 @@ import { createClient } from '@/utils/supabase/client'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import {
-    Search,
+    MagnifyingGlass as Search,
     Users,
-    Loader2
-} from 'lucide-react'
+    CircleNotch as Loader2,
+} from '@phosphor-icons/react/ssr'
 import { StudentActions } from './components/StudentActions'
 import { MentorAssignCell } from './components/MentorAssignCell'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
@@ -130,40 +130,40 @@ export default function AdminStudentsPage() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
-            <header className="flex items-center justify-between">
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Students</h1>
-                    <p className="text-gray-500 mt-1">Manage all students on the platform.</p>
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Students</h1>
+                    <p className="text-muted-foreground mt-1">Manage all students on the platform.</p>
                 </div>
             </header>
 
             {/* Search */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 border border-gray-100 rounded-2xl shadow-sm">
+            <div className="border border-transparent flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-card shadow-border">
                 <div className="relative w-full md:w-96">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isLoading ? 'text-accent animate-pulse' : 'text-gray-400'}`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 size-4 ${isLoading ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
                     <input
                         type="text"
                         placeholder="Search by name or target university..."
                         value={debouncedSearch}
                         onChange={(e) => setDebouncedSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-accent/5 focus:border-accent/20 transition-all shadow-inner"
+                        className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 pe-3.5 pl-10"
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-gray-100 rounded-[32px] shadow-sm">
+            <div className="border border-transparent bg-card rounded-card shadow-border">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                        <Loader2 className="size-8 text-primary animate-spin" />
                     </div>
                 ) : students.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Users className="w-8 h-8 text-gray-300" />
+                        <div className="size-16 bg-muted/60 rounded-full flex items-center justify-center mb-4">
+                            <Users className="size-8 text-muted-foreground/60" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">No students found</h3>
-                        <p className="text-gray-500 max-w-sm">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">No students found</h3>
+                        <p className="text-muted-foreground max-w-sm">
                             {searchTerm ? `No students matching "${searchTerm}"` : 'No students have completed their profile yet.'}
                         </p>
                     </div>
@@ -172,40 +172,40 @@ export default function AdminStudentsPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 border-b border-gray-100">
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Student</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">School</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Target</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mentor</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Hours</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                    <tr className="bg-muted/60 border-b border-border">
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">Student</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">School</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">Target</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">Mentor</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">Hours</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground">Joined</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-border">
                                     {students.map((student) => (
-                                        <tr key={student.id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={student.id} className="hover:bg-muted/60 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                                                    <div className="size-10 rounded-full bg-tint-blue text-tint-blue-foreground flex items-center justify-center font-semibold text-sm shrink-0">
                                                         {student.profile?.full_name?.[0] || 'S'}
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className="font-semibold text-gray-900 truncate">{student.profile?.full_name || 'Unknown'}</span>
-                                                        <span className="text-[10px] text-gray-400 truncate">{student.profile?.email || 'No email'}</span>
+                                                        <span className="font-semibold text-foreground truncate">{student.profile?.full_name || 'Unknown'}</span>
+                                                        <span className="text-[10px] text-muted-foreground truncate">{student.profile?.email || 'No email'}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm text-gray-900">{student.school_name || '-'}</span>
-                                                    <span className="text-[10px] text-gray-400">{student.year_group || ''}</span>
+                                                    <span className="text-sm text-foreground">{student.school_name || '-'}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{student.year_group || ''}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-gray-900">{student.target_university || '-'}</span>
-                                                    <span className="text-[10px] text-gray-400">{student.target_course || ''}</span>
+                                                    <span className="text-sm font-medium text-foreground">{student.target_university || '-'}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{student.target_course || ''}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -224,7 +224,7 @@ export default function AdminStudentsPage() {
                                                     credits={student.profile?.credits ?? 0}
                                                 />
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-500 font-medium">
+                                            <td className="px-6 py-4 text-sm text-muted-foreground font-medium">
                                                 {format(new Date(student.created_at), 'MMM dd, yyyy')}
                                             </td>
                                             <td className="px-6 py-4 text-right">
@@ -237,22 +237,22 @@ export default function AdminStudentsPage() {
                         </div>
 
                         {/* Pagination */}
-                        <div className="px-6 py-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                            <span className="text-sm text-gray-500">
-                                Showing <span className="font-semibold text-gray-900">{offset + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(offset + limit, totalCount)}</span> of <span className="font-semibold text-gray-900">{totalCount}</span> students
+                        <div className="px-6 py-4 border-t border-border bg-muted/60 flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                Showing <span className="font-semibold text-foreground">{offset + 1}</span> to <span className="font-semibold text-foreground">{Math.min(offset + limit, totalCount)}</span> of <span className="font-semibold text-foreground">{totalCount}</span> students
                             </span>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPage(Math.max(1, page - 1))}
                                     disabled={page <= 1}
-                                    className={`px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium transition-colors ${page <= 1 ? 'pointer-events-none opacity-50 bg-gray-50' : 'bg-white hover:bg-gray-50 text-gray-700'}`}
+                                    className={`px-4 py-2 border border-border rounded-control text-sm font-medium transition-colors ${page <= 1 ? 'pointer-events-none opacity-50 bg-muted/60' : 'bg-card hover:bg-muted/60 text-foreground'}`}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                                     disabled={page >= totalPages}
-                                    className={`px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium transition-colors ${page >= totalPages ? 'pointer-events-none opacity-50 bg-gray-50' : 'bg-white hover:bg-gray-50 text-gray-700'}`}
+                                    className={`px-4 py-2 border border-border rounded-control text-sm font-medium transition-colors ${page >= totalPages ? 'pointer-events-none opacity-50 bg-muted/60' : 'bg-card hover:bg-muted/60 text-foreground'}`}
                                 >
                                     Next
                                 </button>

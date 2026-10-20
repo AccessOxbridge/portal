@@ -4,27 +4,30 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-    Calendar,
-    Settings,
-    LogOut,
-    Search,
+    CalendarBlank as Calendar,
+    Gear as Settings,
+    SignOut as LogOut,
+    MagnifyingGlass as Search,
     CheckCircle,
-    ChevronDown,
-    ChevronLeft,
-    ChevronUp,
-    AlertCircle,
+    CaretDown as ChevronDown,
+    SidebarSimple,
+    CaretUpDown,
+    WarningCircle as AlertCircle,
     User,
-} from 'lucide-react'
+} from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import { cn } from '@/utils/lib'
 import { Logo } from '../logo'
 import { navigation, studentSections } from './nav-items'
 import { version as appVersion } from '@/package.json'
 import { useUnreadMessages } from './use-unread-messages'
+import { Avatar } from '@/components/ui/avatar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/overlay'
 
 interface SidebarProps {
     role: string;
     userName: string;
+    userEmail?: string;
     userId?: string;
     photoUrl?: string | null;
     pendingReportsCount?: number;
@@ -40,6 +43,7 @@ interface SidebarProps {
 export default function Sidebar({
     role,
     userName,
+    userEmail,
     userId,
     photoUrl,
     pendingReportsCount = 0,
@@ -56,7 +60,6 @@ export default function Sidebar({
     const [searchQuery, setSearchQuery] = useState('')
     const [profileMenuOpen, setProfileMenuOpen] = useState(false)
     const searchInputRef = useRef<HTMLInputElement>(null)
-    const profileMenuRef = useRef<HTMLDivElement>(null)
 
     // Custom sidebar tab order (persisted per user + role in localStorage)
     const [navOrder, setNavOrder] = useState<string[]>([])
@@ -121,17 +124,8 @@ export default function Sidebar({
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [])
 
-    // Close profile drop-up when clicking outside (student only)
-    useEffect(() => {
-        if (effectiveRole !== 'student' || !profileMenuOpen) return
-        const handleClickOutside = (e: MouseEvent) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
-                setProfileMenuOpen(false)
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [effectiveRole, profileMenuOpen])
+    // The profile menu (student only) is a Radix DropdownMenu: it closes on an
+    // outside click or Escape by itself and returns focus to its button.
 
     // Base nav items for the current role, reordered to match the saved custom order.
     // Items not present in the saved order keep their original position (appended in
@@ -199,70 +193,83 @@ export default function Sidebar({
         window.location.href = '/login'
     }
 
+    // Nav row shared by role items and student sections. Active rows get the
+    // filled icon (Phosphor fill marks the active state, better-ui).
+    const rowBase = cn(
+        'group relative flex items-center rounded-control outline-none',
+        'transition-[background-color,color] duration-150 ease-out',
+        'focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+    )
+    const rowState = (active: boolean) =>
+        active
+            ? 'bg-sidebar-active text-white'
+            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-white'
+
+    const countPill = 'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums'
+
     return (
         <aside
             className={cn(
-                // Hidden below `md` — phones get MobileTopBar + MobileTabBar instead.
-                'bg-accent border-r border-white/10 hidden md:flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-300 ease-in-out',
+                // Hidden below `md`: phones get MobileTopBar + MobileTabBar instead.
+                'bg-sidebar hidden md:flex flex-col h-screen fixed left-0 top-0 z-50 transition-[width] duration-200 ease-snappy motion-reduce:transition-none',
                 collapsed ? 'w-[4.5rem]' : 'w-64'
             )}
         >
-            {onToggleCollapse && (
-                <button
-                    type="button"
-                    onClick={onToggleCollapse}
-                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                    className={cn(
-                        'absolute z-[60] top-7 flex h-6 w-6 items-center justify-center rounded-full',
-                        'border border-white/20 bg-accent text-white/80 shadow-lg',
-                        'hover:bg-white/15 hover:text-white hover:border-white/30 transition-colors -right-3'
-                    )}
-                >
-                    <ChevronLeft
-                        className={cn('h-3.5 w-3.5 stroke-[2.5]', collapsed && 'rotate-180')}
-                    />
-                </button>
-            )}
-
-            {/* Top Branding & Search */}
-            <div className={cn('pb-2', collapsed ? 'px-2 pt-4' : 'p-6 pr-8')}>
-                <div className={cn('mb-6', collapsed ? 'flex justify-center' : 'mb-8')}>
+            {/* Top: brand and the collapse toggle (the CRM's panel button), then
+                search and the student's main action */}
+            <div className="px-3 pb-3">
+                <div className={cn('flex', collapsed ? 'flex-col items-center gap-1 pt-4 pb-3' : 'h-16 items-center justify-between gap-2 pl-1 mb-1')}>
                     <Logo
-                        size={collapsed ? 'default' : 'lg'}
+                        size="sidebar"
                         iconOnly={collapsed}
                         textColor="text-white"
-                        className={collapsed ? 'justify-center' : 'justify-start'}
+                        className="justify-start"
                     />
+                    {onToggleCollapse && (
+                        <button
+                            type="button"
+                            onClick={onToggleCollapse}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            aria-pressed={collapsed}
+                            className={cn(rowBase, rowState(false), 'shrink-0 justify-center', collapsed ? 'h-10 w-full' : 'size-8')}
+                        >
+                            <SidebarSimple className="size-5 text-white/60 group-hover:text-white" />
+                        </button>
+                    )}
                 </div>
 
-                {/* Search Bar */}
                 {!collapsed ? (
-                    <div className="relative mb-6">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                    <div className="relative mb-4">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/50" />
                         <input
                             type="text"
                             placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             ref={searchInputRef}
-                            className="w-full bg-white/10 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all placeholder:text-white/40"
+                            className={cn(
+                                'h-10 w-full rounded-control border border-white/10 bg-white/[0.07] pl-9 pr-12 text-sm text-white outline-none',
+                                'placeholder:text-white/50 transition-[background-color,border-color] duration-150',
+                                'focus:border-white/25 focus:bg-white/[0.11]'
+                            )}
                         />
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/5 border border-white/10 rounded-md px-1.5 py-0.5 text-[10px] text-white/40 font-mono">
+                        <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-[6px] border border-white/10 px-1.5 py-0.5 font-sans text-[11px] text-white/50">
                             ⌘K
-                        </div>
+                        </kbd>
                     </div>
                 ) : (
                     <button
                         type="button"
                         title="Search"
                         onClick={onToggleCollapse}
-                        className="w-full mb-4 flex items-center justify-center rounded-xl py-2.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+                        className={cn(rowBase, rowState(false), 'mb-3 h-10 w-full justify-center')}
                     >
-                        <Search className="w-5 h-5" />
+                        <Search className="size-5" />
                     </button>
                 )}
 
-                {/* Book a session CTA (student only) */}
+                {/* Book a session (student only) */}
                 {effectiveRole === 'student' && (
                     <button
                         type="button"
@@ -273,19 +280,20 @@ export default function Sidebar({
                             }
                         }}
                         className={cn(
-                            'mb-2 inline-flex items-center justify-center rounded-2xl bg-white text-accent font-semibold shadow-md shadow-black/20 hover:bg-amber-100 hover:text-accent transition-colors',
-                            collapsed ? 'w-full p-2.5' : 'w-full gap-2 text-sm py-2.5'
+                            'inline-flex w-full items-center justify-center rounded-full bg-white font-medium text-primary outline-none',
+                            'transition-[background-color,scale] duration-150 ease-out hover:bg-white/90 active:scale-[0.96]',
+                            'focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+                            collapsed ? 'h-10' : 'h-10 gap-2 text-sm'
                         )}
                     >
-                        <Calendar className="w-4 h-4 shrink-0" />
+                        <Calendar weight="bold" className="size-4 shrink-0" />
                         {!collapsed && <span>Book a session</span>}
                     </button>
                 )}
-
             </div>
 
-            {/* Navigation Section - separate scroll, no chaining to main */}
-            <nav className={cn('grow min-h-0 py-2 space-y-1 overflow-y-auto overscroll-contain custom-scrollbar', collapsed ? 'px-1.5' : 'px-3')}>
+            {/* Navigation: its own scroll, never chained to the page */}
+            <nav className={cn('custom-scrollbar grow min-h-0 space-y-0.5 overflow-y-auto overscroll-contain py-2', collapsed ? 'px-3' : 'px-3')}>
                 {filteredMenuItems.map((item) => {
                     const isActive = pathname === item.href
                     const showReportsBadge = item.name === 'Reports' && effectiveRole === 'mentor' && pendingReportsCount > 0
@@ -313,6 +321,7 @@ export default function Sidebar({
                             key={item.href}
                             href={item.href}
                             title={collapsed ? item.name : undefined}
+                            aria-current={isActive ? 'page' : undefined}
                             draggable={dndEnabled}
                             onDragStart={dndEnabled ? () => { dragNameRef.current = item.name; setDraggingName(item.name) } : undefined}
                             onDragEnd={dndEnabled ? () => { dragNameRef.current = null; setDraggingName(null); setDragOverName(null) } : undefined}
@@ -320,48 +329,47 @@ export default function Sidebar({
                             onDragLeave={dndEnabled ? () => { if (dragOverName === item.name) setDragOverName(null) } : undefined}
                             onDrop={dndEnabled ? (e) => { e.preventDefault(); handleNavDrop(item.name) } : undefined}
                             className={cn(
-                                'flex items-center rounded-xl transition-all group relative',
-                                collapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5',
-                                isActive
-                                    ? 'bg-white/15 text-white shadow-sm'
-                                    : 'text-white/70 hover:bg-white/10 hover:text-white',
+                                rowBase,
+                                rowState(isActive),
+                                collapsed ? 'h-10 justify-center' : 'h-10 justify-between gap-3 px-3 in-data-[density=compact]:h-9',
                                 dndEnabled && 'cursor-grab active:cursor-grabbing',
                                 draggingName === item.name && 'opacity-40',
                                 dragOverName === item.name && draggingName !== item.name && 'ring-2 ring-white/40'
                             )}
                         >
-                            <div className={cn('flex items-center', !collapsed && 'gap-3')}>
-                                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
-                                {!collapsed && <span className="font-medium text-sm">{item.name}</span>}
-                            </div>
+                            <span className={cn('flex min-w-0 items-center', !collapsed && 'gap-3')}>
+                                <item.icon
+                                    weight={isActive ? 'fill' : 'regular'}
+                                    className={cn('size-5 shrink-0', isActive ? 'text-white' : 'text-white/60 group-hover:text-white')}
+                                />
+                                {!collapsed && <span className="truncate text-[15px] font-medium in-data-[density=compact]:text-sm">{item.name}</span>}
+                            </span>
                             {collapsed && hasBadge && (
-                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+                                <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-[#f87171] ring-2 ring-sidebar" />
                             )}
                             {!collapsed && showReportsBadge && (
-                                <span className="px-1.5 py-0.5 bg-amber-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
-                                    {pendingReportsCount}
-                                </span>
+                                <span className={cn(countPill, 'bg-[#fbbf24] text-[#422006]')}>{pendingReportsCount}</span>
                             )}
                             {!collapsed && showRequestsBadge && (
-                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                <span className={cn(countPill, 'bg-[#f87171] text-white')}>
                                     {pendingRequestsCount > 9 ? '9+' : pendingRequestsCount}
                                 </span>
                             )}
                             {!collapsed && showTrainingIncompleteBadge && (
-                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                                    <AlertCircle className="w-3 h-3" />
+                                <span className={cn(countPill, 'bg-[#f87171] px-1 text-white')} title="Training not finished">
+                                    <AlertCircle weight="bold" className="size-3.5" />
                                 </span>
                             )}
                             {!collapsed && showTrainingCompleteBadge && (
-                                <span className="px-1.5 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                                    <CheckCircle className="w-3 h-3" />
+                                <span className={cn(countPill, 'bg-[#34d399] px-1 text-[#022c22]')} title="Training complete">
+                                    <CheckCircle weight="bold" className="size-3.5" />
                                 </span>
                             )}
                             {!collapsed && showStudentHelpBadge && (
-                                <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50" />
+                                <span className="size-2.5 rounded-full bg-[#f87171]" title="Students waiting for help" />
                             )}
                             {!collapsed && showMessagesUnreadBadge && (
-                                <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                <span className={cn(countPill, 'bg-[#f87171] text-white')}>
                                     {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                                 </span>
                             )}
@@ -369,7 +377,7 @@ export default function Sidebar({
                     )
                 })}
 
-                {/* Expandable Sections (only for student) */}
+                {/* Expandable sections (student only) */}
                 {effectiveRole === 'student' && filteredStudentSections.map((section) => {
                     const isExpanded = expandedSections.includes(section.name) || searchQuery !== ''
                     const isAnySectionActive = section.subsections.some(sub => pathname === sub.href)
@@ -380,14 +388,9 @@ export default function Sidebar({
                                 key={section.name}
                                 href={section.subsections[0].href}
                                 title={section.name}
-                                className={cn(
-                                    'flex items-center justify-center p-2.5 rounded-xl transition-all group',
-                                    isAnySectionActive
-                                        ? 'bg-white/15 text-white shadow-sm'
-                                        : 'text-white/70 hover:bg-white/10 hover:text-white'
-                                )}
+                                className={cn(rowBase, rowState(isAnySectionActive), 'h-10 justify-center')}
                             >
-                                <section.icon className={`w-5 h-5 transition-colors ${isAnySectionActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                                <section.icon weight={isAnySectionActive ? 'fill' : 'regular'} className="size-5" />
                             </Link>
                         )
                     }
@@ -402,39 +405,34 @@ export default function Sidebar({
                                             : [...prev, section.name]
                                     )
                                 }}
-                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group ${isAnySectionActive
-                                    ? 'bg-white/15 text-white shadow-sm'
-                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                                    }`}
+                                className={cn(rowBase, rowState(isAnySectionActive), 'h-10 w-full justify-between px-3')}
                             >
-                                <div className="flex items-center gap-3">
-                                    <section.icon className={`w-5 h-5 transition-colors ${isAnySectionActive ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
-                                    <span className="font-medium text-sm">{section.name}</span>
-                                </div>
+                                <span className="flex items-center gap-3">
+                                    <section.icon weight={isAnySectionActive ? 'fill' : 'regular'} className="size-5" />
+                                    <span className="text-[15px] font-medium">{section.name}</span>
+                                </span>
                                 <ChevronDown
-                                    className={`w-4 h-4 text-white/40 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                    className={cn('size-4 text-white/50 transition-[rotate] duration-200 ease-snappy', isExpanded && 'rotate-180')}
                                 />
                             </button>
 
-                            {/* Subsections */}
-                            <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                <div className="pl-4 pt-1 space-y-0.5">
-                                    {section.subsections.map((sub) => {
-                                        const isSubActive = pathname === sub.href
-                                        return (
-                                            <Link
-                                                key={sub.href}
-                                                href={sub.href}
-                                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all group ${isSubActive
-                                                    ? 'bg-white/10 text-white'
-                                                    : 'text-white/60 hover:bg-white/5 hover:text-white'
-                                                    }`}
-                                            >
-                                                <sub.icon className={`w-4 h-4 transition-colors ${isSubActive ? 'text-white' : 'text-white/40 group-hover:text-white/60'}`} />
-                                                <span className="font-medium text-sm">{sub.name}</span>
-                                            </Link>
-                                        )
-                                    })}
+                            <div className={cn('grid transition-[grid-template-rows,opacity] duration-200 ease-snappy', isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0')}>
+                                <div className="overflow-hidden">
+                                    <div className="space-y-0.5 pt-1 pl-4">
+                                        {section.subsections.map((sub) => {
+                                            const isSubActive = pathname === sub.href
+                                            return (
+                                                <Link
+                                                    key={sub.href}
+                                                    href={sub.href}
+                                                    className={cn(rowBase, rowState(isSubActive), 'h-9 gap-3 px-3')}
+                                                >
+                                                    <sub.icon weight={isSubActive ? 'fill' : 'regular'} className="size-4" />
+                                                    <span className="text-sm font-medium">{sub.name}</span>
+                                                </Link>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -443,152 +441,110 @@ export default function Sidebar({
 
                 {filteredMenuItems.length === 0 && filteredStudentSections.length === 0 && !collapsed && (
                     <div className="px-4 py-8 text-center">
-                        <p className="text-white/40 text-sm">No results found</p>
+                        <p className="text-sm text-white/60">No results found</p>
                     </div>
                 )}
             </nav>
 
-            {/* Footer Section */}
-            <div className={cn('border-t border-white/10 bg-black/10', collapsed ? 'p-1.5' : 'p-3')}>
+            {/* Footer: who's signed in, settings and sign out */}
+            <div className={cn('border-t border-sidebar-border', collapsed ? 'p-2' : 'p-3')}>
                 {effectiveRole === 'student' ? (
-                    <div className="relative" ref={profileMenuRef}>
-                        {/* Drop-up menu (above profile button) – connected */}
-                        <div
-                            className={cn(
-                                'absolute overflow-hidden border border-white/10 bg-accent shadow-lg transition-all duration-200 ease-out z-50',
-                                collapsed
-                                    ? 'bottom-0 left-full ml-2 w-48 rounded-2xl'
-                                    : 'bottom-full left-0 right-0 rounded-t-2xl border-b-0',
-                                profileMenuOpen
-                                    ? 'opacity-100 translate-y-0 visible'
-                                    : collapsed
-                                      ? 'opacity-0 -translate-x-2 pointer-events-none invisible'
-                                      : 'opacity-0 translate-y-2 pointer-events-none invisible'
-                            )}
-                        >
-                            <Link
-                                href="/dashboard/student/profile"
-                                onClick={() => setProfileMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm border-b border-white/10"
-                            >
-                                <User className="w-5 h-5 text-white/60" />
-                                <span>My Profile</span>
-                            </Link>
-                            <Link
-                                href="/dashboard/settings"
-                                onClick={() => setProfileMenuOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm border-b border-white/10"
-                            >
-                                <Settings className="w-5 h-5 text-white/60" />
-                                <span>Settings</span>
-                            </Link>
+                    <DropdownMenu open={profileMenuOpen} onOpenChange={setProfileMenuOpen}>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setProfileMenuOpen(false)
-                                    handleSignOut()
-                                }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 text-white/80 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group"
-                            >
-                                <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                                <span>Sign Out</span>
-                            </button>
-                        </div>
-
-                        {/* Profile button – opens drop-up, connects visually when menu open */}
-                        <button
-                            type="button"
-                            title={userName || 'Profile'}
-                            onClick={() => setProfileMenuOpen((open) => !open)}
-                            className={cn(
-                                'w-full flex items-center bg-white/5 border border-white/5 group cursor-pointer hover:bg-white/10 hover:border-white/10 transition-all',
-                                collapsed
-                                    ? 'justify-center p-2 rounded-xl'
-                                    : `justify-between py-3 px-3 rounded-b-2xl ${profileMenuOpen ? 'rounded-t-none' : 'rounded-2xl'}`
-                            )}
-                        >
-                            <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
-                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10 overflow-hidden">
-                                    {photoUrl ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={photoUrl} alt="" className="w-full h-full object-cover" />
-                                    ) : (
-                                        userName?.[0] || 'U'
-                                    )}
-                                </div>
-                                {!collapsed && (
-                                    <div className="flex flex-col min-w-0 text-left">
-                                        <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
-                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
-                                    </div>
+                                title={userName || 'Profile'}
+                                className={cn(
+                                    rowBase,
+                                    'w-full text-left hover:bg-sidebar-accent',
+                                    profileMenuOpen && 'bg-sidebar-accent',
+                                    collapsed ? 'justify-center p-1.5' : 'justify-between gap-3 p-2'
                                 )}
+                            >
+                                <span className={cn('flex min-w-0 items-center', !collapsed && 'gap-3')}>
+                                    <Avatar name={userName || 'User'} src={photoUrl} size="md" />
+                                    {!collapsed && (
+                                        <span className="flex min-w-0 flex-col">
+                                            <span className="truncate text-sm font-medium text-white">{userName || 'User'}</span>
+                                            <span className="truncate text-xs capitalize text-white/60">{role}</span>
+                                        </span>
+                                    )}
+                                </span>
+                                {!collapsed && <CaretUpDown className="size-4 shrink-0 text-white/50" />}
+                            </button>
+                        </DropdownMenuTrigger>
+                        {/* Opens beside the sidebar (shadcn's sidebar pattern), lined up
+                            with the bottom of the button, so it never covers the nav. */}
+                        <DropdownMenuContent side="right" align="end" sideOffset={12} className="w-max min-w-60 max-w-80">
+                            {/* Grows to fit (up to 320px), then wraps: a long name or
+                                email is never cut off. */}
+                            <div className="flex items-center gap-2.5 px-2 py-2">
+                                <Avatar name={userName || 'User'} src={photoUrl} size="sm" />
+                                <div className="min-w-0 leading-tight">
+                                    <p className="text-sm font-medium text-foreground [overflow-wrap:anywhere]">{userName || 'User'}</p>
+                                    {userEmail && <p className="mt-0.5 text-xs text-muted-foreground [overflow-wrap:anywhere]">{userEmail}</p>}
+                                </div>
                             </div>
-                            {!collapsed && (
-                                <ChevronUp
-                                    className={`w-4 h-4 text-white/40 shrink-0 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`}
-                                />
-                            )}
-                        </button>
-                    </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/student/profile">
+                                    <User />
+                                    <span>My profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/settings">
+                                    <Settings />
+                                    <span>Settings</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive" onSelect={() => handleSignOut()}>
+                                <LogOut />
+                                <span>Sign out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 ) : (
                     <>
                         <div
-                            className={cn(
-                                'flex items-center bg-white/5 border border-white/5 rounded-2xl group hover:bg-white/10 hover:border-white/10 transition-all',
-                                collapsed ? 'justify-center p-2' : 'justify-between py-3 px-3'
-                            )}
+                            className={cn('flex items-center rounded-control', collapsed ? 'justify-center p-1.5' : 'gap-3 p-2')}
                             title={userName || 'Profile'}
                         >
-                            <div className={cn('flex items-center min-w-0', !collapsed && 'gap-3')}>
-                                <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center text-sm font-bold shrink-0 border border-white/10 overflow-hidden">
-                                    {photoUrl ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={photoUrl} alt="" className="w-full h-full object-cover" />
-                                    ) : (
-                                        userName?.[0] || 'U'
-                                    )}
-                                </div>
-                                {!collapsed && (
-                                    <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-semibold text-white truncate">{userName || 'User'}</span>
-                                        <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium truncate">{role}</span>
-                                    </div>
-                                )}
-                            </div>
+                            <Avatar name={userName || 'User'} src={photoUrl} size="md" />
+                            {!collapsed && (
+                                <span className="flex min-w-0 flex-col">
+                                    <span className="truncate text-sm font-medium text-white">{userName || 'User'}</span>
+                                    <span className="truncate text-xs capitalize text-white/60">{role}</span>
+                                </span>
+                            )}
                         </div>
 
                         <Link
                             href="/dashboard/settings"
                             title="Settings"
-                            className={cn(
-                                'mt-2 w-full flex items-center rounded-xl text-white/50 hover:bg-white/10 hover:text-white transition-all text-sm group',
-                                collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-                            )}
+                            className={cn(rowBase, rowState(pathname === '/dashboard/settings'), 'mt-1 h-9 w-full text-sm', collapsed ? 'justify-center' : 'gap-3 px-3')}
                         >
-                            <Settings className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors shrink-0" />
+                            <Settings className="size-5 shrink-0" />
                             {!collapsed && <span>Settings</span>}
                         </Link>
 
                         <button
                             type="button"
-                            title="Sign Out"
+                            title="Sign out"
                             onClick={handleSignOut}
-                            className={cn(
-                                'mt-1 w-full flex items-center rounded-xl text-white/50 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm group',
-                                collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'
-                            )}
+                            className={cn(rowBase, 'mt-0.5 h-9 w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-white', collapsed ? 'justify-center' : 'gap-3 px-3')}
                         >
-                            <LogOut className="w-5 h-5 transition-transform group-hover:translate-x-1 shrink-0" />
-                            {!collapsed && <span>Sign Out</span>}
+                            <LogOut className="size-5 shrink-0" />
+                            {!collapsed && <span>Sign out</span>}
                         </button>
                     </>
                 )}
 
                 {!collapsed && (
-                    <div className="mt-3 flex items-center justify-center gap-2">
-                        <span className="text-[11px] font-medium text-white/40">Access Oxbridge Portal</span>
-                        <span className="font-mono text-[11px] tracking-wide text-white/50">v{appVersion}</span>
-                    </div>
+                    <p className="mt-3 text-center text-[11px] text-white/50">
+                        Access Oxbridge Portal <span className="font-mono tabular-nums">v{appVersion}</span>
+                    </p>
                 )}
             </div>
         </aside>

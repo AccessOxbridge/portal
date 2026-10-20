@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Send, CheckCircle2, MessageSquareHeart } from 'lucide-react'
+import { X, PaperPlaneRight as Send, CheckCircle as CheckCircle2, ChatTeardropText as MessageSquareHeart } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/client'
 import {
     SURVEY_QUESTIONS,
@@ -9,6 +9,10 @@ import {
     type SurveyQuestion,
 } from '@/config/satisfaction.config'
 import type { DueSatisfactionSurvey } from '@/lib/student-satisfaction'
+import { sheet } from '@/components/ui/sheet-classes'
+import { buttonVariants } from '@/components/ui/button'
+import { fieldBase } from '@/components/ui/input'
+import { cn } from '@/utils/lib'
 
 interface SatisfactionSurveyModalProps {
     isOpen: boolean
@@ -123,9 +127,9 @@ export default function SatisfactionSurveyModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className={sheet.root}>
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className={sheet.overlay}
                 onClick={onClose}
                 aria-hidden
             />
@@ -133,22 +137,22 @@ export default function SatisfactionSurveyModal({
                 role="dialog"
                 aria-modal="true"
                 aria-label="Quick check-in"
-                className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-lg max-h-[92dvh] overflow-y-auto"
+                className={cn(sheet.panel, 'overflow-y-auto overscroll-contain sm:max-w-lg')}
             >
                 <button
                     type="button"
                     onClick={onClose}
-                    className="absolute top-6 right-6 w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors z-10"
+                    className={cn(sheet.close, 'absolute top-5 right-5 z-10')}
                     aria-label="Close"
                 >
-                    <X className="w-4 h-4 text-gray-600" />
+                    <X className="size-5" />
                 </button>
 
                 {success ? (
-                    <div className="p-6 space-y-4">
-                        <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                            <p className="text-sm text-emerald-800">
+                    <div className="space-y-4 p-6 pt-14">
+                        <div role="status" className="flex items-start gap-3 rounded-card bg-tint-green p-4">
+                            <CheckCircle2 weight="fill" className="mt-0.5 size-5 shrink-0 text-success" />
+                            <p className="text-sm text-tint-green-foreground text-pretty">
                                 Thanks! That goes straight to the Access Oxbridge team and
                                 genuinely shapes what we build next.
                             </p>
@@ -156,29 +160,29 @@ export default function SatisfactionSurveyModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 bg-accent text-white font-bold rounded-2xl hover:opacity-95 transition-opacity"
+                            className={cn(buttonVariants(), 'w-full')}
                         >
                             Done
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-                                <MessageSquareHeart className="w-5 h-5 text-accent" />
+                        <div className="flex items-center gap-3.5 px-6 pt-6 pe-16 pb-2">
+                            <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-rose text-tint-rose-foreground">
+                                <MessageSquareHeart weight="fill" className="size-6" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-extrabold text-gray-900">
+                                <h2 className="text-lg font-semibold text-foreground">
                                     Quick check-in
                                 </h2>
-                                <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">
+                                <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground text-pretty">
                                     You&apos;re {survey.tier} sessions in. Three questions, about
                                     thirty seconds.
                                 </p>
                             </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 p-6">
                             {SURVEY_QUESTIONS.map((question) => (
                                 <RatingRow
                                     key={question.key}
@@ -197,10 +201,10 @@ export default function SatisfactionSurveyModal({
                             <div>
                                 <label
                                     htmlFor="satisfaction-comment"
-                                    className="block text-sm font-semibold text-gray-700 mb-2"
+                                    className="mb-2 block text-sm font-medium text-foreground"
                                 >
                                     Anything you&apos;d like to add?{' '}
-                                    <span className="font-normal text-gray-400">(optional)</span>
+                                    <span className="font-normal text-muted-foreground">(optional)</span>
                                 </label>
                                 <textarea
                                     id="satisfaction-comment"
@@ -209,12 +213,12 @@ export default function SatisfactionSurveyModal({
                                     placeholder="Anything working well, or anything we should fix?"
                                     rows={3}
                                     maxLength={SURVEY_COMMENT_MAX_LENGTH}
-                                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                                    className={cn(fieldBase, 'resize-none px-3.5 py-2.5 leading-relaxed')}
                                 />
                             </div>
 
                             {error && (
-                                <p className="text-sm text-red-600 font-medium" role="alert">
+                                <p className="text-sm text-destructive" role="alert">
                                     {error}
                                 </p>
                             )}
@@ -222,9 +226,9 @@ export default function SatisfactionSurveyModal({
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-accent text-white font-bold rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-60"
+                                className={cn(buttonVariants(), 'w-full')}
                             >
-                                <Send className="w-4 h-4" />
+                                <Send weight="fill" />
                                 {loading ? 'Sending…' : 'Submit'}
                             </button>
                         </form>
@@ -254,7 +258,7 @@ function RatingRow({
 }) {
     return (
         <div>
-            <p className="text-sm font-semibold text-gray-800 mb-3">{question.label}</p>
+            <p className="mb-3 text-sm font-medium text-foreground text-pretty">{question.label}</p>
             <div
                 className="grid grid-cols-5 gap-2"
                 role="radiogroup"
@@ -269,10 +273,10 @@ function RatingRow({
                             role="radio"
                             aria-checked={selected}
                             onClick={() => onChange(option)}
-                            className={`py-3 rounded-2xl text-base font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
+                            className={`h-11 rounded-full border text-base font-medium tabular-nums outline-none transition-[background-color,color,border-color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 ${
                                 selected
-                                    ? 'bg-accent text-white border-accent'
-                                    : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-input bg-card text-foreground hover:bg-muted'
                             }`}
                         >
                             {option}
@@ -280,7 +284,7 @@ function RatingRow({
                     )
                 })}
             </div>
-            <div className="flex justify-between mt-2 text-xs text-gray-400 font-medium">
+            <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                 <span>{question.lowLabel}</span>
                 <span>{question.highLabel}</span>
             </div>

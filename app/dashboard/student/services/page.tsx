@@ -38,9 +38,9 @@ export default async function CreditsPage() {
 
     return (
         <div className="max-w-6xl mx-auto">
-            <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
-                    Expert Guidance, For You
+            <header className="mb-6">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    Expert guidance, for you
                 </h1>
             </header>
 

@@ -112,22 +112,22 @@ const SAMPLE_REQUEST = `
 <div class="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100">
   <div class="p-6 sm:p-10 flex-1">
     <div class="flex items-center gap-4 mb-8">
-      <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent font-black text-2xl shadow-inner">A</div>
-      <div><h3 class="text-2xl font-black text-gray-900">Alex Morgan</h3><span class="text-xs font-bold text-accent uppercase tracking-widest bg-accent/5 px-3 py-1 rounded-full">New Request</span></div>
+      <div class="w-16 h-16 bg-legacy-accent/10 rounded-2xl flex items-center justify-center text-legacy-accent font-black text-2xl shadow-inner">A</div>
+      <div><h3 class="text-2xl font-black text-gray-900">Alex Morgan</h3><span class="text-xs font-bold text-legacy-accent uppercase tracking-widest bg-legacy-accent/5 px-3 py-1 rounded-full">New Request</span></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
       <div class="space-y-1 sm:col-span-2"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Academic Interests</h4><p class="text-gray-700 leading-relaxed font-medium">Algorithms and how computers solve hard problems. I have been reading about graph theory and cryptography.</p></div>
       <div class="space-y-1 sm:col-span-2"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Extracurriculars</h4><p class="text-gray-700 leading-relaxed font-medium">School coding club lead, UKMT Senior Maths Challenge (Gold), volunteer at a local primary school.</p></div>
       <div class="space-y-1"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Subjects</h4><div class="flex flex-wrap gap-2"><span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">Mathematics (A*)</span><span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">Further Maths (A*)</span><span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium">Physics (A)</span></div></div>
-      <div class="space-y-1"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Target Universities</h4><div class="flex flex-wrap gap-2"><span class="bg-accent/10 text-accent px-3 py-1 rounded-lg text-sm font-medium">Cambridge</span></div></div>
+      <div class="space-y-1"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Target Universities</h4><div class="flex flex-wrap gap-2"><span class="bg-legacy-accent/10 text-legacy-accent px-3 py-1 rounded-lg text-sm font-medium">Cambridge</span></div></div>
       <div class="space-y-1"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Curriculum</h4><p class="text-gray-700 leading-relaxed font-medium">A-Level</p></div>
       <div class="space-y-1"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">School</h4><p class="text-gray-700 leading-relaxed font-medium">Westminster School, United Kingdom</p></div>
       <div class="space-y-1 sm:col-span-2"><h4 class="text-sm font-bold text-gray-400 uppercase tracking-tight">Available Time Slots</h4><p class="text-xs text-gray-500 mb-2">Timezone: Europe/London</p>
-        <div class="flex flex-wrap gap-2 mt-2"><span class="bg-accent/10 text-accent px-3 py-1.5 rounded-lg text-sm font-medium">Thu 15 Oct, 17:00 - 18:00</span><span class="bg-accent/10 text-accent px-3 py-1.5 rounded-lg text-sm font-medium">Sat 17 Oct, 10:00 - 11:00</span><span class="bg-accent/10 text-accent px-3 py-1.5 rounded-lg text-sm font-medium">Mon 19 Oct, 18:00 - 19:00</span></div></div>
+        <div class="flex flex-wrap gap-2 mt-2"><span class="bg-legacy-accent/10 text-legacy-accent px-3 py-1.5 rounded-lg text-sm font-medium">Thu 15 Oct, 17:00 - 18:00</span><span class="bg-legacy-accent/10 text-legacy-accent px-3 py-1.5 rounded-lg text-sm font-medium">Sat 17 Oct, 10:00 - 11:00</span><span class="bg-legacy-accent/10 text-legacy-accent px-3 py-1.5 rounded-lg text-sm font-medium">Mon 19 Oct, 18:00 - 19:00</span></div></div>
     </div>
   </div>
   <div class="p-6 sm:p-10 bg-gray-50/50 w-full md:w-80 flex flex-col justify-center gap-4">
-    <button class="w-full py-5 bg-accent text-white font-black rounded-2xl text-lg">Select a Time Slot</button>
+    <button class="w-full py-5 bg-legacy-accent text-white font-black rounded-2xl text-lg">Select a Time Slot</button>
     <button class="w-full py-4 text-gray-400 font-bold">Decline</button>
   </div>
 </div>`
@@ -135,7 +135,7 @@ const SAMPLE_REQUEST = `
 const SAMPLE_THREAD = (() => {
     const sep = (label) => `<div class="flex items-center gap-3 py-3"><span class="flex-1 h-px bg-gray-200/70"></span><span class="text-[11px] font-medium text-gray-400 tracking-wide">${label}</span><span class="flex-1 h-px bg-gray-200/70"></span></div>`
     const inc = (time, lines) => `<div class="flex gap-2.5 mb-3"><div class="w-8 shrink-0"><div class="w-8 h-8 rounded-full bg-[#4f868e] text-white flex items-center justify-center text-xs font-semibold">AM</div></div><div class="min-w-0 max-w-[85%]"><div class="flex items-baseline gap-2 mb-1"><span class="text-[13px] font-semibold text-gray-900">Alex Morgan</span><span class="text-[11px] text-gray-400 tabular-nums">${time}</span></div>${lines.map((l) => `<div class="text-gray-700 mb-1.5">${l}</div>`).join('')}</div></div>`
-    const out = (time, lines) => `<div class="flex flex-col items-end mb-3">${lines.map((l, i) => `<div class="max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-accent text-white ${i === lines.length - 1 ? 'rounded-br-md' : 'mb-1'}">${l}</div>`).join('')}<div class="flex items-center gap-1.5 mt-1 px-0.5"><span class="text-[11px] text-gray-400 tabular-nums">${time}</span></div></div>`
+    const out = (time, lines) => `<div class="flex flex-col items-end mb-3">${lines.map((l, i) => `<div class="max-w-[70%] px-3.5 py-2.5 rounded-2xl bg-legacy-accent text-white ${i === lines.length - 1 ? 'rounded-br-md' : 'mb-1'}">${l}</div>`).join('')}<div class="flex items-center gap-1.5 mt-1 px-0.5"><span class="text-[11px] text-gray-400 tabular-nums">${time}</span></div></div>`
     return '<div>' +
         sep('Monday 5 October') +
         out('16:02', ["Hi Alex, I'm Emily and I'll be your mentor. I studied Computer Science at Cambridge, so I know the application well.", 'What would you like to focus on first?']) +

@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Trash2, Plus, X, Check, Star } from 'lucide-react'
+import { PencilSimple as Pencil, Trash as Trash2, Plus, X, Check, Star } from '@phosphor-icons/react/ssr'
+import { SelectField } from '@/components/ui/select'
+import { confirmDialog } from '@/components/ui/confirm'
 
 interface CreditPackage {
     id: string
@@ -128,7 +130,7 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this package?')) return
+        if (!(await confirmDialog({ title: 'Delete this package?', confirmLabel: 'Delete package', destructive: true }))) return
         setLoading(true)
         setError(null)
         try {
@@ -170,10 +172,10 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
     return (
         <div className="space-y-8">
             {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm flex items-center justify-between">
+                <div className="p-4 bg-tint-rose border border-border rounded-card text-tint-rose-foreground text-sm flex items-center justify-between">
                     {error}
-                    <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
-                        <X className="w-4 h-4" />
+                    <button onClick={() => setError(null)} className="text-destructive hover:text-tint-rose-foreground">
+                        <X className="size-4" />
                     </button>
                 </div>
             )}
@@ -182,81 +184,75 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
             {!isCreating && !editingId && (
                 <button
                     onClick={() => { setIsCreating(true); resetForm(); }}
-                    className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                 >
-                    <Plus className="w-5 h-5" />
-                    Add New Package
+                    <Plus className="size-5" />
+                    Add new package
                 </button>
             )}
 
             {/* Create/Edit Form */}
             {(isCreating || editingId) && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
-                    <h3 className="text-xl font-bold text-gray-900 mb-6">
-                        {isCreating ? 'Create New Package' : 'Edit Package'}
+                <div className="border border-transparent bg-card rounded-card p-6 shadow-border">
+                    <h3 className="text-xl font-semibold text-foreground mb-6">
+                        {isCreating ? 'Create new package' : 'Edit package'}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Package Name</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Package name</label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="e.g., Starter"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Credits (Hours)</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Credits (Hours)</label>
                             <input
                                 type="number"
                                 min="1"
                                 value={formData.credits}
                                 onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Price (in pence/cents)</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Price (in pence/cents)</label>
                             <input
                                 type="number"
                                 min="0"
                                 value={formData.price_cents}
                                 onChange={(e) => setFormData({ ...formData, price_cents: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                                 placeholder="4900 = £49.00"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Display: {formatPrice(formData.price_cents, formData.currency)}
                             </p>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Currency</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Currency</label>
                             <div className="relative">
-                                <select
+                                <SelectField
                                     value={formData.currency}
                                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none appearance-none transition-all pr-10"
                                 >
                                     <option value="gbp">GBP (£)</option>
                                     <option value="usd">USD ($)</option>
                                     <option value="eur">EUR (€)</option>
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </div>
+                                </SelectField>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Sort Order</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Sort order</label>
                             <input
                                 type="number"
                                 min="0"
                                 value={formData.sort_order}
                                 onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm h-11 in-data-[density=compact]:h-9 px-3.5"
                             />
                         </div>
                         <div className="flex items-center gap-6 pt-6">
@@ -265,26 +261,26 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                                     type="checkbox"
                                     checked={formData.is_popular}
                                     onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="size-5 rounded border-border text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm font-medium text-gray-700">Popular</span>
+                                <span className="text-sm font-medium text-foreground">Popular</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={formData.is_active}
                                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent"
+                                    className="size-5 rounded border-border text-primary focus:ring-primary"
                                 />
-                                <span className="text-sm font-medium text-gray-700">Active</span>
+                                <span className="text-sm font-medium text-foreground">Active</span>
                             </label>
                         </div>
                         <div className="md:col-span-2 lg:col-span-3">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Description</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none resize-none"
+                                className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 in-data-[density=compact]:sm:text-sm py-2.5 px-3.5 leading-relaxed resize-none"
                                 rows={2}
                                 placeholder="Brief description shown to students"
                             />
@@ -294,14 +290,14 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                         <button
                             onClick={isCreating ? handleCreate : handleUpdate}
                             disabled={loading || !formData.name || formData.credits < 1}
-                            className="flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-control hover:bg-primary/90 transition-colors disabled:opacity-50"
                         >
-                            <Check className="w-5 h-5" />
-                            {loading ? 'Saving...' : (isCreating ? 'Create Package' : 'Save Changes')}
+                            <Check className="size-5" />
+                            {loading ? 'Saving...' : (isCreating ? 'Create package' : 'Save changes')}
                         </button>
                         <button
                             onClick={cancelEdit}
-                            className="px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-11 px-5 text-base in-data-[density=compact]:h-9 in-data-[density=compact]:px-4 in-data-[density=compact]:text-sm"
                         >
                             Cancel
                         </button>
@@ -310,62 +306,62 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
             )}
 
             {/* Packages Table */}
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-card rounded-card border border-border overflow-hidden">
                 <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-muted/60 border-b border-border">
                         <tr>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Package</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Credits</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Price</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Status</th>
-                            <th className="text-left px-6 py-4 text-sm font-bold text-gray-600">Order</th>
-                            <th className="text-right px-6 py-4 text-sm font-bold text-gray-600">Actions</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Package</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Credits</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Price</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Status</th>
+                            <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Order</th>
+                            <th className="text-right px-6 py-4 text-sm font-semibold text-muted-foreground">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border">
                         {packages.map((pkg) => (
-                            <tr key={pkg.id} className={`hover:bg-gray-50 transition-colors ${!pkg.is_active ? 'opacity-50' : ''}`}>
+                            <tr key={pkg.id} className={`hover:bg-muted/60 transition-colors ${!pkg.is_active ? 'opacity-50' : ''}`}>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-bold text-gray-900">{pkg.name}</span>
+                                        <span className="font-semibold text-foreground">{pkg.name}</span>
                                         {pkg.is_popular && (
-                                            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                            <Star weight="fill" className="size-4 text-warning fill-amber-500" />
                                         )}
                                     </div>
                                     {pkg.description && (
-                                        <p className="text-sm text-gray-500 mt-1 truncate max-w-xs">{pkg.description}</p>
+                                        <p className="text-sm text-muted-foreground mt-1 truncate max-w-xs">{pkg.description}</p>
                                     )}
                                 </td>
-                                <td className="px-6 py-4 font-medium text-gray-700">{pkg.credits} hrs</td>
-                                <td className="px-6 py-4 font-bold text-accent">{formatPrice(pkg.price_cents, pkg.currency)}</td>
+                                <td className="px-6 py-4 font-medium text-foreground">{pkg.credits} hrs</td>
+                                <td className="px-6 py-4 font-semibold text-primary">{formatPrice(pkg.price_cents, pkg.currency)}</td>
                                 <td className="px-6 py-4">
                                     <button
                                         onClick={() => toggleActive(pkg)}
                                         disabled={loading}
-                                        className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${pkg.is_active
-                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                        className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${pkg.is_active
+                                            ? 'bg-tint-green text-tint-green-foreground hover:bg-tint-green/70'
+                                            : 'bg-muted text-muted-foreground hover:bg-muted'
                                             }`}
                                     >
                                         {pkg.is_active ? 'Active' : 'Inactive'}
                                     </button>
                                 </td>
-                                <td className="px-6 py-4 text-gray-500">{pkg.sort_order}</td>
+                                <td className="px-6 py-4 text-muted-foreground">{pkg.sort_order}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center justify-end gap-2">
                                         <button
                                             onClick={() => startEdit(pkg)}
                                             disabled={loading || isCreating || !!editingId}
-                                            className="p-2 text-gray-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors disabled:opacity-50"
+                                            className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:opacity-50"
                                         >
-                                            <Pencil className="w-4 h-4" />
+                                            <Pencil className="size-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(pkg.id)}
                                             disabled={loading || isCreating || !!editingId}
-                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                            className="p-2 text-muted-foreground hover:text-destructive hover:bg-tint-rose rounded-lg transition-colors disabled:opacity-50"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            <Trash2 className="size-4" />
                                         </button>
                                     </div>
                                 </td>
@@ -373,8 +369,8 @@ export default function CreditPackagesManager({ initialPackages }: Props) {
                         ))}
                         {packages.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                                    No credit packages yet. Create one to get started!
+                                <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                                    No credit packages yet. Create one to get started.
                                 </td>
                             </tr>
                         )}

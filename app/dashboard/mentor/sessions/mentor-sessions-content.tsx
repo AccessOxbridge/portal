@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Calendar, Video, FileText, Clock, ArrowRight, Users, MessageSquare, Hourglass, XCircle, CalendarPlus, CalendarClock } from 'lucide-react'
+import { CalendarBlank as Calendar, VideoCamera as Video, FileText, Clock, ArrowRight, Users, ChatCentered as MessageSquare, Hourglass, XCircle, CalendarPlus, CalendarDots as CalendarClock } from '@phosphor-icons/react/ssr'
+import { Avatar } from '@/components/ui/avatar'
 import { createClient } from '@/utils/supabase/client'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import MentorRequestSessionModal, { type MentorRequestStudentOption } from '@/components/dashboard/mentor-request-session-modal'
 import RescheduleSessionModal from '@/components/dashboard/reschedule-session-modal'
+import { toast } from '@/components/ui/toaster'
 
 interface Session {
     /** Present on public.sessions; was missing from this local interface. */
@@ -20,6 +22,7 @@ interface Session {
     zoom_join_url: string | null
     zoom_meeting_status: string | null
     student_full_name: string
+    student_photo_url?: string | null
     has_report: boolean
 }
 
@@ -27,6 +30,7 @@ interface PendingRequest {
     id: string
     created_at: string
     student_full_name: string
+    student_photo_url?: string | null
     proposed_start: string | null
     proposed_end: string | null
     note: string | null
@@ -219,10 +223,10 @@ export default function MentorSessionsContent({
                 body: JSON.stringify({ requestId })
             })
             const data = await res.json().catch(() => ({}))
-            if (!res.ok) throw new Error(data.error || 'Failed to cancel request')
+            if (!res.ok) throw new Error(data.error || "Couldn't cancel the request. Try again in a moment.")
             router.refresh()
         } catch (e) {
-            alert(e instanceof Error ? e.message : 'Failed to cancel request')
+            toast.error(e instanceof Error ? e.message : "Couldn't cancel the request. Try again in a moment.")
         } finally {
             setCancellingId(null)
         }
@@ -237,12 +241,12 @@ export default function MentorSessionsContent({
     return (
         <div className="space-y-8">
             {showReportSuccess && (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-sm flex items-center justify-between">
+                <div className="p-4 bg-tint-green border border-border text-tint-green-foreground rounded-card text-sm flex items-center justify-between">
                     <span className="font-semibold">Report successfully submitted.</span>
                     <button
                         type="button"
                         onClick={() => setShowReportSuccess(false)}
-                        className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold"
+                        className="text-tint-green-foreground hover:text-emerald-900 text-xs font-semibold"
                     >
                         Dismiss
                     </button>
@@ -250,59 +254,59 @@ export default function MentorSessionsContent({
             )}
             {/* Tab Switcher + Request a Session */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3">
-                <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
+                <div className="flex gap-2 p-1.5 bg-muted rounded-card w-full sm:w-fit max-w-full overflow-x-auto no-scrollbar">
                     <button
                         onClick={() => setActiveTab('pending')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'pending'
-                            ? 'bg-white text-amber-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'pending'
+                            ? 'bg-card text-warning shadow-border'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         Pending
                         {pendingRequests.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-tint-amber text-warning rounded-full text-xs">
                                 {pendingRequests.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('upcoming')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'upcoming'
-                            ? 'bg-white text-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'upcoming'
+                            ? 'bg-card text-primary shadow-border'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         Upcoming
                         {upcomingSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-accent/10 text-accent rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs">
                                 {upcomingSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('current')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'current'
-                            ? 'bg-white text-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'current'
+                            ? 'bg-card text-primary shadow-border'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         Current
                         {currentSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-tint-green text-tint-green-foreground rounded-full text-xs">
                                 {currentSessions.length}
                             </span>
                         )}
                     </button>
                     <button
                         onClick={() => setActiveTab('past')}
-                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === 'past'
-                            ? 'bg-white text-accent shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        className={`shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 rounded-control font-semibold text-sm transition-[background-color,box-shadow,color] duration-150 ${activeTab === 'past'
+                            ? 'bg-card text-primary shadow-border'
+                            : 'text-muted-foreground hover:text-foreground'
                             }`}
                     >
                         Completed
                         {pastSessions.length > 0 && (
-                            <span className="ml-2 px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full text-xs">
+                            <span className="ml-2 px-2 py-0.5 bg-muted text-muted-foreground rounded-full text-xs">
                                 {pastSessions.length}
                             </span>
                         )}
@@ -311,10 +315,10 @@ export default function MentorSessionsContent({
                 <button
                     type="button"
                     onClick={() => setShowRequestModal(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg shadow-accent/20"
+                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm"
                 >
-                    <CalendarPlus className="w-4 h-4" />
-                    Request a Session
+                    <CalendarPlus className="size-4" />
+                    Request a session
                 </button>
             </div>
 
@@ -322,22 +326,22 @@ export default function MentorSessionsContent({
             {activeTab === 'pending' && (
                 pendingRequests.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                            <Hourglass className="w-10 h-10 text-gray-400" />
+                        <div className="size-20 bg-muted rounded-full flex items-center justify-center mb-6">
+                            <Hourglass className="size-10 text-muted-foreground" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
                             No pending requests
                         </h3>
-                        <p className="text-gray-500 max-w-sm">
+                        <p className="text-muted-foreground max-w-sm">
                             When you request a session with a student, it will appear here until they respond.
                         </p>
                         <button
                             type="button"
                             onClick={() => setShowRequestModal(true)}
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-6"
                         >
-                            Request a Session
-                            <ArrowRight className="w-4 h-4" />
+                            Request a session
+                            <ArrowRight className="size-4" />
                         </button>
                     </div>
                 ) : (
@@ -345,46 +349,44 @@ export default function MentorSessionsContent({
                         {pendingRequests.map((request) => (
                             <div
                                 key={request.id}
-                                className="p-6 bg-white rounded-2xl border border-amber-200 shadow-lg shadow-amber-100/50 hover:shadow-xl transition-all"
+                                className="border border-transparent p-6 bg-card rounded-card shadow-border hover:shadow-border transition-[background-color,box-shadow,color] duration-150"
                             >
                                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                     <div className="flex items-start gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold shrink-0">
-                                            {request.student_full_name?.[0] || 'S'}
-                                        </div>
+                                        <Avatar name={request.student_full_name || 'Student'} src={request.student_photo_url} size="lg" />
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                            <h3 className="text-lg font-semibold text-foreground mb-1">
                                                 {request.reschedule_of_session_id
                                                     ? `Reschedule pending with ${request.student_full_name}`
                                                     : `Request sent to ${request.student_full_name}`}
                                             </h3>
-                                            <div className="flex items-center gap-3 text-sm text-gray-500">
+                                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                                 <span className="flex items-center gap-1.5">
-                                                    <Calendar className="w-4 h-4" />
+                                                    <Calendar className="size-4" />
                                                     Proposed: {formatSlot(request.proposed_start)}
                                                 </span>
                                             </div>
                                             {request.reschedule_of_session_id && request.original_scheduled_at && (
-                                                <p className="mt-1 text-xs text-gray-400">
+                                                <p className="mt-1 text-xs text-muted-foreground">
                                                     Current session: {formatSlot(request.original_scheduled_at)}
                                                 </p>
                                             )}
                                             {request.note && (
-                                                <p className="mt-2 text-sm text-gray-600 italic">&ldquo;{request.note}&rdquo;</p>
+                                                <p className="mt-2 text-sm text-muted-foreground italic">&ldquo;{request.note}&rdquo;</p>
                                             )}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-start md:items-end gap-2">
-                                        <span className="px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl text-sm font-bold whitespace-nowrap">
-                                            Awaiting Response
+                                        <span className="px-4 py-2.5 bg-tint-amber text-tint-amber-foreground rounded-control text-sm font-semibold whitespace-nowrap">
+                                            Awaiting response
                                         </span>
                                         <button
                                             type="button"
                                             onClick={() => handleCancelPending(request.id)}
                                             disabled={cancellingId === request.id}
-                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
+                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive hover:text-tint-rose-foreground disabled:opacity-50"
                                         >
-                                            <XCircle className="w-3.5 h-3.5" />
+                                            <XCircle className="size-3.5" />
                                             {cancellingId === request.id ? 'Cancelling…' : 'Cancel request'}
                                         </button>
                                     </div>
@@ -398,26 +400,26 @@ export default function MentorSessionsContent({
             {/* Sessions List */}
             {activeTab !== 'pending' && (sessionsForTab.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                        <Calendar className="w-10 h-10 text-gray-400" />
+                    <div className="size-20 bg-muted rounded-full flex items-center justify-center mb-6">
+                        <Calendar className="size-10 text-muted-foreground" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                         {activeTab === 'upcoming' && 'No upcoming sessions'}
                         {activeTab === 'current' && 'No current sessions'}
                         {activeTab === 'past' && 'No completed sessions'}
                     </h3>
-                    <p className="text-gray-500 max-w-sm">
+                    <p className="text-muted-foreground max-w-sm">
                         {activeTab === 'upcoming' && 'Once students book sessions with you, they will appear here.'}
                         {activeTab === 'past' && 'Your completed sessions will appear here.'}
                     </p>
                     {activeTab === 'upcoming' && (
                         <Link
                             href="/dashboard/mentor/requests"
-                            className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:scale-[1.02] transition-transform"
+                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base mt-6"
                         >
-                            <Users className="w-4 h-4" />
-                            View Requests
-                            <ArrowRight className="w-4 h-4" />
+                            <Users className="size-4" />
+                            View requests
+                            <ArrowRight className="size-4" />
                         </Link>
                     )}
                 </div>
@@ -426,27 +428,25 @@ export default function MentorSessionsContent({
                     {sessionsForTab.map((session) => (
                         <div
                             key={session.id}
-                            className="p-6 bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:shadow-gray-200/50 transition-all group"
+                            className="border border-transparent p-6 bg-card rounded-card shadow-border hover:shadow-border transition-[background-color,box-shadow,color] duration-150 group"
                         >
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                 <div className="flex items-start gap-4">
                                     {/* Student Avatar */}
-                                    <div className="w-14 h-14 rounded-2xl bg-accent text-white flex items-center justify-center text-lg font-bold shrink-0">
-                                        {session.student_full_name?.[0] || 'S'}
-                                    </div>
+                                    <Avatar name={session.student_full_name || 'Student'} src={session.student_photo_url} size="lg" />
 
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                        <h3 className="text-lg font-semibold text-foreground mb-1">
                                             Session with {session.student_full_name}
                                         </h3>
-                                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                             <span className="flex items-center gap-1.5">
-                                                <Calendar className="w-4 h-4" />
+                                                <Calendar className="size-4" />
                                                 {formatDate(session.scheduled_at)}
                                             </span>
                                             {session.scheduled_at && (
                                                 <span className="flex items-center gap-1.5">
-                                                    <Clock className="w-4 h-4" />
+                                                    <Clock className="size-4" />
                                                     {formatTime(session.scheduled_at)}
                                                 </span>
                                             )}
@@ -454,8 +454,8 @@ export default function MentorSessionsContent({
 
                                         {/* Status Badge */}
                                         {activeTab === 'upcoming' && isSessionSoon(session.scheduled_at) && (
-                                            <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold animate-pulse">
-                                                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                                            <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-tint-green text-tint-green-foreground rounded-full text-xs font-semibold animate-pulse">
+                                                <span className="size-2 bg-success rounded-full" />
                                                 Starting soon
                                             </span>
                                         )}
@@ -471,16 +471,16 @@ export default function MentorSessionsContent({
                                                     href={`/api/sessions/${session.id}/start`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className={`inline-flex items-center gap-2 px-5 py-2.5 font-bold rounded-xl transition-all ${isSessionSoon(session.scheduled_at)
-                                                        ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                                                        : 'bg-accent text-white hover:scale-[1.02]'
+                                                    className={`inline-flex items-center gap-2 px-5 py-2.5 font-semibold rounded-control transition-[background-color,box-shadow,color] duration-150 ${isSessionSoon(session.scheduled_at)
+                                                        ? 'bg-success text-white hover:bg-success/90 shadow-border'
+                                                        : 'bg-primary text-white'
                                                         }`}
                                                 >
-                                                    <Video className="w-4 h-4" />
-                                                    Start Session
+                                                    <Video className="size-4" />
+                                                    Start session
                                                 </a>
                                             ) : (
-                                                <span className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-xl text-sm font-medium">
+                                                <span className="px-4 py-2.5 bg-muted text-muted-foreground rounded-control text-sm font-medium">
                                                     Zoom link coming soon
                                                 </span>
                                             )}
@@ -488,9 +488,9 @@ export default function MentorSessionsContent({
                                                 <button
                                                     type="button"
                                                     onClick={() => setRescheduleSession(session)}
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 border border-transparent bg-card text-foreground shadow-border hover:bg-muted h-9 px-4 text-sm"
                                                 >
-                                                    <CalendarClock className="w-4 h-4" />
+                                                    <CalendarClock className="size-4" />
                                                     Reschedule
                                                 </button>
                                             )}
@@ -498,9 +498,9 @@ export default function MentorSessionsContent({
                                                 <button
                                                     type="button"
                                                     onClick={() => setReportSessionId(session.id)}
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-semibold hover:bg-red-100 transition-colors"
+                                                    className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-tint-rose text-tint-rose-foreground hover:bg-tint-rose/70 h-9 px-4 text-sm"
                                                 >
-                                                    <MessageSquare className="w-4 h-4" />
+                                                    <MessageSquare className="size-4" />
                                                     Report
                                                 </button>
                                             )}
@@ -510,15 +510,15 @@ export default function MentorSessionsContent({
                                             {!session.has_report ? (
                                                 <Link
                                                     href={`/dashboard/mentor/sessions/${session.id}/report`}
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl hover:bg-amber-200 transition-colors"
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-tint-amber text-tint-amber-foreground font-semibold rounded-control hover:bg-tint-amber transition-colors"
                                                 >
-                                                    <FileText className="w-4 h-4" />
-                                                    Submit Report
+                                                    <FileText className="size-4" />
+                                                    Submit report
                                                 </Link>
                                             ) : (
-                                                <span className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-100 text-green-700 font-medium rounded-xl">
-                                                    <FileText className="w-4 h-4" />
-                                                    Report Submitted
+                                                <span className="inline-flex items-center gap-2 px-4 py-2.5 bg-tint-green text-tint-green-foreground font-medium rounded-control">
+                                                    <FileText className="size-4" />
+                                                    Report submitted
                                                 </span>
                                             )}
                                         </div>
@@ -547,36 +547,36 @@ export default function MentorSessionsContent({
             />
 
             {reportSessionId && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center">
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         onClick={() => { setReportSessionId(null); setReportError(null) }}
                     />
-                    <div className="relative z-50 w-full max-w-md mx-4 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                    <div className="border border-transparent relative z-50 w-full max-w-md mx-4 bg-card rounded-card shadow-border overflow-hidden">
+                        <div className="p-6 border-b border-border flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-extrabold text-gray-900">Report a Problem</h2>
-                                <p className="text-sm text-gray-500 mt-1">Let us know if your student didn&apos;t show up.</p>
+                                <h2 className="text-xl font-semibold text-foreground">Report a problem</h2>
+                                <p className="text-sm text-muted-foreground mt-1">Let us know if your student didn&apos;t show up.</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => { setReportSessionId(null); setReportError(null) }}
-                                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-gray-500 text-sm font-semibold"
+                                className="size-9 rounded-full bg-muted flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground text-sm font-semibold"
                             >
                                 ×
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
-                            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
-                                <p className="text-sm text-gray-800 font-medium">
+                            <div className="p-4 bg-tint-rose border border-border rounded-card">
+                                <p className="text-sm text-foreground font-medium">
                                     Is the student absent?
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                     Only use this if your student hasn&apos;t joined the Zoom room after the scheduled start time.
                                 </p>
                             </div>
                             {reportError && (
-                                <p className="text-sm text-red-600">{reportError}</p>
+                                <p className="text-sm text-destructive">{reportError}</p>
                             )}
                             <button
                                 type="button"
@@ -593,19 +593,19 @@ export default function MentorSessionsContent({
                                         })
                                         const data = await res.json().catch(() => ({}))
                                         if (!res.ok) {
-                                            setReportError(data.error || 'Failed to submit report')
+                                            setReportError(data.error || "Couldn't send your report. Try again in a moment.")
                                             return
                                         }
                                         setReportSessionId(null)
                                         setShowReportSuccess(true)
                                         setTimeout(() => setShowReportSuccess(false), 4000)
                                     } catch {
-                                        setReportError('Something went wrong. Please try again.')
+                                        setReportError("Something went wrong. Try again in a moment.")
                                     } finally {
                                         setReportSubmitting(false)
                                     }
                                 }}
-                                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white font-bold text-sm shadow-lg shadow-red-200 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-destructive text-white hover:bg-destructive/90 h-11 px-5 text-base w-full"
                             >
                                 {reportSubmitting ? 'Submitting…' : 'Yes, student is absent'}
                             </button>

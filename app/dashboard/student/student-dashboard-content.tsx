@@ -1,18 +1,24 @@
 'use client'
 
+import { useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { Calendar, Clock, Video, ArrowRight } from 'lucide-react'
+import { CalendarBlank as Calendar, VideoCamera as Video, Buildings, BookOpen, Hourglass, Plus } from '@phosphor-icons/react/ssr'
+import { Avatar } from '@/components/ui/avatar'
+import { ProgressRing } from '@/components/ui/progress'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/utils/lib'
 import AcademicProfileCard from '@/components/dashboard/academic-profile-card'
 import WeeklyCalendar from '@/components/dashboard/weekly-calendar'
 import ApplicationTimeline from '@/components/dashboard/application-timeline'
 import { useStudentCredits } from '@/components/dashboard/student-credits-provider'
-import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
+import { formatDateInTz, formatTimeInTz, getZonedNow, resolveTz } from '@/lib/timezone'
 
 interface UpcomingSession {
     id: string
     scheduled_at: string
     zoom_join_url: string | null
     mentor_full_name: string
+    mentor_photo_url?: string | null
 }
 
 interface AcademicProfile {
@@ -37,12 +43,16 @@ interface StudentDashboardContentProps {
     activeSession: any
     pendingRequests: any[]
     upcomingSessions: UpcomingSession[]
+    /** Past and upcoming sessions for the week calendar. */
+    calendarSessions?: (UpcomingSession & { duration_minutes: number | null })[]
     academicProfile: AcademicProfile | null
     hasMentors?: boolean
     userId: string
     userName: string
     greetingName: string
     sessionsThisWeek?: number
+    /** Hours taken off so far; the ring shows hours left out of left + used. */
+    hoursUsed?: number
     timezone?: string | null
 }
 
@@ -51,22 +61,23 @@ export default function StudentDashboardContent({
     activeSession,
     pendingRequests,
     upcomingSessions,
+    calendarSessions,
     academicProfile,
     hasMentors = false,
     userId,
     userName,
     greetingName,
     sessionsThisWeek = 0,
+    hoursUsed = 0,
     timezone = null
 }: StudentDashboardContentProps) {
-    const formatDate = (dateString: string) =>
-        formatDateInTz(dateString, timezone, { weekday: 'short', day: 'numeric', month: 'short' })
-
     const formatTime = (dateString: string) => formatTimeInTz(dateString, timezone)
+
+    // The time the card's state is judged against; moved on by one timer below.
+    const [now, setNow] = useState(() => Date.now())
 
     const isSessionSoon = (dateString: string) => {
         const sessionTime = new Date(dateString).getTime()
-        const now = Date.now()
         const oneHour = 60 * 60 * 1000
         return sessionTime - now <= oneHour && sessionTime > now
     }
@@ -83,203 +94,293 @@ export default function StudentDashboardContent({
     // Booking also requires at least one admin-assigned mentor.
     const canBook = !!profileComplete && hasMentors
 
+    const credits: number = profile?.credits || 0
+    const nextAt: string | null = activeSession?.scheduled_at ?? null
+    const nextZoomUrl: string | null =
+        activeSession?.zoom_join_url ?? upcomingSessions.find((s) => s.id === activeSession?.id)?.zoom_join_url ?? null
+    const startingSoon = !!nextAt && isSessionSoon(nextAt)
+
+    // Re-render once, at the moment the next session enters its final hour,
+    // so a page left open flips to "Join session" without a reload. A single
+    // timer, not polling; nothing is fetched.
+    useEffect(() => {
+        if (!nextAt) return
+        const flipAt = new Date(nextAt).getTime() - 60 * 60 * 1000
+        const wait = flipAt - Date.now()
+        if (wait <= 0 || wait > 2 ** 31 - 1) return
+        const timer = setTimeout(() => setNow(Date.now()), wait + 500)
+        return () => clearTimeout(timer)
+    }, [nextAt])
+
+    // The three target chips share one quiet style.
+    const chip = 'inline-flex items-center gap-1.5 rounded-full bg-tint-blue px-3 py-1.5 text-sm font-medium text-tint-blue-foreground [&_svg]:size-4'
+    const firstName = greetingName.trim().split(/\s+/)[0] || greetingName
+
+    // Whatever is "up next" sits in one warm card: the next session, a pending
+    // request, or the step that unlocks booking. Same states and buttons as
+    // before, one place for them.
+    const bookButton = (label: string) =>
+        canBook ? (
+            <button type="button" onClick={tryOpenBookSession} className={buttonVariants()}>
+                <Plus weight="bold" />
+                {label}
+            </button>
+        ) : !profileComplete ? (
+            <Link href="/dashboard/student/profile" className={buttonVariants()}>
+                Complete profile
+            </Link>
+        ) : (
+            <span className="inline-flex h-11 items-center rounded-full bg-card/70 px-4 text-sm text-tint-amber-foreground">
+                Mentor assignment pending
+            </span>
+        )
+
     return (
         <>
-            <div className="space-y-10">
-                {/* Top row: heading + welcome aligned with hours remaining & bell (same vertical level) */}
-                <div className="flex flex-wrap items-center justify-between gap-4 -mt-1 md:-mt-5">
+            <div className="space-y-6 md:space-y-8">
+                {/* Top row: greeting aligned with hours remaining & bell (same vertical level) */}
+                <Rise i={0} className="flex flex-wrap items-center justify-between gap-4 -mt-1 md:-mt-5">
                     <div>
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight">
-                            Student Dashboard
+                        <p className="text-sm font-medium text-muted-foreground">Welcome back</p>
+                        <h1 className="mt-0.5 text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                            Hi {firstName}
                         </h1>
-                        <p className="mt-4 text-gray-500 text-xl font-medium">Welcome back, {greetingName}!</p>
-                    </div>
-                    {/* Spacer so fixed hours/bell sit on the right without overlapping this row */}
-                    <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
-                </div>
-
-                <header className="mb-12 flex flex-col md:flex-row md:items-start justify-between gap-6 mt-6">
-                    <div className="flex-1 min-w-0">
-                        {/* Academic Profile + Targets on left */}
-                        <div className="space-y-4">
-                            <AcademicProfileCard userId={userId} userName={userName} />
-
-                            {/* Targets Section */}
-                            {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
-                                <div className="flex flex-wrap items-center gap-3">
-                                    {academicProfile.target_university && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                            </svg>
-                                            {academicProfile.target_university}
-                                        </span>
-                                    )}
-                                    {academicProfile.target_course && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                            </svg>
-                                            {academicProfile.target_course}
-                                        </span>
-                                    )}
-                                    {academicProfile.application_year && (
-                                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold">
-                                            <Calendar className="w-4 h-4" />
-                                            {academicProfile.application_year} Entry
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="w-full md:w-[360px] shrink-0">
-                        {activeSession ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 w-full">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-gray-900 truncate">Active Mentorship</h3>
-                                        <p className="text-sm text-gray-500 mt-0.5 truncate">Mentor: <strong>{activeSession.mentor_full_name}</strong></p>
-                                    </div>
-                                </div>
-                                {activeSession.scheduled_at && (
-                                    <p className="text-accent font-bold text-sm mt-4">
-                                        {formatDate(activeSession.scheduled_at)} · {formatTime(activeSession.scheduled_at)}
-                                    </p>
+                        {academicProfile && (academicProfile.target_university || academicProfile.target_course) && (
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                                {academicProfile.target_university && (
+                                    <span className={chip}>
+                                        <Buildings weight="duotone" />
+                                        {academicProfile.target_university}
+                                    </span>
                                 )}
-                            </div>
-                        ) : pendingRequests.length > 0 ? (
-                            <div className="p-6 bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-200/50 w-full flex flex-col">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                                        <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-gray-900 truncate">Request Pending</h3>
-                                        <p className="text-sm text-gray-500 mt-2 leading-relaxed">We've sent your request to your mentor. We'll notify you once they confirm a time!</p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-5">
-                                    <Link
-                                        href="/dashboard/student/sessions"
-                                        className="block w-full py-3 bg-accent text-white font-bold text-[18px] rounded-2xl shadow-lg shadow-accent/20 hover:scale-[1.02] transition-all text-center mb-3"
-                                    >
-                                        View Pending Requests
-                                    </Link>
-                                    {canBook ? (
-                                        <button
-                                            onClick={tryOpenBookSession}
-                                            className="block w-full py-3 text-accent font-semibold text-[16px] text-center border-2 border-accent/20 rounded-2xl hover:bg-accent/5 transition-colors"
-                                        >
-                                            + Book Another Session
-                                        </button>
-                                    ) : !profileComplete ? (
-                                        <Link
-                                            href="/dashboard/student/profile"
-                                            className="block w-full py-3 text-amber-600 font-semibold text-[16px] text-center border-2 border-amber-200 rounded-2xl hover:bg-amber-50 transition-colors"
-                                        >
-                                            Complete Profile to Book
-                                        </Link>
-                                    ) : (
-                                        <p className="block w-full py-3 text-gray-400 text-[14px] text-center">
-                                            Your mentor will be assigned by the team soon.
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="p-6 bg-accent rounded-[32px] shadow-2xl shadow-accent/30 w-full space-y-6">
-                                <div className="space-y-3">
-                                    <p className="text-xs font-semibold text-white/70 uppercase tracking-wider">
-                                        This Week
-                                    </p>
-                                    <div className="flex items-baseline gap-2.5 flex-wrap">
-                                        <span className="text-6xl font-extrabold text-white leading-none tabular-nums">
-                                            {sessionsThisWeek}
-                                        </span>
-                                        <span className="text-white/80 font-medium text-base">
-                                            {sessionsThisWeek === 1 ? 'session booked' : 'sessions booked'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {canBook ? (
-                                    <button
-                                        type="button"
-                                        onClick={tryOpenBookSession}
-                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
-                                    >
-                                        Book a Session
-                                    </button>
-                                ) : !profileComplete ? (
-                                    <Link
-                                        href="/dashboard/student/profile"
-                                        className="flex w-full items-center justify-center bg-rich-amber-accent text-accent font-bold py-3.5 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-black/10"
-                                    >
-                                        Complete Profile
-                                    </Link>
-                                ) : (
-                                    <span className="flex w-full items-center justify-center bg-white/10 text-white/80 font-semibold py-3.5 px-6 rounded-2xl text-sm">
-                                        Mentor assignment pending
+                                {academicProfile.target_course && (
+                                    <span className={chip}>
+                                        <BookOpen weight="duotone" />
+                                        {academicProfile.target_course}
+                                    </span>
+                                )}
+                                {academicProfile.application_year && (
+                                    <span className={chip}>
+                                        <Calendar weight="duotone" />
+                                        {academicProfile.application_year} entry
                                     </span>
                                 )}
                             </div>
                         )}
                     </div>
-                </header>
+                    {/* Spacer so fixed hours/bell sit on the right without overlapping this row */}
+                    <div className="w-0 md:w-[280px] shrink-0" aria-hidden="true" />
+                </Rise>
+
+                {/* Wide screens: the up-next card beside hours and profile. Narrower
+                    (tablets, laptops under 1280px): the card spans the row, the two
+                    small cards sit side by side underneath. */}
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <Rise i={1} className="md:col-span-2 xl:row-span-2">
+                        <div
+                            className={cn(
+                                'flex h-full flex-col gap-5 rounded-card p-6 ring-1 transition-colors duration-300 sm:flex-row sm:items-center sm:gap-6 sm:p-7',
+                                startingSoon ? 'bg-tint-green ring-success/30' : 'bg-tint-amber ring-warning/30',
+                            )}
+                        >
+                            {activeSession ? (
+                                <>
+                                    <Avatar name={activeSession.mentor_full_name || 'Mentor'} src={activeSession.mentor_photo_url} size="xl" className="size-20 shrink-0 text-2xl ring-4 ring-card" />
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <p className={cn('text-sm font-medium', startingSoon ? 'text-tint-green-foreground' : 'text-tint-amber-foreground')}>
+                                                {startingSoon ? 'Starting soon' : 'Up next'}
+                                            </p>
+                                            {nextAt && !startingSoon && (
+                                                <span className="rounded-full bg-card px-2.5 py-0.5 text-xs font-medium text-tint-amber-foreground">
+                                                    {relativeDay(nextAt, timezone)}
+                                                </span>
+                                            )}
+                                            {startingSoon && (
+                                                <span className="relative flex size-2">
+                                                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-success/60 motion-reduce:animate-none" />
+                                                    <span className="relative inline-flex size-2 rounded-full bg-success" />
+                                                </span>
+                                            )}
+                                        </div>
+                                        {nextAt ? (
+                                            <>
+                                                <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground text-balance">
+                                                    {formatDateInTz(nextAt, timezone, { weekday: 'long', day: 'numeric', month: 'long' })}
+                                                </p>
+                                                <p className={cn('mt-1 text-lg tabular-nums', startingSoon ? 'text-tint-green-foreground' : 'text-tint-amber-foreground')}>
+                                                    {formatTime(nextAt)} with {activeSession.mentor_full_name}
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground text-balance">Active mentorship</p>
+                                                <p className="mt-1 text-lg text-tint-amber-foreground">Mentor: {activeSession.mentor_full_name}</p>
+                                            </>
+                                        )}
+                                        <div className="mt-5 flex flex-wrap gap-2">
+                                            {startingSoon ? (
+                                                nextZoomUrl ? (
+                                                    credits > 0 ? (
+                                                        <a href={nextZoomUrl} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants(), 'bg-success hover:bg-success/90')}>
+                                                            <Video weight="fill" />
+                                                            Join session
+                                                        </a>
+                                                    ) : (
+                                                        <Link href="/dashboard/student/services" className={cn(buttonVariants(), 'bg-warning hover:bg-warning/90')}>
+                                                            Top up to join
+                                                        </Link>
+                                                    )
+                                                ) : (
+                                                    <span className="inline-flex h-11 items-center rounded-full bg-card/70 px-4 text-sm text-tint-green-foreground">
+                                                        Zoom link pending
+                                                    </span>
+                                                )
+                                            ) : (
+                                                canBook && bookButton('Book another session')
+                                            )}
+                                            <Link href="/dashboard/student/sessions" className={buttonVariants({ variant: 'secondary' })}>
+                                                View my sessions
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : pendingRequests.length > 0 ? (
+                                <>
+                                    <span className="grid size-20 shrink-0 place-items-center rounded-full bg-card text-tint-amber-foreground">
+                                        <Hourglass weight="duotone" className="size-9" />
+                                    </span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-sm font-medium text-tint-amber-foreground">Up next</p>
+                                        <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground">Request pending</p>
+                                        <p className="mt-1 max-w-prose text-base text-tint-amber-foreground text-pretty">We've sent your request to your mentor. We'll let you know once they confirm a time.</p>
+                                        <div className="mt-5 flex flex-wrap gap-2">
+                                            <Link href="/dashboard/student/sessions" className={buttonVariants()}>
+                                                View pending requests
+                                            </Link>
+                                            {canBook ? (
+                                                <button type="button" onClick={tryOpenBookSession} className={buttonVariants({ variant: 'secondary' })}>
+                                                    <Plus weight="bold" />
+                                                    Book another session
+                                                </button>
+                                            ) : !profileComplete ? (
+                                                <Link href="/dashboard/student/profile" className={buttonVariants({ variant: 'secondary' })}>
+                                                    Complete profile to book
+                                                </Link>
+                                            ) : (
+                                                <span className="inline-flex h-11 items-center px-1 text-sm text-tint-amber-foreground">
+                                                    Your mentor will be assigned by the team soon.
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="grid size-20 shrink-0 place-items-center rounded-full bg-card text-tint-amber-foreground">
+                                        <Calendar weight="duotone" className="size-9" />
+                                    </span>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <p className="text-sm font-medium text-tint-amber-foreground">Up next</p>
+                                            <span className="rounded-full bg-card px-2.5 py-0.5 text-xs font-medium text-tint-amber-foreground tabular-nums">
+                                                {sessionsThisWeek} {sessionsThisWeek === 1 ? 'session' : 'sessions'} this week
+                                            </span>
+                                        </div>
+                                        <p className="mt-1.5 text-3xl font-semibold tracking-tight text-foreground text-balance">
+                                            {canBook ? 'Book your next session' : !profileComplete ? 'Complete your profile' : 'Your mentor is on the way'}
+                                        </p>
+                                        <p className="mt-1 text-lg text-tint-amber-foreground text-pretty">
+                                            {canBook ? 'Pick a few times that suit you and your mentor chooses one.' : !profileComplete ? 'Finish your profile so we can match you with a mentor.' : 'The team is choosing your mentor.'}
+                                        </p>
+                                        <div className="mt-5 flex flex-wrap gap-2">
+                                            {bookButton('Book a session')}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </Rise>
+
+                    <Rise i={2}>
+                        <div className="flex h-full flex-col items-center justify-center gap-3 rounded-card border border-transparent bg-card p-6 text-center shadow-border">
+                            <ProgressRing
+                                value={credits}
+                                max={Math.max(credits + hoursUsed, 1)}
+                                size={104}
+                                stroke={8}
+                                label={`${credits} of ${credits + hoursUsed} hours left`}
+                                tone={credits > 0 ? 'success' : 'warning'}
+                            >
+                                <span className="text-3xl font-semibold tracking-tight text-foreground">{credits}</span>
+                            </ProgressRing>
+                            <div>
+                                <p className="font-medium text-foreground tabular-nums">
+                                    {hoursUsed > 0 ? `of ${credits + hoursUsed} hours left` : credits === 1 ? 'hour left' : 'hours left'}
+                                </p>
+                                <p className="text-sm text-muted-foreground tabular-nums">
+                                    {sessionsThisWeek} {sessionsThisWeek === 1 ? 'session' : 'sessions'} booked this week
+                                </p>
+                            </div>
+                        </div>
+                    </Rise>
+
+                    <Rise i={3}>
+                        <AcademicProfileCard userId={userId} userName={userName} />
+                    </Rise>
+                </div>
 
                 {/* Application Timeline */}
-                <ApplicationTimeline
-                    applicationYear={academicProfile?.application_year}
-                    entranceExamDate={academicProfile?.entrance_exam_date}
-                />
+                <Rise i={4}>
+                    <ApplicationTimeline
+                        applicationYear={academicProfile?.application_year}
+                        entranceExamDate={academicProfile?.entrance_exam_date}
+                        targetUniversity={academicProfile?.target_university}
+                    />
+                </Rise>
 
                 {/* Weekly Calendar */}
-                <div className="mb-10">
+                <Rise i={5}>
                     <WeeklyCalendar
-                        sessions={upcomingSessions.map(s => ({
+                        sessions={(calendarSessions ?? upcomingSessions.map(s => ({ ...s, duration_minutes: null }))).map(s => ({
                             id: s.id,
                             scheduled_at: s.scheduled_at,
+                            duration_minutes: s.duration_minutes,
                             zoom_url: s.zoom_join_url,
-                            person_name: s.mentor_full_name
+                            person_name: s.mentor_full_name,
+                            person_photo_url: s.mentor_photo_url ?? null
                         }))}
                         personLabel="Mentor"
                         credits={profile?.credits || 0}
                         timezone={timezone}
                     />
-                </div>
-
-                {/* Learning Resources — hidden from student home view
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div className={`p-8 bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-indigo-100 transition-all group ${upcomingSessions.length === 0 ? 'lg:col-span-2' : ''}`}>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Learning Resources</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {[
-                                { label: 'Oxbridge Strategy', slug: 'oxbridge-admissions' },
-                                { label: 'Personal Statement Guide', slug: 'personal-statement' },
-                                { label: 'Interview Mastery', slug: 'interview-tips' },
-                                { label: 'Subject Deep Dives', slug: 'uk-universities' },
-                            ].map(({ label, slug }) => (
-                                <Link key={slug} href={`/dashboard/student/resources?category=${slug}`} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:border-accent/30 transition-colors flex items-center justify-between group/item">
-                                    <span className="font-semibold text-gray-700">{label}</span>
-                                    <svg className="w-5 h-5 text-gray-300 group-hover/item:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-                */}
+                </Rise>
             </div>
         </>
+    )
+}
+
+/** "Today", "Tomorrow" or "In 3 days", counted in the student's timezone. */
+function relativeDay(iso: string, timezone: string | null) {
+    const tz = resolveTz(timezone)
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date(iso))
+    const diff = Math.round((Date.parse(day) - Date.parse(getZonedNow(tz).date)) / 86400000)
+    if (diff <= 0) return 'Today'
+    if (diff === 1) return 'Tomorrow'
+    return `In ${diff} days`
+}
+
+/**
+ * First-load entrance (better-ui): 100ms apart, 12px rise with 4px blur over
+ * 300ms ease-out. Under reduced motion it only fades. Runs once per visit.
+ */
+function Rise({ i, className, children }: { i: number; className?: string; children: ReactNode }) {
+    return (
+        <div
+            className={cn('animate-in fade-in-0 slide-in-from-bottom-3 blur-in-4 duration-300 ease-snappy fill-mode-both motion-reduce:slide-in-from-bottom-0 motion-reduce:blur-in-0', className)}
+            style={{ animationDelay: `${i * 100}ms` }}
+        >
+            {children}
+        </div>
     )
 }

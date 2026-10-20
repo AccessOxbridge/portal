@@ -250,7 +250,7 @@ export default async function StudentMessagesPage({
                 this page is, and three stacked headers before any content
                 was the main thing making this screen feel cluttered. */}
             <header className="shrink-0 px-4 md:px-10 pt-4 md:pt-5 pb-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-accent tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                     Messages
                 </h1>
             </header>

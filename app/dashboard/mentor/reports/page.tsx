@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MentorReportsContent from './reports-content'
+import { isBillableLength } from '@/utils/session-billing'
 
 export default async function MentorReportsPage() {
     const supabase = await createClient()
@@ -31,8 +32,10 @@ export default async function MentorReportsPage() {
             scheduled_at,
             status,
             zoom_meeting_status,
+            actual_minutes,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -52,25 +55,25 @@ export default async function MentorReportsPage() {
         submittedReports?.map(r => [r.session_id, r.created_at]) || []
     )
 
-    const now = new Date()
-
     // Process sessions into to-complete and completed categories
     const processedSessions = (sessions || []).map((session: any) => ({
         id: session.id,
         scheduled_at: session.scheduled_at,
         status: session.status,
         zoom_meeting_status: session.zoom_meeting_status,
+        actual_minutes: session.actual_minutes ?? null,
         student_full_name: session.student?.full_name || 'Student',
+        student_photo_url: session.student?.photo_url || null,
         has_report: submittedSessionIds.has(session.id),
         submitted_at: submissionDates.get(session.id) || null
     }))
 
-    // Sessions that need reports: completed/ended sessions without reports
+    // Sessions that need reports: ones that took place (completed, or ended
+    // on Zoom; the same rule as payouts) without a report. Cancelled and
+    // never-started sessions don't need one.
     const toComplete = processedSessions.filter(session => {
-        // Session must be past or ended
-        const isPast = session.scheduled_at && new Date(session.scheduled_at) < now
         const isEnded = session.zoom_meeting_status === 'ended' || session.status === 'completed'
-        return (isPast || isEnded) && !session.has_report
+        return isEnded && isBillableLength(session.actual_minutes) && !session.has_report
     }).sort((a, b) => {
         // Most recent first (they need attention)
         if (!a.scheduled_at) return 1
@@ -90,10 +93,10 @@ export default async function MentorReportsPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
-                    Session Reports
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    Session reports
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Submit reports after each session to help generate personalised feedback for students
                 </p>
             </header>

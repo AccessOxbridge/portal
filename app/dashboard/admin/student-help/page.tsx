@@ -73,21 +73,21 @@ export default async function StudentHelpPage() {
     return (
         <div className="max-w-7xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Student Help Requests
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Student help requests
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Manage help requests submitted by students from the feedback page
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
-                    <div className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg font-medium">
-                        {openCount} Open
+                    <div className="px-3 py-1.5 bg-tint-rose text-destructive rounded-lg font-medium">
+                        {openCount} open
                     </div>
-                    <div className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg font-medium">
-                        {inProgressCount} In Progress
+                    <div className="px-3 py-1.5 bg-tint-blue text-brand rounded-lg font-medium">
+                        {inProgressCount} in progress
                     </div>
-                    <div className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg font-medium">
-                        {resolvedCount} Resolved
+                    <div className="px-3 py-1.5 bg-tint-green text-success rounded-lg font-medium">
+                        {resolvedCount} resolved
                     </div>
                 </div>
             </header>

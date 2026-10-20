@@ -24,12 +24,12 @@ export function ArticleMarkdown({ body }: { body: string }) {
                 ul: ({ children }) => <ul className="list-disc pl-6 mb-6 space-y-1">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal pl-6 mb-6 space-y-1">{children}</ol>,
                 a: ({ children, href }) => (
-                    <a href={href} className="text-accent font-semibold underline hover:text-accent/80" target="_blank" rel="noopener noreferrer">
+                    <a href={href} className="text-legacy-accent font-semibold underline hover:text-legacy-accent/80" target="_blank" rel="noopener noreferrer">
                         {children}
                     </a>
                 ),
                 blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-accent bg-accent/5 px-8 py-6 italic text-gray-700 rounded-r-2xl my-8 text-xl">
+                    <blockquote className="border-l-4 border-legacy-accent bg-legacy-accent/5 px-8 py-6 italic text-gray-700 rounded-r-2xl my-8 text-xl">
                         {children}
                     </blockquote>
                 ),

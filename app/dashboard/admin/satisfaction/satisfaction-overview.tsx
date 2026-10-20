@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ArrowDownRight, ArrowRight, ArrowUpRight, MessageSquareHeart } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, ChatTeardropText as MessageSquareHeart } from '@phosphor-icons/react/ssr'
 import {
     CartesianGrid,
     Legend,
@@ -31,7 +31,7 @@ interface SatisfactionOverviewProps {
 }
 
 const METRICS = [
-    { key: 'portal', label: 'Portal', colour: '#092c68' },
+    { key: 'portal', label: 'Portal', colour: '#13275a' },
     { key: 'mentoring', label: 'Mentoring', colour: '#4f868e' },
     { key: 'progress', label: 'Progress', colour: '#ffb81d' },
 ] as const
@@ -42,11 +42,11 @@ const average = (values: number[]) =>
     values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null
 
 function scoreColour(value: number | null) {
-    if (value === null) return 'text-gray-400'
-    if (value >= 4.5) return 'text-green-600'
-    if (value >= 4) return 'text-lime-600'
-    if (value >= 3) return 'text-amber-500'
-    return 'text-red-600'
+    if (value === null) return 'text-muted-foreground'
+    if (value >= 4.5) return 'text-success'
+    if (value >= 4) return 'text-success'
+    if (value >= 3) return 'text-warning'
+    return 'text-destructive'
 }
 
 /**
@@ -117,12 +117,12 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
 
     if (rows.length === 0) {
         return (
-            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
-                    <MessageSquareHeart className="w-7 h-7 text-accent" />
+            <div className="bg-card rounded-card border border-border p-12 text-center">
+                <div className="size-14 rounded-card bg-primary/10 flex items-center justify-center mx-auto">
+                    <MessageSquareHeart className="size-7 text-primary" />
                 </div>
-                <p className="mt-4 font-bold text-gray-900">No check-ins yet</p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-4 font-semibold text-foreground">No check-ins yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">
                     Students are asked once they reach 4 completed sessions.
                 </p>
             </div>
@@ -138,20 +138,20 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
                     return (
                         <div
                             key={metric.key}
-                            className="bg-white rounded-2xl border border-gray-200 p-6"
+                            className="bg-card rounded-card border border-border p-6"
                         >
-                            <p className="text-sm font-medium text-gray-500 mb-1">
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
                                 {metric.label}
                             </p>
                             <p
-                                className={`text-3xl font-black flex items-center gap-2 ${scoreColour(value)}`}
+                                className={`text-3xl font-semibold flex items-center gap-2 ${scoreColour(value)}`}
                             >
-                                {value !== null ? value.toFixed(1) : '—'}
-                                <span className="text-lg text-gray-400">/ 5</span>
+                                {value !== null ? value.toFixed(1) : 'None'}
+                                <span className="text-lg text-muted-foreground">/ 5</span>
                                 {delta !== null && <TrendArrow delta={delta} />}
                             </p>
                             {delta !== null && (
-                                <p className="text-xs text-gray-400 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                     {delta >= 0 ? '+' : ''}
                                     {delta.toFixed(2)} vs. before this month
                                 </p>
@@ -159,18 +159,18 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
                         </div>
                     )
                 })}
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Responses</p>
-                    <p className="text-3xl font-black text-gray-900">{rows.length}</p>
-                    <p className="text-xs text-gray-400 mt-1">
+                <div className="bg-card rounded-card border border-border p-6">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Responses</p>
+                    <p className="text-3xl font-semibold text-foreground">{rows.length}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                         from {new Set(rows.map((r) => r.studentId)).size} students
                     </p>
                 </div>
             </div>
 
             {trend.length > 1 && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <h2 className="font-bold text-gray-900 mb-4">Averages over time</h2>
+                <div className="bg-card rounded-card border border-border p-6">
+                    <h2 className="font-semibold text-foreground mb-4">Averages over time</h2>
                     <div className="h-72">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={trend}>
@@ -199,11 +199,11 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
                 </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                <h2 className="font-bold text-gray-900 p-6 pb-4">All responses</h2>
+            <div className="bg-card rounded-card border border-border overflow-hidden">
+                <h2 className="font-semibold text-foreground p-6 pb-4">All responses</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="bg-gray-50 text-gray-500">
+                        <thead className="bg-muted/60 text-muted-foreground">
                             <tr>
                                 <th className="text-left font-semibold px-6 py-3">Student</th>
                                 <th className="text-left font-semibold px-6 py-3">At</th>
@@ -214,29 +214,29 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
                                 <th className="text-left font-semibold px-6 py-3">Submitted</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-border">
                             {rows.map((row) => (
                                 <tr key={`${row.studentId}-${row.sessionCount}`}>
-                                    <td className="px-6 py-3 font-semibold text-gray-900 whitespace-nowrap">
+                                    <td className="px-6 py-3 font-semibold text-foreground whitespace-nowrap">
                                         {row.studentName}
                                     </td>
-                                    <td className="px-6 py-3 text-gray-500 whitespace-nowrap">
+                                    <td className="px-6 py-3 text-muted-foreground whitespace-nowrap">
                                         {row.sessionCount} sessions
                                     </td>
                                     {METRICS.map((metric) => (
                                         <td
                                             key={metric.key}
-                                            className={`px-6 py-3 text-center font-bold ${scoreColour(row[metric.key])}`}
+                                            className={`px-6 py-3 text-center font-semibold ${scoreColour(row[metric.key])}`}
                                         >
                                             {row[metric.key]}
                                         </td>
                                     ))}
-                                    <td className="px-6 py-3 text-gray-600 max-w-md">
+                                    <td className="px-6 py-3 text-muted-foreground max-w-md">
                                         {row.comment?.trim() || (
-                                            <span className="text-gray-300">—</span>
+                                            <span className="text-muted-foreground">None</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-3 text-gray-500 whitespace-nowrap">
+                                    <td className="px-6 py-3 text-muted-foreground whitespace-nowrap">
                                         {new Date(row.submittedAt).toLocaleDateString('en-GB', {
                                             day: 'numeric',
                                             month: 'short',
@@ -251,20 +251,20 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
             </div>
 
             {comments.length > 0 && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                    <h2 className="font-bold text-gray-900 mb-4">
+                <div className="bg-card rounded-card border border-border p-6">
+                    <h2 className="font-semibold text-foreground mb-4">
                         What students wrote ({comments.length})
                     </h2>
                     <div className="space-y-3">
                         {comments.map((row) => (
                             <div
                                 key={`${row.studentId}-${row.sessionCount}`}
-                                className="p-4 rounded-2xl bg-gray-50 border border-gray-100"
+                                className="p-4 rounded-card bg-muted/60 border border-border"
                             >
-                                <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                                     {row.comment}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-2">
+                                <p className="text-xs text-muted-foreground mt-2">
                                     {row.studentName} · {row.sessionCount} sessions ·{' '}
                                     {new Date(row.submittedAt).toLocaleDateString('en-GB', {
                                         day: 'numeric',
@@ -284,10 +284,10 @@ export default function SatisfactionOverview({ rows }: SatisfactionOverviewProps
 function TrendArrow({ delta }: { delta: number }) {
     // A tenth of a point either way is noise at these sample sizes, so it
     // reads as flat rather than as a direction.
-    if (Math.abs(delta) < 0.1) return <ArrowRight className="w-5 h-5 text-gray-400" />
+    if (Math.abs(delta) < 0.1) return <ArrowRight className="size-5 text-muted-foreground" />
     return delta > 0 ? (
-        <ArrowUpRight className="w-5 h-5 text-green-600" />
+        <ArrowUpRight className="size-5 text-success" />
     ) : (
-        <ArrowDownRight className="w-5 h-5 text-red-600" />
+        <ArrowDownRight className="size-5 text-destructive" />
     )
 }

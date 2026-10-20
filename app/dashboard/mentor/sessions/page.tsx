@@ -42,7 +42,8 @@ export default async function MentorSessionsPage() {
             zoom_join_url,
             zoom_meeting_status,
             student:profiles!sessions_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -71,6 +72,7 @@ export default async function MentorSessionsPage() {
         zoom_join_url: session.zoom_join_url,
         zoom_meeting_status: session.zoom_meeting_status,
         student_full_name: session.student?.full_name || 'Student',
+        student_photo_url: session.student?.photo_url || null,
         has_report: reportSet.has(session.id)
     }))
 
@@ -83,7 +85,8 @@ export default async function MentorSessionsPage() {
             responses,
             reschedule_of_session_id,
             student:profiles!mentorship_requests_student_id_fkey (
-                full_name
+                full_name,
+                photo_url
             )
         `)
         .eq('mentor_id', user.id)
@@ -106,6 +109,7 @@ export default async function MentorSessionsPage() {
             id: req.id,
             created_at: req.created_at,
             student_full_name: req.student?.full_name || 'Student',
+            student_photo_url: req.student?.photo_url || null,
             proposed_start: slot?.startTime || null,
             proposed_end: slot?.endTime || null,
             note: req.responses?.note || null,
@@ -139,10 +143,10 @@ export default async function MentorSessionsPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-accent tracking-tight">
-                    My Sessions
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                    My sessions
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View your scheduled and completed mentorship sessions
                 </p>
             </header>

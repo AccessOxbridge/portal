@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { buttonVariants } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -35,58 +36,58 @@ export default async function PaymentSuccessPage({
     }
 
     return (
-        <div className="max-w-2xl mx-auto text-center py-16">
+        <div className="mx-auto max-w-xl py-12 text-center sm:py-16">
             {/* Success Icon */}
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
-                <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-auto mb-6 grid size-20 place-items-center rounded-full bg-success text-white ring-8 ring-tint-green animate-in zoom-in-50 fade-in-0 duration-500 ease-snappy motion-reduce:animate-none">
+                <svg className="size-10" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-                Payment Successful! 🎉
+            <h1 className="mb-3 text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+                Payment successful 🎉
             </h1>
 
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="mb-8 text-lg text-muted-foreground text-pretty">
                 Your credits have been added to your account.
             </p>
 
             {/* Credits Added */}
             {purchase && (
-                <div className="bg-accent/5 border border-accent/20 rounded-3xl p-8 mb-8">
-                    <div className="text-6xl font-black text-accent mb-2">
+                <div className="mb-4 rounded-card bg-tint-blue p-8">
+                    <div className="mb-1 text-6xl font-semibold tracking-tight text-brand tabular-nums">
                         +{purchase.credits_purchased}
                     </div>
-                    <p className="text-gray-600">credits added</p>
+                    <p className="text-tint-blue-foreground">credits added</p>
                 </div>
             )}
 
             {/* New Balance */}
-            <div className="bg-gray-50 rounded-2xl p-6 mb-10">
-                <p className="text-gray-500 text-sm mb-1">Your New Balance</p>
-                <p className="text-3xl font-bold text-gray-900">
-                    {profile?.credits || 0} Credits
+            <div className="mb-8 rounded-card bg-card p-6 shadow-border">
+                <p className="mb-1 text-sm text-muted-foreground">Your new balance</p>
+                <p className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+                    {profile?.credits || 0} credits
                 </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col justify-center gap-2 sm:flex-row">
                 <Link
                     href="/dashboard/student"
-                    className="px-8 py-4 bg-accent text-white font-bold rounded-2xl hover:bg-accent/90 transition-all shadow-lg shadow-accent/20"
+                    className={buttonVariants({ size: 'lg' })}
                 >
-                    Start Booking Sessions
+                    Start booking sessions
                 </Link>
                 <Link
                     href="/dashboard/student/credits"
-                    className="px-8 py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition-all"
+                    className={buttonVariants({ variant: 'secondary', size: 'lg' })}
                 >
-                    Buy More Credits
+                    Buy more credits
                 </Link>
             </div>
 
             {/* Receipt Note */}
-            <p className="mt-10 text-sm text-gray-400">
+            <p className="mt-8 text-sm text-muted-foreground">
                 A receipt has been sent to your email address.
             </p>
         </div>

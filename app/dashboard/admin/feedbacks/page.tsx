@@ -145,10 +145,10 @@ export default async function AdminFeedbacksPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Student Feedback
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Student feedback
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     Review feedback from students about their mentorship sessions
                 </p>
             </header>

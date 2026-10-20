@@ -3,8 +3,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { Check, Dot } from '@phosphor-icons/react/ssr'
 import { registerMentor } from './actions'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/field'
+import { cn } from '@/utils/lib'
 
 interface PasswordValidation {
     minLength: boolean
@@ -53,96 +57,70 @@ export function MentorRegisterForm({ error }: { error?: string }) {
     const errorMessage = error ? (ERROR_COPY[error] || ERROR_COPY.failed) : null
     const canSubmit = isPasswordValid && isEmailValid && passwordsMatch && !isLoading
 
+    const rule = (ok: boolean, text: string) => (
+        <li className={cn('flex items-center gap-1.5', ok ? 'text-success' : 'text-destructive')}>
+            {ok ? <Check weight="bold" className="size-3.5 shrink-0" /> : <Dot weight="bold" className="size-3.5 shrink-0" />}
+            {text}
+        </li>
+    )
+
     return (
-        <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-white selection:bg-accent/30 selection:text-accent">
-            <div className="hidden lg:flex flex-col justify-between w-1/2 bg-accent p-16 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[120px]" />
+        <div className="flex min-h-[100dvh] bg-background">
+            {/* Brand panel (desktop): the same frame as the login page. */}
+            <aside className="relative hidden w-[44%] max-w-2xl shrink-0 flex-col overflow-hidden bg-primary px-12 py-10 text-primary-foreground lg:flex xl:px-16">
+                <div aria-hidden className="pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-white/[0.06] blur-3xl" />
+                <div aria-hidden className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand/20 blur-3xl" />
+
+                <div className="relative flex items-center gap-4">
+                    <Image src="/logo.png" alt="" width={56} height={56} priority className="shrink-0 [mix-blend-mode:screen]" />
+                    <span className="text-2xl font-extrabold tracking-tight">Access Oxbridge</span>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="z-10"
-                >
-                    <div className="flex items-center gap-4 mb-12">
-                        <Image
-                            src="/logo.png"
-                            alt="Logo"
-                            width={60}
-                            height={60}
-                            className="[mix-blend-mode:screen]"
-                        />
-                        <span className="text-3xl font-bold text-white tracking-tight">
-                            Access Oxbridge
+                <div className="relative my-auto max-w-md py-10">
+                    <h2 className="text-4xl font-semibold leading-tight tracking-tight text-balance xl:text-5xl">Become a mentor</h2>
+                    <p className="mt-5 text-lg leading-relaxed text-primary-foreground/75 text-pretty">
+                        Create an account, complete a short application, then wait while we review it. You will only start mentoring after we approve you.
+                    </p>
+                    <ol className="mt-10 space-y-4">
+                        {['Create your mentor account', 'Fill in your application', 'We review it, usually within 24 to 48 hours'].map((step, i) => (
+                            <li key={step} className="flex items-center gap-3.5 text-base font-medium">
+                                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/10 text-sm font-semibold tabular-nums ring-1 ring-white/15">{i + 1}</span>
+                                {step}
+                            </li>
+                        ))}
+                    </ol>
+                </div>
+
+                <p className="relative text-sm text-primary-foreground/60">© 2026 Access Oxbridge. All rights reserved.</p>
+            </aside>
+
+            {/* Form */}
+            <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+                <div className="w-full max-w-sm">
+                    <div className="mb-8 flex items-center justify-center gap-2.5 lg:hidden">
+                        <span className="grid size-11 place-items-center rounded-full bg-primary">
+                            <Image src="/logo.png" alt="" width={32} height={32} className="[mix-blend-mode:screen]" />
                         </span>
+                        <span className="text-xl font-extrabold tracking-tight text-primary">Access Oxbridge</span>
                     </div>
 
-                    <div className="mt-20 xl:mt-24">
-                        <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
-                            Become a mentor
-                        </h2>
-                        <p className="text-white/70 text-lg leading-relaxed max-w-md mb-10">
-                            Create an account, complete a short application, then wait while we review it. You will only start mentoring after we approve you.
-                        </p>
-                        <ol className="space-y-5 text-white">
-                            <li className="flex gap-4">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm font-bold">1</span>
-                                <span className="pt-1 font-medium">Create your mentor account</span>
-                            </li>
-                            <li className="flex gap-4">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm font-bold">2</span>
-                                <span className="pt-1 font-medium">Fill in your application</span>
-                            </li>
-                            <li className="flex gap-4">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm font-bold">3</span>
-                                <span className="pt-1 font-medium">We review it, usually within 24 to 48 hours</span>
-                            </li>
-                        </ol>
-                    </div>
-                </motion.div>
-
-                <div className="z-10 text-white/60 text-sm font-medium">
-                    © 2026 Access Oxbridge. All rights reserved.
-                </div>
-            </div>
-
-            <div className="w-full lg:w-1/2 flex items-center lg:items-start justify-center p-6 md:p-12 lg:p-16 lg:pt-16 lg:h-screen lg:overflow-y-auto">
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="w-full max-w-md"
-                >
-                    <div className="lg:hidden mb-8 flex flex-col items-center">
-                        <Image
-                            src="/logo.png"
-                            alt="Logo"
-                            width={50}
-                            height={50}
-                            className="mb-4 rounded-xl shadow-lg"
-                        />
-                        <h1 className="text-2xl font-bold text-accent">Access Oxbridge</h1>
-                    </div>
-
-                    <div className="mb-10 text-center lg:text-left">
-                        <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Create your mentor account</h1>
+                    <div className="mb-8 text-center lg:text-left">
+                        <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance">Create your mentor account</h1>
+                        <p className="mt-2 text-muted-foreground text-pretty lg:hidden">You&apos;ll fill in a short application next. We review it within 24 to 48 hours.</p>
                     </div>
 
                     {errorMessage && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-sm font-medium text-red-700">
+                        <div role="alert" className="mb-6 rounded-control bg-tint-rose px-4 py-3 text-sm font-medium text-tint-rose-foreground ring-1 ring-destructive/20">
                             {errorMessage}{' '}
                             {error === 'exists' && (
-                                <Link href="/login" className="underline font-bold">
+                                <Link href="/login" className="font-semibold underline underline-offset-2">
                                     Log in
                                 </Link>
                             )}
                         </div>
                     )}
 
-                    <form className="relative space-y-6" onSubmit={() => setIsLoading(true)}>
+                    <form className="relative space-y-5" onSubmit={() => setIsLoading(true)}>
                         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                             <label htmlFor="company_website">Company website</label>
                             <input
@@ -154,26 +132,21 @@ export function MentorRegisterForm({ error }: { error?: string }) {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="full_name">
-                                Full name
-                            </label>
-                            <input
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="full_name">Full name</Label>
+                            <Input
                                 id="full_name"
                                 name="full_name"
                                 type="text"
                                 required
                                 autoComplete="name"
                                 placeholder="Jane Smith"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all duration-200 text-gray-900"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="email">
-                                Email address
-                            </label>
-                            <input
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="email">Email address</Label>
+                            <Input
                                 id="email"
                                 name="email"
                                 type="email"
@@ -183,23 +156,18 @@ export function MentorRegisterForm({ error }: { error?: string }) {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 onFocus={() => setIsEmailTouched(true)}
-                                className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showEmailError
-                                    ? 'border-red-300 focus:ring-red-100'
-                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
-                                    }`}
+                                aria-invalid={showEmailError || undefined}
                             />
                             {showEmailError && (
-                                <p className="text-xs text-red-500 font-medium ml-1">
+                                <p className="text-sm text-destructive">
                                     Please enter a valid email address
                                 </p>
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="password">
-                                Password
-                            </label>
-                            <input
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
                                 id="password"
                                 name="password"
                                 type="password"
@@ -209,41 +177,24 @@ export function MentorRegisterForm({ error }: { error?: string }) {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 onFocus={() => setIsTouched(true)}
-                                className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showValidation
-                                    ? 'border-red-300 focus:ring-red-100'
-                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
-                                    }`}
+                                aria-invalid={showValidation || undefined}
                             />
                             {showValidation && (
-                                <div className="p-3 bg-red-50 rounded-lg space-y-2 mt-2">
-                                    <p className="text-xs font-bold text-red-800 uppercase tracking-wider">Password must include:</p>
-                                    <ul className="text-xs space-y-1">
-                                        <li className={validation.minLength ? 'text-green-600' : 'text-red-500'}>
-                                            <span className="inline-block w-4">{validation.minLength ? '✓' : '•'}</span>
-                                            At least 8 characters
-                                        </li>
-                                        <li className={validation.hasUppercase ? 'text-green-600' : 'text-red-500'}>
-                                            <span className="inline-block w-4">{validation.hasUppercase ? '✓' : '•'}</span>
-                                            At least one uppercase letter
-                                        </li>
-                                        <li className={validation.hasLowercase ? 'text-green-600' : 'text-red-500'}>
-                                            <span className="inline-block w-4">{validation.hasLowercase ? '✓' : '•'}</span>
-                                            At least one lowercase letter
-                                        </li>
-                                        <li className={validation.hasNumber ? 'text-green-600' : 'text-red-500'}>
-                                            <span className="inline-block w-4">{validation.hasNumber ? '✓' : '•'}</span>
-                                            At least one number
-                                        </li>
+                                <div className="mt-1 rounded-control bg-tint-rose/60 px-3 py-2.5">
+                                    <p className="text-xs font-semibold text-foreground">Password must include:</p>
+                                    <ul className="mt-1.5 space-y-1 text-xs">
+                                        {rule(validation.minLength, 'At least 8 characters')}
+                                        {rule(validation.hasUppercase, 'At least one uppercase letter')}
+                                        {rule(validation.hasLowercase, 'At least one lowercase letter')}
+                                        {rule(validation.hasNumber, 'At least one number')}
                                     </ul>
                                 </div>
                             )}
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1" htmlFor="confirm_password">
-                                Confirm password
-                            </label>
-                            <input
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="confirm_password">Confirm password</Label>
+                            <Input
                                 id="confirm_password"
                                 name="confirm_password"
                                 type="password"
@@ -252,57 +203,35 @@ export function MentorRegisterForm({ error }: { error?: string }) {
                                 placeholder="••••••••"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-gray-900 ${showMismatch
-                                    ? 'border-red-300 focus:ring-red-100'
-                                    : 'border-gray-200 focus:ring-accent/20 focus:border-accent'
-                                    }`}
+                                aria-invalid={showMismatch || undefined}
                             />
                             {showMismatch && (
-                                <p className="text-xs text-red-500 font-medium ml-1">
+                                <p className="text-sm text-destructive">
                                     Passwords do not match
                                 </p>
                             )}
                         </div>
 
-                        <button
-                            formAction={registerMentor}
-                            disabled={!canSubmit}
-                            className={`w-full py-4 px-4 rounded-xl text-white font-bold text-base shadow-lg transition-all duration-300 transform active:scale-[0.98] ${canSubmit
-                                ? 'bg-accent hover:bg-[#07214d] hover:shadow-accent/40'
-                                : 'bg-gray-300 cursor-not-allowed shadow-none'
-                                } flex items-center justify-center gap-2`}
-                        >
-                            {isLoading ? (
-                                <span className="flex items-center gap-2">
-                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Creating account...
-                                </span>
-                            ) : (
-                                'Create mentor account'
-                            )}
-                        </button>
+                        <Button formAction={registerMentor} disabled={!canSubmit} loading={isLoading} size="lg" className="w-full">
+                            {isLoading ? 'Creating account' : 'Create mentor account'}
+                        </Button>
 
-                        <p className="text-center text-xs text-gray-400">
+                        <p className="text-center text-xs leading-relaxed text-muted-foreground text-pretty">
                             By continuing, you agree to our{' '}
-                            <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Terms of Service</a>
+                            <a href="https://www.accessoxbridge.io/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</a>
                             {' '}and{' '}
-                            <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Privacy Policy</a>.
+                            <a href="https://www.accessoxbridge.io/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</a>.
                         </p>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-600 font-medium">
-                            Already have an account?{' '}
-                            <Link href="/login" className="text-accent font-bold hover:underline decoration-2 underline-offset-4">
-                                Log in
-                            </Link>
-                        </p>
-                    </div>
-                </motion.div>
-            </div>
+                    <p className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+                        Already have an account?{' '}
+                        <Link href="/login" className="font-semibold text-brand hover:underline underline-offset-4">
+                            Log in
+                        </Link>
+                    </p>
+                </div>
+            </main>
         </div>
     )
 }

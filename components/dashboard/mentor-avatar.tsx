@@ -11,17 +11,17 @@
 interface MentorAvatarProps {
     name: string
     photoUrl?: string | null
-    /** Tailwind size classes; defaults to the 56px tile the session rows use. */
+    /** Tailwind size classes; defaults to the 48px circle the session rows use. */
     sizeClassName?: string
-    /** Fallback tile colours, so amber (pending) and accent (booked) both work. */
+    /** Fallback colours, so amber (pending) and blue (booked) both work. */
     fallbackClassName?: string
 }
 
 export default function MentorAvatar({
     name,
     photoUrl = null,
-    sizeClassName = 'w-14 h-14',
-    fallbackClassName = 'bg-accent text-white',
+    sizeClassName = 'size-12',
+    fallbackClassName = 'bg-tint-blue text-tint-blue-foreground',
 }: MentorAvatarProps) {
     if (photoUrl) {
         return (
@@ -32,14 +32,14 @@ export default function MentorAvatar({
             <img
                 src={photoUrl}
                 alt=""
-                className={`${sizeClassName} rounded-2xl object-cover shrink-0`}
+                className={`${sizeClassName} rounded-full object-cover shrink-0 outline-1 -outline-offset-1 outline-black/10`}
             />
         )
     }
 
     return (
         <div
-            className={`${sizeClassName} ${fallbackClassName} rounded-2xl flex items-center justify-center text-lg font-bold shrink-0`}
+            className={`${sizeClassName} ${fallbackClassName} rounded-full flex items-center justify-center text-base font-semibold shrink-0`}
             aria-hidden
         >
             {name?.[0]?.toUpperCase() || 'M'}

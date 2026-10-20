@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Calendar, Clock } from 'lucide-react'
+import { X, CalendarBlank as Calendar, Clock } from '@phosphor-icons/react/ssr'
+import { sheet } from '@/components/ui/sheet-classes'
+import { cn } from '@/utils/lib'
 import { addMinutesToWallTime, getZonedNow, resolveTz, zonedTimeToUtcISO } from '@/lib/timezone'
 import DatePicker from '@/components/dashboard/date-picker'
 import SelectMenu from '@/components/dashboard/select-menu'
@@ -144,7 +146,7 @@ export default function MentorRequestSessionModal({
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || 'Failed to send session request.')
+                throw new Error(result.error || "Couldn't send your session request. Try again in a moment.")
             }
 
             router.refresh()
@@ -160,34 +162,36 @@ export default function MentorRequestSessionModal({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className={sheet.root}>
+            <div className={sheet.overlay} onClick={onClose} />
 
-            <div className="relative bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl w-full max-w-xl sm:mx-4 max-h-[92dvh] sm:max-h-[90vh] overflow-hidden flex flex-col">
-                <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between gap-3">
+            <div role="dialog" aria-modal="true" aria-labelledby="request-session-title" className={cn(sheet.panel, 'sm:max-w-xl')}>
+                <div className={sheet.handle}><span className={sheet.handleBar} /></div>
+                <div className={sheet.header}>
                     <div>
-                        <h2 className="text-2xl font-extrabold text-gray-900">Request a Session</h2>
-                        <p className="text-gray-500 mt-1">Propose a time for your student to confirm</p>
+                        <h2 id="request-session-title" className={sheet.title}>Request a session</h2>
+                        <p className={sheet.description}>Propose a time for your student to confirm</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                        aria-label="Close"
+                        className={sheet.close}
                     >
-                        <X className="w-5 h-5 text-gray-600" />
+                        <X className="size-5" />
                     </button>
                 </div>
 
-                <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
-                    <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                <div className={cn(sheet.body, 'space-y-5')}>
+                    <div className="rounded-card bg-tint-blue p-4">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
-                                <Calendar className="w-4 h-4 text-accent" />
+                            <div className="grid size-8 shrink-0 place-items-center rounded-full bg-card text-tint-blue-foreground">
+                                <Calendar weight="duotone" className="size-4" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-700 leading-relaxed">
+                                <p className="text-sm text-foreground leading-relaxed">
                                     Choose a student and propose one time. They&apos;ll be able to accept or decline it from their Pending tab.
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                     Timezone: <strong>{tz}</strong>
                                 </p>
                             </div>
@@ -196,7 +200,7 @@ export default function MentorRequestSessionModal({
 
                     {!preselectedStudentId && (
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Student</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Student</label>
                             <SelectMenu
                                 value={studentId}
                                 onChange={setStudentId}
@@ -207,9 +211,9 @@ export default function MentorRequestSessionModal({
                         </div>
                     )}
 
-                    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 space-y-4">
+                    <div className="bg-muted/60 rounded-card p-5 border border-border space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1.5">Date</label>
+                            <label className="mb-1.5 block text-sm font-medium text-foreground">Date</label>
                             <DatePicker
                                 value={date}
                                 min={todayDate}
@@ -218,7 +222,7 @@ export default function MentorRequestSessionModal({
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">Start Time</label>
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">Start time</label>
                                 <SelectMenu
                                     value={startTime}
                                     onChange={setStartTime}
@@ -228,7 +232,7 @@ export default function MentorRequestSessionModal({
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1.5">End Time</label>
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">End time</label>
                                 <SelectMenu
                                     value={endTime}
                                     onChange={setEndTime}
@@ -252,46 +256,46 @@ export default function MentorRequestSessionModal({
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Message (optional)</label>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Message (optional)</label>
                         <textarea
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             rows={3}
                             placeholder="Let them know what you'd like to cover, or why you're proposing this time…"
-                            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all text-sm resize-none"
+                            className="w-full min-w-0 rounded-control border border-input bg-card text-base text-foreground placeholder:text-muted-foreground outline-none transition-[border-color,box-shadow] duration-150 ease-out focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60 py-2.5 px-3.5 leading-relaxed resize-none"
                         />
                     </div>
 
                     {error && (
-                        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="p-4 bg-tint-rose border border-border rounded-card flex items-center gap-3">
+                            <div className="size-8 rounded-full bg-tint-rose flex items-center justify-center shrink-0">
+                                <svg className="size-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p className="flex-1 text-red-700 text-sm leading-6">{error}</p>
-                            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 p-1 flex items-center justify-center">
-                                <X className="w-4 h-4" />
+                            <p className="flex-1 text-tint-rose-foreground text-sm leading-6">{error}</p>
+                            <button onClick={() => setError(null)} aria-label="Dismiss" className="grid size-8 shrink-0 place-items-center rounded-full text-tint-rose-foreground transition-colors hover:bg-white/60">
+                                <X className="size-4" />
                             </button>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                <div className={sheet.footer}>
                     <button
                         onClick={onClose}
-                        className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:text-gray-700 transition-colors"
+                        className="relative inline-flex h-11 shrink-0 items-center justify-center rounded-full px-5 text-base font-medium text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-muted active:scale-[0.96]"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !studentId || !date || !startTime || !endTime}
-                        className="bg-accent text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 inline-flex items-center justify-center gap-2"
+                        className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-5 text-base"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                <svg className="animate-spin size-5 text-white" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -299,8 +303,8 @@ export default function MentorRequestSessionModal({
                             </span>
                         ) : (
                             <>
-                                <Clock className="w-4 h-4" />
-                                Send Request
+                                <Clock className="size-4" />
+                                Send request
                             </>
                         )}
                     </button>

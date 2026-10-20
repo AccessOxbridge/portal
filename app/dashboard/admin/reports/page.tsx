@@ -109,18 +109,18 @@ export default async function AdminReportsPage() {
     return (
         <div className="max-w-7xl mx-auto">
             <header className="mb-10">
-                <h1 className="text-4xl font-extrabold text-accent tracking-tight">
-                    Session Reports
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
+                    Session reports
                 </h1>
-                <p className="mt-3 text-gray-500 text-lg">
+                <p className="mt-2 text-lg text-muted-foreground">
                     View all session reports generated for student-mentor sessions
                 </p>
                 <div className="mt-4 flex gap-4 text-sm">
-                    <div className="px-3 py-1.5 bg-accent/10 text-accent rounded-lg font-medium">
-                        {tableData.length} Total Reports
+                    <div className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg font-medium">
+                        {tableData.length} total reports
                     </div>
-                    <div className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg font-medium">
-                        {tableData.filter(r => r.personalized_report).length} With Personalized Reports
+                    <div className="px-3 py-1.5 bg-tint-green text-success rounded-lg font-medium">
+                        {tableData.filter(r => r.personalized_report).length} with personalised reports
                     </div>
                 </div>
             </header>

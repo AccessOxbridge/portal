@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, X, Loader2 } from 'lucide-react'
+import { ChatCentered as MessageSquare, X, CircleNotch as Loader2 } from '@phosphor-icons/react/ssr'
 import ChatWindow from '@/components/chat/v2/chat-window'
 import { ensureMentorSupportThread } from '../../messages/actions'
 
@@ -41,30 +41,30 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
             <button
                 type="button"
                 onClick={openChat}
-                className="p-2 text-gray-400 hover:text-accent transition-colors"
-                title="Message Mentor"
+                className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                title="Message mentor"
             >
-                <MessageSquare className="w-4 h-4" />
+                <MessageSquare className="size-4" />
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/40"
+                        className="absolute inset-0 bg-black/40 animate-in fade-in-0 duration-200 motion-reduce:animate-none"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="relative w-full max-w-lg h-[640px] max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                    <div className="border border-transparent relative w-full max-w-lg h-[640px] max-h-[85vh] bg-card rounded-sheet overflow-hidden flex flex-col shadow-overlay animate-in fade-in-0 zoom-in-96 duration-200 ease-snappy motion-reduce:animate-none">
                         {/* Modal header */}
-                        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+                        <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/60">
                             <div>
-                                <p className="text-sm font-semibold text-gray-900">Message {mentorName}</p>
-                                <p className="text-[11px] text-gray-400">Sending as Claire Marlowe · Access Oxbridge</p>
+                                <p className="text-sm font-semibold text-foreground">Message {mentorName}</p>
+                                <p className="text-[11px] text-muted-foreground">Sending as Claire Marlowe · Access Oxbridge</p>
                             </div>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="p-2 hover:bg-muted rounded-lg transition-colors"
                             >
-                                <X className="w-5 h-5 text-gray-400" />
+                                <X className="size-5 text-muted-foreground" />
                             </button>
                         </div>
 
@@ -73,17 +73,17 @@ export function MentorMessageButton({ mentorId, mentorName, photoUrl }: MentorMe
                             {isLoading || !thread ? (
                                 error ? (
                                     <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-                                        <p className="text-sm text-red-600 font-medium">{error}</p>
+                                        <p className="text-sm text-destructive font-medium">{error}</p>
                                         <button
                                             onClick={openChat}
-                                            className="mt-3 px-4 py-2 bg-accent text-white text-sm font-semibold rounded-xl hover:bg-accent/90 transition-colors"
+                                            className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3 mt-3"
                                         >
                                             Try again
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="flex-1 flex items-center justify-center">
-                                        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                                        <Loader2 className="size-6 text-primary animate-spin" />
                                     </div>
                                 )
                             ) : (

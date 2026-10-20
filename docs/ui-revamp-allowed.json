@@ -1,0 +1,300 @@
+{
+    "_about": "Behaviour-contract differences that are explained and approved. Each entry: category, item exactly as the check prints it, and why. Anything not listed still fails G2.",
+    "allowed": [
+        {
+            "category": "form field name",
+            "item": "{name}",
+            "files": [
+                "components/dashboard/date-picker.tsx",
+                "components/ui/select.tsx"
+            ],
+            "why": "SelectField's hidden input. It carries the same name the replaced native <select> had, so form submissions are unchanged. DatePicker does the same for the session-target start date (approved by Raj on 2026-10-08): the field name is still written at the call site, and its input keeps the browser's required check."
+        },
+        {
+            "category": "href",
+            "item": "{nextZoomUrl}",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Join session within the last hour before the next session; same Zoom link and new-tab behaviour as the week calendar's Join."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/student/services",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Top up to join at 0 hours; the same destination the week calendar already uses."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/student/sessions",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. View my sessions link to the existing sessions page."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/timezone > getZonedNow",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Pure date helper for the 'Today / Tomorrow / In 2 days' label. Fetches nothing."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/timezone > resolveTz",
+            "files": [
+                "app/dashboard/student/student-dashboard-content.tsx"
+            ],
+            "why": "Student home \"Up next\" card, approved by Raj on 2026-10-08. Pure date helper for the same label. Fetches nothing."
+        },
+        {
+            "category": "supabase table",
+            "item": "'sessions'",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Bug fix requested by Raj on 2026-10-08: the student home's week calendar only received upcoming sessions, so past days always looked empty. One extra read-only SELECT of the student's own recent sessions (active or completed, newest 200) feeds the calendar; ended sessions are shown without Join."
+        },
+        {
+            "category": "data import",
+            "item": "@/lib/mentor-photo > getMentorPhotoUrl",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-08: show mentor photos on the student home (up-next card, week calendar) and in the booking sheet. Read-only: the existing session and assignment queries also select photo_url:mentors(photo_url), the same pattern the sessions, reports and recordings pages use; this helper only reads it."
+        },
+        {
+            "category": "href",
+            "item": "{href}",
+            "files": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "why": "The admin home's Shortcut card forwards its href prop to <Link>. The four destinations are still written out literally on each <Shortcut href=\"...\">, so the gate counts them unchanged."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/blog",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/clients",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/creators",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/admin/mentors",
+            "removedFrom": [
+                "app/dashboard/admin/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the admin home is now AdminOverview. The old home's four shortcut cards (clients, mentors, blog, creators) and its stale 'Payment processing is not yet available' notice are gone; every one of those pages is still in the admin sidebar."
+        },
+        {
+            "category": "href",
+            "item": "/dashboard/mentor/training",
+            "removedFrom": [
+                "app/dashboard/mentor/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the mentor home is now MentorOverview (an approved new file). The training link appears once, on the onboarding card shown only while onboarding is unfinished; Start session still goes to /api/sessions/{id}/start, written as ${next.id}."
+        },
+        {
+            "category": "href",
+            "item": "{`/api/sessions/${session.id}",
+            "removedFrom": [
+                "app/dashboard/mentor/page.tsx"
+            ],
+            "files": [],
+            "why": "Approved by Raj on 2026-10-08 (\"Swap this\"): the mentor home is now MentorOverview (an approved new file). The training link appears once, on the onboarding card shown only while onboarding is unfinished; Start session still goes to /api/sessions/{id}/start, written as ${next.id}."
+        },
+        {
+            "category": "supabase table",
+            "item": "'credit_transactions'",
+            "files": [
+                "app/dashboard/student/page.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-08: the student hours ring shows hours left out of left + used ('85 of 90 hours left') instead of always full. One read-only SELECT of the student's own 'booking' rows (hours are deducted when a session takes place); RLS 'Users can view own transactions' already allows it."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to add creator. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/admin/creators/creators-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to decline request. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/mentor/requests/mentor-request-card.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to save. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/admin/students/components/StudentActions.tsx",
+                "app/dashboard/student/profile/academic-profile-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert('Failed to submit report. Please try again.')",
+            "removedFrom": [
+                "components/forms/mentor-report-form.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(e instanceof Error ? e.message : 'Failed to cancel pending requests')",
+            "removedFrom": [
+                "app/dashboard/student/sessions/student-sessions-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(e instanceof Error ? e.message : 'Failed to cancel request')",
+            "removedFrom": [
+                "app/dashboard/mentor/sessions/mentor-sessions-content.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(error instanceof Error ? error.message : 'Failed to accept request. Please try again.')",
+            "removedFrom": [
+                "app/dashboard/mentor/requests/mentor-request-card.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "alert(error.message || 'Failed to start Stripe onboarding')",
+            "removedFrom": [
+                "components/dashboard/stripe-onboarding-button.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Are you sure you want to delete this event? This will also remove all registrations.')",
+            "removedFrom": [
+                "app/dashboard/admin/events/events-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Are you sure you want to delete this package?')",
+            "removedFrom": [
+                "app/dashboard/admin/products/credit-packages-manager.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm('Send this invoice to Finance? Once sent it is locked and cannot be edited (only voided)",
+            "removedFrom": [
+                "app/dashboard/mentor/payouts/invoicing-panel.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm(`Void ${label}? The mentor's sessions return to their unbilled list so they can reissue a corrected invoice. This cannot be undone.`)",
+            "removedFrom": [
+                "app/dashboard/admin/payouts/page.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "browser dialog",
+            "item": "confirm(msg)",
+            "removedFrom": [
+                "app/dashboard/mentor/payouts/invoicing-panel.tsx"
+            ],
+            "files": [],
+            "why": "Phase 5 (approved plan: replace alert()/confirm()): alert(message) became toast.error(message) with the same text; confirm(...) became await confirmDialog({...}), which resolves true only on the confirm button, like the browser's OK. Every call site was already inside an async function."
+        },
+        {
+            "category": "data import",
+            "item": "@/utils/session-billing > isBillableLength",
+            "files": [
+                "app/dashboard/admin/overview-data.ts",
+                "app/dashboard/layout.tsx",
+                "app/dashboard/mentor/overview-data.ts",
+                "app/dashboard/mentor/reports/page.tsx",
+                "app/dashboard/mentor/students/page.tsx"
+            ],
+            "why": "After merging PR #18 (2026-10-19): a session under 15 real Zoom minutes is not a session (not charged, not invoiceable, no report requested by the webhook). The revamp's counts of completed sessions (mentor and admin homes, the reports badge, the Reports page list, My students) now apply the same isBillableLength filter so they agree with To Be Paid and the invoice picker. Read-only; also selects sessions.actual_minutes."
+        },
+        {
+            "category": "global key listener",
+            "item": "document:keydown",
+            "files": [
+                "components/dashboard/book-session-modal.tsx"
+            ],
+            "why": "Approved by Raj on 2026-10-19 ('fix all 3'): the booking sheet closes on Escape like every other popup. It skips the key while a date or time menu inside is open (those close on Escape themselves) and while a request is submitting."
+        }
+    ],
+    "newFiles": [
+        {
+            "file": "app/dashboard/admin/overview-data.ts",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Reads with the admin client after the page's admin-role check, like manage-sessions and session-payouts. Completed sessions only."
+        },
+        {
+            "file": "app/dashboard/admin/admin-overview.tsx",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Display only; every tile links to the page that already handles it."
+        },
+        {
+            "file": "app/dashboard/mentor/overview-data.ts",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. The live page passes the mentor's own signed-in client, so RLS limits it to their rows. Ratings deliberately excluded."
+        },
+        {
+            "file": "app/dashboard/mentor/mentor-overview.tsx",
+            "why": "New read-only dashboard requested by Raj on 2026-10-08 (real data instead of hard-coded numbers). Preview first at /dashboard/ui-preview/dashboards; not wired into the live homes until he approves. Display only; Start session is the same /api/sessions/{id}/start link the current home uses."
+        },
+        {
+            "file": "components/ui/confirm.tsx",
+            "why": "Phase 5: the on-brand confirm dialog (ConfirmHost in the root layout, confirmDialog() returns a promise). Falls back to window.confirm only if the host is missing."
+        }
+    ]
+}

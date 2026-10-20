@@ -245,7 +245,7 @@ export default function RichComposer({
             {!value && (
                 // A real element rather than `:empty::before` — a contenteditable
                 // is rarely truly empty once it has been typed in and cleared.
-                <span className="pointer-events-none absolute left-3.5 top-3 text-[16px] md:text-[15px] text-gray-400 select-none">
+                <span className="pointer-events-none absolute left-3.5 top-3 text-[16px] md:text-[15px] text-muted-foreground select-none">
                     {placeholder}
                 </span>
             )}
@@ -269,9 +269,9 @@ export default function RichComposer({
                     'w-full max-h-[140px] overflow-y-auto px-3.5 pt-3 pb-1 text-[16px] md:text-[15px] leading-relaxed',
                     'focus:outline-none [overflow-wrap:anywhere] whitespace-pre-wrap',
                     '[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5',
-                    '[&_code]:bg-gray-100 [&_code]:border [&_code]:border-gray-200/80 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_code]:font-mono',
-                    '[&_pre]:bg-gray-50 [&_pre]:border [&_pre]:border-gray-200 [&_pre]:rounded-lg [&_pre]:px-2.5 [&_pre]:py-2 [&_pre]:text-[13px] [&_pre]:font-mono',
-                    '[&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-2.5 [&_blockquote]:text-gray-500',
+                    '[&_code]:bg-muted [&_code]:border [&_code]:border-border [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em] [&_code]:font-mono',
+                    '[&_pre]:bg-muted/60 [&_pre]:border [&_pre]:border-border [&_pre]:rounded-lg [&_pre]:px-2.5 [&_pre]:py-2 [&_pre]:text-[13px] [&_pre]:font-mono',
+                    '[&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-2.5 [&_blockquote]:text-muted-foreground',
                     '[&_strong]:font-semibold',
                     disabled && 'opacity-50'
                 )}

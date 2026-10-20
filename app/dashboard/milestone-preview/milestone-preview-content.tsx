@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Trophy } from 'lucide-react'
+import { Trophy } from '@phosphor-icons/react/ssr'
 import MilestoneModal from '@/components/dashboard/milestone-modal'
 import { MILESTONES, MILESTONE_COPY, type Milestone } from '@/config/milestones.config'
 
@@ -42,11 +42,11 @@ export default function MilestonePreviewContent() {
                             key={milestone}
                             type="button"
                             onClick={() => launch(milestone)}
-                            className="text-left p-5 rounded-2xl border border-gray-200 bg-white hover:border-accent hover:shadow-md transition-all"
+                            className="text-left p-5 rounded-2xl border border-gray-200 bg-white hover:border-legacy-accent hover:shadow-md transition-all"
                         >
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-rich-beige-accent flex items-center justify-center shrink-0">
-                                    <Trophy className="w-5 h-5 text-accent" />
+                                    <Trophy className="w-5 h-5 text-legacy-accent" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold uppercase tracking-wide text-gray-400">

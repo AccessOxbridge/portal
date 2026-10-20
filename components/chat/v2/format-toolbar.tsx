@@ -2,14 +2,14 @@
 
 import { Fragment } from 'react'
 import {
-    Bold,
-    Italic,
-    Underline,
-    Strikethrough,
+    TextB as Bold,
+    TextItalic as Italic,
+    TextUnderline as Underline,
+    TextStrikethrough as Strikethrough,
     Code,
-    List,
-    ListOrdered,
-} from 'lucide-react'
+    ListBullets as List,
+    ListNumbers as ListOrdered,
+} from '@phosphor-icons/react/ssr'
 
 /**
  * The formatting controls inside the composer.
@@ -170,7 +170,7 @@ export default function FormatToolbar({ onCommand, disabled = false }: FormatToo
                 // Safari 16 / iOS 17, which would have cost these buttons their
                 // semantics on older phones. A Fragment emits no node at all.
                 <Fragment key={command}>
-                    {group && <span className="shrink-0 w-px h-4 bg-gray-200 mx-1" />}
+                    {group && <span className="shrink-0 w-px h-4 bg-muted mx-1" />}
                     <button
                         type="button"
                         disabled={disabled}
@@ -181,7 +181,7 @@ export default function FormatToolbar({ onCommand, disabled = false }: FormatToo
                         // command runs.
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => onCommand(command)}
-                        className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-accent hover:bg-accent/[0.06] transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                        className="shrink-0 size-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/[0.06] transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
                     >
                         <Icon className="w-[15px] h-[15px]" />
                     </button>

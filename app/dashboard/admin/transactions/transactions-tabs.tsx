@@ -126,7 +126,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
 
             {/* Tab Content */}
             {activeTab === 'inbound' ? (
-                <div className="bg-card rounded-card border border-border overflow-hidden">
+                <div className="bg-card rounded-card border border-border overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-muted/60 border-b border-border">
                             <tr>
@@ -177,7 +177,7 @@ export default function TransactionsTabs({ purchases, payouts }: Props) {
                     </table>
                 </div>
             ) : (
-                <div className="bg-card rounded-card border border-border overflow-hidden">
+                <div className="bg-card rounded-card border border-border overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-muted/60 border-b border-border">
                             <tr>

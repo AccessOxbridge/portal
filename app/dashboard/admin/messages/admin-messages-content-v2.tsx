@@ -463,7 +463,7 @@ export default function AdminMessagesContent({
         // threads — no floating cards.
         <div className="flex flex-1 min-h-0 bg-card border-t border-border overflow-hidden">
             {/* Conversations */}
-            <div className="w-80 lg:w-96 shrink-0 border-r border-border flex flex-col overflow-hidden">
+            <div className={cn('w-full md:w-80 lg:w-96 shrink-0 md:border-r border-border flex flex-col overflow-hidden', selectedConversation && 'max-md:hidden')}>
                 <div className="p-4 border-b border-border">
                     <div className="flex items-center gap-2">
                         <div className="relative flex-1 min-w-0">
@@ -577,7 +577,7 @@ export default function AdminMessagesContent({
             </div>
 
             {/* Thread */}
-            <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+            <div className={cn('flex-1 min-w-0 flex flex-col overflow-hidden', !selectedConversation && 'max-md:hidden')}>
                 {selectedConversation ? (
                     <>
                         <div className="px-6 py-4 border-b border-border flex items-center justify-between">

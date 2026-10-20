@@ -138,8 +138,8 @@ export default function MentorProfilePage() {
             </Link>
 
             {/* Header Card */}
-            <div className="border border-transparent bg-card rounded-card p-8 shadow-border">
-                <div className="flex items-start gap-6">
+            <div className="border border-transparent bg-card rounded-card p-5 shadow-border sm:p-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
                     <div className="size-20 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-2xl shrink-0 overflow-hidden">
                         {mentor.photo_url ? (
                             <img src={mentor.photo_url} alt="" className="w-full h-full object-cover" />
@@ -167,7 +167,7 @@ export default function MentorProfilePage() {
                         {/* Contact Info */}
                         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
                             {mentor.profile?.email && (
-                                <a href={`mailto:${mentor.profile.email}`} className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                                <a href={`mailto:${mentor.profile.email}`} className="flex min-w-0 items-center gap-1.5 [overflow-wrap:anywhere] hover:text-primary transition-colors">
                                     <Mail className="size-4" />
                                     {mentor.profile.email}
                                 </a>
@@ -197,7 +197,7 @@ export default function MentorProfilePage() {
                         )}
 
                         {/* Stats */}
-                        <div className="flex gap-6">
+                        <div className="flex flex-wrap gap-x-6 gap-y-2">
                             <div className="flex items-center gap-2">
                                 <span className="text-2xl font-semibold text-foreground">{mentor.sessions_completed}</span>
                                 <span className="text-sm text-muted-foreground">Sessions</span>

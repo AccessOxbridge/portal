@@ -182,7 +182,7 @@ function WeeklyBars({ weeks }: { weeks: Data['weekly'] }) {
                         style={{ height: `${Math.max(2, (w.completed / max) * 100)}%` }}
                         title={`Week of ${formatDateInTz(w.weekStart, TZ, { day: 'numeric', month: 'short' })}: ${w.completed}`}
                     />
-                    <span className="text-[11px] whitespace-nowrap text-muted-foreground tabular-nums">
+                    <span className={cn('text-[11px] whitespace-nowrap text-muted-foreground tabular-nums', i % 3 !== 0 && 'max-sm:invisible')}>
                         {formatDateInTz(w.weekStart, TZ, { day: 'numeric', month: 'short' })}
                     </span>
                 </div>

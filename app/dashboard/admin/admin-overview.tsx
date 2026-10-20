@@ -49,7 +49,7 @@ export default function AdminOverview({ data, firstName }: { data: Data; firstNa
                 </div>
             </section>
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
                 <section className={cn(card, 'lg:col-span-2')}>
                     <div className="flex items-baseline justify-between px-5 pt-4 pb-3">
                         <h2 className="text-sm font-semibold text-foreground">Next 7 days</h2>
@@ -98,7 +98,7 @@ export default function AdminOverview({ data, firstName }: { data: Data; firstNa
                 </section>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
                 <section className={cn(card, 'p-5 lg:col-span-2')}>
                     <h2 className="text-sm font-semibold text-foreground">Completed sessions, last 12 weeks</h2>
                     <WeeklyBars weeks={data.weekly} />

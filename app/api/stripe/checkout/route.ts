@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
         // 3. Get user profile with stripe_customer_id
         const { data: profile } = await supabase
-            .from('profiles')
+            .from('profiles_private')
             .select('stripe_customer_id, full_name')
             .eq('id', user.id)
             .single()

@@ -109,13 +109,15 @@ export async function handleMentorshipRequest(
         const endAt = new Date(effectiveSlot.endTime)
         const durationMinutes = Math.round((endAt.getTime() - scheduledAt.getTime()) / (60 * 1000))
 
-        const { data: studentProfile } = await supabase
+        // Emails are private to each person; read them with the service role
+        // (this request was loaded through the caller's own access above).
+        const { data: studentProfile } = await createAdminClient()
             .from('profiles')
             .select('full_name, email')
             .eq('id', request.student_id)
             .single()
 
-        const { data: mentorProfile } = await supabase
+        const { data: mentorProfile } = await createAdminClient()
             .from('profiles')
             .select('full_name, email')
             .eq('id', request.mentor_id)

@@ -13,7 +13,7 @@ export default async function CreditsPage() {
 
     // Fetch user's current credits and profile details
     const { data: profile } = await supabase
-        .from('profiles')
+        .from('profiles_private')
         .select(`
             credits,
             student_profiles (

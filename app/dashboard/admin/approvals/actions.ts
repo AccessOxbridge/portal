@@ -87,7 +87,7 @@ export async function handleApplication(userId: string, status: 'approved' | 'di
 
         // Fetch user email from profiles for notification
         const { data: userData } = await supabase
-            .from('profiles')
+            .from('profiles_private')
             .select('email, full_name')
             .eq('id', userId)
             .single()

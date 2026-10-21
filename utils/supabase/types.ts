@@ -108,6 +108,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       conversation_reads: {
@@ -142,6 +149,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -198,10 +212,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "conversations_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "conversations_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
           {
@@ -216,6 +244,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -350,6 +385,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "credit_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       credit_transactions: {
@@ -398,10 +440,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "credit_transactions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "credit_transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -438,6 +494,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -533,6 +596,13 @@ export type Database = {
             columns: ["respondent_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_responses_respondent_id_fkey"
+            columns: ["respondent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
           {
@@ -733,6 +803,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "mentor_invoices_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "mentor_invoices_payout_id_fkey"
             columns: ["payout_id"]
             isOneToOne: false
@@ -859,6 +936,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "mentor_payouts_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       mentor_session_checkins: {
@@ -892,6 +976,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_session_checkins_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
           {
@@ -1008,6 +1099,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "mentors_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       mentorship_requests: {
@@ -1053,6 +1151,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "mentorship_requests_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "mentorship_requests_reschedule_of_session_id_fkey"
             columns: ["reschedule_of_session_id"]
             isOneToOne: false
@@ -1064,6 +1169,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_requests_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1111,6 +1223,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
@@ -1153,6 +1272,13 @@ export type Database = {
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1222,6 +1348,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_feedback_prompts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1374,6 +1507,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sessions_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sessions_mentor_id_mentors_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
@@ -1399,6 +1539,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1443,8 +1590,29 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "student_mentor_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "student_mentor_assignments_mentor_id_fkey"
             columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_mentor_assignments_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_mentor_assignments_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1453,7 +1621,7 @@ export type Database = {
             foreignKeyName: "student_mentor_assignments_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1533,6 +1701,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "student_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       student_satisfaction_surveys: {
@@ -1574,6 +1749,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "student_satisfaction_surveys_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
       student_session_milestones: {
@@ -1601,6 +1783,13 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_session_milestones_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1648,10 +1837,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "student_session_targets_set_by_fkey"
+            columns: ["set_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "student_session_targets_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_session_targets_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
         ]
@@ -1724,10 +1927,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_issues_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_issues_resolved_by_fkey"
             columns: ["resolved_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_issues_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
             referencedColumns: ["id"]
           },
           {
@@ -1787,6 +2004,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "whats_new_entries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -1810,7 +2034,50 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "mentors_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      profiles_private: {
+        Row: {
+          credits: number | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          member_code: string | null
+          photo_url: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          stripe_customer_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          credits?: never
+          email?: never
+          full_name?: string | null
+          id?: string | null
+          member_code?: never
+          photo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          stripe_customer_id?: never
+          updated_at?: string | null
+        }
+        Update: {
+          credits?: never
+          email?: never
+          full_name?: string | null
+          id?: string | null
+          member_code?: never
+          photo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          stripe_customer_id?: never
+          updated_at?: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {

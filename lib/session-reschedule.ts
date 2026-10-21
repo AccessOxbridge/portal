@@ -5,6 +5,7 @@ import {
 } from '@/lib/email/templates'
 import { formatDateInTz, formatTimeInTz } from '@/lib/timezone'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 const DATE_OPTS: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' }
 
@@ -33,7 +34,9 @@ export async function notifyRescheduleDeclined(args: {
 }) {
     const { supabase, studentId, mentorId, originalScheduledAt, withdrawnByProposer = false } = args
 
-    const { data: profiles } = await supabase
+    // Emails are private to each person, so read them with the service role.
+    // Callers have already checked the caller is a party to this request.
+    const { data: profiles } = await createAdminClient()
         .from('profiles')
         .select('id, full_name, email')
         .in('id', [studentId, mentorId])

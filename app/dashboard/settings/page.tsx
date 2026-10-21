@@ -14,8 +14,8 @@ export default async function SettingsPage() {
     }
 
     const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name, role, email, updated_at')
+        .from('profiles_private')
+        .select('full_name, role, email')
         .eq('id', user.id)
         .single()
 
@@ -23,7 +23,8 @@ export default async function SettingsPage() {
         return redirect('/error?message=Could not load your profile.')
     }
 
-    const role = profile.role
+    // Every profile row has a role; the view's generated type is nullable.
+    const role = profile.role as NonNullable<typeof profile.role>
     const isStudent = role === 'student' || role === 'admin-dev'
 
     // Timezone lives on student_profiles for students, mentors for mentors.

@@ -80,7 +80,7 @@ export default function AdminStudentsPage() {
             .from('student_profiles')
             .select(`
                 *,
-                profile:profiles!student_profiles_id_fkey (
+                profile:profiles_private!student_profiles_id_fkey (
                     full_name,
                     email,
                     credits

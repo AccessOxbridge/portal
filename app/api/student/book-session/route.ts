@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -132,8 +133,9 @@ export async function POST(req: Request) {
                 updated_at: new Date().toISOString(),
             }, { onConflict: 'id' })
 
-        // Notify the assigned mentor.
-        const { data: mentorProfile } = await supabase
+        // Notify the assigned mentor. Their email is private to them, so it is
+        // read with the service role (the assignment was checked above).
+        const { data: mentorProfile } = await createAdminClient()
             .from('profiles')
             .select('id, email, full_name')
             .eq('id', mentorId)

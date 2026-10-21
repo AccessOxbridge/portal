@@ -97,13 +97,27 @@ export async function loadGroupMembers(
             profile:profiles!conversation_participants_user_id_fkey (
                 id,
                 full_name,
-                email,
                 photo_url
             )
         `)
         .in('conversation_id', conversationIds)
 
     const participants = (rows || []) as ParticipantRow[]
+
+    // Emails are private: profiles_private returns them only where the caller
+    // may see them (admins and the service role: everyone; others: themselves,
+    // or a mentor's own students). Members without one keep email null.
+    const emailMap = new Map<string, string | null>()
+    const memberIds = [...new Set(participants.map((p) => p.user_id))]
+    if (memberIds.length > 0) {
+        const { data: emailRows } = await supabase
+            .from('profiles_private')
+            .select('id, email')
+            .in('id', memberIds)
+        for (const row of (emailRows || []) as { id: string | null; email: string | null }[]) {
+            if (row.id) emailMap.set(row.id, row.email)
+        }
+    }
     const mentorIds = [
         ...new Set(
             participants
@@ -131,7 +145,7 @@ export async function loadGroupMembers(
             role,
             last_read_at: row.last_read_at,
             full_name: profile?.full_name ?? null,
-            email: profile?.email ?? null,
+            email: emailMap.get(row.user_id) ?? null,
             photo_url:
                 role === 'admin'
                     ? '/logo.png'

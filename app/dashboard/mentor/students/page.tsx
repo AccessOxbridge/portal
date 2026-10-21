@@ -37,7 +37,7 @@ export default async function MentorStudentsPage() {
         .select(`
             student_id,
             created_at,
-            student:profiles!student_mentor_assignments_student_id_fkey (
+            student:profiles_private!student_mentor_assignments_student_id_fkey (
                 full_name,
                 email,
                 photo_url

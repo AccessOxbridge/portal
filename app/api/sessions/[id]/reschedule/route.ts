@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { NextResponse } from 'next/server'
 import { sendEmail, EMAIL_SENDER_TEAM } from '@/lib/email/client'
 import {
@@ -120,7 +121,9 @@ export async function POST(
             throw insertError
         }
 
-        const { data: profiles } = await supabase
+        // Emails are private to each person, so read them with the service
+        // role (the caller was checked as a participant above).
+        const { data: profiles } = await createAdminClient()
             .from('profiles')
             .select('id, full_name, email')
             .in('id', [session.student_id, session.mentor_id])

@@ -21,8 +21,9 @@ insert); the admin action then sets the role to parent with the service role,
 checks it, and deletes the account if that fails. Never from sign-up
 metadata.
 
-Mockup placeholders to settle before the real page: Claire's work email
-(shown as claire@example.com), the session topic (needs the booking topic
+Claire's contact email is office@accessoxbridge.io for now (Raj, 22 Oct).
+
+Mockup placeholders to settle before the real page: the session topic (needs the booking topic
 field), and the definitions of "this term" and attendance rate.
 
 ## The brief, in one line

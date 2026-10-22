@@ -44,8 +44,8 @@ const PLAN_PER_WEEK = 2
 const SUCCESS_MANAGER = {
     name: 'Claire Marlowe',
     title: 'Senior Strategist',
-    // Placeholder until Claire's work address is confirmed.
-    email: 'claire@example.com',
+    // The shared office inbox for now (Raj, 22 Oct).
+    email: 'office@accessoxbridge.io',
 }
 
 const LIVE = {

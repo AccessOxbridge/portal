@@ -1,6 +1,6 @@
 -- ==========================================
 -- Write rules, batch 1: blog, purchases, sessions, invoice numbers
--- Date: 2026-10-22
+-- Date: 2026-10-22 (applied to production 2026-10-22)
 -- ==========================================
 -- No rows change. Replaces four over-broad write rules found in the 22 Oct
 -- audit (docs/write-rule-audit.md, findings 3, 4, 5 and 15). Reads are

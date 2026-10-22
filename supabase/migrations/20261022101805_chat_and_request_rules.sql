@@ -1,6 +1,6 @@
 -- ==========================================
 -- Chats, messages, reports and requests: only with people you work with
--- Date: 2026-10-22
+-- Date: 2026-10-22 (applied to production 2026-10-22)
 -- ==========================================
 -- No rows change. Findings 6–11 of the 22 Oct write-rule audit
 -- (docs/write-rule-audit.md). These must be in place before any parent

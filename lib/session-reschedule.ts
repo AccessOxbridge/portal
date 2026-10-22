@@ -70,7 +70,7 @@ export async function notifyRescheduleDeclined(args: {
         : `The reschedule request was declined. Your session on ${mentorWhen.display} still stands.`
 
     if (studentProfile?.email) {
-        await supabase.from('notifications').insert({
+        await createAdminClient().from('notifications').insert({
             recipient_id: studentId,
             recipient_email: studentProfile.email,
             type: 'session_reschedule_declined' as const,
@@ -85,7 +85,7 @@ export async function notifyRescheduleDeclined(args: {
     }
 
     if (mentorProfile?.email) {
-        await supabase.from('notifications').insert({
+        await createAdminClient().from('notifications').insert({
             recipient_id: mentorId,
             recipient_email: mentorProfile.email,
             type: 'session_reschedule_declined' as const,

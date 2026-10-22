@@ -142,7 +142,7 @@ export async function POST(req: Request) {
             .single()
 
         if (mentorProfile?.email) {
-            await supabase.from('notifications').insert({
+            await createAdminClient().from('notifications').insert({
                 recipient_id: mentorProfile.id,
                 recipient_email: mentorProfile.email,
                 type: 'mentorship_request' as const,

@@ -157,7 +157,7 @@ export async function POST(
             : studentProfile?.full_name || 'Your student'
 
         if (otherProfile?.email) {
-            await supabase.from('notifications').insert({
+            await createAdminClient().from('notifications').insert({
                 recipient_id: otherPartyId,
                 recipient_email: otherProfile.email,
                 type: 'session_reschedule_request' as const,

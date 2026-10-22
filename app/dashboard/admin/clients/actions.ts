@@ -61,9 +61,22 @@ export async function registerPremiumClient(formData: FormData) {
 
     const userId = userData.user.id
 
-    // The profile should be created automatically by the database trigger 'on_auth_user_created'
-    // which calls 'handle_new_user()'.
-    // We'll wait a brief moment or just proceed to insert the notification.
+    // The sign-up trigger (handle_new_user) creates the profile, but it only
+    // takes 'mentor' from user_metadata (which users control) and makes
+    // everyone else a student. Set the real role here with the service role,
+    // and remove the account if that fails so no half-made user is left.
+    const { data: profile, error: roleError } = await supabase
+        .from('profiles')
+        .update({ role: selectedRole as 'admin' | 'client' })
+        .eq('id', userId)
+        .select('role')
+        .single()
+
+    if (roleError || profile?.role !== selectedRole) {
+        console.error('registerPremiumClient role update failed:', roleError?.message ?? profile?.role)
+        await supabase.auth.admin.deleteUser(userId)
+        return { error: 'Failed to create the account' }
+    }
 
     // Trigger welcome email by inserting into notifications table
     const roleLabel = selectedRole === 'admin' ? 'Admin' : 'Premium Client'

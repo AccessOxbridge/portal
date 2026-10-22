@@ -1,6 +1,6 @@
 -- ==========================================
 -- Notifications: only the server may create them
--- Date: 2026-10-22
+-- Date: 2026-10-22 (applied to production 2026-10-22)
 -- ==========================================
 -- No rows change. Finding 2 of the 22 Oct write-rule audit
 -- (docs/write-rule-audit.md).

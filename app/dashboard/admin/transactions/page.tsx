@@ -21,12 +21,15 @@ export default async function AdminTransactionsPage() {
         redirect('/dashboard')
     }
 
+    // Emails come from profiles_private: public.profiles no longer exposes
+    // them (the alias stays `profiles` so the tabs below are unchanged).
+
     // Fetch inbound transactions (credit purchases)
     const { data: purchases } = await supabase
         .from('credit_purchases')
         .select(`
             *,
-            profiles:user_id (full_name, email),
+            profiles:profiles_private!credit_purchases_user_id_fkey (full_name, email),
             credit_packages:package_id (name, credits)
         `)
         .eq('status', 'completed')
@@ -38,7 +41,7 @@ export default async function AdminTransactionsPage() {
         .from('mentor_payouts')
         .select(`
             *,
-            profiles:mentor_id (full_name, email)
+            profiles:profiles_private!mentor_payouts_mentor_id_fkey (full_name, email)
         `)
         .order('created_at', { ascending: false })
         .limit(100)

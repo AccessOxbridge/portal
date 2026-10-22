@@ -9,14 +9,21 @@ Last updated: 22 Oct 2026
 | Piece | Status |
 | --- | --- |
 | Security prerequisites (profiles read scope, private fields, write-rule audit, email relay, chat rules) | Live on production |
-| Design mockup `/dashboard/ui-preview/parent` (dev only) | Built with the portal's components; desktop and phone checked |
+| Design mockup `/dashboard/ui-preview/parent` (dev only) | Reworked to the boss's 8 widgets ("Confirmed Dashboard Widgets"), each with a live and an empty state; a mockup-only switch previews Live, Just started and Not linked yet (with or without the child's name). Desktop and phone checked |
+| Sign-up trigger fix (`20261022134710`, PR #32) | Live on production. Only mentor or student comes from sign-up; other roles are set by server code after `createUser` |
 | `20261022180000_parent_role.sql` (role value) | Tested locally |
 | `20261022180100_parent_access.sql` (links, read access to one child, no writes) | Tested locally: 33 parent checks pass; all earlier tests pass; student and mentor pages unchanged |
 | Real parent pages, parent nav, admin "create parent", recordings access, hours request route | Next |
 
-Parent accounts are created by the server. The role is set by an admin
-action through the service role, never from sign-up metadata. See the
-`handle_new_user` note in the PR.
+Parent accounts are created by the server. `createUser` makes a student
+profile (the trigger cannot see app_metadata, which Supabase writes after the
+insert); the admin action then sets the role to parent with the service role,
+checks it, and deletes the account if that fails. Never from sign-up
+metadata.
+
+Mockup placeholders to settle before the real page: Claire's work email
+(shown as claire@example.com), the session topic (needs the booking topic
+field), and the definitions of "this term" and attendance rate.
 
 ## The brief, in one line
 

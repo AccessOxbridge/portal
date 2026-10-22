@@ -1,6 +1,6 @@
 -- ==========================================
 -- Profiles private fields, part A: add profiles_private (additive only)
--- Date: 2026-10-21
+-- Date: 2026-10-21 (applied to production 2026-10-22)
 -- ==========================================
 -- No rows change and nothing loses access. Adds private.my_student_ids()
 -- and the public.profiles_private view, the place app code reads email,
@@ -10,7 +10,7 @@
 --   1. this migration (A);
 --   2. deploy app code that reads those four fields from profiles_private
 --      (or the service-role client) instead of public.profiles;
---   3. 20261021120100_profiles_private_columns.sql (B): removes direct
+--   3. 20261022120000_profiles_private_columns.sql (version set when applied) (B): removes direct
 --      read access to the four columns on public.profiles.
 --
 -- What profiles_private returns (plus id, full_name, role, photo_url,

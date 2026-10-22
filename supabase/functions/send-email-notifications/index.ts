@@ -7,7 +7,38 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL =
     Deno.env.get("RESEND_FROM_EMAIL") || "Access Oxbridge <office@accessoxbridge.io>";
 
+// The gateway (verify_jwt) only checks that *a* valid JWT was sent, and every
+// signed-in user has one. This sends email from our domain to any address, so
+// only the service role may call it.
+function isServiceRole(req: Request): boolean {
+    const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const part = token.split(".")[1];
+    if (!part) return false;
+    try {
+        const json = atob(part.replace(/-/g, "+").replace(/_/g, "/"));
+        return JSON.parse(json)?.role === "service_role";
+    } catch {
+        return false;
+    }
+}
+
+function escapeHtml(value: unknown): string {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 serve(async (req) => {
+    if (!isServiceRole(req)) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+            headers: { "Content-Type": "application/json" },
+            status: 403,
+        });
+    }
+
     try {
         const payload = await req.json();
         console.log("Notification payload received:", payload);
@@ -50,11 +81,11 @@ serve(async (req) => {
             body: JSON.stringify({
                 from: RESEND_FROM_EMAIL,
                 to: recipient_email,
-                subject: title,
+                subject: String(title ?? ""),
                 html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-            <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">${title}</h1>
-            <p style="color: #555; font-size: 16px; line-height: 1.5;">${message}</p>
+            <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">${escapeHtml(title)}</h1>
+            <p style="color: #555; font-size: 16px; line-height: 1.5;">${escapeHtml(message)}</p>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
             <p style="color: #888; font-size: 14px;">This is an automated notification from Oxbridge Portal. You can view your notifications by logging into your dashboard.</p>
             <a href="https://app.accessoxbridge.io/dashboard" style="display: inline-block; padding: 10px 20px; background-color: #0070f3; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">Go to Dashboard</a>

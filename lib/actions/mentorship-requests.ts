@@ -309,7 +309,7 @@ export async function handleMentorshipRequest(
 
         if (isReschedule) {
             if (studentProfile?.email) {
-                await supabase.from('notifications').insert({
+                await createAdminClient().from('notifications').insert({
                     recipient_id: request.student_id,
                     recipient_email: studentProfile.email,
                     type: 'session_reschedule_accepted' as const,
@@ -326,7 +326,7 @@ export async function handleMentorshipRequest(
             }
 
             if (mentorProfile?.email) {
-                await supabase.from('notifications').insert({
+                await createAdminClient().from('notifications').insert({
                     recipient_id: request.mentor_id,
                     recipient_email: mentorProfile.email,
                     type: 'session_reschedule_accepted' as const,
@@ -375,7 +375,7 @@ export async function handleMentorshipRequest(
             }
         } else {
             if (studentProfile?.email) {
-                await supabase.from('notifications').insert({
+                await createAdminClient().from('notifications').insert({
                     recipient_id: request.student_id,
                     recipient_email: studentProfile.email,
                     type: 'match_accepted' as const,
@@ -394,7 +394,7 @@ export async function handleMentorshipRequest(
             }
 
             if (mentorProfile?.email) {
-                await supabase.from('notifications').insert({
+                await createAdminClient().from('notifications').insert({
                     recipient_id: request.mentor_id,
                     recipient_email: mentorProfile.email,
                     type: 'session_confirmed' as const,

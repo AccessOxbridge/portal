@@ -1,6 +1,6 @@
 -- ==========================================
 -- Profiles private fields, part B: stop direct reads of the four columns
--- Date: 2026-10-21
+-- Date: 2026-10-21 (applied to production 2026-10-22)
 -- ==========================================
 -- No rows change. Apply ONLY after app code that reads email, credits,
 -- stripe_customer_id and member_code from public.profiles_private (or the

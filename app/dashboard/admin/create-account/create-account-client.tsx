@@ -98,7 +98,7 @@ export function CreateAccountClient() {
 
         async function loadStudents() {
             const { data, error } = await client
-                .from('profiles')
+                .from('profiles_private')
                 .select('id, full_name, email, credits, updated_at')
                 .eq('role', 'student')
                 .order('updated_at', { ascending: false })
@@ -119,7 +119,7 @@ export function CreateAccountClient() {
         async function loadMentors() {
             const { data, error } = await client
                 .from('mentors')
-                .select('id, status, updated_at, profile:profiles!left(full_name, email)')
+                .select('id, status, updated_at, profile:profiles_private!left(full_name, email)')
                 .order('updated_at', { ascending: false })
 
             if (cancelled || error || !data) return

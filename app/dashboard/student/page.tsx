@@ -15,8 +15,10 @@ export default async function StudentDashboard() {
         return redirect('/login')
     }
 
+    // Own row from profiles_private: same columns, plus the private ones
+    // (credits) that public.profiles no longer exposes.
     const { data: profile } = await supabase
-        .from('profiles')
+        .from('profiles_private')
         .select('*')
         .eq('id', user.id)
         .single()

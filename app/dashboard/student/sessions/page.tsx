@@ -20,7 +20,7 @@ export default async function StudentSessionsPage({ searchParams }: StudentSessi
     }
 
     const { data: profile } = await supabase
-        .from('profiles')
+        .from('profiles_private')
         .select('role, credits')
         .eq('id', user.id)
         .single()

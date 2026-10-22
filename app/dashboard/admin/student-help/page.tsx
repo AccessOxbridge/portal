@@ -34,11 +34,11 @@ export default async function StudentHelpPage() {
 
     if (reporterIds.length > 0) {
         const { data: profiles } = await supabase
-            .from('profiles')
+            .from('profiles_private')
             .select('id, full_name, email, role')
             .in('id', reporterIds)
 
-        profileMap = new Map(profiles?.map(p => [p.id, {
+        profileMap = new Map(profiles?.map(p => [p.id as string, {
             full_name: p.full_name,
             email: p.email,
             role: p.role

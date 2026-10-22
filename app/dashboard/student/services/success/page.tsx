@@ -19,7 +19,7 @@ export default async function PaymentSuccessPage({
 
     // Fetch updated credits
     const { data: profile } = await supabase
-        .from('profiles')
+        .from('profiles_private')
         .select('credits')
         .eq('id', user.id)
         .single()

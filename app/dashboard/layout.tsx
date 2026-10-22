@@ -38,7 +38,6 @@ export default async function DashboardLayout({
         .select(`
             full_name, 
             role,
-            credits,
             photo_url,
             mentors (
                 status,
@@ -74,7 +73,7 @@ export default async function DashboardLayout({
             if (insertError.code === '23505') {
                 const { data: existingProfile } = await supabase
                     .from('profiles')
-                    .select('full_name, role, credits')
+                    .select('full_name, role')
                     .eq('id', user.id)
                     .single()
                 if (existingProfile) {
@@ -99,7 +98,6 @@ export default async function DashboardLayout({
                 .select(`
                     full_name, 
                     role,
-                    credits,
                     photo_url,
                     mentors (
                         status,
@@ -417,9 +415,17 @@ export default async function DashboardLayout({
     )
 
     if (isStudent) {
+        // Hours balance is private: read it from profiles_private, which only
+        // returns it for your own row (public.profiles no longer exposes it).
+        const { data: account } = await supabase
+            .from('profiles_private')
+            .select('credits')
+            .eq('id', user.id)
+            .maybeSingle()
+
         return (
             <StudentCreditsProvider
-                initialCredits={(profile as any).credits ?? 0}
+                initialCredits={account?.credits ?? 0}
                 bookingProfile={canBook ? bookingProfile : null}
                 canBook={canBook}
                 mentors={bookingMentors}

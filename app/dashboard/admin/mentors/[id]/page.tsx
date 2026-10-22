@@ -71,7 +71,7 @@ export default function MentorProfilePage() {
                 .from('mentors')
                 .select(`
                     *,
-                    profile:profiles!mentors_id_fkey (
+                    profile:profiles_private!mentors_id_fkey (
                         full_name,
                         email
                     )

@@ -38,7 +38,7 @@ export default function AdminClientsPage() {
         setIsLoading(true)
 
         const { data, error } = await supabase
-            .from('profiles')
+            .from('profiles_private')
             .select('id, full_name, email')
             .eq('role', 'client')
             .order('updated_at', { ascending: false })

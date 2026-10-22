@@ -14,12 +14,12 @@ export async function POST(req: Request) {
 
         // 2. Verify user is a mentor
         const { data: profile } = await supabase
-            .from('profiles')
+            .from('profiles_private')
             .select('role, full_name, email')
             .eq('id', user.id)
             .single()
 
-        if (!profile || !['mentor', 'admin-dev'].includes(profile.role)) {
+        if (!profile?.role || !['mentor', 'admin-dev'].includes(profile.role)) {
             return NextResponse.json({ error: 'Only mentors can onboard to Stripe Connect' }, { status: 403 })
         }
 

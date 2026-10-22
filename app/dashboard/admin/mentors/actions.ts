@@ -55,7 +55,7 @@ export async function fetchMentors(
         .from('mentors')
         .select(`
             *,
-            profile:profiles!left (
+            profile:profiles_private!left (
                 full_name,
                 email
             )

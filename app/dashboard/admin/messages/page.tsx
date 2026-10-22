@@ -34,12 +34,12 @@ export default async function AdminMessagesPage() {
             type,
             last_message_at,
             created_at,
-            student:profiles!conversations_student_id_fkey (
+            student:profiles_private!conversations_student_id_fkey (
                 id,
                 full_name,
                 email
             ),
-            mentor:profiles!conversations_mentor_id_fkey (
+            mentor:profiles_private!conversations_mentor_id_fkey (
                 id,
                 full_name,
                 email

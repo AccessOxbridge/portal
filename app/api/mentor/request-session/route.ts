@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -93,8 +94,9 @@ export async function POST(req: Request) {
 
         if (insertError) throw insertError
 
-        // Notify the student.
-        const { data: studentProfile } = await supabase
+        // Notify the student. Their email is private to them, so it is read
+        // with the service role (the assignment was checked above).
+        const { data: studentProfile } = await createAdminClient()
             .from('profiles')
             .select('id, email')
             .eq('id', studentId)

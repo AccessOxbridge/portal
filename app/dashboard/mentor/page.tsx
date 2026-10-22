@@ -18,7 +18,7 @@ export default async function MentorDashboard() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, role, photo_url')
         .eq('id', user.id)
         .single()
 

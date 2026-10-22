@@ -17,7 +17,7 @@ export default async function CreatorsPage() {
     // Role check
     const { data: profile } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, role, photo_url')
         .eq('id', user.id)
         .single()
 

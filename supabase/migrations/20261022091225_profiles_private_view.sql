@@ -10,7 +10,7 @@
 --   1. this migration (A);
 --   2. deploy app code that reads those four fields from profiles_private
 --      (or the service-role client) instead of public.profiles;
---   3. 20261022120000_profiles_private_columns.sql (version set when applied) (B): removes direct
+--   3. 20261022092404_profiles_private_columns.sql (B): removes direct
 --      read access to the four columns on public.profiles.
 --
 -- What profiles_private returns (plus id, full_name, role, photo_url,

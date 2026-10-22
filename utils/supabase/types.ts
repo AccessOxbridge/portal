@@ -1283,6 +1283,129 @@ export type Database = {
           },
         ]
       }
+      parent_profiles: {
+        Row: {
+          child_first_name: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          child_first_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          child_first_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_student_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          parent_id: string
+          revoked_at: string | null
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          parent_id: string
+          revoked_at?: string | null
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          parent_id?: string
+          revoked_at?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_student_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           credits: number | null
@@ -2124,6 +2247,7 @@ export type Database = {
           similarity: number
         }[]
       }
+      my_child_has_signed_in: { Args: never; Returns: boolean }
       next_mentor_invoice_number: { Args: never; Returns: string }
       prune_login_events: { Args: never; Returns: undefined }
       session_time_span: {
@@ -2156,7 +2280,7 @@ export type Database = {
         | "session_reschedule_request"
         | "session_reschedule_accepted"
         | "session_reschedule_declined"
-      user_role: "student" | "mentor" | "admin" | "client" | "admin-dev"
+      user_role: "student" | "mentor" | "admin" | "client" | "admin-dev" | "parent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2310,7 +2434,7 @@ export const Constants = {
         "session_reschedule_accepted",
         "session_reschedule_declined",
       ],
-      user_role: ["student", "mentor", "admin", "client", "admin-dev"],
+      user_role: ["student", "mentor", "admin", "client", "admin-dev", "parent"],
     },
   },
 } as const

@@ -7,7 +7,8 @@ import { getZoomAccessToken, getZoomRecordings } from '@/utils/zoom'
  * GET /api/recording/[sessionId]
  * Streams the Zoom cloud recording (MP4) for a session through our own Zoom
  * OAuth / webhook download token, so students never hit Zoom's passcode gate.
- * Only the session's mentor/student or an admin may access it.
+ * Only the session's mentor/student, their linked parent, or an admin may
+ * access it.
  *
  * Forwards the client's Range header to Zoom so the HTML5 <video> player can
  * seek without buffering the whole file.
@@ -49,7 +50,22 @@ export async function GET(
         }
 
         const isParticipant = session.mentor_id === user.id || session.student_id === user.id
-        if (!isAdmin && !isParticipant) {
+
+        // A parent may watch their linked child's sessions. Checked with the
+        // parent's own client: RLS only shows them their own active link.
+        let isLinkedParent = false
+        if (!isAdmin && !isParticipant && profile?.role === 'parent' && session.student_id) {
+            const { data: link } = await supabase
+                .from('parent_student_links')
+                .select('id')
+                .eq('parent_id', user.id)
+                .eq('student_id', session.student_id)
+                .is('revoked_at', null)
+                .maybeSingle()
+            isLinkedParent = Boolean(link)
+        }
+
+        if (!isAdmin && !isParticipant && !isLinkedParent) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
         }
 

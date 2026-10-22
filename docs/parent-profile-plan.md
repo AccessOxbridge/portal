@@ -1,7 +1,8 @@
 # Parent profile: V1 plan (draft for discussion)
 
-Status: design mockup and database rules built and tested locally on
-`feat/parent-profile` (22 Oct). Nothing applied to production yet.
+Status: built and tested locally on `feat/parent-profile` (22 Oct): database
+rules, admin "Parents" page, and the real parent pages. Nothing parent-related
+is applied to production yet.
 Last updated: 22 Oct 2026
 
 ## Build status (22 Oct)
@@ -9,11 +10,40 @@ Last updated: 22 Oct 2026
 | Piece | Status |
 | --- | --- |
 | Security prerequisites (profiles read scope, private fields, write-rule audit, email relay, chat rules) | Live on production |
-| Design mockup `/dashboard/ui-preview/parent` (dev only) | Reworked to the boss's 8 widgets ("Confirmed Dashboard Widgets"), each with a live and an empty state; a mockup-only switch previews Live, Just started and Not linked yet (with or without the child's name). Desktop and phone checked |
 | Sign-up trigger fix (`20261022134710`, PR #32) | Live on production. Only mentor or student comes from sign-up; other roles are set by server code after `createUser` |
 | `20261022180000_parent_role.sql` (role value) | Tested locally |
-| `20261022180100_parent_access.sql` (links, read access to one child, no writes) | Tested locally: 33 parent checks pass; all earlier tests pass; student and mentor pages unchanged |
-| Real parent pages, parent nav, admin "create parent", recordings access, hours request route | Next |
+| `20261022180100_parent_access.sql` (links, read access to one child, no writes) | Tested locally |
+| `20261022180200_parent_details.sql` (optional child's name, "has the child signed in") | Tested locally |
+| Admin `/dashboard/admin/parents` | Create a parent (before or after the student exists, optional child's name, optional link), link, unlink (kept as history), edit child's name, suggestions from students' saved parent email. Tested in the browser |
+| Parent pages `/dashboard/parent` (+ sessions, reports, recordings) | The 8 widgets on real data; parent nav and mobile tab bar. The mockup now renders the same component with sample data |
+| `/api/parent/request-hours` | Linked parents only; one open request a day; files a `user_issues` row (reporter_type parent) and notifies admins |
+| `/api/recording/[sessionId]` | Also allows the linked parent |
+| `app/dashboard/admin/layout.tsx` | Every admin page is admin-only on the server (five admin pages were client-only with no server check) |
+| Tests (local) | 74 parent page/route checks, 33 parent database checks, chat/batch-1/notification suites, and the 104-page crawl for all six existing users unchanged |
+
+### What the parent sees
+
+| Widget | Source | Notes |
+| --- | --- | --- |
+| Progress graph | completed sessions, last 10 weeks; plan line from `student_session_targets` | Same counting rule as the pace check and milestones (status completed). Empty: faded sample line |
+| Next session | earliest `active` session in the future | No topic until the booking topic field exists |
+| Sessions attended | total completed, last 4 weeks, upcoming booked | "This term" and attendance rate wait for agreed definitions |
+| Session reports | `session_reports`, newest first | Summary, key points and next steps, or the written report (behind "Read full report" when both exist). Not the mentor's private form |
+| Mentor | current assignment (else the next session's mentor); `mentors` bio, photo, college, specialisation | |
+| Success manager | Claire Marlowe, Senior Strategist, office@accessoxbridge.io | Same for every family for now; no photo |
+| Onboarding checklist | child signed in; profile `is_complete`; current mentor; any non-cancelled session | Moves to the bottom once complete |
+| Goals and milestones | `target_university`, `target_course`, `application_year`; session milestones | |
+
+Times are shown in the child's time zone, labelled on every page.
+
+### Production rollout (each step needs approval)
+
+1. Read-only dry run of the three parent migrations as a real student,
+   mentor and admin (transaction rolled back), then apply them in order,
+   with the row-count check before and after. They change nothing for
+   existing users (the local crawl is identical before and after).
+2. Merge and deploy the code.
+3. Pilot: create one parent account, link it, check what they see.
 
 Parent accounts are created by the server. `createUser` makes a student
 profile (the trigger cannot see app_metadata, which Supabase writes after the
@@ -21,10 +51,12 @@ insert); the admin action then sets the role to parent with the service role,
 checks it, and deletes the account if that fails. Never from sign-up
 metadata.
 
-Claire's contact email is office@accessoxbridge.io for now (Raj, 22 Oct).
-
-Mockup placeholders to settle before the real page: the session topic (needs the booking topic
-field), and the definitions of "this term" and attendance rate.
+**Found while building (not fixed, needs its own change):** the `mentors`
+table is readable in full by anyone with the public key, signed in or not
+("Public can view active mentors"). That includes every active mentor's
+phone, Stripe account ID, contract signature, CV and DBS certificate links.
+It predates the parent work, but a phone number would let a parent get round
+"no messaging", so it should be fixed before parents go live.
 
 ## The brief, in one line
 

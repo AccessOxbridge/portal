@@ -15,6 +15,8 @@ interface Recording {
 interface StudentRecordingsContentProps {
     recordings: Recording[]
     timezone?: string | null
+    /** Empty-state sentence; the parent view words it for the parent. */
+    emptyDescription?: string
 }
 
 // A single card with a YouTube-style hover preview: shows a still frame from
@@ -101,6 +103,7 @@ function RecordingCard({
 export default function StudentRecordingsContent({
     recordings,
     timezone = null,
+    emptyDescription = 'Recordings of your sessions will appear here a few minutes after each session ends.',
 }: StudentRecordingsContentProps) {
     const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -112,8 +115,7 @@ export default function StudentRecordingsContent({
                 </div>
                 <h2 className="text-base font-semibold text-foreground">No recordings yet</h2>
                 <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground text-pretty">
-                    Recordings of your sessions will appear here a few minutes after each
-                    session ends.
+                    {emptyDescription}
                 </p>
             </div>
         )

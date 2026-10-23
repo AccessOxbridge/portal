@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
     const { data: profile } = await supabase
         .from('profiles_private')
-        .select('full_name, role, email')
+        .select('full_name, role, email, photo_url')
         .eq('id', user.id)
         .single()
 
@@ -28,8 +28,11 @@ export default async function SettingsPage() {
     const isStudent = role === 'student' || role === 'admin-dev'
 
     // Timezone lives on student_profiles for students, mentors for mentors.
+    // Parents have neither: their pages use the linked child's time zone.
     let timezone: string | null = null
-    if (isStudent) {
+    if (role === 'parent') {
+        timezone = null
+    } else if (isStudent) {
         const { data } = await supabase
             .from('student_profiles')
             .select('timezone')
@@ -76,6 +79,8 @@ export default async function SettingsPage() {
             role={role}
             createdAt={user.created_at}
             timezone={timezone}
+            userId={user.id}
+            photoUrl={profile.photo_url ?? null}
         />
     )
 }

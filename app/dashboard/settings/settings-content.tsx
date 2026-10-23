@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle } from '@phosphor-icons/react/ssr'
+import { User, Envelope as Mail, Shield, CalendarDots as CalendarDays, Globe, Key as KeyRound, Check, WarningCircle as AlertCircle, Camera } from '@phosphor-icons/react/ssr'
 import { updateTimezone, sendPasswordResetLink } from './actions'
 import { getDefaultTimezone, getTimezoneOptions, rememberTimezone } from '@/lib/timezone'
 import LoginHistory, { type LoginEvent } from './login-history'
 import { Button } from '@/components/ui/button'
 import { SelectField } from '@/components/ui/select'
 import { cn } from '@/utils/lib'
+import AvatarUploader from '@/components/profile/avatar-uploader'
 
 interface SettingsContentProps {
     email: string
@@ -18,6 +19,8 @@ interface SettingsContentProps {
     loginEvents: LoginEvent[]
     /** Every user's events — admins only; null for everyone else. */
     allLoginEvents: LoginEvent[] | null
+    userId: string
+    photoUrl: string | null
 }
 
 const roleLabel = (role: string) => {
@@ -26,6 +29,7 @@ const roleLabel = (role: string) => {
         case 'admin': return 'Admin'
         case 'mentor': return 'Mentor'
         case 'student': return 'Student'
+        case 'parent': return 'Parent'
         default: return role
     }
 }
@@ -38,7 +42,12 @@ export default function SettingsContent({
     timezone,
     loginEvents,
     allLoginEvents,
+    userId,
+    photoUrl,
 }: SettingsContentProps) {
+    // Parents have no timezone of their own (their pages use the child's) and
+    // no profile page, so their photo lives here instead.
+    const isParent = role === 'parent'
     const [tz, setTz] = useState(timezone || getDefaultTimezone())
     const [savedTz, setSavedTz] = useState(timezone || '')
     const [tzFeedback, setTzFeedback] = useState<{ ok: boolean; message: string } | null>(null)
@@ -86,7 +95,9 @@ export default function SettingsContent({
         <div className="mx-auto max-w-3xl space-y-6">
             <header>
                 <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Settings</h1>
-                <p className="mt-1 text-muted-foreground">Manage your account, timezone and password.</p>
+                <p className="mt-1 text-muted-foreground">
+                    {isParent ? 'Manage your account, photo and password.' : 'Manage your account, timezone and password.'}
+                </p>
             </header>
 
             {/* Account info (read-only) */}
@@ -103,39 +114,50 @@ export default function SettingsContent({
                 </dl>
             </section>
 
-            {/* Timezone */}
-            <section className={card}>
-                <SectionHead icon={Globe} tint="bg-tint-violet text-tint-violet-foreground" title="Timezone" description="Used for scheduling and displaying session times" />
-                <div className="space-y-4 p-5 sm:p-6">
-                    <SelectField
-                        value={tz}
-                        onChange={(e) => { setTz(e.target.value); setTzFeedback(null) }}
-                        aria-label="Timezone"
-                    >
-                        {tz === '' && <option value="">Select your timezone…</option>}
-                        {tzOptions.map((option) => (
-                            <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
-                        ))}
-                    </SelectField>
-
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        {tzFeedback ? (
-                            <p role="status" className={cn('flex items-center gap-2 text-sm', tzFeedback.ok ? 'text-success' : 'text-destructive')}>
-                                {tzFeedback.ok ? <Check weight="bold" className="size-4" /> : <AlertCircle className="size-4" />}
-                                <span>{tzFeedback.message}</span>
-                            </p>
-                        ) : <span />}
-                        <Button
-                            type="button"
-                            onClick={handleSaveTimezone}
-                            disabled={tzPending || tz === savedTz || tz === ''}
-                            loading={tzPending}
-                        >
-                            Save timezone
-                        </Button>
+            {isParent && (
+                <section className={card}>
+                    <SectionHead icon={Camera} tint="bg-tint-green text-tint-green-foreground" title="Profile photo" description="Shown on your account in the portal" />
+                    <div className="p-5 sm:p-6">
+                        <AvatarUploader userId={userId} photoUrl={photoUrl} name={fullName} />
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
+
+            {/* Timezone */}
+            {!isParent && (
+                <section className={card}>
+                    <SectionHead icon={Globe} tint="bg-tint-violet text-tint-violet-foreground" title="Timezone" description="Used for scheduling and displaying session times" />
+                    <div className="space-y-4 p-5 sm:p-6">
+                        <SelectField
+                            value={tz}
+                            onChange={(e) => { setTz(e.target.value); setTzFeedback(null) }}
+                            aria-label="Timezone"
+                        >
+                            {tz === '' && <option value="">Select your timezone…</option>}
+                            {tzOptions.map((option) => (
+                                <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
+                            ))}
+                        </SelectField>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            {tzFeedback ? (
+                                <p role="status" className={cn('flex items-center gap-2 text-sm', tzFeedback.ok ? 'text-success' : 'text-destructive')}>
+                                    {tzFeedback.ok ? <Check weight="bold" className="size-4" /> : <AlertCircle className="size-4" />}
+                                    <span>{tzFeedback.message}</span>
+                                </p>
+                            ) : <span />}
+                            <Button
+                                type="button"
+                                onClick={handleSaveTimezone}
+                                disabled={tzPending || tz === savedTz || tz === ''}
+                                loading={tzPending}
+                            >
+                                Save timezone
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Password */}
             <section className={card}>

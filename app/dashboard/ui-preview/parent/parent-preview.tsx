@@ -49,7 +49,6 @@ function sample(scenario: Scenario, nameGiven: boolean): ParentHomeData {
         childFirstName: linked || nameGiven ? 'Amelia' : null,
         linked,
         greeting: 'Good afternoon',
-        timezoneLabel: 'London',
         checklist: { activated: linked, profile: linked, matched: linked, booked: live },
         next: live
             ? { dateLabel: 'Thursday 23 October', timeLabel: '16:00', when: 'Tomorrow', topic: 'Timed HAT source extract', mentorName: 'Oliver Bennett', mentorPhotoUrl: null }

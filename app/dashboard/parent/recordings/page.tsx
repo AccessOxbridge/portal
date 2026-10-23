@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { getMentorPhotoUrl } from '@/lib/mentor-photo'
-import { requireParent, timezoneLabel } from '@/lib/parent-dashboard'
-import { ParentFootnote, ParentHeading, Rise } from '@/components/parent/parent-home'
+import { requireParent } from '@/lib/parent-dashboard'
+import { ParentHeading, Rise } from '@/components/parent/parent-home'
 import { wordsFor } from '@/lib/parent-words'
 import StudentRecordingsContent from '@/app/dashboard/student/recordings/recordings-content'
 
@@ -34,7 +34,7 @@ export default async function ParentRecordingsPage() {
 
     return (
         <div className="mx-auto max-w-4xl pb-16">
-            <ParentHeading childFirstName={ctx.childFirstName} title="Session recordings" />
+            <ParentHeading title="Session recordings" />
             <Rise i={1} className="mt-8">
                 <StudentRecordingsContent
                     recordings={recordings}
@@ -42,7 +42,6 @@ export default async function ParentRecordingsPage() {
                     emptyDescription={`Recordings of ${w.childs} sessions appear here a few minutes after each session ends.`}
                 />
             </Rise>
-            <ParentFootnote childFirstName={ctx.childFirstName} timezoneLabel={timezoneLabel(ctx.timezone)} />
         </div>
     )
 }

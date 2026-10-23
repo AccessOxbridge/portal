@@ -1,7 +1,7 @@
 import { CalendarBlank, Clock, FileText, VideoCamera } from '@phosphor-icons/react/ssr'
 import { createClient } from '@/utils/supabase/server'
-import { loadParentSessions, requireParent, timezoneLabel, type ParentSessionRow } from '@/lib/parent-dashboard'
-import { ParentFootnote, ParentHeading, Rise } from '@/components/parent/parent-home'
+import { loadParentSessions, requireParent, type ParentSessionRow } from '@/lib/parent-dashboard'
+import { ParentHeading, Rise } from '@/components/parent/parent-home'
 import { wordsFor } from '@/lib/parent-words'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -23,8 +23,8 @@ export default async function ParentSessionsPage() {
     const past = rows.filter((r) => r.status !== 'upcoming')
 
     return (
-        <div className="mx-auto max-w-3xl pb-16">
-            <ParentHeading childFirstName={ctx.childFirstName} title="Sessions" />
+        <div className="mx-auto max-w-4xl pb-16">
+            <ParentHeading title="Sessions" />
             <div className="mt-8 space-y-8">
                 {rows.length === 0 ? (
                     <Rise i={1}>
@@ -55,7 +55,6 @@ export default async function ParentSessionsPage() {
                     </>
                 )}
             </div>
-            <ParentFootnote childFirstName={ctx.childFirstName} timezoneLabel={timezoneLabel(ctx.timezone)} />
         </div>
     )
 }

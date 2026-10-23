@@ -69,7 +69,6 @@ export interface ParentHomeData {
     childFirstName: string | null
     linked: boolean
     greeting: string
-    timezoneLabel: string
     checklist: { activated: boolean; profile: boolean; matched: boolean; booked: boolean }
     next: ParentNextSession | null
     progress: { points: ProgressPoint[]; total: number; planLabel: string | null } | null
@@ -95,11 +94,6 @@ export interface ParentSessionRow {
 
 function firstName(fullName: string | null | undefined): string {
     return (fullName || '').trim().split(/\s+/)[0] || ''
-}
-
-/** "Europe/London" → "London". */
-export function timezoneLabel(tz: string): string {
-    return (tz.split('/').pop() || tz).replace(/_/g, ' ')
 }
 
 function greetingAt(now: Date, tz: string): string {
@@ -289,7 +283,6 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
         childFirstName: ctx.childFirstName,
         linked: Boolean(ctx.childId),
         greeting: greetingAt(now, ctx.timezone),
-        timezoneLabel: timezoneLabel(ctx.timezone),
         checklist: { activated: false, profile: false, matched: false, booked: false },
         next: null,
         progress: null,

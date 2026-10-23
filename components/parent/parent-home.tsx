@@ -12,7 +12,6 @@ import {
     CheckCircle,
     Circle,
     EnvelopeSimple,
-    Eye,
     FileText,
     GraduationCap,
     Headset,
@@ -55,108 +54,96 @@ export function Rise({ i, className, children }: { i: number; className?: string
     )
 }
 
-/** Page heading shared by every parent page: "<Child>'s progress · View only". */
-export function ParentHeading({ childFirstName, title }: { childFirstName: string | null; title: string }) {
-    const w = wordsFor(childFirstName)
+/** Page title shared by every parent page. */
+export function ParentHeading({ title }: { title: string }) {
     return (
         <Rise i={0}>
-            <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-muted-foreground">
-                {w.Childs} progress
-                <Badge tone="outline">
-                    <Eye weight="bold" />
-                    View only
-                </Badge>
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-balance sm:text-3xl">{title}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">{title}</h1>
         </Rise>
     )
 }
 
-/** The eight widgets from "Confirmed Dashboard Widgets", each with a live and an empty state. */
+/**
+ * The eight widgets from "Confirmed Dashboard Widgets", each with a live and
+ * an empty state. Two columns on wide screens, like the rest of the portal:
+ * the child's activity on the left, the people and plan on the right.
+ */
 export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onRequestHours?: () => Promise<boolean> }) {
     const w = wordsFor(data.childFirstName)
     const c = data.checklist
-    const onboarded = c.activated && c.profile && c.matched && c.booked
+    // Linked, and every onboarding step done: the checklist has nothing left to say.
+    const onboarded = data.linked && c.activated && c.profile && c.matched && c.booked
     let i = 1
     return (
-        <div className="mx-auto max-w-3xl pb-16">
-            <ParentHeading childFirstName={data.childFirstName} title={`${data.greeting}, ${data.parentFirstName}`} />
+        <div className="mx-auto max-w-6xl pb-16">
+            <ParentHeading title={`${data.greeting}, ${data.parentFirstName}`} />
 
-            <div className="mt-8 space-y-6">
-                {!data.linked && (
+            <div className="mt-8 grid items-start gap-6 xl:grid-cols-3">
+                <div className="min-w-0 space-y-6 xl:col-span-2">
+                    {!data.linked && (
+                        <Rise i={i++}>
+                            <SetupBanner w={w} />
+                        </Rise>
+                    )}
+                    {!onboarded && (
+                        <Rise i={i++}>
+                            <Onboarding data={data} w={w} />
+                        </Rise>
+                    )}
                     <Rise i={i++}>
-                        <SetupBanner w={w} />
+                        <NextSession data={data} w={w} />
                     </Rise>
-                )}
-                {!onboarded && (
                     <Rise i={i++}>
-                        <Onboarding data={data} w={w} />
+                        <ProgressGraph data={data} w={w} />
                     </Rise>
-                )}
-                <Rise i={i++}>
-                    <NextSession data={data} w={w} />
-                </Rise>
-                <Rise i={i++}>
-                    <ProgressGraph data={data} w={w} />
-                </Rise>
-                <Rise i={i++}>
-                    <SessionsAttended data={data} />
-                </Rise>
-                <Rise i={i++}>
-                    <section>
-                        <div className="mb-3 flex items-end justify-between">
-                            <h2 className="text-lg font-semibold">Session reports</h2>
-                            {data.reportsTotal > data.reports.length && (
-                                <Button asChild variant="link" size="sm">
-                                    <Link href="/dashboard/parent/reports">
-                                        All reports
-                                        <ArrowRight />
-                                    </Link>
-                                </Button>
-                            )}
-                        </div>
-                        {data.reports.length ? (
-                            <div className="space-y-4">
-                                {data.reports.map((r) => (
-                                    <ParentReportCard key={r.id} report={r} />
-                                ))}
+                    <Rise i={i++}>
+                        <SessionsAttended data={data} />
+                    </Rise>
+                    <Rise i={i++}>
+                        <section>
+                            <div className="mb-3 flex items-end justify-between">
+                                <h2 className="text-lg font-semibold">Session reports</h2>
+                                {data.reportsTotal > data.reports.length && (
+                                    <Button asChild variant="link" size="sm">
+                                        <Link href="/dashboard/parent/reports">
+                                            All reports
+                                            <ArrowRight />
+                                        </Link>
+                                    </Button>
+                                )}
                             </div>
-                        ) : (
-                            <ReportsEmpty childFirstName={data.childFirstName} />
-                        )}
-                    </section>
-                </Rise>
-                <Rise i={i++} className="grid gap-4 sm:grid-cols-2">
-                    <MentorCard data={data} w={w} />
-                    <SuccessManagerCard w={w} />
-                </Rise>
-                <Rise i={i++}>
-                    <Goals data={data} w={w} />
-                </Rise>
-                {onboarded && (
-                    <Rise i={i++}>
-                        <Onboarding data={data} w={w} />
+                            {data.reports.length ? (
+                                <div className="space-y-4">
+                                    {data.reports.map((r) => (
+                                        <ParentReportCard key={r.id} report={r} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <ReportsEmpty childFirstName={data.childFirstName} />
+                            )}
+                        </section>
                     </Rise>
-                )}
-                {data.hoursLeft !== null && (
+                </div>
+
+                {/* Two across under the main column on mid-size screens; a side column on wide ones. */}
+                <div className="grid min-w-0 items-start gap-6 sm:grid-cols-2 xl:grid-cols-1">
                     <Rise i={i++}>
-                        <RequestHours hoursLeft={data.hoursLeft} w={w} onRequest={onRequestHours} />
+                        <MentorCard data={data} w={w} />
                     </Rise>
-                )}
+                    <Rise i={i++}>
+                        <SuccessManagerCard w={w} />
+                    </Rise>
+                    <Rise i={i++}>
+                        <Goals data={data} w={w} />
+                    </Rise>
+                    {data.hoursLeft !== null && (
+                        <Rise i={i++}>
+                            <RequestHours hoursLeft={data.hoursLeft} w={w} onRequest={onRequestHours} />
+                        </Rise>
+                    )}
+                </div>
             </div>
-
-            <ParentFootnote childFirstName={data.childFirstName} timezoneLabel={data.timezoneLabel} />
         </div>
-    )
-}
-
-export function ParentFootnote({ childFirstName, timezoneLabel }: { childFirstName: string | null; timezoneLabel: string }) {
-    const w = wordsFor(childFirstName)
-    return (
-        <p className="mt-10 text-center text-sm text-muted-foreground text-pretty">
-            Times are shown in {w.childs} time zone ({timezoneLabel}). You can follow {w.childs} progress here; messages stay
-            between {w.child} and the mentor.
-        </p>
     )
 }
 
@@ -591,7 +578,7 @@ function SuccessManagerCard({ w }: { w: Words }) {
                     className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-sm text-sm font-medium text-brand underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/40"
                 >
                     <EnvelopeSimple weight="bold" className="size-4 shrink-0" />
-                    <span className="truncate">{SUCCESS_MANAGER.email}</span>
+                    <span className="[overflow-wrap:anywhere]">{SUCCESS_MANAGER.email}</span>
                 </a>
             </CardContent>
         </Card>

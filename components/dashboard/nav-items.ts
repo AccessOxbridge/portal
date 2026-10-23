@@ -109,6 +109,7 @@ export const navigation: Record<string, NavItem[]> = {
         { name: 'Sessions', href: '/dashboard/parent/sessions', icon: Calendar },
         { name: 'Reports', href: '/dashboard/parent/reports', icon: FileText },
         { name: 'Recordings', href: '/dashboard/parent/recordings', icon: Film },
+        { name: 'Resources', href: '/dashboard/parent/resources', icon: BookOpen },
     ],
     admin: adminNav,
     'admin-dev': adminNav, // Same as admin for now
@@ -122,7 +123,7 @@ export const navigation: Record<string, NavItem[]> = {
 export const MOBILE_TAB_NAMES: Record<string, string[]> = {
     student: ['Home', 'My Sessions', 'Messages', 'My Mentors'],
     mentor: ['Dashboard', 'Sessions', 'Requests', 'Messages'],
-    parent: ['Home', 'Sessions', 'Reports', 'Recordings'],
+    parent: ['Home', 'Sessions', 'Reports', 'Resources'],
 }
 
 /** Shorter labels so the tab bar fits five items across a 375px screen. */

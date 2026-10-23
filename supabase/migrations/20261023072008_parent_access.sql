@@ -3,7 +3,7 @@
 -- Date: 2026-10-22
 -- ==========================================
 -- No rows change. Plan: docs/parent-profile-plan.md. Requires
--- 20261022180000_parent_role.sql.
+-- 20261023071929_parent_role.sql.
 --
 -- 1. public.parent_student_links: one active link per parent and per
 --    student (V1 is one-to-one). Only admins create or revoke links.

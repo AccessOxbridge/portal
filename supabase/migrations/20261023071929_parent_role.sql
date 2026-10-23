@@ -4,7 +4,7 @@
 -- ==========================================
 -- No rows change. Adds 'parent' to public.user_role. A new enum value has
 -- to be committed before anything can use it, so the tables and rules
--- that use it are in the next migration (20261022180100_parent_access.sql).
+-- that use it are in the next migration (20261023072008_parent_access.sql).
 --
 -- Nothing in the app assigns this role yet; until an admin creates a
 -- parent account, no profile has it.

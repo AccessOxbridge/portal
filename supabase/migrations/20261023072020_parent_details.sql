@@ -2,7 +2,7 @@
 -- Parent accounts, part 3: details kept before linking, child sign-in status
 -- Date: 2026-10-22
 -- ==========================================
--- No rows change. Requires 20261022180100_parent_access.sql.
+-- No rows change. Requires 20261023072008_parent_access.sql.
 --
 -- 1. public.parent_profiles: one row per parent account, holding the
 --    optional child's first name an admin (later: sales) enters when the

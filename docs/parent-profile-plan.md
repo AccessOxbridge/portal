@@ -1,8 +1,9 @@
 # Parent profile: V1 plan (draft for discussion)
 
-Status: built and tested locally on `feat/parent-profile` (22 Oct): database
-rules, admin "Parents" page, and the real parent pages. Nothing parent-related
-is applied to production yet.
+Status: database rules live on production (23 Oct; dry-run and live checks:
+all 72 existing accounts see exactly what they saw before). Admin "Parents"
+page and parent pages built and tested locally on `feat/parent-profile`, not
+yet deployed.
 Last updated: 22 Oct 2026
 
 ## Build status (22 Oct)
@@ -11,9 +12,9 @@ Last updated: 22 Oct 2026
 | --- | --- |
 | Security prerequisites (profiles read scope, private fields, write-rule audit, email relay, chat rules) | Live on production |
 | Sign-up trigger fix (`20261022134710`, PR #32) | Live on production. Only mentor or student comes from sign-up; other roles are set by server code after `createUser` |
-| `20261022180000_parent_role.sql` (role value) | Tested locally |
-| `20261022180100_parent_access.sql` (links, read access to one child, no writes) | Tested locally |
-| `20261022180200_parent_details.sql` (optional child's name, "has the child signed in") | Tested locally |
+| `20261023071929_parent_role.sql` (role value) | Live on production (23 Oct) |
+| `20261023072008_parent_access.sql` (links, read access to one child, no writes) | Live on production (23 Oct) |
+| `20261023072020_parent_details.sql` (optional child's name, "has the child signed in") | Live on production (23 Oct) |
 | Admin `/dashboard/admin/parents` | Create a parent (before or after the student exists, optional child's name, optional link), link, unlink (kept as history), edit child's name, suggestions from students' saved parent email. Tested in the browser |
 | Parent pages `/dashboard/parent` (+ sessions, reports, recordings) | The 8 widgets on real data; parent nav and mobile tab bar. The mockup now renders the same component with sample data |
 | `/api/parent/request-hours` | Linked parents only; one open request a day; files a `user_issues` row (reporter_type parent) and notifies admins |
@@ -38,10 +39,10 @@ Times are shown in the child's time zone, labelled on every page.
 
 ### Production rollout (each step needs approval)
 
-1. Read-only dry run of the three parent migrations as a real student,
-   mentor and admin (transaction rolled back), then apply them in order,
-   with the row-count check before and after. They change nothing for
-   existing users (the local crawl is identical before and after).
+1. Done 23 Oct: rolled-back dry runs on production (all three apply
+   cleanly; 72 accounts x 13 visibility checks identical), then applied in
+   order with identical row counts before and after, and re-checked live
+   against yesterday's rules (0 differences).
 2. Merge and deploy the code.
 3. Pilot: create one parent account, link it, check what they see.
 
@@ -51,12 +52,11 @@ insert); the admin action then sets the role to parent with the service role,
 checks it, and deletes the account if that fails. Never from sign-up
 metadata.
 
-**Found while building (not fixed, needs its own change):** the `mentors`
-table is readable in full by anyone with the public key, signed in or not
-("Public can view active mentors"). That includes every active mentor's
-phone, Stripe account ID, contract signature, CV and DBS certificate links.
-It predates the parent work, but a phone number would let a parent get round
-"no messaging", so it should be fixed before parents go live.
+**Mentors' private fields** (found while building): were readable by anyone
+with the public key. Fixed on production 23 Oct (PR #34, migrations
+20261023065906 and 20261023070921). Still open: CV and DBS files in the public
+`mentor-assets` bucket (DBS links are guessable), the production-only
+`mentors_directory` view.
 
 ## The brief, in one line
 

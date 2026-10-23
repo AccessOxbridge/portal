@@ -9,7 +9,7 @@ import { formatDateInTz, formatTimeInTz, resolveTz } from '@/lib/timezone'
 /*
  * Data for the parent pages (/dashboard/parent/*). Every read goes through
  * the parent's own RLS-respecting client: the database only returns rows for
- * the one linked child (see 20261022180100_parent_access.sql). Nothing here
+ * the one linked child (see 20261023072008_parent_access.sql). Nothing here
  * writes, and nothing here uses the service role.
  */
 

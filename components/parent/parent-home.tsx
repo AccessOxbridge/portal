@@ -11,13 +11,11 @@ import {
     Check,
     CheckCircle,
     Circle,
-    EnvelopeSimple,
     FileText,
     GraduationCap,
     Headset,
     Hourglass,
     Medal,
-    Sparkle,
     Target,
     UserCircle,
 } from '@phosphor-icons/react/ssr'
@@ -27,7 +25,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { EmptyState } from '@/components/ui/empty-state'
 import { Field } from '@/components/ui/field'
 import { ProgressRing } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
@@ -35,6 +32,7 @@ import { toast } from '@/components/ui/toaster'
 import { normalizeReportMarkdown, sanitizeReportContent } from '@/lib/report-utils'
 import type { ParentHomeData, ParentReport } from '@/lib/parent-dashboard'
 import { SUCCESS_MANAGER, wordsFor, type ParentWords } from '@/lib/parent-words'
+import { EXAMPLE_PROGRESS, EXAMPLE_REPORT } from '@/lib/parent-examples'
 
 type Words = ParentWords
 
@@ -80,11 +78,9 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
 
             <div className="mt-8 grid items-start gap-6 xl:grid-cols-3">
                 <div className="min-w-0 space-y-6 xl:col-span-2">
-                    {!data.linked && (
-                        <Rise i={i++}>
-                            <SetupBanner w={w} />
-                        </Rise>
-                    )}
+                    <Rise i={i++}>
+                        <ProgressGraph data={data} w={w} />
+                    </Rise>
                     {!onboarded && (
                         <Rise i={i++}>
                             <Onboarding data={data} w={w} />
@@ -92,9 +88,6 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
                     )}
                     <Rise i={i++}>
                         <NextSession data={data} w={w} />
-                    </Rise>
-                    <Rise i={i++}>
-                        <ProgressGraph data={data} w={w} />
                     </Rise>
                     <Rise i={i++}>
                         <SessionsAttended data={data} />
@@ -119,7 +112,7 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
                                     ))}
                                 </div>
                             ) : (
-                                <ReportsEmpty childFirstName={data.childFirstName} />
+                                <ExampleReport childFirstName={data.childFirstName} />
                             )}
                         </section>
                     </Rise>
@@ -144,25 +137,6 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
                 </div>
             </div>
         </div>
-    )
-}
-
-function SetupBanner({ w }: { w: Words }) {
-    return (
-        <Card className="bg-tint-blue">
-            <CardContent className="flex items-start gap-4">
-                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-card text-tint-blue-foreground">
-                    <Sparkle weight="duotone" className="size-5" />
-                </div>
-                <div>
-                    <p className="font-semibold text-balance">{w.Childs} portal is being set up</p>
-                    <p className="mt-1 text-sm text-pretty text-muted-foreground">
-                        Once your account is linked to {w.childs} account, sessions, reports and progress appear here. There is nothing
-                        you need to do yet.
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
     )
 }
 
@@ -277,12 +251,13 @@ function pathOf(p: readonly (readonly [number, number])[]) {
 
 /**
  * Total sessions completed over time, against the plan when there is one.
- * Functional data, so it does not animate; the table gives screen readers the
- * same numbers. Before the first session it shows a faded, labelled sample.
+ * Before the first session it shows an example line, labelled as such, so a
+ * parent sees straight away what this will look like. Functional data, so it
+ * does not animate; the table gives screen readers the same numbers.
  */
 function ProgressGraph({ data, w }: { data: ParentHomeData; w: Words }) {
-    const progress = data.progress
-    if (!progress) return <ProgressGraphEmpty w={w} />
+    const example = !data.progress
+    const progress = data.progress ?? EXAMPLE_PROGRESS
 
     const pts = progress.points
     const totals = pts.map((p) => p.completed)
@@ -300,10 +275,14 @@ function ProgressGraph({ data, w }: { data: ParentHomeData; w: Words }) {
                         Sessions completed{plan && progress.planLabel ? `, against a plan of ${progress.planLabel}` : ''}
                     </CardDescription>
                 </div>
-                <div className="text-right">
-                    <p className="text-2xl font-semibold tabular-nums">{progress.total}</p>
-                    <p className="text-xs text-muted-foreground">{progress.total === 1 ? 'session' : 'sessions'}</p>
-                </div>
+                {example ? (
+                    <Badge tone="outline">Example</Badge>
+                ) : (
+                    <div className="text-right">
+                        <p className="text-2xl font-semibold tabular-nums">{progress.total}</p>
+                        <p className="text-xs text-muted-foreground">{progress.total === 1 ? 'session' : 'sessions'}</p>
+                    </div>
+                )}
             </CardHeader>
             <CardContent>
                 <div className="relative h-40" aria-hidden>
@@ -321,20 +300,21 @@ function ProgressGraph({ data, w }: { data: ParentHomeData; w: Words }) {
                     />
                 </div>
                 <WeekLabels labels={pts.map((p) => p.label)} />
-                {plan && (
-                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-hidden>
-                        <span className="flex items-center gap-1.5">
-                            <span className="h-0.5 w-4 rounded-full bg-brand" />
-                            {w.Child}
-                        </span>
-                        <span className="flex items-center gap-1.5">
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1.5" aria-hidden>
+                        <span className="h-0.5 w-4 rounded-full bg-brand" />
+                        {example ? 'Sessions completed' : w.Child}
+                    </span>
+                    {plan && (
+                        <span className="flex items-center gap-1.5" aria-hidden>
                             <span className="w-4 border-t-[1.5px] border-dashed border-muted-foreground/60" />
                             Plan
                         </span>
-                    </div>
-                )}
+                    )}
+                    {example && <span className="text-pretty">Example data. {w.Childs} own progress appears here once sessions begin.</span>}
+                </div>
                 <table className="sr-only">
-                    <caption>Sessions completed, by week</caption>
+                    <caption>{example ? 'Example: sessions completed, by week' : 'Sessions completed, by week'}</caption>
                     <tbody>
                         {pts.map((p) => (
                             <tr key={p.label}>
@@ -346,37 +326,6 @@ function ProgressGraph({ data, w }: { data: ParentHomeData; w: Words }) {
                         ))}
                     </tbody>
                 </table>
-            </CardContent>
-        </Card>
-    )
-}
-
-function ProgressGraphEmpty({ w }: { w: Words }) {
-    const line = points([0, 1, 3, 4, 6, 7, 9, 11], 13)
-    return (
-        <Card>
-            <CardHeader>
-                <div>
-                    <CardTitle>Progress</CardTitle>
-                    <CardDescription>Sessions completed over time</CardDescription>
-                </div>
-                <Badge tone="outline">Sample</Badge>
-            </CardHeader>
-            <CardContent>
-                <div className="relative h-40">
-                    <div className="absolute inset-0" aria-hidden>
-                        <ChartGrid />
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
-                            <path d={pathOf(line)} fill="none" className="stroke-muted-foreground/30" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                        </svg>
-                    </div>
-                    <div className="absolute inset-0 grid place-items-center px-4">
-                        <div className="rounded-control bg-card/90 px-4 py-3 text-center shadow-border backdrop-blur-sm">
-                            <p className="font-semibold text-balance">Progress tracking starts after onboarding</p>
-                            <p className="mt-0.5 text-sm text-pretty text-muted-foreground">The faded line is a sample. {w.Childs} real progress replaces it.</p>
-                        </div>
-                    </div>
-                </div>
             </CardContent>
         </Card>
     )
@@ -436,16 +385,16 @@ function SessionsAttended({ data }: { data: ParentHomeData }) {
     )
 }
 
-export function ReportsEmpty({ childFirstName }: { childFirstName: string | null }) {
+/** Before the first report: say where reports will appear, and show an example of one. */
+export function ExampleReport({ childFirstName }: { childFirstName: string | null }) {
     const w = wordsFor(childFirstName)
     return (
-        <Card>
-            <EmptyState
-                icon={FileText}
-                title="Reports appear after each session"
-                description={`${w.Childs} mentor writes a short report after every session. The newest is shown first.`}
-            />
-        </Card>
+        <div className="space-y-3">
+            <p className="text-sm text-pretty text-muted-foreground">
+                {w.Childs} mentor writes a report after every session, and it appears here. This is an example of what you’ll see.
+            </p>
+            <ParentReportCard report={EXAMPLE_REPORT} example />
+        </div>
     )
 }
 
@@ -454,7 +403,7 @@ export function ReportsEmpty({ childFirstName }: { childFirstName: string | null
  * steps; newer ones a written report. Shows whichever exists, and the
  * written report behind a toggle when both do.
  */
-export function ParentReportCard({ report }: { report: ParentReport }) {
+export function ParentReportCard({ report, example = false }: { report: ParentReport; example?: boolean }) {
     const structured = Boolean(report.summary || report.keyPoints.length || report.nextSteps.length)
     const [open, setOpen] = useState(!structured)
     return (
@@ -464,7 +413,7 @@ export function ParentReportCard({ report }: { report: ParentReport }) {
                     <CardTitle>{report.dateLabel}</CardTitle>
                     <CardDescription>Session with {report.mentorName}</CardDescription>
                 </div>
-                <FileText className="size-5 text-muted-foreground" />
+                {example ? <Badge tone="outline">Example</Badge> : <FileText className="size-5 text-muted-foreground" />}
             </CardHeader>
             <CardContent className="space-y-4">
                 {report.summary && <p className="max-w-prose text-pretty leading-relaxed">{report.summary}</p>}
@@ -564,7 +513,7 @@ function SuccessManagerCard({ w }: { w: Words }) {
             <CardContent>
                 <p className="text-sm text-muted-foreground">Success manager</p>
                 <div className="mt-3 flex items-center gap-3">
-                    <div className="grid size-12 shrink-0 place-items-center rounded-full bg-tint-violet text-tint-violet-foreground">
+                    <div className="grid size-12 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-foreground">
                         <Headset weight="duotone" className="size-6" />
                     </div>
                     <div className="min-w-0">
@@ -573,13 +522,6 @@ function SuccessManagerCard({ w }: { w: Words }) {
                     </div>
                 </div>
                 <p className="mt-3 text-sm text-pretty text-muted-foreground">Your contact for anything about {w.childs} programme.</p>
-                <a
-                    href={`mailto:${SUCCESS_MANAGER.email}`}
-                    className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-sm text-sm font-medium text-brand underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/40"
-                >
-                    <EnvelopeSimple weight="bold" className="size-4 shrink-0" />
-                    <span className="[overflow-wrap:anywhere]">{SUCCESS_MANAGER.email}</span>
-                </a>
             </CardContent>
         </Card>
     )
@@ -619,7 +561,7 @@ function Goals({ data, w }: { data: ParentHomeData; w: Words }) {
             <CardContent>
                 <p className="text-sm text-muted-foreground">Goals and milestones</p>
                 <div className="mt-3 flex items-center gap-3">
-                    <div className="grid size-10 shrink-0 place-items-center rounded-full bg-tint-blue text-tint-blue-foreground">
+                    <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-foreground">
                         <Target weight="duotone" className="size-5" />
                     </div>
                     <div className="min-w-0 flex-1">

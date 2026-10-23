@@ -26,6 +26,7 @@ import {
     Gauge,
     Pulse as Activity,
     UsersThree,
+    ChartLineUp,
 } from '@phosphor-icons/react/ssr'
 
 export interface NavItem {
@@ -105,11 +106,11 @@ export const navigation: Record<string, NavItem[]> = {
     ],
     // View-only: no messages, booking or payments.
     parent: [
-        { name: 'Home', href: '/dashboard/parent', icon: Home },
+        { name: 'Progress Tracker', href: '/dashboard/parent', icon: ChartLineUp },
+        { name: 'Resources', href: '/dashboard/parent/resources', icon: BookOpen },
         { name: 'Sessions', href: '/dashboard/parent/sessions', icon: Calendar },
         { name: 'Reports', href: '/dashboard/parent/reports', icon: FileText },
         { name: 'Recordings', href: '/dashboard/parent/recordings', icon: Film },
-        { name: 'Resources', href: '/dashboard/parent/resources', icon: BookOpen },
     ],
     admin: adminNav,
     'admin-dev': adminNav, // Same as admin for now
@@ -123,7 +124,7 @@ export const navigation: Record<string, NavItem[]> = {
 export const MOBILE_TAB_NAMES: Record<string, string[]> = {
     student: ['Home', 'My Sessions', 'Messages', 'My Mentors'],
     mentor: ['Dashboard', 'Sessions', 'Requests', 'Messages'],
-    parent: ['Home', 'Sessions', 'Reports', 'Resources'],
+    parent: ['Progress Tracker', 'Resources', 'Sessions', 'Reports'],
 }
 
 /** Shorter labels so the tab bar fits five items across a 375px screen. */
@@ -131,4 +132,5 @@ export const MOBILE_TAB_LABELS: Record<string, string> = {
     'My Sessions': 'Sessions',
     'My Mentors': 'Mentors',
     'My Profile': 'Profile',
+    'Progress Tracker': 'Progress',
 }

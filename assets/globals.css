@@ -18,7 +18,7 @@
 
   /* The old navy (#092c68) moves to the revamp's deep navy (blue 2), so pages
      not yet restyled already match the new sidebar. */
-  --color-legacy-accent: #13275a;
+  --color-legacy-accent: #122436;
   --color-legacy-accent-light: #595a81;
   --color-legacy-accent-foreground: #15196b;
   --color-rich-green-accent: #4f868e;
@@ -101,7 +101,7 @@
   --card-foreground: oklch(0.147 0.004 49.25);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: #13275a;                             /* deep navy, white text 14.3:1 */
+  --primary: #122436;                             /* guide-banner navy (Oct 2026), white text 15.8:1 */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0.001 106.424);         /* stone 100 */
   --secondary-foreground: oklch(0.216 0.006 56.043);
@@ -124,7 +124,14 @@
   --tint-green: #ecfdf5;   --tint-green-foreground: #065f46;
   --tint-rose: #fff1f2;    --tint-rose-foreground: #9f1239;
 
-  --sidebar: #13275a;
+  /* Gold from the parent guides. --gold is for lines, edges, icons and text
+     on navy (8.1:1); on white it is 2:1, so gold text on light surfaces uses
+     --gold-foreground (6.2:1 on white, 5.6:1 on --gold-soft). */
+  --gold: #cfb77e;
+  --gold-foreground: #7a5d22;
+  --gold-soft: #f7f4ec;
+
+  --sidebar: #122436;
   --sidebar-foreground: oklch(1 0 0 / 0.72);      /* 8.1:1 on the navy */
   --sidebar-primary: oklch(1 0 0);
   --sidebar-accent: oklch(1 0 0 / 0.1);           /* hover */
@@ -133,7 +140,7 @@
   --sidebar-ring: oklch(1 0 0 / 0.4);
 
   --chart-1: #2563eb;
-  --chart-2: #13275a;
+  --chart-2: #122436;
   --chart-3: #38bdf8;
   --chart-4: #a78bfa;
   --chart-5: #fbbf24;
@@ -175,6 +182,9 @@
   --color-tint-violet-foreground: var(--tint-violet-foreground);
   --color-tint-amber: var(--tint-amber);
   --color-tint-amber-foreground: var(--tint-amber-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-gold-soft: var(--gold-soft);
   --color-tint-green: var(--tint-green);
   --color-tint-green-foreground: var(--tint-green-foreground);
   --color-tint-rose: var(--tint-rose);
@@ -224,7 +234,7 @@
 
 @layer base {
   :root {
-    --brand-color: #13275a
+    --brand-color: #122436
   }
 }
 @layer utilities {

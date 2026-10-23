@@ -4,6 +4,7 @@ import { requireParent } from '@/lib/parent-dashboard'
 import { ParentHeading, Rise } from '@/components/parent/parent-home'
 import { wordsFor } from '@/lib/parent-words'
 import StudentRecordingsContent from '@/app/dashboard/student/recordings/recordings-content'
+import { ExampleRecording } from '@/components/parent/example-recording'
 
 /**
  * Session recordings for the linked child, played through /api/recording,
@@ -36,11 +37,11 @@ export default async function ParentRecordingsPage() {
         <div className="mx-auto max-w-4xl pb-16">
             <ParentHeading title="Session recordings" />
             <Rise i={1} className="mt-8">
-                <StudentRecordingsContent
-                    recordings={recordings}
-                    timezone={ctx.timezone}
-                    emptyDescription={`Recordings of ${w.childs} sessions appear here a few minutes after each session ends.`}
-                />
+                {recordings.length ? (
+                    <StudentRecordingsContent recordings={recordings} timezone={ctx.timezone} />
+                ) : (
+                    <ExampleRecording childsLabel={w.childs} />
+                )}
             </Rise>
         </div>
     )

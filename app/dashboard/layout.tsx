@@ -39,7 +39,7 @@ export default async function DashboardLayout({
             full_name, 
             role,
             photo_url,
-            mentors (
+            mentors:mentors_private (
                 status,
                 bio,
                 photo_url,
@@ -80,7 +80,7 @@ export default async function DashboardLayout({
                     let mentorsData: { status: string | null; bio: string | null; photo_url: string | null; payouts_enabled: boolean | null; questionnaire_completed_at: string | null; contract_signed_at: string | null; dbs_certificate_url: string | null; background_check_confirmed_at: string | null; profile_completed_at: string | null } | null = null
                     if (existingProfile.role === 'mentor' || existingProfile.role === 'admin-dev') {
                         const { data: mentorRow } = await supabase
-                            .from('mentors')
+                            .from('mentors_private')
                             .select('status, bio, photo_url, payouts_enabled, questionnaire_completed_at, contract_signed_at, dbs_certificate_url, background_check_confirmed_at, profile_completed_at')
                             .eq('id', user.id)
                             .single()
@@ -99,7 +99,7 @@ export default async function DashboardLayout({
                     full_name, 
                     role,
                     photo_url,
-                    mentors (
+                    mentors:mentors_private (
                         status,
                         bio,
                         photo_url,

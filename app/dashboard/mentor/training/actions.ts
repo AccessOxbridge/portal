@@ -231,7 +231,7 @@ export async function submitBackgroundCheck(formData: FormData) {
     try {
         // Try to get the stored public URL again in case the earlier upload branch executed.
         const dbRow = await supabase
-            .from('mentors')
+            .from('mentors_private')
             .select('dbs_certificate_url')
             .eq('id', user.id)
             .single()

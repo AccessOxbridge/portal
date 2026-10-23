@@ -28,7 +28,7 @@ export default async function AdminApprovalsPage() {
     if (!profile || (profile.role !== 'admin' && profile.role !== 'admin-dev')) return redirect('/dashboard')
 
     const { data: mentors } = await supabase
-        .from('mentors')
+        .from('mentors_private')
         .select(`
             *,
             profiles:profiles!mentors_id_fkey (

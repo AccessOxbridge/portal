@@ -50,7 +50,6 @@ export default async function StudentMentorProfilePage({ params }: PageProps) {
             expertise,
             university,
             photo_url,
-            cv_url,
             timezone,
             profile:profiles!mentors_id_fkey ( full_name )
         `)
@@ -60,6 +59,14 @@ export default async function StudentMentorProfilePage({ params }: PageProps) {
     if (!mentor) {
         return redirect('/dashboard/student/mentors')
     }
+
+    // The CV link is private: mentors_private only fills it in for a
+    // student's own mentors.
+    const { data: privateFields } = await supabase
+        .from('mentors_private')
+        .select('cv_url')
+        .eq('id', mentorId)
+        .maybeSingle()
 
     // Session stats between this student and this mentor.
     const { data: sessions } = await supabase
@@ -93,7 +100,7 @@ export default async function StudentMentorProfilePage({ params }: PageProps) {
                     expertise: mentor.expertise || [],
                     university: mentor.university,
                     photo_url: mentor.photo_url,
-                    cv_url: mentor.cv_url,
+                    cv_url: privateFields?.cv_url ?? null,
                 }}
                 isCurrent={isCurrent}
                 totalSessions={totalSessions}

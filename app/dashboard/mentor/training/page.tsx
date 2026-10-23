@@ -43,7 +43,7 @@ export default async function MentorTrainingPage({ searchParams }: MentorTrainin
     // Fetch mentor details - using only existing columns for now
     // New columns will be added via database migration
     const { data: mentor } = await supabase
-        .from('mentors')
+        .from('mentors_private')
         .select(`
             id,
             status,

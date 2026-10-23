@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
         // 3. Check if mentor already has a Stripe account
         const { data: mentor } = await supabase
-            .from('mentors')
+            .from('mentors_private')
             .select('stripe_account_id, payouts_enabled')
             .eq('id', user.id)
             .single()

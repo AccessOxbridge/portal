@@ -16,7 +16,7 @@ export default async function ParentResourcesPage() {
     const w = wordsFor(ctx.childFirstName)
 
     return (
-        <div className="mx-auto max-w-6xl pb-16">
+        <div className="mx-auto max-w-7xl pb-16">
             <ParentHeading title="Resources" />
             <Rise i={1}>
                 <p className="mt-2 max-w-2xl text-pretty text-muted-foreground">
@@ -26,8 +26,8 @@ export default async function ParentResourcesPage() {
 
             <Rise i={2}>
                 <section className="mt-8">
-                    <h2 className="mb-3 text-lg font-semibold">For you</h2>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <h2 className="mb-3 text-lg font-semibold">Parent Resources</h2>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {PARENT_GUIDES.map((g) => (
                             <GuideCard
                                 key={g.slug}
@@ -44,8 +44,8 @@ export default async function ParentResourcesPage() {
 
             <Rise i={3}>
                 <section className="mt-10">
-                    <h2 className="mb-3 text-lg font-semibold">For {w.child}</h2>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <h2 className="mb-3 text-lg font-semibold">{w.Childs} Resources</h2>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {LOCKED_RESOURCES.map((r) => (
                             <LockedCard key={r.title} title={r.title} summary={r.summary} childFirstName={ctx.childFirstName} />
                         ))}

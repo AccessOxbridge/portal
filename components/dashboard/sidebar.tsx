@@ -128,8 +128,8 @@ export default function Sidebar({
     // outside click or Escape by itself and returns focus to its button.
 
     // Base nav items for the current role, reordered to match the saved custom order.
-    // Items not present in the saved order keep their original position (appended in
-    // original order), so newly added tabs still show up.
+    // Items not present in the saved order (newly added or renamed tabs) go back to
+    // their default position, so a renamed first tab stays first.
     const orderedBaseItems = useMemo(() => {
         const baseItems = navigation[effectiveRole as keyof typeof navigation] || navigation.student
         if (navOrder.length === 0) return baseItems
@@ -142,7 +142,9 @@ export default function Sidebar({
                 remaining.delete(name)
             }
         }
-        for (const item of remaining.values()) ordered.push(item)
+        for (const item of remaining.values()) {
+            ordered.splice(Math.min(baseItems.indexOf(item), ordered.length), 0, item)
+        }
         return ordered
     }, [effectiveRole, navOrder])
 

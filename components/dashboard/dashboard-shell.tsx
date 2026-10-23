@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import Sidebar from '@/components/dashboard/sidebar'
 import MobileTopBar from '@/components/dashboard/mobile-top-bar'
 import MobileTabBar from '@/components/dashboard/mobile-tab-bar'
+import { LogoWatermark } from './logo-watermark'
 import { cn } from '@/utils/lib'
 
 const STORAGE_KEY = 'dashboard-sidebar-collapsed'
@@ -55,7 +56,9 @@ export default function DashboardShell({
 
     return (
         // 100dvh rather than 100vh so the mobile URL bar doesn't crop the layout.
-        <div data-density={density} className="flex h-[100dvh] overflow-hidden bg-background">
+        // isolate: the watermark's -z-10 stays inside this shell, above its
+        // background and below everything else, without new stacking layers.
+        <div data-density={density} className="isolate flex h-[100dvh] overflow-hidden bg-background">
             {showSidebar && (
                 <Sidebar
                     {...sidebarProps}
@@ -68,7 +71,9 @@ export default function DashboardShell({
                 className={cn(
                     'flex-1 min-h-0 overflow-x-hidden overscroll-contain transition-[margin-left] duration-200 ease-snappy motion-reduce:transition-none',
                     showSidebar
-                        ? 'bg-background overflow-y-auto'
+                        // Transparent so the shell's background (and the
+                        // watermark painted on it) shows through.
+                        ? 'overflow-y-auto'
                         // Sidebar-less screens (mentor onboarding, Application
                         // Pending) still need to scroll, or short viewports
                         // strand content, e.g. Sign Out, below the fold.
@@ -78,6 +83,7 @@ export default function DashboardShell({
                 )}
             >
                 {showSidebar && <MobileTopBar />}
+                {showSidebar && <LogoWatermark sidebarCollapsed={collapsed} />}
 
                 {showSidebar ? (
                     <div

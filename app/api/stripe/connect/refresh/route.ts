@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
         // 2. Get mentor's Stripe account ID
         const { data: mentor } = await supabase
-            .from('mentors')
+            .from('mentors_private')
             .select('stripe_account_id')
             .eq('id', user.id)
             .single()

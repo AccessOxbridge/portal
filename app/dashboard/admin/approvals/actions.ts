@@ -34,7 +34,7 @@ export async function handleApplication(userId: string, status: 'approved' | 'di
     if (status === 'approved') {
         // Fetch mentor data to generate embedding
         const { data: mentor } = await supabase
-            .from('mentors')
+            .from('mentors_private')
             .select('responses')
             .eq('id', userId)
             .single()

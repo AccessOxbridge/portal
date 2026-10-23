@@ -2043,6 +2043,56 @@ export type Database = {
           },
         ]
       }
+      mentors_private: {
+        Row: {
+          background_check_confirmed_at: string | null
+          bio: string | null
+          contract_signature: string | null
+          contract_signed_at: string | null
+          created_at: string | null
+          cv_url: string | null
+          dbs_certificate_url: string | null
+          embedding: string | null
+          expertise: string[] | null
+          hourly_rate_cents: number | null
+          id: string | null
+          is_active: boolean | null
+          payouts_enabled: boolean | null
+          phone: string | null
+          photo_url: string | null
+          profile_completed_at: string | null
+          q_alevels: string | null
+          q_approach: string | null
+          q_oxbridge_college: string | null
+          q_specialisation: string | null
+          questionnaire_completed_at: string | null
+          quiz_answers: Json | null
+          quiz_completed_at: string | null
+          responses: Json | null
+          status: Database["public"]["Enums"]["mentor_status"] | null
+          stripe_account_id: string | null
+          timezone: string | null
+          training_completed_at: string | null
+          university: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentors_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentors_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles_private"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_private: {
         Row: {
           credits: number | null

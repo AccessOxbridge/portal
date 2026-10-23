@@ -28,7 +28,7 @@ export default async function MentorDashboard() {
 
     // Check application status
     const { data: mentor } = await supabase
-        .from('mentors')
+        .from('mentors_private')
         .select('*')
         .eq('id', user.id)
         .single()

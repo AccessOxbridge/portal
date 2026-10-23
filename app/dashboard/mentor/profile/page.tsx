@@ -24,7 +24,7 @@ export default async function MentorProfilePage() {
     }
 
     const { data: mentor } = await supabase
-        .from('mentors')
+        .from('mentors_private')
         .select('*')
         .eq('id', user.id)
         .single()

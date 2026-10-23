@@ -38,7 +38,7 @@ export async function loadMentorOverview(db: SupabaseClient, mentorId: string): 
 
     const [{ data: profile }, { data: mentor }] = await Promise.all([
         db.from('profiles').select('full_name').eq('id', mentorId).single(),
-        db.from('mentors')
+        db.from('mentors_private')
             .select('hourly_rate_cents, timezone, questionnaire_completed_at, contract_signed_at, dbs_certificate_url, background_check_confirmed_at, payouts_enabled, profile_completed_at, bio, photo_url')
             .eq('id', mentorId)
             .single(),

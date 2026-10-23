@@ -68,7 +68,7 @@ export default function MentorProfilePage() {
             setIsLoading(true)
 
             const { data: mentorData, error } = await supabase
-                .from('mentors')
+                .from('mentors_private')
                 .select(`
                     *,
                     profile:profiles_private!mentors_id_fkey (

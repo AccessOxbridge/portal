@@ -22,7 +22,7 @@ export default async function MentorPayoutsPage() {
 
     // Get mentor's Stripe Connect status
     const { data: mentor } = await supabase
-        .from('mentors')
+        .from('mentors_private')
         .select('stripe_account_id, payouts_enabled, hourly_rate_cents')
         .eq('id', user.id)
         .single()

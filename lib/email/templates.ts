@@ -894,6 +894,46 @@ export function studentWelcome(args: {
     }
 }
 
+/**
+ * Staff-provisioned parent account: login details and what the parent view
+ * shows. `childFirstName` is optional (the parent may be created before the
+ * student exists); without it the copy says "your child".
+ */
+export function parentWelcome(args: {
+    fullName: string
+    email: string
+    password: string
+    childFirstName?: string | null
+}): EmailTemplate {
+    const firstName = firstNameFrom(args.fullName)
+    const childs = args.childFirstName ? `${escapeHtml(args.childFirstName)}'s` : "your child's"
+    return {
+        subject: `Welcome to Access Oxbridge, ${firstName} - Your Parent Login`,
+        html: layout({
+            title: 'Welcome to Access Oxbridge',
+            preheader: `Your parent login for following ${childs} progress.`,
+            paragraphs: [
+                `Hi ${escapeHtml(firstName)},`,
+                `Welcome to Access Oxbridge! Your parent account lets you follow ${childs} progress on the portal.`,
+            ],
+            list: {
+                heading: 'What you can see',
+                items: [
+                    { body: 'Upcoming and past sessions, and who they are with.' },
+                    { body: 'The report the mentor writes after each session, and session recordings.' },
+                    { body: 'Progress over time, hours remaining, and goals.' },
+                ],
+            },
+            closingParagraphs: [
+                `<strong>Your login details:</strong><br />${loginDetailsParagraph(args.email, args.password)}`,
+                'For security, please log in and change your password as soon as you can.',
+                `The parent view is read-only: sessions and messages stay between ${childs.replace(/'s$/, '')} and the mentor. If you need anything, just reply to this email.`,
+            ],
+            signOff: ['Best wishes,', 'The Access Oxbridge Team'],
+        }),
+    }
+}
+
 /** Staff-provisioned mentor account: login details + onboarding next steps. */
 export function mentorWelcome(args: {
     fullName: string

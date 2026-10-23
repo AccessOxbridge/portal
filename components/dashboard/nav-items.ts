@@ -25,6 +25,7 @@ import {
     FilmStrip as Film,
     Gauge,
     Pulse as Activity,
+    UsersThree,
 } from '@phosphor-icons/react/ssr'
 
 export interface NavItem {
@@ -57,6 +58,7 @@ const adminNav: NavItem[] = [
     { name: 'Approvals', href: '/dashboard/admin/approvals', icon: CheckCircle },
     { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
     { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
+    { name: 'Parents', href: '/dashboard/admin/parents', icon: UsersThree },
     { name: 'Create Account', href: '/dashboard/admin/create-account', icon: UserPlus },
     { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
     { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },
@@ -101,6 +103,13 @@ export const navigation: Record<string, NavItem[]> = {
         { name: 'Availability', href: '/dashboard/mentor/availability', icon: CheckCircle },
         { name: 'My Profile', href: '/dashboard/mentor/profile', icon: User },
     ],
+    // View-only: no messages, booking or payments.
+    parent: [
+        { name: 'Home', href: '/dashboard/parent', icon: Home },
+        { name: 'Sessions', href: '/dashboard/parent/sessions', icon: Calendar },
+        { name: 'Reports', href: '/dashboard/parent/reports', icon: FileText },
+        { name: 'Recordings', href: '/dashboard/parent/recordings', icon: Film },
+    ],
     admin: adminNav,
     'admin-dev': adminNav, // Same as admin for now
 }
@@ -113,6 +122,7 @@ export const navigation: Record<string, NavItem[]> = {
 export const MOBILE_TAB_NAMES: Record<string, string[]> = {
     student: ['Home', 'My Sessions', 'Messages', 'My Mentors'],
     mentor: ['Dashboard', 'Sessions', 'Requests', 'Messages'],
+    parent: ['Home', 'Sessions', 'Reports', 'Recordings'],
 }
 
 /** Shorter labels so the tab bar fits five items across a 375px screen. */

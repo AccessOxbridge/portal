@@ -16,7 +16,7 @@ export interface NewIssueNotification {
     priority?: string
     /** Reporter's display name; falls back to their role. */
     reporterName?: string | null
-    reporterType: 'mentor' | 'student'
+    reporterType: 'mentor' | 'student' | 'parent'
     /** In-app notification title. Defaults to "New issue reported". */
     title?: string
     /** In-app notification body. Defaults to a short summary of the report. */
@@ -53,7 +53,7 @@ export async function notifyAdminsOfNewIssue(
         }
         if (!admins || admins.length === 0) return
 
-        const reporterLabel = `${issue.reporterName || (issue.reporterType === 'mentor' ? 'A mentor' : 'A student')} (${issue.reporterType})`
+        const reporterLabel = `${issue.reporterName || (issue.reporterType === 'mentor' ? 'A mentor' : issue.reporterType === 'parent' ? 'A parent' : 'A student')} (${issue.reporterType})`
         const priority = issue.priority || 'normal'
 
         // student_help issues are triaged on their own page.

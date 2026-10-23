@@ -16,5 +16,5 @@ export const WATERMARK = {
     tone: 'navy' as 'navy' | 'gold' | 'off',
     opacity: { navy: 0.1, gold: 0.14 },
     size: 'min(115vh, 170vw)',
-    centre: { x: 0.58, y: 0.5 },
+    centre: { x: 0.65, y: 0.7 },
 }

@@ -4,6 +4,7 @@ import { getGreetingName } from '@/utils/lib'
 import DashboardShell from '@/components/dashboard/dashboard-shell'
 import StudentCreditsProvider from '@/components/dashboard/student-credits-provider'
 import HelpSupportButton from '@/components/dashboard/help-support-button'
+import { ProgrammesLink } from '@/components/parent/programmes-link'
 import type { StudentBookingProfile } from '@/components/dashboard/book-session-modal'
 import type { RateableSession } from '@/components/dashboard/rate-session-modal'
 import { feedbackPromptWindowStart } from '@/config/feedback.config'
@@ -435,6 +436,15 @@ export default async function DashboardLayout({
             >
                 {dashboardShell}
             </StudentCreditsProvider>
+        )
+    }
+
+    if (profile.role === 'parent') {
+        return (
+            <>
+                {dashboardShell}
+                <ProgrammesLink />
+            </>
         )
     }
 

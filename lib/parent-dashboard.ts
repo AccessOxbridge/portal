@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation'
 import type { Database } from '@/utils/supabase/types'
 import { MILESTONES } from '@/config/milestones.config'
 import { getMentorPhotoUrl } from '@/lib/mentor-photo'
-import { describePace, isPlanType, parseStartDate, type SessionTarget } from '@/lib/session-frequency'
 import { formatDateInTz, formatTimeInTz, resolveTz } from '@/lib/timezone'
+import type { ParentDocument, StudentInfo } from '@/lib/parent-student-info'
 
 /*
  * Data for the parent pages (/dashboard/parent/*). Every read goes through
@@ -16,9 +16,6 @@ import { formatDateInTz, formatTimeInTz, resolveTz } from '@/lib/timezone'
 type Client = SupabaseClient<Database>
 
 const DAY_MS = 24 * 60 * 60 * 1000
-const WEEK_MS = 7 * DAY_MS
-/** Weeks shown on the progress graph. */
-const PROGRESS_WEEKS = 10
 /** "Recent" in Sessions attended. */
 const RECENT_DAYS = 28
 
@@ -58,20 +55,17 @@ export interface ParentMentor {
     bio: string | null
 }
 
-export interface ProgressPoint {
-    label: string
-    completed: number
-    plan: number | null
-}
-
 export interface ParentHomeData {
     parentFirstName: string
     childFirstName: string | null
     linked: boolean
     greeting: string
-    checklist: { activated: boolean; profile: boolean; matched: boolean; booked: boolean }
+    /** Getting started: info sent, offer made, enrolled (mentor matched), first session booked. */
+    checklist: { submitted: boolean; offered: boolean; enrolled: boolean; learning: boolean }
+    /** What the parent told us about their child, and the documents they uploaded. */
+    studentInfo: StudentInfo | null
+    documents: ParentDocument[]
     next: ParentNextSession | null
-    progress: { points: ProgressPoint[]; total: number; planLabel: string | null } | null
     attended: { total: number; recent: number; upcoming: number }
     reports: ParentReport[]
     reportsTotal: number
@@ -130,12 +124,15 @@ export async function requireParent(supabase: Client): Promise<ParentContext> {
     const { data: me } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
     if (me?.role !== 'parent') redirect('/dashboard')
 
-    const [{ data: link }, { data: details }] = await Promise.all([
+    const [{ data: link }, { data: details }, { data: info }] = await Promise.all([
         supabase.from('parent_student_links').select('student_id').eq('parent_id', user.id).is('revoked_at', null).maybeSingle(),
         supabase.from('parent_profiles').select('child_first_name').eq('id', user.id).maybeSingle(),
+        supabase.from('parent_student_info').select('child_first_name').eq('parent_id', user.id).maybeSingle(),
     ])
 
-    let childFirstName = details?.child_first_name || null
+    // The linked child's name wins; then the name the team entered; then the
+    // one the parent gave on the student profile form.
+    let childFirstName = details?.child_first_name || info?.child_first_name || null
     let timezone = resolveTz(null)
     if (link) {
         const [{ data: child }, { data: academic }] = await Promise.all([
@@ -238,44 +235,6 @@ export async function loadParentSessions(supabase: Client, ctx: ParentContext, n
     return [...upcoming, ...past].map((x) => x.row)
 }
 
-/**
- * Total sessions completed at the end of each of the last few weeks, and,
- * when the admin set a plan, where the plan says the total should be. Before
- * the plan starts the plan line follows the real total. Same counting rule
- * as the pace check and milestones: status 'completed' only.
- */
-export function buildProgress(completedAt: Date[], target: SessionTarget | null, now: Date, tz: string): ParentHomeData['progress'] {
-    if (!completedAt.length) return null
-    const first = Math.min(...completedAt.map((d) => d.getTime()))
-    const weeks = Math.max(2, Math.min(PROGRESS_WEEKS, Math.floor((now.getTime() - first) / WEEK_MS) + 2))
-    const countBy = (t: number) => completedAt.filter((d) => d.getTime() <= t).length
-
-    const start = target ? parseStartDate(target.startDate).getTime() : null
-    const rate = target ? target.sessions / target.weeks : 0
-    const beforeStart = start !== null ? completedAt.filter((d) => d.getTime() < start).length : 0
-
-    const points: ProgressPoint[] = []
-    for (let k = 0; k < weeks; k++) {
-        const end = now.getTime() - (weeks - 1 - k) * WEEK_MS
-        let plan: number | null = null
-        if (target && start !== null && start <= now.getTime()) {
-            if (end < start) {
-                plan = countBy(end)
-            } else {
-                const due = rate * ((end - start) / WEEK_MS)
-                plan = beforeStart + (target.planType === 'package' ? Math.min(target.sessions, due) : due)
-            }
-        }
-        points.push({ label: formatDateInTz(new Date(end), tz, { day: 'numeric', month: 'short' }), completed: countBy(end), plan })
-    }
-
-    return {
-        points,
-        total: completedAt.length,
-        planLabel: target && start !== null && start <= now.getTime() ? describePace(target.sessions, target.weeks) : null,
-    }
-}
-
 /** Everything the parent home page shows. */
 export async function loadParentHome(supabase: Client, ctx: ParentContext, now = new Date()): Promise<ParentHomeData> {
     const base: ParentHomeData = {
@@ -283,9 +242,10 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
         childFirstName: ctx.childFirstName,
         linked: Boolean(ctx.childId),
         greeting: greetingAt(now, ctx.timezone),
-        checklist: { activated: false, profile: false, matched: false, booked: false },
+        checklist: { submitted: false, offered: false, enrolled: false, learning: false },
+        studentInfo: null,
+        documents: [],
         next: null,
-        progress: null,
         attended: { total: 0, recent: 0, upcoming: 0 },
         reports: [],
         reportsTotal: 0,
@@ -294,16 +254,19 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
         milestones: { thresholds: MILESTONES, completed: 0 },
         hoursLeft: null,
     }
+    const profile = await loadStudentProfile(supabase, ctx.userId)
+    base.studentInfo = profile.info
+    base.documents = profile.documents
+    base.checklist.submitted = Boolean(profile.info)
+
     const childId = ctx.childId
     if (!childId) return base
 
-    const [sessions, { data: academic }, { data: assignments }, { data: targetRow }, { data: account }, { data: signedIn }] = await Promise.all([
+    const [sessions, { data: academic }, { data: assignments }, { data: account }] = await Promise.all([
         loadSessions(supabase, childId),
-        supabase.from('student_profiles').select('is_complete, target_university, target_course, application_year').eq('id', childId).maybeSingle(),
+        supabase.from('student_profiles').select('target_university, target_course, application_year').eq('id', childId).maybeSingle(),
         supabase.from('student_mentor_assignments').select('mentor_id, created_at').eq('student_id', childId).eq('is_current', true).order('created_at', { ascending: false }),
-        supabase.from('student_session_targets').select('plan_type, sessions, weeks, start_date').eq('student_id', childId).maybeSingle(),
         supabase.from('profiles_private').select('credits').eq('id', childId).maybeSingle(),
-        supabase.rpc('my_child_has_signed_in'),
     ])
 
     const nowMs = now.getTime()
@@ -311,11 +274,6 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
         .filter((s) => s.status === 'completed' && s.scheduled_at)
         .map((s) => new Date(s.scheduled_at as string))
     const upcoming = sessions.filter((s) => s.status === 'active' && s.scheduled_at && Date.parse(s.scheduled_at) > nowMs)
-
-    const target: SessionTarget | null =
-        targetRow && isPlanType(targetRow.plan_type) && targetRow.sessions > 0 && Number(targetRow.weeks) > 0
-            ? { planType: targetRow.plan_type, sessions: targetRow.sessions, weeks: Number(targetRow.weeks), startDate: targetRow.start_date }
-            : null
 
     const nextRow = upcoming[0]
     const next: ParentNextSession | null = nextRow
@@ -358,13 +316,14 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
     return {
         ...base,
         checklist: {
-            activated: signedIn === true,
-            profile: Boolean(academic?.is_complete),
-            matched: Boolean(assignments?.length),
-            booked: sessions.some((s) => s.status !== 'cancelled'),
+            // A linked family has been through the consultation and enrolled,
+            // whether or not the parent used the form.
+            submitted: true,
+            offered: true,
+            enrolled: Boolean(assignments?.length),
+            learning: sessions.some((s) => s.status !== 'cancelled'),
         },
         next,
-        progress: buildProgress(completedAt, target, now, ctx.timezone),
         attended: {
             total: completedAt.length,
             recent: completedAt.filter((d) => nowMs - d.getTime() <= RECENT_DAYS * DAY_MS).length,
@@ -376,5 +335,28 @@ export async function loadParentHome(supabase: Client, ctx: ParentContext, now =
         goal,
         milestones: { thresholds: MILESTONES, completed: completedAt.length },
         hoursLeft: account?.credits ?? null,
+    }
+}
+
+/** The parent's own student profile form and uploaded documents (RLS: their own rows). */
+export async function loadStudentProfile(supabase: Client, parentId: string): Promise<{ info: StudentInfo | null; documents: ParentDocument[] }> {
+    const [{ data: info }, { data: docs }] = await Promise.all([
+        supabase.from('parent_student_info').select('*').eq('parent_id', parentId).maybeSingle(),
+        supabase.from('parent_documents').select('id, file_name, mime_type, size_bytes, created_at').eq('parent_id', parentId).order('created_at', { ascending: false }),
+    ])
+    return {
+        info: info
+            ? {
+                  childFirstName: info.child_first_name,
+                  childLastName: info.child_last_name ?? '',
+                  school: info.school ?? '',
+                  yearGroup: info.year_group ?? '',
+                  subjects: info.subjects ?? '',
+                  courseInterest: info.course_interest ?? '',
+                  universityPreference: info.university_preference ?? '',
+                  notes: info.notes ?? '',
+              }
+            : null,
+        documents: (docs || []).map((d) => ({ id: d.id, fileName: d.file_name, mimeType: d.mime_type, sizeBytes: d.size_bytes, createdAt: d.created_at })),
     }
 }

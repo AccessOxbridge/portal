@@ -1,4 +1,4 @@
-import type { ParentReport, ProgressPoint } from '@/lib/parent-dashboard'
+import type { ParentReport } from '@/lib/parent-dashboard'
 
 /*
  * Examples shown to a parent before their child has any of the real thing
@@ -56,17 +56,6 @@ export const EXAMPLE_REPORT: ParentReport = {
         '',
         'Hannah',
     ].join('\n'),
-}
-
-/** An example of the progress line once sessions are under way. */
-export const EXAMPLE_PROGRESS: { points: ProgressPoint[]; total: number; planLabel: string } = {
-    points: [0, 1, 2, 4, 5, 6, 8, 9, 11, 12].map((completed, i) => ({
-        label: `Week ${i + 1}`,
-        completed,
-        plan: Math.round((i + 1) * 1.25 * 10) / 10,
-    })),
-    total: 12,
-    planLabel: '1 session a week',
 }
 
 /**

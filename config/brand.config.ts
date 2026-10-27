@@ -13,7 +13,7 @@
  *   area's width and height (0.5 is the middle).
  */
 export const WATERMARK = {
-    tone: 'navy' as 'navy' | 'gold' | 'off',
+    tone: 'off' as 'navy' | 'gold' | 'off',
     opacity: { navy: 0.1, gold: 0.14 },
     size: 'min(115vh, 170vw)',
     centre: { x: 0.65, y: 0.7 },

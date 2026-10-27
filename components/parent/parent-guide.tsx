@@ -73,10 +73,10 @@ function Panel({ children }: { children: React.ReactNode }) {
     return <div className="rounded-r-card border-l-4 border-gold bg-gold-soft p-5 sm:p-6">{children}</div>
 }
 
-function SectionTitle({ label, title }: { label: string; title: string }) {
+function SectionTitle({ label, title }: { label?: string; title: string }) {
     return (
         <div className="pt-6">
-            <Eyebrow>{label}</Eyebrow>
+            {label && <Eyebrow>{label}</Eyebrow>}
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-balance">{title}</h2>
             <div className="mt-3 h-0.5 w-10 rounded-full bg-gold" />
         </div>
@@ -198,6 +198,23 @@ function Block({ block }: { block: Grouped }) {
                     </ol>
                 </Panel>
             )
+        case 'myths':
+            return (
+                <ul className="space-y-3">
+                    {block.items.map((m) => (
+                        <li key={m.myth} className="overflow-hidden rounded-card bg-card shadow-border">
+                            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-border px-5 py-3">
+                                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Myth</span>
+                                <span className="font-semibold text-foreground">{m.myth}</span>
+                            </p>
+                            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-l-4 border-gold bg-gold-soft px-5 py-3">
+                                <span className="text-xs font-semibold tracking-wider text-gold-foreground uppercase">Reality</span>
+                                <span className="text-pretty text-foreground/90">{m.reality}</span>
+                            </p>
+                        </li>
+                    ))}
+                </ul>
+            )
         case 'callout':
             return (
                 <Panel>
@@ -208,8 +225,8 @@ function Block({ block }: { block: Grouped }) {
         case 'list':
             return (
                 <Panel>
-                    <Eyebrow>{block.label}</Eyebrow>
-                    <ul className="mt-3 space-y-2.5">
+                    {block.label && <Eyebrow>{block.label}</Eyebrow>}
+                    <ul className={block.label ? 'mt-3 space-y-2.5' : 'space-y-2.5'}>
                         {block.items.map((item) => (
                             <li key={item} className="flex gap-2.5 text-pretty text-foreground">
                                 <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-gold-foreground" aria-hidden />
@@ -223,7 +240,7 @@ function Block({ block }: { block: Grouped }) {
             return (
                 <section>
                     <SectionTitle label={block.label} title={block.title} />
-                    <p className="mt-3 leading-relaxed text-pretty text-foreground/90">{block.intro}</p>
+                    {block.intro && <p className="mt-3 leading-relaxed text-pretty text-foreground/90">{block.intro}</p>}
                     <ul className="mt-4 grid gap-x-6 sm:grid-cols-2">
                         {block.items.map((item) => (
                             <li key={item} className="flex items-start gap-3 border-b border-border py-2.5 text-sm text-foreground">

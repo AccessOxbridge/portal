@@ -4,11 +4,13 @@
  * Each guide is the content of a PDF from the Access Oxbridge team, rebuilt as
  * blocks so it reads as a portal page (and reflows on a phone) instead of a
  * download. The wording is the PDF's. To add a guide, add an entry to
- * PARENT_GUIDES; to tease one that isn't available yet, add it to
- * LOCKED_RESOURCES (title and one line only, no content).
+ * PARENT_GUIDES. The guides written for students are in ./child-guides
+ * (CHILD_GUIDES), locked until the family is enrolled.
  *
  * Server-only data: the pages that render it check the caller is a parent.
  */
+
+import { CHILD_GUIDES } from '@/lib/child-guides'
 
 export type GuideBlock =
     | { type: 'lead'; text: string }
@@ -19,14 +21,16 @@ export type GuideBlock =
     | { type: 'table'; label: string; intro: string; columns: string[]; rows: string[][] }
     | { type: 'stats'; label: string; items: { value: string; text: string }[] }
     | { type: 'callout'; label: string; text: string }
-    | { type: 'list'; label: string; items: string[] }
+    | { type: 'list'; label?: string; items: string[] }
     | { type: 'links'; title: string; intro: string; items: { label: string; href: string; text: string }[] }
     /** A numbered stage heading (gold circle), as in the application guide. */
     | { type: 'stage'; n: number; title: string }
     /** "The journey at a glance": a numbered overview of the stages. */
     | { type: 'glance'; label: string; intro: string; items: string[] }
     /** A tick-list of milestones (decorative boxes). */
-    | { type: 'checklist'; label: string; title: string; intro: string; items: string[] }
+    | { type: 'checklist'; label?: string; title: string; intro?: string; items: string[] }
+    /** "Myths and reality" pairs, as in the interview guide. */
+    | { type: 'myths'; items: { myth: string; reality: string }[] }
 
 export interface ParentGuide {
     slug: string
@@ -36,11 +40,6 @@ export interface ParentGuide {
     /** One line for the card on the Resources page. */
     summary: string
     blocks: GuideBlock[]
-}
-
-export interface LockedResource {
-    title: string
-    summary: string
 }
 
 const OXFORD = 'https://www.ox.ac.uk/admissions/undergraduate'
@@ -987,16 +986,12 @@ const supportingTopGrades: ParentGuide = {
 export const PARENT_GUIDES: ParentGuide[] = [oxbridgeDictionary, applicationProcess, supportingTopGrades, whereADegreeCanLead]
 
 /** Guides for the child that aren't available to this family yet: shown blurred and locked. */
-export const LOCKED_RESOURCES: LockedResource[] = [
-    { title: 'Personal statement, step by step', summary: 'From a blank page to a final draft, with examples of what tutors look for.' },
-    { title: 'Admissions tests explained', summary: 'Which courses set a test, what each one checks and how to prepare.' },
-    { title: 'Inside an Oxbridge interview', summary: 'What really happens in the room, and how to practise thinking aloud.' },
-    { title: 'Choosing a college', summary: 'How colleges differ, and when an open application makes sense.' },
-    { title: 'Super-curricular reading by subject', summary: 'Books, lectures and competitions that build real interest in a subject.' },
-]
-
-export function getParentGuide(slug: string): ParentGuide | undefined {
-    return PARENT_GUIDES.find((g) => g.slug === slug)
+/** A guide by slug, and whether it's one of the student guides (locked until enrolled). */
+export function getGuide(slug: string): { guide: ParentGuide; forChild: boolean } | undefined {
+    const parent = PARENT_GUIDES.find((g) => g.slug === slug)
+    if (parent) return { guide: parent, forChild: false }
+    const child = CHILD_GUIDES.find((g) => g.slug === slug)
+    return child ? { guide: child, forChild: true } : undefined
 }
 
 /** Rough reading time: about 200 words a minute. */
@@ -1018,7 +1013,9 @@ export function readingMinutes(guide: ParentGuide): number {
                 case 'glance':
                     return [b.intro, ...b.items].join(' ')
                 case 'checklist':
-                    return [b.title, b.intro, ...b.items].join(' ')
+                    return [b.title, b.intro ?? '', ...b.items].join(' ')
+                case 'myths':
+                    return b.items.map((x) => `${x.myth} ${x.reality}`).join(' ')
                 case 'term':
                     return `${b.term} ${b.text}`
                 default:

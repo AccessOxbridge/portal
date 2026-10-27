@@ -11,7 +11,6 @@ import type { ParentHomeData, ParentReport } from '@/lib/parent-dashboard'
  * The switch shows each widget's empty state.
  */
 
-const WEEKS = ['13 Aug', '20 Aug', '27 Aug', '3 Sep', '10 Sep', '17 Sep', '24 Sep', '1 Oct', '8 Oct', '15 Oct', '22 Oct']
 const PER_WEEK = [0, 1, 2, 2, 1, 2, 2, 0, 2, 2, 2]
 
 const REPORTS: ParentReport[] = [
@@ -42,18 +41,18 @@ type Scenario = 'live' | 'starting' | 'unlinked'
 function sample(scenario: Scenario, nameGiven: boolean): ParentHomeData {
     const live = scenario === 'live'
     const linked = scenario !== 'unlinked'
-    let total = 0
-    const points = WEEKS.map((label, i) => ({ label, completed: (total += PER_WEEK[i]), plan: i * 2 }))
+    const total = PER_WEEK.reduce((sum, n) => sum + n, 0)
     return {
         parentFirstName: 'Sarah',
         childFirstName: linked || nameGiven ? 'Amelia' : null,
         linked,
         greeting: 'Good afternoon',
-        checklist: { activated: linked, profile: linked, matched: linked, booked: live },
+        checklist: { submitted: linked, offered: linked, enrolled: linked, learning: live },
+        studentInfo: null,
+        documents: [],
         next: live
             ? { dateLabel: 'Thursday 23 October', timeLabel: '16:00', when: 'Tomorrow', topic: 'Timed HAT source extract', mentorName: 'Oliver Bennett', mentorPhotoUrl: null }
             : null,
-        progress: live ? { points, total, planLabel: '2 sessions per week' } : null,
         attended: live ? { total, recent: 6, upcoming: 2 } : { total: 0, recent: 0, upcoming: 0 },
         reports: live ? REPORTS : [],
         reportsTotal: live ? 9 : 0,

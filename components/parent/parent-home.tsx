@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -32,7 +33,9 @@ import { toast } from '@/components/ui/toaster'
 import { normalizeReportMarkdown, sanitizeReportContent } from '@/lib/report-utils'
 import type { ParentHomeData, ParentReport } from '@/lib/parent-dashboard'
 import { SUCCESS_MANAGER, wordsFor, type ParentWords } from '@/lib/parent-words'
-import { EXAMPLE_PROGRESS, EXAMPLE_REPORT } from '@/lib/parent-examples'
+import { EXAMPLE_REPORT } from '@/lib/parent-examples'
+import { AboutCard } from '@/components/parent/about-card'
+import { StudentProfileCard } from '@/components/parent/student-profile-card'
 
 type Words = ParentWords
 
@@ -69,8 +72,8 @@ export function ParentHeading({ title }: { title: string }) {
 export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onRequestHours?: () => Promise<boolean> }) {
     const w = wordsFor(data.childFirstName)
     const c = data.checklist
-    // Linked, and every onboarding step done: the checklist has nothing left to say.
-    const onboarded = data.linked && c.activated && c.profile && c.matched && c.booked
+    // Every Getting started step done: the checklist has nothing left to say.
+    const onboarded = c.submitted && c.offered && c.enrolled && c.learning
     let i = 1
     return (
         <div className="mx-auto max-w-6xl pb-16">
@@ -79,7 +82,10 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
             <div className="mt-8 grid items-start gap-6 xl:grid-cols-3">
                 <div className="min-w-0 space-y-6 xl:col-span-2">
                     <Rise i={i++}>
-                        <ProgressGraph data={data} w={w} />
+                        <AboutCard />
+                    </Rise>
+                    <Rise i={i++}>
+                        <StudentProfileCard info={data.studentInfo} documents={data.documents} words={w} />
                     </Rise>
                     {!onboarded && (
                         <Rise i={i++}>
@@ -158,10 +164,10 @@ function EmptyRow({ icon: IconComponent, title, description }: { icon: Icon; tit
 function Onboarding({ data, w }: { data: ParentHomeData; w: Words }) {
     const c = data.checklist
     const items = [
-        { label: 'Account activated', hint: `${w.Child} signs in to the portal`, done: c.activated },
-        { label: 'Academic profile completed', hint: 'School, subjects and target course', done: c.profile },
-        { label: 'Mentor matched', hint: 'Paired with an Oxford or Cambridge mentor', done: c.matched },
-        { label: 'First session booked', hint: 'With the matched mentor', done: c.booked },
+        { label: 'Submit student information', hint: 'Upload documents', done: c.submitted },
+        { label: 'Receive an offer to join the programme', hint: 'This will be finalised in your 1:1 consultation', done: c.offered },
+        { label: 'Enrolment', hint: `${w.Childs} place is confirmed and an Oxbridge mentor is matched`, done: c.enrolled },
+        { label: 'Learning begins', hint: `${w.Childs} first session with their mentor is booked`, done: c.learning },
     ]
     const done = items.filter((x) => x.done).length
     const complete = done === items.length
@@ -207,7 +213,7 @@ function NextSession({ data, w }: { data: ParentHomeData; w: Words }) {
                 <CardContent>
                     <EmptyRow
                         icon={CalendarBlank}
-                        title={data.checklist.booked ? 'No upcoming session booked' : `${w.Childs} first session will appear here`}
+                        title={data.checklist.learning ? 'No upcoming session booked' : `${w.Childs} first session will appear here`}
                         description="Once a session is booked you will see the date, time and mentor here."
                     />
                 </CardContent>
@@ -237,125 +243,6 @@ function NextSession({ data, w }: { data: ParentHomeData; w: Words }) {
                 </div>
             </CardContent>
         </Card>
-    )
-}
-
-/** Points for a line in a 100×100 box, oldest on the left. */
-function points(values: number[], max: number) {
-    return values.map((n, i) => [(i / (values.length - 1)) * 100, 100 - (n / max) * 100] as const)
-}
-
-function pathOf(p: readonly (readonly [number, number])[]) {
-    return p.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join(' ')
-}
-
-/**
- * Total sessions completed over time, against the plan when there is one.
- * Before the first session it shows an example line, labelled as such, so a
- * parent sees straight away what this will look like. Functional data, so it
- * does not animate; the table gives screen readers the same numbers.
- */
-function ProgressGraph({ data, w }: { data: ParentHomeData; w: Words }) {
-    const example = !data.progress
-    const progress = data.progress ?? EXAMPLE_PROGRESS
-
-    const pts = progress.points
-    const totals = pts.map((p) => p.completed)
-    const plan = pts.every((p) => p.plan !== null) ? pts.map((p) => p.plan as number) : null
-    const max = Math.max(1, ...totals, ...(plan ?? [])) * 1.08
-    const line = points(totals, max)
-    const [endX, endY] = line[line.length - 1]
-
-    return (
-        <Card>
-            <CardHeader>
-                <div>
-                    <CardTitle>Progress</CardTitle>
-                    <CardDescription>
-                        Sessions completed{plan && progress.planLabel ? `, against a plan of ${progress.planLabel}` : ''}
-                    </CardDescription>
-                </div>
-                {example ? (
-                    <Badge tone="outline">Example</Badge>
-                ) : (
-                    <div className="text-right">
-                        <p className="text-2xl font-semibold tabular-nums">{progress.total}</p>
-                        <p className="text-xs text-muted-foreground">{progress.total === 1 ? 'session' : 'sessions'}</p>
-                    </div>
-                )}
-            </CardHeader>
-            <CardContent>
-                <div className="relative h-40" aria-hidden>
-                    <ChartGrid />
-                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
-                        <path d={`${pathOf(line)} L100 100 L0 100 Z`} className="fill-brand/10" />
-                        {plan && (
-                            <path d={pathOf(points(plan, max))} fill="none" className="stroke-muted-foreground/60" strokeWidth={1.5} strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />
-                        )}
-                        <path d={pathOf(line)} fill="none" className="stroke-brand" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                    </svg>
-                    <span
-                        className="absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand ring-4 ring-card"
-                        style={{ left: `${endX}%`, top: `${endY}%` }}
-                    />
-                </div>
-                <WeekLabels labels={pts.map((p) => p.label)} />
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1.5" aria-hidden>
-                        <span className="h-0.5 w-4 rounded-full bg-brand" />
-                        {example ? 'Sessions completed' : w.Child}
-                    </span>
-                    {plan && (
-                        <span className="flex items-center gap-1.5" aria-hidden>
-                            <span className="w-4 border-t-[1.5px] border-dashed border-muted-foreground/60" />
-                            Plan
-                        </span>
-                    )}
-                    {example && <span className="text-pretty">Example data. {w.Childs} own progress appears here once sessions begin.</span>}
-                </div>
-                <table className="sr-only">
-                    <caption>{example ? 'Example: sessions completed, by week' : 'Sessions completed, by week'}</caption>
-                    <tbody>
-                        {pts.map((p) => (
-                            <tr key={p.label}>
-                                <th scope="row">{p.label}</th>
-                                <td>
-                                    {p.completed} completed{p.plan !== null ? `, plan ${Math.floor(p.plan)}` : ''}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </CardContent>
-        </Card>
-    )
-}
-
-function ChartGrid() {
-    return (
-        <>
-            {[0, 50, 100].map((top) => (
-                <div key={top} className="absolute inset-x-0 border-t border-border/70" style={{ top: `${top}%` }} />
-            ))}
-        </>
-    )
-}
-
-function WeekLabels({ labels }: { labels: string[] }) {
-    // Every other label on phones, counted back from the latest week so it
-    // always shows; the end labels line up with the ends of the line.
-    return (
-        <div className="relative mt-2 h-4 text-[11px] text-muted-foreground" aria-hidden>
-            {labels.map((label, i) => (
-                <span
-                    key={`${i}:${label}`}
-                    className={cn('absolute -translate-x-1/2 whitespace-nowrap first:translate-x-0 last:-translate-x-full', (labels.length - 1 - i) % 2 === 1 && 'max-sm:hidden')}
-                    style={{ left: `${(i / Math.max(1, labels.length - 1)) * 100}%` }}
-                >
-                    {label}
-                </span>
-            ))}
-        </div>
     )
 }
 
@@ -513,9 +400,13 @@ function SuccessManagerCard({ w }: { w: Words }) {
             <CardContent>
                 <p className="text-sm text-muted-foreground">Success manager</p>
                 <div className="mt-3 flex items-center gap-3">
-                    <div className="grid size-12 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-foreground">
-                        <Headset weight="duotone" className="size-6" />
-                    </div>
+                    {SUCCESS_MANAGER.photo ? (
+                        <Image src={SUCCESS_MANAGER.photo} alt={SUCCESS_MANAGER.name} width={96} height={96} className="size-12 shrink-0 rounded-full object-cover" />
+                    ) : (
+                        <div className="grid size-12 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-foreground">
+                            <Headset weight="duotone" className="size-6" />
+                        </div>
+                    )}
                     <div className="min-w-0">
                         <p className="font-semibold">{SUCCESS_MANAGER.name}</p>
                         <p className="text-sm text-muted-foreground">{SUCCESS_MANAGER.title}</p>

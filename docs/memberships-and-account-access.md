@@ -84,7 +84,7 @@ production `.env.local` into this worktree.
 Apply the migration only to the local `supabase_db_ao-portal-localtest` container:
 
 ```sh
-docker exec -i supabase_db_ao-portal-localtest psql -U postgres -v ON_ERROR_STOP=1 -1 < supabase/migrations/20261027083312_account_access_controls.sql
+docker exec -i supabase_db_ao-portal-localtest psql -U postgres -v ON_ERROR_STOP=1 -1 < supabase/migrations/20261027102918_account_access_controls.sql
 ```
 
 Start the app on port 3200, then run:
@@ -109,7 +109,7 @@ access tables or functions. This is not a production security audit.
 ## Production rollout status
 
 Raj authorised the migration and production deployment on 27 October 2026.
-Deployment remains pending: the production rollback-only dry run found that
+The initial production rollback-only dry run found that
 `CREATE OR REPLACE VIEW` cleared existing `security_barrier` options. The entire
 transaction rolled back; follow-up catalogue checks found no new access tables,
 policies or triggers. The long comparison also briefly delayed live requests on
@@ -124,11 +124,18 @@ invoker and ordinary views using the actual migration guard:
 node scripts/test-account-view-options.mjs
 ```
 
-Before another production DDL attempt, obtain approval for a short transaction
-with a database-enforced total time bound. Do visibility comparisons outside
-the DDL transaction so they do not prolong schema locks. Do not deploy application
-code until the migration has succeeded. Production is active: row counts may
-increase from real user activity and must not be described as unchanged.
+Raj approved a shorter retry. The corrected migration passed a rollback-only
+transaction with a five-second statement timeout and one-second lock timeout,
+then was applied as version `20261027102918`. Verification found zero access/audit
+records, 38 restrictive policies, 39 disabled-actor triggers and three participant
+triggers. View options, owners and grants were preserved. Before/after counts
+matched: 77 profiles, 282 sessions, 107 conversations and 2,057 messages. No
+requests were waiting on database locks at the follow-up check. No account was
+disabled and no payment was attempted.
+
+For future changes, do visibility comparisons outside DDL transactions so they
+do not prolong schema locks. Production is active: row counts may increase from
+real user activity.
 
 1. Review the local code and tests; do not push without Raj's approval.
 2. Review the live catalogue and function grants read-only for production drift.

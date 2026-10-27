@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
-const migration = readFileSync(new URL('../supabase/migrations/20261027083312_account_access_controls.sql', import.meta.url), 'utf8')
+const migration = readFileSync(new URL('../supabase/migrations/20261027102918_account_access_controls.sql', import.meta.url), 'utf8')
 const guard = migration.match(/DO \$guard\$[\s\S]*?END \$guard\$;/)?.[0]
 assert.ok(guard, 'The migration contains its view guard')
 const sql = `

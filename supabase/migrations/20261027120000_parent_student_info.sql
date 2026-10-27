@@ -45,7 +45,9 @@ COMMENT ON TABLE public.parent_student_info IS
     'What a parent tells us about their child before or during enrolment. Written by the server only (service role).';
 
 ALTER TABLE public.parent_student_info ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.parent_student_info FROM PUBLIC, anon;
+-- Supabase's default privileges give new tables ALL to anon and authenticated;
+-- take them back so signed-in users can only read (RLS then limits which rows).
+REVOKE ALL ON public.parent_student_info FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.parent_student_info TO authenticated;
 GRANT ALL ON public.parent_student_info TO service_role;
 
@@ -73,7 +75,9 @@ CREATE INDEX IF NOT EXISTS parent_documents_parent_id_idx
     ON public.parent_documents (parent_id, created_at DESC);
 
 ALTER TABLE public.parent_documents ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.parent_documents FROM PUBLIC, anon;
+-- Supabase's default privileges give new tables ALL to anon and authenticated;
+-- take them back so signed-in users can only read (RLS then limits which rows).
+REVOKE ALL ON public.parent_documents FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.parent_documents TO authenticated;
 GRANT ALL ON public.parent_documents TO service_role;
 

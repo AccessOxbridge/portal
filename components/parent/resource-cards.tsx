@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, LockSimple } from '@phosphor-icons/react/ssr'
+import { ArrowRight, ArrowSquareOut, LockSimple } from '@phosphor-icons/react/ssr'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -42,6 +42,43 @@ export function GuideCard({ href, eyebrow, title, summary, minutes }: { href: st
                         <span className="inline-flex items-center gap-1 font-medium text-brand">
                             Read
                             <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                        </span>
+                    </div>
+                </div>
+            </Card>
+        </Link>
+    )
+}
+
+export function PdfResourceCard({
+    href,
+    eyebrow,
+    title,
+    summary,
+    pages,
+}: {
+    href: string
+    eyebrow: string
+    title: string
+    summary: string
+    pages: number
+}) {
+    return (
+        <Link
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block h-full rounded-card outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40"
+        >
+            <Card className="flex h-full flex-col overflow-hidden transition-shadow duration-150 group-hover:shadow-border-hover">
+                <Cover eyebrow={eyebrow} title={title} />
+                <div className="flex flex-1 flex-col p-5">
+                    <p className="flex-1 text-sm text-pretty text-muted-foreground">{summary}</p>
+                    <div className="mt-4 flex items-center justify-between gap-3 text-sm">
+                        <span className="text-muted-foreground tabular-nums">PDF · {pages} pages</span>
+                        <span className="inline-flex items-center gap-1 font-medium text-brand">
+                            Open PDF
+                            <ArrowSquareOut className="size-4 transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
                         </span>
                     </div>
                 </div>

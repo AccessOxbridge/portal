@@ -18,7 +18,7 @@ export function ProgrammesLink() {
         <div data-floating-ui className="fixed top-2.5 right-16 z-100 flex h-11 items-center md:top-5 md:right-[4.25rem]">
             <Link
                 href={HREF}
-                className="flex h-9 items-center gap-1.5 rounded-full bg-card px-3.5 text-sm font-medium text-foreground shadow-border outline-none transition-[box-shadow,scale] duration-150 ease-out hover:shadow-border-hover active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40"
+                className="gold-rim-button flex h-9 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-foreground outline-none transition-[box-shadow,scale] duration-150 ease-out active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40"
             >
                 <Sparkle weight="fill" className="size-4 text-gold-foreground" aria-hidden />
                 {/* Phones keep it short so it fits beside the bell. */}

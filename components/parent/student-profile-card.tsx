@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FileText, ImageSquare, PencilSimple, ShieldCheck, Trash, UploadSimple, UserList } from '@phosphor-icons/react/ssr'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { confirmDialog } from '@/components/ui/confirm'
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -102,7 +103,10 @@ export function StudentProfileCard({ info, documents, words: w }: { info: Studen
         <Card>
             <CardHeader>
                 <div>
-                    <CardTitle>{info ? `${w.Childs} profile` : 'Student profile'}</CardTitle>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <CardTitle>{info ? `${w.Childs} profile` : 'Student profile'}</CardTitle>
+                        <Badge tone="rose">Required</Badge>
+                    </div>
                     <CardDescription>
                         Tell us about {w.child} and share anything that helps our academic team prepare for your consultation.
                     </CardDescription>
@@ -144,7 +148,10 @@ export function StudentProfileCard({ info, documents, words: w }: { info: Studen
                 <section>
                     <div className="flex flex-wrap items-end justify-between gap-3">
                         <div>
-                            <h3 className="font-semibold">Documents</h3>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="font-semibold">Documents</h3>
+                                <Badge tone="rose">Required</Badge>
+                            </div>
                             <p className="mt-0.5 max-w-xl text-sm text-pretty text-muted-foreground">
                                 Please upload any documents that will help our academic team understand {w.childs} strengths. For example a
                                 recent school report, predicted grades, GCSE results, a personal statement draft or admissions test results.

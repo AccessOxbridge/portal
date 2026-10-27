@@ -4,7 +4,24 @@ import { PARENT_GUIDES, readingMinutes } from '@/lib/parent-resources'
 import { CHILD_GUIDES } from '@/lib/child-guides'
 import { wordsFor } from '@/lib/parent-words'
 import { ParentHeading, Rise } from '@/components/parent/parent-home'
-import { GuideCard, LockedCard } from '@/components/parent/resource-cards'
+import { GuideCard, LockedCard, PdfResourceCard } from '@/components/parent/resource-cards'
+
+const STUDENT_PDF_RESOURCES = [
+    {
+        href: '/resources/critical-thinking-toolkit.pdf',
+        eyebrow: 'A guide for students',
+        title: 'Critical Thinking Toolkit',
+        summary: 'How to question ideas, weigh evidence and think for yourself.',
+        pages: 5,
+    },
+    {
+        href: '/resources/writing-like-an-oxbridge-student.pdf',
+        eyebrow: 'A guide for students',
+        title: 'Writing Like an Oxbridge Student',
+        summary: 'How to build a clear, persuasive academic argument step by step.',
+        pages: 5,
+    },
+] as const
 
 /**
  * Resources for parents: the guides written for parents, open to every
@@ -60,6 +77,18 @@ export default async function ParentResourcesPage() {
                                 />
                             ) : (
                                 <LockedCard key={g.slug} title={g.title} summary={g.summary} childFirstName={ctx.childFirstName} />
+                            )
+                        )}
+                        {STUDENT_PDF_RESOURCES.map((resource) =>
+                            ctx.childId ? (
+                                <PdfResourceCard key={resource.href} {...resource} />
+                            ) : (
+                                <LockedCard
+                                    key={resource.href}
+                                    title={resource.title}
+                                    summary={resource.summary}
+                                    childFirstName={ctx.childFirstName}
+                                />
                             )
                         )}
                     </div>

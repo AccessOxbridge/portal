@@ -30,7 +30,7 @@ export default async function SettingsPage() {
     // Timezone lives on student_profiles for students, mentors for mentors.
     // Parents have neither: their pages use the linked child's time zone.
     let timezone: string | null = null
-    if (role === 'parent') {
+    if (role === 'parent' || role === 'sales') {
         timezone = null
     } else if (isStudent) {
         const { data } = await supabase

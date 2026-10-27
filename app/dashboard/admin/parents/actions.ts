@@ -14,8 +14,8 @@ const PATH = '/dashboard/admin/parents'
 type ActionResult = { error: string } | { success: true; warning?: string }
 type CreateParentResult = { error: string } | { success: true; emailSent: boolean; warning?: string }
 
-async function requireStaff(): Promise<
-    { error: string } | { ok: true; admin: ReturnType<typeof createAdminClient>; userId: string }
+async function requireStaff(allowSales = false): Promise<
+    { error: string } | { ok: true; admin: ReturnType<typeof createAdminClient>; userId: string; role: 'admin' | 'admin-dev' | 'sales' }
 > {
     const authClient = await createClient()
     const {
@@ -31,11 +31,21 @@ async function requireStaff(): Promise<
         .eq('id', user.id)
         .single()
 
-    if (!callerProfile || (callerProfile.role !== 'admin' && callerProfile.role !== 'admin-dev')) {
+    const allowed = callerProfile && (
+        callerProfile.role === 'admin' ||
+        callerProfile.role === 'admin-dev' ||
+        (allowSales && callerProfile.role === 'sales')
+    )
+    if (!allowed) {
         return { error: 'Not authorized' }
     }
 
-    return { ok: true, admin: createAdminClient(), userId: user.id }
+    return {
+        ok: true,
+        admin: createAdminClient(),
+        userId: user.id,
+        role: callerProfile.role as 'admin' | 'admin-dev' | 'sales',
+    }
 }
 
 function isStrongPassword(password: string): boolean {
@@ -91,7 +101,7 @@ async function insertLink(
  * role and checked; if any of that fails the account is removed again.
  */
 export async function createParentAccount(formData: FormData): Promise<CreateParentResult> {
-    const staff = await requireStaff()
+    const staff = await requireStaff(true)
     if ('error' in staff) return staff
     const admin = staff.admin
 
@@ -110,6 +120,9 @@ export async function createParentAccount(formData: FormData): Promise<CreatePar
     const child = parseChildName(formData.get('child_first_name'))
     if ('error' in child) return child
     const studentId = String(formData.get('student_id') || '').trim()
+    if (staff.role === 'sales' && studentId) {
+        return { error: 'Sales accounts cannot link a parent to a student' }
+    }
     if (studentId && !UUID_RE.test(studentId)) {
         return { error: 'Choose a student from the list' }
     }
@@ -180,6 +193,7 @@ export async function createParentAccount(formData: FormData): Promise<CreatePar
     }
 
     revalidatePath(PATH)
+    revalidatePath('/dashboard/sales/parents')
     return { success: true, emailSent: sendResult.ok, warning }
 }
 

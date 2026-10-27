@@ -9,6 +9,7 @@ import {
     CheckCircle as CheckCircle2,
     Clock,
     GraduationCap,
+    Headset,
     Key as KeyRound,
     CircleNotch as Loader2,
     Envelope as Mail,
@@ -21,11 +22,11 @@ import {
     X,
 } from '@phosphor-icons/react/ssr'
 import { useEffect, useState, useTransition } from 'react'
-import { createMentorAccount, createStudentAccount } from './actions'
+import { createMentorAccount, createSalesAccount, createStudentAccount } from './actions'
 import { AdjustCreditsCell } from '@/components/admin/adjust-credits-cell'
 import { SessionTargetFields, todayIso, type TargetDraft } from '@/components/admin/session-target-fields'
 
-type AccountTab = 'student' | 'mentor'
+type AccountTab = 'student' | 'mentor' | 'sales'
 
 interface StudentAccount {
     id: string
@@ -42,6 +43,8 @@ interface MentorAccount {
     updated_at: string
     status: string
 }
+
+type SalesAccount = Pick<StudentAccount, 'id' | 'full_name' | 'email' | 'updated_at'>
 
 const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const LOWER = 'abcdefghijklmnopqrstuvwxyz'
@@ -78,6 +81,7 @@ export function CreateAccountClient() {
     const [tab, setTab] = useState<AccountTab>('student')
     const [students, setStudents] = useState<StudentAccount[]>([])
     const [mentors, setMentors] = useState<MentorAccount[]>([])
+    const [sales, setSales] = useState<SalesAccount[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -147,12 +151,31 @@ export function CreateAccountClient() {
             setMentors(mapped)
         }
 
-        async function load() {
-            if (tab === 'student') {
-                await loadStudents()
-            } else {
-                await loadMentors()
+        async function loadSales() {
+            const disabled = await disabledAccountIds(client)
+            const { data, error } = await client
+                .from('profiles_private')
+                .select('id, full_name, email, updated_at')
+                .eq('role', 'sales')
+                .order('updated_at', { ascending: false })
+
+            if (cancelled || error || !data) return
+            let filtered = (data as SalesAccount[]).filter(account => !disabled.has(account.id))
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase()
+                filtered = filtered.filter(
+                    (account) =>
+                        account.full_name?.toLowerCase().includes(term) ||
+                        account.email?.toLowerCase().includes(term)
+                )
             }
+            setSales(filtered)
+        }
+
+        async function load() {
+            if (tab === 'student') await loadStudents()
+            else if (tab === 'mentor') await loadMentors()
+            else await loadSales()
             if (!cancelled) setIsLoading(false)
         }
 
@@ -183,20 +206,23 @@ export function CreateAccountClient() {
         const formData = new FormData(e.currentTarget)
         formData.set('password', password)
         const creatingMentor = tab === 'mentor'
+        const creatingSales = tab === 'sales'
 
         startTransition(async () => {
             const result = creatingMentor
                 ? await createMentorAccount(formData)
-                : await createStudentAccount(formData)
+                : creatingSales
+                  ? await createSalesAccount(formData)
+                  : await createStudentAccount(formData)
             if ('success' in result && result.success) {
                 setReloadToken((token) => token + 1)
-                const roleLabel = creatingMentor ? 'Mentor' : 'Student'
+                const roleLabel = creatingMentor ? 'Mentor' : creatingSales ? 'Sales' : 'Student'
                 const parts: string[] = []
                 if (result.emailSent) {
                     parts.push(`${roleLabel} account created. Welcome email sent with login details.`)
                 } else {
                     parts.push(
-                        `Account created, but the welcome email failed. Copy the password now and send it to the ${creatingMentor ? 'mentor' : 'student'} yourself.`
+                        `Account created, but the welcome email failed. Copy the password now and send it to the ${creatingMentor ? 'mentor' : creatingSales ? 'sales colleague' : 'student'} yourself.`
                     )
                 }
                 if (result.warning) {
@@ -223,7 +249,9 @@ export function CreateAccountClient() {
     }
 
     const isMentorTab = tab === 'mentor'
-    const empty = isMentorTab ? mentors.length === 0 : students.length === 0
+    const isSalesTab = tab === 'sales'
+    const isStudentTab = tab === 'student'
+    const empty = isMentorTab ? mentors.length === 0 : isSalesTab ? sales.length === 0 : students.length === 0
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-12">
@@ -239,7 +267,7 @@ export function CreateAccountClient() {
                     className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full in-data-[density=compact]:rounded-control font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm in-data-[density=compact]:h-8 in-data-[density=compact]:px-3"
                 >
                     <Plus className="size-5" />
-                    {isMentorTab ? 'Create mentor' : 'Create student'}
+                    {isMentorTab ? 'Create mentor' : isSalesTab ? 'Create sales account' : 'Create student'}
                 </button>
             </header>
 
@@ -261,6 +289,24 @@ export function CreateAccountClient() {
                 >
                     <BookOpen className="size-4" />
                     Students
+                </button>
+                <button
+                    onClick={() => {
+                        if (isPending) return
+                        setTab('sales')
+                        setIsLoading(true)
+                        setIsModalOpen(false)
+                        setMessage(null)
+                        setPassword('')
+                    }}
+                    className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
+                        tab === 'sales'
+                            ? 'text-primary border-primary'
+                            : 'text-muted-foreground border-transparent hover:text-foreground'
+                    }`}
+                >
+                    <Headset className="size-4" />
+                    Sales
                 </button>
                 <button
                     onClick={() => {
@@ -296,7 +342,9 @@ export function CreateAccountClient() {
                 <div className="text-sm text-muted-foreground font-medium">
                     {isMentorTab
                         ? `${mentors.length} ${mentors.length === 1 ? 'Mentor' : 'Mentors'} found`
-                        : `${students.length} ${students.length === 1 ? 'Student' : 'Students'} found`}
+                        : isSalesTab
+                          ? `${sales.length} sales ${sales.length === 1 ? 'account' : 'accounts'} found`
+                          : `${students.length} ${students.length === 1 ? 'Student' : 'Students'} found`}
                 </div>
             </div>
 
@@ -311,14 +359,16 @@ export function CreateAccountClient() {
                             <Users className="size-10 text-muted-foreground/60" />
                         </div>
                         <h3 className="text-xl font-semibold text-foreground mb-2">
-                            {isMentorTab ? 'No mentor accounts yet' : 'No student accounts yet'}
+                            {isMentorTab ? 'No mentor accounts yet' : isSalesTab ? 'No sales accounts yet' : 'No student accounts yet'}
                         </h3>
                         <p className="text-muted-foreground max-w-sm">
                             {searchTerm
-                                ? `No ${isMentorTab ? 'mentors' : 'students'} matching "${searchTerm}"`
+                                ? `No ${isMentorTab ? 'mentors' : isSalesTab ? 'sales accounts' : 'students'} matching "${searchTerm}"`
                                 : isMentorTab
                                   ? 'Create the first mentor account to send login details and the onboarding guide.'
-                                  : 'Create the first student account to send login details and hours.'}
+                                  : isSalesTab
+                                    ? 'Create the first sales account with parent-account access only.'
+                                    : 'Create the first student account to send login details and hours.'}
                         </p>
                         {!searchTerm && (
                             <button
@@ -367,6 +417,44 @@ export function CreateAccountClient() {
                                         </td>
                                         <td className="px-8 py-5 text-sm text-muted-foreground font-medium">
                                             {format(new Date(mentor.updated_at), 'd MMM yyyy')}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : isSalesTab ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-muted/60 border-b border-border">
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Sales colleague</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Access</th>
+                                    <th className="px-8 py-5 text-xs font-semibold text-muted-foreground">Last updated</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {sales.map((account) => (
+                                    <tr key={account.id} className="hover:bg-muted/60 transition-colors group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="size-12 rounded-card bg-tint-amber text-tint-amber-foreground flex items-center justify-center font-semibold text-lg shrink-0 shadow-border group-hover:scale-105 transition-transform">
+                                                    {account.full_name?.[0] || 'S'}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="font-semibold text-foreground truncate text-base">
+                                                        {account.full_name || 'Unnamed sales colleague'}
+                                                    </span>
+                                                    <span className="text-sm text-muted-foreground truncate flex items-center gap-1.5">
+                                                        <Mail className="size-3.5" />
+                                                        {account.email}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 text-sm text-muted-foreground">Parent accounts only</td>
+                                        <td className="px-8 py-5 text-sm text-muted-foreground font-medium">
+                                            {format(new Date(account.updated_at), 'd MMM yyyy')}
                                         </td>
                                     </tr>
                                 ))}
@@ -438,12 +526,14 @@ export function CreateAccountClient() {
                                     <UserPlus className="size-7 text-primary" />
                                 </div>
                                 <h2 className="text-2xl font-semibold text-foreground">
-                                    {isMentorTab ? 'Create mentor account' : 'Create student account'}
+                                    {isMentorTab ? 'Create mentor account' : isSalesTab ? 'Create sales account' : 'Create student account'}
                                 </h2>
                                 <p className="text-muted-foreground mt-2">
                                     {isMentorTab
                                         ? 'A welcome email with login details and the mentor onboarding guide will be sent automatically.'
-                                        : 'A welcome email with login details and the onboarding guide will be sent automatically.'}
+                                        : isSalesTab
+                                          ? 'A welcome email with login details and the limited parent-account access will be sent automatically.'
+                                          : 'A welcome email with login details and the onboarding guide will be sent automatically.'}
                                 </p>
                             </div>
 
@@ -517,7 +607,7 @@ export function CreateAccountClient() {
                                     </div>
                                 </div>
 
-                                {!isMentorTab && (
+                                {isStudentTab && (
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-foreground ml-1" htmlFor="total_hours">
                                             Total hours
@@ -540,7 +630,7 @@ export function CreateAccountClient() {
                                     </div>
                                 )}
 
-                                {!isMentorTab && (
+                                {isStudentTab && (
                                     <div className="space-y-3 pt-2 border-t border-border">
                                         <div className="ml-1 pt-4">
                                             <p className="text-sm font-semibold text-foreground">Session plan</p>

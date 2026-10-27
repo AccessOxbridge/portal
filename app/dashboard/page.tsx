@@ -26,5 +26,8 @@ export default async function DashboardPage() {
     if (profile.role === 'admin-dev') {
         redirect('/dashboard/admin')
     }
+    if (profile.role === 'sales') {
+        redirect('/dashboard/sales/parents')
+    }
     redirect(`/dashboard/${profile.role}`)
 }

@@ -3,13 +3,14 @@
 import { revalidatePath } from 'next/cache'
 import { EMAIL_SENDER_TEAM, sendEmail } from '@/lib/email/client'
 import { loadOnboardingGuideAttachment } from '@/lib/email/onboarding-guide'
-import { mentorWelcome, studentWelcome } from '@/lib/email/templates'
+import { mentorWelcome, salesWelcome, studentWelcome } from '@/lib/email/templates'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
 import { validateTargetInput, type SessionTarget } from '@/lib/session-frequency'
 
 const STUDENT_ROLE = 'student' as const
 const MENTOR_ROLE = 'mentor' as const
+const SALES_ROLE = 'sales' as const
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MAX_HOURS = 1000
 
@@ -304,4 +305,60 @@ export async function createMentorAccount(formData: FormData): Promise<CreateAcc
         success: true,
         emailSent: sendResult.ok,
     }
+}
+
+export async function createSalesAccount(formData: FormData): Promise<CreateAccountResult> {
+    const staff = await requireStaff()
+    if ('error' in staff) return staff
+
+    const identity = parseIdentity(formData)
+    if ('error' in identity) return identity
+    const { fullName, email, password } = identity
+    const admin = staff.admin
+
+    const { data: created, error: createError } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: fullName },
+        app_metadata: { role: SALES_ROLE },
+    })
+    if (createError || !created.user) {
+        const message = (createError?.message || '').toLowerCase()
+        if (message.includes('already') || message.includes('registered') || message.includes('exists')) {
+            return { error: 'An account with this email already exists' }
+        }
+        console.error('createSalesAccount createUser failed:', createError?.message)
+        return { error: 'Failed to create the sales account' }
+    }
+
+    const userId = created.user.id
+    const discard = async (reason: string, detail?: unknown) => {
+        console.error(`createSalesAccount refused: ${reason}`, { userId, detail })
+        await admin.auth.admin.deleteUser(userId)
+        return { error: 'Failed to create the sales account' } as const
+    }
+    const { data: profile, error: roleError } = await admin
+        .from('profiles')
+        .update({ role: SALES_ROLE })
+        .eq('id', userId)
+        .select('role')
+        .single()
+    if (roleError || profile?.role !== SALES_ROLE) {
+        return discard('role update failed', roleError?.message ?? profile?.role)
+    }
+
+    const template = salesWelcome({ fullName, email, password })
+    const sendResult = await sendEmail({
+        from: EMAIL_SENDER_TEAM,
+        to: email,
+        subject: template.subject,
+        html: template.html,
+    })
+    if (!sendResult.ok) {
+        console.error('createSalesAccount welcome email failed:', sendResult.error)
+    }
+
+    revalidatePath('/dashboard/admin/create-account')
+    return { success: true, emailSent: sendResult.ok }
 }

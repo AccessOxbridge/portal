@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
+import { disabledAccountIds } from '@/lib/account-access'
 import ManageSessionsTable from './manage-sessions-table'
 import AdminBookSessionModal from './admin-book-session-modal'
 
@@ -27,6 +28,7 @@ export default async function AdminManageSessionsPage() {
         redirect('/dashboard')
     }
 
+    const disabled = await disabledAccountIds(adminSupabase)
     const { data: sessions } = await adminSupabase
         .from('sessions')
         .select(`
@@ -56,7 +58,7 @@ export default async function AdminManageSessionsPage() {
         `)
 
     const mentorOptions = (mentors || [])
-        .filter((m: any) => m.profile?.full_name)
+        .filter((m: any) => m.profile?.full_name && !disabled.has(m.id))
         .map((m: any) => ({
             id: m.id as string,
             name: m.profile.full_name as string,
@@ -96,7 +98,7 @@ export default async function AdminManageSessionsPage() {
     )
 
     const assignedPairs = (assignments || [])
-        .filter((a: any) => a.student?.full_name && a.mentor?.full_name)
+        .filter((a: any) => a.student?.full_name && a.mentor?.full_name && !disabled.has(a.student_id) && !disabled.has(a.mentor_id))
         .map((a: any) => ({
             studentId: a.student_id as string,
             studentName: a.student.full_name as string,

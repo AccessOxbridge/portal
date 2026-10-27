@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
+import { disabledAccountIds } from '@/lib/account-access'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import {
@@ -45,6 +46,7 @@ export default function AdminStudentsPage() {
     const limit = 10
 
     const fetchMentorsAndAssignments = async () => {
+        const disabled = await disabledAccountIds(supabase)
         const { data: mentorRows } = await supabase
             .from('mentors')
             .select(`
@@ -55,7 +57,7 @@ export default function AdminStudentsPage() {
             `)
 
         const mentorOptions: MentorOption[] = (mentorRows || [])
-            .filter((m: any) => m.profile?.full_name)
+            .filter((m: any) => m.profile?.full_name && !disabled.has(m.id))
             .map((m: any) => ({ id: m.id as string, name: m.profile.full_name as string }))
             .sort((a: MentorOption, b: MentorOption) => a.name.localeCompare(b.name))
         setMentors(mentorOptions)
@@ -67,6 +69,7 @@ export default function AdminStudentsPage() {
 
         const map: Record<string, string[]> = {}
         ;(assignmentRows || []).forEach((row: any) => {
+            if (disabled.has(row.student_id) || disabled.has(row.mentor_id)) return
             if (!map[row.student_id]) map[row.student_id] = []
             map[row.student_id].push(row.mentor_id)
         })
@@ -75,6 +78,7 @@ export default function AdminStudentsPage() {
 
     const fetchStudents = async () => {
         setIsLoading(true)
+        const disabled = await disabledAccountIds(supabase)
 
         const { data, error } = await supabase
             .from('student_profiles')
@@ -89,7 +93,7 @@ export default function AdminStudentsPage() {
             .order('created_at', { ascending: false })
 
         if (!error && data) {
-            let filtered = data as Student[]
+            let filtered = (data as Student[]).filter(student => !disabled.has(student.id))
             if (searchTerm) {
                 const term = searchTerm.toLowerCase()
                 filtered = filtered.filter(student => {

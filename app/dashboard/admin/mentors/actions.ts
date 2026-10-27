@@ -4,6 +4,7 @@ import { sendMentorApprovedMessage } from '@/lib/claire-auto-messages'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { disabledAccountIds } from '@/lib/account-access'
 
 export interface Mentor {
     id: string
@@ -48,7 +49,13 @@ export async function fetchMentors(
     page: number,
     limit: number
 ): Promise<FetchMentorsResult> {
+    const authed = await createClient()
+    const { data: { user } } = await authed.auth.getUser()
+    if (!user) throw new Error('Please sign in again.')
+    const { data: caller } = await authed.from('profiles').select('role').eq('id', user.id).single()
+    if (!caller || !['admin', 'admin-dev'].includes(caller.role)) throw new Error('Administrator access is required.')
     const supabase = createAdminClient()
+    const disabled = await disabledAccountIds(supabase)
 
     // Fetch all mentors with profiles using admin client (bypasses RLS)
     const { data: mentorsData, error } = await supabase
@@ -114,7 +121,7 @@ export async function fetchMentors(
     })
 
     // Enrich mentor data
-    let enrichedMentors = mentorsData.map(m => ({
+    let enrichedMentors = mentorsData.filter(m => !disabled.has(m.id)).map(m => ({
         ...m,
         sessions_completed: sessionCountMap[m.id] || 0,
         avg_rating: avgRatingMap[m.id] || null

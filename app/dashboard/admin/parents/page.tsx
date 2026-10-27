@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { disabledAccountIds } from '@/lib/account-access'
 import { createClient } from '@/utils/supabase/server'
 import { ParentsClient, type MissingAccount, type ParentRow, type StudentOption, type Suggestion } from './parents-client'
 
@@ -20,6 +21,7 @@ export default async function AdminParentsPage() {
         return redirect('/dashboard')
     }
 
+    const disabled = await disabledAccountIds(supabase)
     const [{ data: parents }, { data: details }, { data: links }, { data: students }, { data: academic }, { data: infos }, { data: docs }] = await Promise.all([
         supabase.from('profiles_private').select('id, full_name, email, updated_at').eq('role', 'parent').order('updated_at', { ascending: false }),
         supabase.from('parent_profiles').select('id, child_first_name'),
@@ -48,7 +50,7 @@ export default async function AdminParentsPage() {
             .filter(([, email]) => email.length > 0)
     )
 
-    const rows: ParentRow[] = (parents || []).map((p) => {
+    const rows: ParentRow[] = (parents || []).filter(p => !disabled.has(p.id)).map((p) => {
         const link = linkOfParent.get(p.id as string)
         const info = infoOf.get(p.id as string)
         return {
@@ -76,7 +78,7 @@ export default async function AdminParentsPage() {
         }
     })
 
-    const studentOptions: StudentOption[] = (students || []).map((s) => ({
+    const studentOptions: StudentOption[] = (students || []).filter(s => !disabled.has(s.id)).map((s) => ({
         id: s.id as string,
         name: s.full_name || s.email || 'Student',
         email: s.email || '',

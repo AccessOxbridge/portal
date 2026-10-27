@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { getZoomStartUrl } from '@/utils/zoom'
+import { isAccountDisabled, DISABLED_ACCOUNT_MESSAGE } from '@/lib/account-access'
 
 // Always run fresh: each request mints a new, short-lived Zoom host token.
 export const dynamic = 'force-dynamic'
@@ -33,6 +34,9 @@ export async function GET(
     // session from the dashboard, which generates a fresh link the same way.
     if (!user) {
         return NextResponse.redirect(new URL('/login', _req.url))
+    }
+    if (await isAccountDisabled(supabase, user.id)) {
+        return NextResponse.json({ error: DISABLED_ACCOUNT_MESSAGE }, { status: 403 })
     }
 
     const adminSupabase = createAdminClient()

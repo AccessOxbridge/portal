@@ -9,6 +9,7 @@ import {
     type SessionTarget,
 } from '@/lib/session-frequency'
 import type { createAdminClient } from '@/utils/supabase/admin'
+import { disabledAccountIds } from '@/lib/account-access'
 
 type Db = ReturnType<typeof createAdminClient>
 
@@ -72,12 +73,13 @@ function toIsoDate(d: Date): string {
  * assignments, profiles, mentors and student feedback. Nothing here writes.
  */
 export async function loadPerformanceData(db: Db, now: Date = new Date()) {
+    const disabled = await disabledAccountIds(db)
     const [
         sessions,
-        { data: students },
+        { data: studentRecords },
         { data: targets },
         { data: assignments },
-        { data: mentors },
+        { data: mentorRecords },
         { data: feedbacks },
     ] = await Promise.all([
         fetchAllSessions(db),
@@ -90,6 +92,9 @@ export async function loadPerformanceData(db: Db, now: Date = new Date()) {
             .select('session_id, rating, responses, created_at')
             .eq('form_type', 'student_feedback'),
     ])
+
+    const students = studentRecords?.filter(student => !disabled.has(student.id))
+    const mentors = mentorRecords?.filter(mentor => !disabled.has(mentor.id))
 
     // Names for every mentor we might mention.
     const mentorIds = new Set<string>([
@@ -220,7 +225,7 @@ export async function loadPerformanceData(db: Db, now: Date = new Date()) {
         ...completedByMentor.keys(),
     ])
 
-    const mentorRows: MentorRatingRow[] = [...relevantMentors].map((mentorId) => {
+    const mentorRows: MentorRatingRow[] = [...relevantMentors].filter(mentorId => !disabled.has(mentorId)).map((mentorId) => {
         const result = evaluateMentorRatings(ratingsByMentor.get(mentorId) || [], now)
         return {
             mentorId,

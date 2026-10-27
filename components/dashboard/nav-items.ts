@@ -60,6 +60,7 @@ const adminNav: NavItem[] = [
     { name: 'Mentors', href: '/dashboard/admin/mentors', icon: Users },
     { name: 'Students', href: '/dashboard/admin/students', icon: BookOpen },
     { name: 'Parents', href: '/dashboard/admin/parents', icon: UsersThree },
+    { name: 'Disable Account', href: '/dashboard/admin/disable-account', icon: UsersThree },
     { name: 'Create Account', href: '/dashboard/admin/create-account', icon: UserPlus },
     { name: 'Student Help', href: '/dashboard/admin/student-help', icon: HelpCircle },
     { name: 'Events', href: '/dashboard/admin/events', icon: CalendarDays },

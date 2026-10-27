@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { disabledAccountIds } from '@/lib/account-access'
 import { ApprovalButtons } from './approval-buttons'
 
 function formatResponseKey(key: string) {
@@ -27,7 +28,8 @@ export default async function AdminApprovalsPage() {
 
     if (!profile || (profile.role !== 'admin' && profile.role !== 'admin-dev')) return redirect('/dashboard')
 
-    const { data: mentors } = await supabase
+    const disabled = await disabledAccountIds(supabase)
+    const { data: mentorRows } = await supabase
         .from('mentors_private')
         .select(`
             *,
@@ -38,6 +40,8 @@ export default async function AdminApprovalsPage() {
         `)
         .eq('status', 'pending_approval')
         .order('created_at', { ascending: false })
+
+    const mentors = mentorRows?.filter(mentor => !disabled.has(mentor.id))
 
     return (
         <div className="space-y-10">

@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/server'
 import { recordLoginEvent } from '@/lib/login-events'
 import { sendStudentFirstLoginMessage } from '@/lib/claire-auto-messages'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { isAccountDisabled } from '@/lib/account-access'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -18,6 +19,10 @@ export async function login(formData: FormData) {
 
     const result = await supabase.auth.signInWithPassword(data)
     const { error, data: authData } = result
+
+    if (!error && authData.user && await isAccountDisabled(supabase, authData.user.id)) {
+        redirect('/account-disabled')
+    }
 
     let isFirstSuccessfulLogin = false
     if (!error && authData.user) {

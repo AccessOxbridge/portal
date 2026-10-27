@@ -16,8 +16,6 @@ import {
     GraduationCap,
     Headset,
     Hourglass,
-    Medal,
-    Target,
     UserCircle,
 } from '@phosphor-icons/react/ssr'
 import { cn } from '@/utils/lib'
@@ -126,14 +124,14 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
 
                 {/* Two across under the main column on mid-size screens; a side column on wide ones. */}
                 <div className="grid min-w-0 items-start gap-6 sm:grid-cols-2 xl:grid-cols-1">
+                    <Rise i={i++} className="sm:col-span-2 xl:col-span-1">
+                        <ConsultationCard w={w} />
+                    </Rise>
                     <Rise i={i++}>
                         <MentorCard data={data} w={w} />
                     </Rise>
                     <Rise i={i++}>
                         <SuccessManagerCard w={w} />
-                    </Rise>
-                    <Rise i={i++}>
-                        <Goals data={data} w={w} />
                     </Rise>
                     {data.hoursLeft !== null && (
                         <Rise i={i++}>
@@ -418,66 +416,36 @@ function SuccessManagerCard({ w }: { w: Words }) {
     )
 }
 
-function ordinal(n: number) {
-    const s = ['th', 'st', 'nd', 'rd']
-    const d = n % 100
-    return n + (s[(d - 20) % 10] || s[d] || s[0])
-}
-
-function Goals({ data, w }: { data: ParentHomeData; w: Words }) {
-    const goal = data.goal
-    if (!goal) {
-        return (
-            <Card>
-                <CardContent>
-                    <p className="text-sm text-muted-foreground">Goals and milestones</p>
-                    <div className="mt-3">
-                        <EmptyRow
-                            icon={Target}
-                            title={`Goals are set with ${w.childs} mentor`}
-                            description="The target university and course, and the milestones along the way, appear here once agreed."
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-        )
-    }
-    const { thresholds, completed } = data.milestones
-    // Show reached milestones plus the next one, so it never runs to 100 early.
-    const nextIndex = thresholds.findIndex((n) => n > completed)
-    const shown = nextIndex === -1 ? thresholds : thresholds.slice(0, Math.max(nextIndex + 1, 4))
-    const next = nextIndex === -1 ? null : thresholds[nextIndex]
+function ConsultationCard({ w }: { w: Words }) {
     return (
-        <Card>
-            <CardContent>
-                <p className="text-sm text-muted-foreground">Goals and milestones</p>
-                <div className="mt-3 flex items-center gap-3">
-                    <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-foreground">
-                        <Target weight="duotone" className="size-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="font-semibold">{[goal.university, goal.course].filter(Boolean).join(' · ')}</p>
-                        {goal.entryYear && <p className="text-sm text-muted-foreground">{goal.entryYear} entry</p>}
-                    </div>
+        <Card className="relative overflow-hidden border-gold/80 shadow-[0_0_0_1px_color-mix(in_srgb,var(--gold)_24%,transparent),0_16px_36px_-28px_var(--gold-foreground)]">
+            <div aria-hidden className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
+            <CardContent className="space-y-5 sm:p-6">
+                <div>
+                    <p className="text-xs font-semibold tracking-[0.14em] text-gold-foreground uppercase">Your consultation</p>
+                    <h2 className="mt-2 text-xl font-semibold leading-snug text-balance text-foreground">
+                        What to expect in {w.Childs} 1:1 Consultation
+                    </h2>
                 </div>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                    {shown.map((n) => {
-                        const reached = completed >= n
-                        return (
-                            <li key={n}>
-                                <Badge tone={reached ? 'amber' : 'outline'} size="lg" className={cn(!reached && 'text-muted-foreground')}>
-                                    <Medal weight={reached ? 'fill' : 'regular'} />
-                                    {ordinal(n)} session
-                                </Badge>
-                            </li>
-                        )
-                    })}
-                </ul>
-                {next !== null && (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                        {next - completed} {next - completed === 1 ? 'session' : 'sessions'} to the next milestone.
-                    </p>
-                )}
+                <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
+                    <p>Over 45 minutes, we will:</p>
+                    <ol className="list-decimal space-y-3 pl-5 marker:font-semibold marker:text-gold-foreground">
+                        <li className="pl-1"><strong>Assess {w.child} honestly</strong> against our four pillars, to understand exactly where {w.child} stands today.</li>
+                        <li className="pl-1"><strong>Share our findings with you:</strong> what’s going well, and what we’d focus on.</li>
+                        <li className="pl-1"><strong>Offer {w.child} a place,</strong> if {w.child} is a strong fit for the programme.</li>
+                        <li className="pl-1"><strong>Recommend the right programme</strong> for {w.child}, so you can decide together on the call.</li>
+                        <li className="pl-1"><strong>Get {w.child} started,</strong> with clear next steps.</li>
+                    </ol>
+                </div>
+                <div className="border-t border-gold/50 pt-5">
+                    <h3 className="font-semibold text-foreground">To make the most of the Consultation:</h3>
+                    <ul className="mt-3 space-y-3 text-sm leading-relaxed text-foreground/90">
+                        <li className="flex gap-2.5"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-gold-foreground" /><span><strong>Please attend together.</strong> Everyone involved in the decision should join, along with {w.child}, so you all hear the same findings and can decide on the call.</span></li>
+                        <li className="flex gap-2.5"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-gold-foreground" /><span><strong>Join from a laptop with stable Wi-Fi.</strong></span></li>
+                        <li className="flex gap-2.5"><span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-gold-foreground" /><span><strong>Have a detailed look through the resources tab and information sent by our team.</strong></span></li>
+                    </ul>
+                </div>
+                <p className="font-semibold text-foreground">We look forward to speaking with you soon.</p>
             </CardContent>
         </Card>
     )

@@ -238,6 +238,35 @@
   }
 }
 @layer utilities {
+  @keyframes gold-rim-shimmer {
+    0% { background-position: 0 0, 0% 50%; }
+    100% { background-position: 0 0, 250% 50%; }
+  }
+
+  /* Restrained adaptation of an outline shimmer: gold stays on the CTA rim,
+     preserving the guide palette instead of becoming a decorative fill. */
+  .gold-rim-button {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--card), var(--card)) padding-box,
+      linear-gradient(115deg, var(--gold-foreground), var(--gold), #fff2b8, var(--gold), var(--gold-foreground)) border-box;
+    background-size: 100% 100%, 250% 100%;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--gold) 20%, transparent),
+      0 0 16px color-mix(in srgb, var(--gold) 24%, transparent),
+      0 2px 4px var(--shadow-soft);
+    animation: gold-rim-shimmer 4.5s linear infinite;
+  }
+  .gold-rim-button:hover {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent),
+      0 0 22px color-mix(in srgb, var(--gold) 38%, transparent),
+      0 2px 4px var(--shadow-soft-hover);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gold-rim-button { animation: none; }
+  }
+
   /* Horizontally scrollable strips (session tabs, onboarding steppers) that
      should scroll without showing a scrollbar. Referenced in markup already
      but never previously defined. */

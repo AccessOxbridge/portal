@@ -10,7 +10,7 @@ import type { ParentReport } from '@/lib/parent-dashboard'
 /** A strong example of the report a mentor writes after a session. */
 export const EXAMPLE_REPORT: ParentReport = {
     id: 'example-report',
-    dateLabel: 'Personal statement and course fit',
+    dateLabel: 'Example Personal statement and course fit',
     mentorName: 'Hannah Reid',
     summary:
         'Alex and Hannah spent the session on Alex’s personal statement for History at Cambridge, focusing on the second paragraph and how it connects to the course. Alex compared two drafts and explained clearly why the version built around their own reading on the Industrial Revolution shows more independent thinking. They then used the Cambridge Guide to Courses to link that interest to the first-year papers, so the statement now reads as preparation for the degree rather than a list of books.',
@@ -58,15 +58,8 @@ export const EXAMPLE_REPORT: ParentReport = {
     ].join('\n'),
 }
 
-/**
- * An example session recording. Placeholder clip until the team's own
- * example recording is ready (then: a private Supabase Storage object played
- * through a signed link, like real recordings).
- */
+/** A non-interactive example showing where a session recording will appear. */
 export const EXAMPLE_RECORDING = {
-    // CC0 sample clip from MDN, standing in for the real example.
-    url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
     title: 'Example session recording',
     mentorName: 'Hannah Reid',
-    note: 'A sample to show how recordings play here. Your child’s own sessions appear in this list a few minutes after each one ends.',
 }

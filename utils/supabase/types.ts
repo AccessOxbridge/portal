@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_access: {
+        Row: {
+          user_id: string
+          disabled_at: string | null
+          changed_by: string
+          changed_at: string
+        }
+        Insert: {
+          user_id: string
+          disabled_at?: string | null
+          changed_by: string
+          changed_at?: string
+        }
+        Update: {
+          disabled_at?: string | null
+          changed_by?: string
+          changed_at?: string
+        }
+        Relationships: []
+      }
+      account_access_events: {
+        Row: {
+          id: string
+          user_id: string
+          actor_id: string
+          enabled: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          actor_id: string
+          enabled: boolean
+          created_at?: string
+        }
+        Update: { [_ in never]: never }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string
@@ -2326,6 +2364,13 @@ export type Database = {
       }
     }
     Functions: {
+      admin_set_account_enabled: {
+        Args: {
+          p_user_id: string
+          p_enabled: boolean
+        }
+        Returns: undefined
+      }
       admin_adjust_credits: {
         Args: {
           p_admin_id: string

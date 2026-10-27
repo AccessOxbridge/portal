@@ -54,6 +54,7 @@ export default function NotificationBell() {
 
     // Hide notification bell on auth pages and mentor onboarding
     const isAuthPage = pathname?.includes('/login') ||
+        pathname === '/account-disabled' ||
         pathname?.includes('/signup') ||
         pathname?.includes('/become-a-mentor') ||
         pathname?.includes('/forgot-password') ||

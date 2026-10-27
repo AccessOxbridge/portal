@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 import { getStripe, getOrCreateStripeCustomer } from '@/utils/stripe'
+import { isAccountDisabled, DISABLED_ACCOUNT_MESSAGE } from '@/lib/account-access'
 
 export async function POST(req: Request) {
     try {
@@ -10,6 +11,9 @@ export async function POST(req: Request) {
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         if (authError || !user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        if (await isAccountDisabled(supabase, user.id)) {
+            return NextResponse.json({ error: DISABLED_ACCOUNT_MESSAGE }, { status: 403 })
         }
 
         const { packageId } = await req.json()

@@ -11,9 +11,8 @@ function maintenanceEnabled(): boolean {
     return v === 'true' || v === 'on' || v === '1'
 }
 
-// Page paths that must stay reachable while maintenance is on. (API routes,
-// _next static assets and image files are already excluded by `config.matcher`
-// below, so webhooks/cron/static never hit this gate.)
+// Page paths that must stay reachable while maintenance is on. API routes
+// bypass maintenance above, but still run the account-access check.
 function isAllowlisted(pathname: string): boolean {
     return pathname === '/maintenance' || pathname.startsWith('/maintenance/')
 }
@@ -28,8 +27,8 @@ export async function bypassToken(secret: string): Promise<string> {
 }
 
 export async function proxy(request: NextRequest) {
-    // Normal operation: behave exactly as before (refresh the auth token).
-    if (!maintenanceEnabled()) {
+    // Refresh auth and enforce account access, including authenticated APIs.
+    if (!maintenanceEnabled() || request.nextUrl.pathname.startsWith('/api/') || request.nextUrl.pathname === '/account-disabled') {
         return await updateSession(request)
     }
 
@@ -66,12 +65,11 @@ export const config = {
     matcher: [
         /*
          * Match all request paths except for the ones starting with:
-         * - api (API routes, including webhooks + cron — kept reachable during maintenance)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }

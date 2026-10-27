@@ -1,4 +1,5 @@
 'use server'
+import { disabledAccountIds } from '@/lib/account-access'
 
 import {
     groupIntroBody,
@@ -216,6 +217,7 @@ function asRecipient(
  */
 export async function searchMessageRecipients(query: string): Promise<MessageRecipient[]> {
     const { supabase } = await requireAdmin()
+    const disabled = await disabledAccountIds(supabase)
     const term = sanitizeSearch(query)
 
     if (!term) {
@@ -253,7 +255,7 @@ export async function searchMessageRecipients(query: string): Promise<MessageRec
         const mentors = (mentorRows || []).map((row) =>
             asRecipient(row.id, oneProfile(row.profile), 'mentor', row.photo_url)
         )
-        return [...students, ...mentors]
+        return [...students, ...mentors].filter(account => !disabled.has(account.id))
     }
 
     const pattern = JSON.stringify(`%${term}%`)
@@ -268,7 +270,7 @@ export async function searchMessageRecipients(query: string): Promise<MessageRec
         throw new Error(error.message || 'Failed to search recipients')
     }
 
-    const rows = profiles || []
+    const rows = (profiles || []).filter(profile => !disabled.has(profile.id))
     const mentorIds = rows.filter((p) => p.role === 'mentor').map((p) => p.id)
     const photoMap = new Map<string, string | null>()
 
@@ -309,6 +311,8 @@ export async function getAssignedMentorsForStudent(
     studentId: string
 ): Promise<MessageRecipient[]> {
     const { supabase } = await requireAdmin()
+    const disabled = await disabledAccountIds(supabase)
+    if (disabled.has(studentId)) return []
 
     const { data: assignments, error } = await supabase
         .from('student_mentor_assignments')
@@ -320,7 +324,7 @@ export async function getAssignedMentorsForStudent(
         throw new Error(error.message || 'Failed to load assigned mentors')
     }
 
-    const mentorIds = [...new Set((assignments || []).map((row) => row.mentor_id))]
+    const mentorIds = [...new Set((assignments || []).map((row) => row.mentor_id))].filter(id => !disabled.has(id))
     if (mentorIds.length === 0) return []
 
     const [{ data: profiles }, { data: mentorPhotos }] = await Promise.all([
@@ -342,6 +346,8 @@ export async function getAssignedMentorsForStudent(
  */
 export async function createGroupThread(participantIds: string[]): Promise<GroupThread> {
     const { userId, supabase } = await requireAdmin()
+    const disabled = await disabledAccountIds(supabase)
+    if (participantIds.some(id => disabled.has(id))) throw new Error('A selected account has been disabled. Choose enabled accounts.')
 
     const uniqueIds = [...new Set(participantIds.filter(Boolean))]
     if (uniqueIds.length < 2) {

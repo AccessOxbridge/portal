@@ -1,4 +1,6 @@
 import { redirect } from 'next/navigation'
+import { isAccountDisabled } from '@/lib/account-access'
+import { AccountAccessGate } from '@/components/dashboard/account-access-gate'
 import { createClient } from '@/utils/supabase/server'
 import { getGreetingName } from '@/utils/lib'
 import DashboardShell from '@/components/dashboard/dashboard-shell'
@@ -33,6 +35,8 @@ export default async function DashboardLayout({
     if (!user) {
         return redirect('/login')
     }
+
+    if (await isAccountDisabled(supabase, user.id)) redirect('/account-disabled')
 
     let { data: profile } = await supabase
         .from('profiles')
@@ -411,6 +415,7 @@ export default async function DashboardLayout({
             sidebarProps={sidebarProps}
             footer={isStudent ? <HelpSupportButton /> : undefined}
         >
+            <AccountAccessGate userId={user.id} />
             {children}
         </DashboardShell>
     )

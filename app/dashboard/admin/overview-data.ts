@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import { getZonedNow, zonedTimeToUtcISO } from '@/lib/timezone'
 import { isBillableLength } from '@/utils/session-billing'
+import { disabledAccountIds } from '@/lib/account-access'
 
 /**
  * Everything the admin home shows, from real rows. Read-only.
@@ -69,6 +70,7 @@ const nameOf = (p: unknown) => (p as { full_name?: string | null } | null)?.full
 
 export async function loadAdminOverview(): Promise<AdminOverview> {
     const db = createAdminClient()
+    const disabled = await disabledAccountIds(db)
     const now = new Date()
     const nowIso = now.toISOString()
     const today = getZonedNow(TZ).date
@@ -90,7 +92,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         requestsPending,
         requestsOver48h,
         issues,
-        students,
+        studentResult,
         assignments,
         invoices,
         upcoming,
@@ -102,7 +104,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         mentorsTotal,
         completedTotal,
     ] = await Promise.all([
-        db.from('mentors').select('*', { count: 'exact', head: true }).eq('status', 'pending_approval'),
+        db.from('mentors').select('id').eq('status', 'pending_approval'),
         db.from('mentorship_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
         db.from('mentorship_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending').lt('created_at', ago48h),
         db.from('user_issues').select('issue_type').neq('status', 'resolved'),
@@ -116,15 +118,17 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
             .lte('scheduled_at', in7Days)
             .order('scheduled_at', { ascending: true }),
         db.from('sessions').select('id, scheduled_at, actual_minutes').eq('status', 'completed').gte('scheduled_at', twelveWeeksAgo < ago90d ? twelveWeeksAgo : ago90d),
-        db.from('student_profiles').select('*', { count: 'exact', head: true }).gte('created_at', monthStart),
+        db.from('student_profiles').select('id').gte('created_at', monthStart),
         // Hours reach students two ways: a portal purchase or an admin top-up.
         // Both write a credit transaction; the portal holds no revenue figures.
         db.from('credit_transactions').select('amount, created_at').in('type', ['purchase', 'admin_adjustment']).gte('created_at', lastMonthStart),
         db.from('form_responses').select('rating').eq('form_type', 'student_feedback').gte('created_at', ago30d),
         db.from('login_events').select('user_id, created_at').eq('status', 'success').order('created_at', { ascending: false }).limit(5000),
-        db.from('mentors').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        db.from('mentors').select('id').eq('status', 'active'),
         db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'completed').or('actual_minutes.is.null,actual_minutes.gte.15'),
     ])
+
+    const students = { ...studentResult, data: studentResult.data?.filter(student => !disabled.has(student.id)) }
 
     // Reports overdue: completed in the last 90 days, more than 48 hours ago,
     // with no mentor report yet.
@@ -184,7 +188,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
 
     return {
         attention: {
-            applications: applications.count ?? 0,
+            applications: (applications.data ?? []).filter(mentor => !disabled.has(mentor.id)).length,
             requestsPending: requestsPending.count ?? 0,
             requestsOver48h: requestsOver48h.count ?? 0,
             reportsOverdue,
@@ -205,7 +209,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         })),
         completedThisWeek,
         completedLastWeek,
-        newStudentsThisMonth: studentProfilesThisMonth.count ?? 0,
+        newStudentsThisMonth: (studentProfilesThisMonth.data ?? []).filter(student => !disabled.has(student.id)).length,
         hoursAddedThisMonth: hoursIn(monthStart, '9999'),
         hoursAddedLastMonth: hoursIn(lastMonthStart, monthStart),
         lastMonthLabel: formatMonth(lastMonthStart),
@@ -218,7 +222,7 @@ export async function loadAdminOverview(): Promise<AdminOverview> {
         atRiskTotal: atRiskAll.length,
         loginTrackingSince: loginRows.length ? loginRows[loginRows.length - 1].created_at : null,
         totals: {
-            mentors: mentorsTotal.count ?? 0,
+            mentors: (mentorsTotal.data ?? []).filter(mentor => !disabled.has(mentor.id)).length,
             students: studentRows.length,
             completedSessions: completedTotal.count ?? 0,
         },

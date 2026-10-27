@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import FortnightlyReportContent from './fortnightly-report-content'
 import { getFortnightWindowForDate } from '@/lib/fortnight'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { disabledAccountIds } from '@/lib/account-access'
 
 export default async function FortnightlyReportPage() {
     const supabase = await createClient()
@@ -24,6 +25,7 @@ export default async function FortnightlyReportPage() {
     }
 
     const now = new Date()
+    const disabled = await disabledAccountIds(adminSupabase)
     const { startDate, endDate } = getFortnightWindowForDate(now)
     const startIso = startDate.toISOString()
     const endIso = endDate.toISOString()
@@ -56,7 +58,7 @@ export default async function FortnightlyReportPage() {
 
         const parentEmailMap = new Map((studentProfiles || []).map(sp => [sp.id, sp.parent_email]))
 
-        students = (profiles || []).map(p => ({
+        students = (profiles || []).filter(p => !disabled.has(p.id)).map(p => ({
             id: p.id,
             full_name: p.full_name || 'Unknown',
             email: p.email,

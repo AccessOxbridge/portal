@@ -1,4 +1,5 @@
 'use client'
+import { disabledAccountIds } from '@/lib/account-access'
 
 import { createClient } from '@/utils/supabase/client'
 import { format } from 'date-fns'
@@ -97,6 +98,7 @@ export function CreateAccountClient() {
         let cancelled = false
 
         async function loadStudents() {
+            const disabled = await disabledAccountIds(client)
             const { data, error } = await client
                 .from('profiles_private')
                 .select('id, full_name, email, credits, updated_at')
@@ -104,7 +106,7 @@ export function CreateAccountClient() {
                 .order('updated_at', { ascending: false })
 
             if (cancelled || error || !data) return
-            let filtered = data as StudentAccount[]
+            let filtered = (data as StudentAccount[]).filter(student => !disabled.has(student.id))
             if (searchTerm) {
                 const term = searchTerm.toLowerCase()
                 filtered = filtered.filter(
@@ -117,13 +119,14 @@ export function CreateAccountClient() {
         }
 
         async function loadMentors() {
+            const disabled = await disabledAccountIds(client)
             const { data, error } = await client
                 .from('mentors')
                 .select('id, status, updated_at, profile:profiles_private!left(full_name, email)')
                 .order('updated_at', { ascending: false })
 
             if (cancelled || error || !data) return
-            let mapped = data.map((row) => {
+            let mapped = data.filter(row => !disabled.has(row.id)).map((row) => {
                 const profile = Array.isArray(row.profile) ? row.profile[0] : row.profile
                 return {
                     id: row.id,

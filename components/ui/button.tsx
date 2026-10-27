@@ -15,7 +15,7 @@ const buttonVariants = cva(
         'relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-medium outline-none select-none',
         'rounded-full in-data-[density=compact]:rounded-control',
         'transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out',
-        'enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96]',
+        'motion-safe:enabled:active:scale-[0.96] motion-safe:[&:is(a)]:active:scale-[0.96]',
         'focus-visible:ring-[3px] focus-visible:ring-ring/40',
         'disabled:pointer-events-none disabled:opacity-50',
         'aria-invalid:ring-[3px] aria-invalid:ring-destructive/20',

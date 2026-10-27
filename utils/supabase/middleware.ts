@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAccountDisabled, DISABLED_ACCOUNT_MESSAGE } from '@/lib/account-access'
 
 export async function updateSession(request: NextRequest) {
-    let supabaseResponse = NextResponse.next({
+    const supabaseResponse = NextResponse.next({
         request,
     });
 
@@ -26,7 +27,18 @@ export async function updateSession(request: NextRequest) {
     );
 
     // Refreshing the auth token so it's available to Server Components
-    await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user && request.nextUrl.pathname !== '/account-disabled' && request.nextUrl.pathname !== '/auth/signout') {
+        const disabled = await isAccountDisabled(supabase, user.id)
+        if (disabled) {
+            const response = request.nextUrl.pathname.startsWith('/api/')
+                ? NextResponse.json({ error: DISABLED_ACCOUNT_MESSAGE }, { status: 403 })
+                : NextResponse.redirect(new URL('/account-disabled', request.url))
+            supabaseResponse.cookies.getAll().forEach(cookie => response.cookies.set(cookie))
+            return response
+        }
+    }
 
     return supabaseResponse;
 }

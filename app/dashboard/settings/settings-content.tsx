@@ -30,6 +30,7 @@ const roleLabel = (role: string) => {
         case 'mentor': return 'Mentor'
         case 'student': return 'Student'
         case 'parent': return 'Parent'
+        case 'sales': return 'Sales'
         default: return role
     }
 }
@@ -48,6 +49,7 @@ export default function SettingsContent({
     // Parents have no timezone of their own (their pages use the child's) and
     // no profile page, so their photo lives here instead.
     const isParent = role === 'parent'
+    const hasTimezone = role !== 'parent' && role !== 'sales'
     const [tz, setTz] = useState(timezone || getDefaultTimezone())
     const [savedTz, setSavedTz] = useState(timezone || '')
     const [tzFeedback, setTzFeedback] = useState<{ ok: boolean; message: string } | null>(null)
@@ -96,7 +98,11 @@ export default function SettingsContent({
             <header>
                 <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">Settings</h1>
                 <p className="mt-1 text-muted-foreground">
-                    {isParent ? 'Manage your account, photo and password.' : 'Manage your account, timezone and password.'}
+                    {isParent
+                        ? 'Manage your account, photo and password.'
+                        : hasTimezone
+                          ? 'Manage your account, timezone and password.'
+                          : 'Manage your account and password.'}
                 </p>
             </header>
 
@@ -124,7 +130,7 @@ export default function SettingsContent({
             )}
 
             {/* Timezone */}
-            {!isParent && (
+            {hasTimezone && (
                 <section className={card}>
                     <SectionHead icon={Globe} tint="bg-tint-violet text-tint-violet-foreground" title="Timezone" description="Used for scheduling and displaying session times" />
                     <div className="space-y-4 p-5 sm:p-6">

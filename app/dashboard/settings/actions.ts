@@ -40,6 +40,9 @@ export async function updateTimezone(timezone: string): Promise<ActionResult> {
         .single()
 
     const role = profile?.role
+    if (role === 'parent' || role === 'sales') {
+        return { ok: false, message: 'This account does not use a scheduling timezone.' }
+    }
     const isStudent = role === 'student' || role === 'admin-dev'
 
     if (isStudent) {

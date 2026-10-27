@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { confirmDialog } from '@/components/ui/confirm'
-import { setAccountEnabled } from './actions'
+import { setAccountEnabled } from '@/app/dashboard/account-access-actions'
 
 type Account = {
     id: string
@@ -18,22 +18,27 @@ type Account = {
     role: string
     disabledAt: string | null
 }
-const roles = [
+const defaultRoles = [
     ['student', 'Students'],
     ['mentor', 'Mentors'],
     ['parent', 'Parents'],
+    ['sales', 'Sales'],
     ['admin', 'Admins'],
 ] as const
 
 export function AccountsClient({
     accounts,
     currentUserId,
+    roleOptions = defaultRoles,
+    footerNote = 'Mentors with outstanding invoices, unresolved payouts or unbilled sessions must settle these first. Historical sessions, reports and financial records remain available.',
 }: {
     accounts: Account[]
     currentUserId: string
+    roleOptions?: ReadonlyArray<readonly [string, string]>
+    footerNote?: string
 }) {
     const router = useRouter()
-    const [role, setRole] = useState('student')
+    const [role, setRole] = useState(roleOptions[0]?.[0] ?? 'parent')
     const [view, setView] = useState('active')
     const [search, setSearch] = useState('')
     const [pendingId, setPendingId] = useState<string | null>(null)
@@ -109,7 +114,7 @@ export function AccountsClient({
                 }}
             >
                 <TabsList aria-label="Account type">
-                    {roles.map(([value, label]) => (
+                    {roleOptions.map(([value, label]) => (
                         <TabsTrigger key={value} value={value}>
                             {label}
                         </TabsTrigger>
@@ -358,11 +363,7 @@ export function AccountsClient({
                     </section>
                 </TabsContent>
             </Tabs>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-                Mentors with outstanding invoices, unresolved payouts or
-                unbilled sessions must settle these first. Historical sessions,
-                reports and financial records remain available.
-            </p>
+            {footerNote && <p className="text-xs leading-relaxed text-muted-foreground">{footerNote}</p>}
         </div>
     )
 }

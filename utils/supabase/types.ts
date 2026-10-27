@@ -2447,7 +2447,7 @@ export type Database = {
         | "session_reschedule_request"
         | "session_reschedule_accepted"
         | "session_reschedule_declined"
-      user_role: "student" | "mentor" | "admin" | "client" | "admin-dev" | "parent"
+      user_role: "student" | "mentor" | "admin" | "client" | "admin-dev" | "parent" | "sales"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2601,7 +2601,7 @@ export const Constants = {
         "session_reschedule_accepted",
         "session_reschedule_declined",
       ],
-      user_role: ["student", "mentor", "admin", "client", "admin-dev", "parent"],
+      user_role: ["student", "mentor", "admin", "client", "admin-dev", "parent", "sales"],
     },
   },
 } as const

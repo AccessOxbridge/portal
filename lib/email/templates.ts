@@ -934,6 +934,39 @@ export function parentWelcome(args: {
     }
 }
 
+/** Staff-provisioned sales account with access limited to parent accounts. */
+export function salesWelcome(args: {
+    fullName: string
+    email: string
+    password: string
+}): EmailTemplate {
+    const firstName = firstNameFrom(args.fullName)
+    return {
+        subject: `Welcome to Access Oxbridge, ${firstName} - Your Sales Login`,
+        html: layout({
+            title: 'Welcome to Access Oxbridge',
+            preheader: 'Your sales portal login details.',
+            paragraphs: [
+                `Hi ${escapeHtml(firstName)},`,
+                'Your Access Oxbridge sales account is ready.',
+            ],
+            list: {
+                heading: 'What you can do',
+                items: [
+                    { body: 'Create parent portal accounts and send their login details.' },
+                    { body: 'Disable or re-enable parent portal access when needed.' },
+                ],
+            },
+            closingParagraphs: [
+                `<strong>Your login details:</strong><br />${loginDetailsParagraph(args.email, args.password)}`,
+                'For security, please log in and change your password as soon as you can.',
+                "If you have any trouble logging in, just reply to this email and we'll be happy to help.",
+            ],
+            signOff: ['Best wishes,', 'The Access Oxbridge Team'],
+        }),
+    }
+}
+
 /** Staff-provisioned mentor account: login details + onboarding next steps. */
 export function mentorWelcome(args: {
     fullName: string

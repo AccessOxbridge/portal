@@ -1,5 +1,8 @@
 -- Reversible account access, separate from profiles and historical records.
 -- No existing rows are changed. Apply locally first; production needs approval.
+-- Apply as one transaction. Abort promptly rather than wait on live requests.
+SET LOCAL lock_timeout = '2s';
+SET LOCAL statement_timeout = '10s';
 
 CREATE TABLE public.account_access (
     user_id uuid PRIMARY KEY REFERENCES public.profiles(id) ON DELETE RESTRICT,
@@ -64,12 +67,24 @@ END $$;
 DO $guard$
 DECLARE v record;
 BEGIN
-    FOR v IN SELECT c.relname, pg_get_viewdef(c.oid, true) AS definition
+    FOR v IN SELECT c.oid, c.relname, c.reloptions, c.relacl, c.relowner, pg_get_viewdef(c.oid, true) AS definition
         FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE n.nspname = 'public' AND c.relkind = 'v'
     LOOP
-        EXECUTE format('CREATE OR REPLACE VIEW public.%I AS SELECT * FROM (%s) account_guarded WHERE (SELECT auth.uid()) IS NULL OR (SELECT private.current_account_enabled())',
-            v.relname, regexp_replace(v.definition, ';[[:space:]]*$', ''));
+        -- CREATE OR REPLACE resets omitted view options, including
+        -- security_barrier/security_invoker. Carry existing options forward.
+        EXECUTE format('CREATE OR REPLACE VIEW public.%I %s AS SELECT * FROM (%s) account_guarded WHERE (SELECT auth.uid()) IS NULL OR (SELECT private.current_account_enabled())',
+            v.relname,
+            CASE WHEN cardinality(v.reloptions) > 0 THEN format('WITH (%s)', array_to_string(v.reloptions, ', ')) ELSE '' END,
+            regexp_replace(v.definition, ';[[:space:]]*$', ''));
+        IF EXISTS (
+            SELECT 1 FROM pg_class c WHERE c.oid = v.oid
+            AND (c.reloptions IS DISTINCT FROM v.reloptions
+                OR c.relacl IS DISTINCT FROM v.relacl
+                OR c.relowner IS DISTINCT FROM v.relowner)
+        ) THEN
+            RAISE EXCEPTION 'View metadata changed for public.%', v.relname;
+        END IF;
     END LOOP;
 END $guard$;
 

@@ -106,7 +106,29 @@ ESLint and TypeScript; production build. The local security advisor reports
 pre-existing objects (including owner-rights views); no findings name the new
 access tables or functions. This is not a production security audit.
 
-## Production rollout, not yet authorised
+## Production rollout status
+
+Raj authorised the migration and production deployment on 27 October 2026.
+Deployment remains pending: the production rollback-only dry run found that
+`CREATE OR REPLACE VIEW` cleared existing `security_barrier` options. The entire
+transaction rolled back; follow-up catalogue checks found no new access tables,
+policies or triggers. The long comparison also briefly delayed live requests on
+schema locks, so automatic approval review rejected another broad dry run.
+
+The corrected guard explicitly preserves view options and aborts if options,
+grants or owners change. The migration now sets a two-second lock timeout and
+ten-second statement timeout. A local rollback-only regression checks barrier,
+invoker and ordinary views using the actual migration guard:
+
+```sh
+node scripts/test-account-view-options.mjs
+```
+
+Before another production DDL attempt, obtain approval for a short transaction
+with a database-enforced total time bound. Do visibility comparisons outside
+the DDL transaction so they do not prolong schema locks. Do not deploy application
+code until the migration has succeeded. Production is active: row counts may
+increase from real user activity and must not be described as unchanged.
 
 1. Review the local code and tests; do not push without Raj's approval.
 2. Review the live catalogue and function grants read-only for production drift.

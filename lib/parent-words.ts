@@ -1,9 +1,10 @@
 /** Copy for the parent pages, usable from server and client components. */
 
-/** Claire for every family for now: name, title and contact email; no photo. */
+/** Claire for every family for now: name, title, photo and contact email. */
 export const SUCCESS_MANAGER = {
     name: 'Claire Marlowe',
     title: 'Senior Strategist',
+    photo: '/team/claire-marlowe.webp' as string | null,
     // The shared office inbox for now (Raj, 22 Oct).
     email: 'office@accessoxbridge.io',
 }

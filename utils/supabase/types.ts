@@ -1283,6 +1283,78 @@ export type Database = {
           },
         ]
       }
+      parent_documents: {
+        Row: {
+          created_at: string
+          file_name: string
+          id: string
+          mime_type: string
+          parent_id: string
+          size_bytes: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          id?: string
+          mime_type: string
+          parent_id: string
+          size_bytes: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime_type?: string
+          parent_id?: string
+          size_bytes?: number
+          storage_path?: string
+        }
+        Relationships: []
+      }
+      parent_student_info: {
+        Row: {
+          child_first_name: string
+          child_last_name: string | null
+          course_interest: string | null
+          notes: string | null
+          parent_id: string
+          school: string | null
+          subjects: string | null
+          submitted_at: string
+          university_preference: string | null
+          updated_at: string
+          year_group: string | null
+        }
+        Insert: {
+          child_first_name: string
+          child_last_name?: string | null
+          course_interest?: string | null
+          notes?: string | null
+          parent_id: string
+          school?: string | null
+          subjects?: string | null
+          submitted_at?: string
+          university_preference?: string | null
+          updated_at?: string
+          year_group?: string | null
+        }
+        Update: {
+          child_first_name?: string
+          child_last_name?: string | null
+          course_interest?: string | null
+          notes?: string | null
+          parent_id?: string
+          school?: string | null
+          subjects?: string | null
+          submitted_at?: string
+          university_preference?: string | null
+          updated_at?: string
+          year_group?: string | null
+        }
+        Relationships: []
+      }
       parent_profiles: {
         Row: {
           child_first_name: string | null

@@ -1,14 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
 import { requireParent } from '@/lib/parent-dashboard'
-import { LOCKED_RESOURCES, PARENT_GUIDES, readingMinutes } from '@/lib/parent-resources'
+import { PARENT_GUIDES, readingMinutes } from '@/lib/parent-resources'
+import { CHILD_GUIDES } from '@/lib/child-guides'
 import { wordsFor } from '@/lib/parent-words'
 import { ParentHeading, Rise } from '@/components/parent/parent-home'
 import { GuideCard, LockedCard } from '@/components/parent/resource-cards'
 
 /**
  * Resources for parents: the guides written for parents, open to every
- * parent account (linked or not), and the guides for the child, shown locked
- * until the family's programme includes them.
+ * parent account (linked or not), and the guides written for the child,
+ * shown locked until the family is enrolled (the parent is linked to the
+ * child's account).
  */
 export default async function ParentResourcesPage() {
     const supabase = await createClient()
@@ -46,9 +48,20 @@ export default async function ParentResourcesPage() {
                 <section className="mt-10">
                     <h2 className="mb-3 text-lg font-semibold">{w.Childs} Resources</h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {LOCKED_RESOURCES.map((r) => (
-                            <LockedCard key={r.title} title={r.title} summary={r.summary} childFirstName={ctx.childFirstName} />
-                        ))}
+                        {CHILD_GUIDES.map((g) =>
+                            ctx.childId ? (
+                                <GuideCard
+                                    key={g.slug}
+                                    href={`/dashboard/parent/resources/${g.slug}`}
+                                    eyebrow={g.eyebrow}
+                                    title={g.title}
+                                    summary={g.summary}
+                                    minutes={readingMinutes(g)}
+                                />
+                            ) : (
+                                <LockedCard key={g.slug} title={g.title} summary={g.summary} childFirstName={ctx.childFirstName} />
+                            )
+                        )}
                     </div>
                 </section>
             </Rise>

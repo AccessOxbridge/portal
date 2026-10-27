@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { ArrowsClockwise, Link as LinkIcon, LinkBreak, MagnifyingGlass, PencilSimple, Plus, UsersThree } from '@phosphor-icons/react/ssr'
+import { ArrowsClockwise, FileText, Link as LinkIcon, LinkBreak, MagnifyingGlass, PencilSimple, Plus, UserList, UsersThree } from '@phosphor-icons/react/ssr'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { PageHeader } from '@/components/ui/page-header'
 import { SelectField } from '@/components/ui/select'
 import { toast } from '@/components/ui/toaster'
+import { formatBytes, UNIVERSITY_PREFERENCES, type ParentDocument, type StudentInfo } from '@/lib/parent-student-info'
 import { createParentAccount, linkParent, unlinkParent, updateChildName } from './actions'
 
 export type ParentRow = {
@@ -22,6 +23,9 @@ export type ParentRow = {
     email: string
     childFirstName: string | null
     link: { studentId: string; studentName: string; since: string } | null
+    /** What the parent filed on their Progress Tracker, for the academic team. */
+    studentInfo: (StudentInfo & { submittedAt: string }) | null
+    documents: ParentDocument[]
 }
 export type StudentOption = { id: string; name: string; email: string; linked: boolean; parentEmail: string | null }
 export type Suggestion = { parentId: string; parentName: string; parentEmail: string; studentId: string; studentName: string }
@@ -62,6 +66,7 @@ export function ParentsClient({
     const [create, setCreate] = useState<CreatePrefill | null>(null)
     const [linking, setLinking] = useState<ParentRow | null>(null)
     const [naming, setNaming] = useState<ParentRow | null>(null)
+    const [viewing, setViewing] = useState<ParentRow | null>(null)
     const [pending, startTransition] = useTransition()
 
     const term = search.trim().toLowerCase()
@@ -190,6 +195,13 @@ export function ParentsClient({
                                     )}
                                 </div>
                                 <div className="flex gap-1">
+                                    {(p.studentInfo || p.documents.length > 0) && (
+                                        <Button size="sm" variant="ghost" onClick={() => setViewing(p)}>
+                                            <UserList />
+                                            Student info
+                                            {p.documents.length > 0 && <Badge tone="neutral">{p.documents.length}</Badge>}
+                                        </Button>
+                                    )}
                                     {p.link ? (
                                         <Button size="sm" variant="destructive-ghost" disabled={pending} onClick={() => unlink(p)}>
                                             <LinkBreak />
@@ -227,6 +239,7 @@ export function ParentsClient({
                     }}
                 />
             )}
+            {viewing && <StudentInfoDialog parent={viewing} onClose={() => setViewing(null)} />}
             {naming && (
                 <ChildNameDialog
                     parent={naming}
@@ -440,6 +453,67 @@ function ChildNameDialog({
                         </Button>
                     </DialogFooter>
                 </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+/** What a parent told us about their child, and their documents (opened through short-lived links). */
+function StudentInfoDialog({ parent, onClose }: { parent: ParentRow; onClose: () => void }) {
+    const info = parent.studentInfo
+    const rows: [string, string][] = info
+        ? [
+              ['Name', [info.childFirstName, info.childLastName].filter(Boolean).join(' ')],
+              ['School', info.school],
+              ['Year group', info.yearGroup],
+              ['Subjects', info.subjects],
+              ['Course of interest', info.courseInterest],
+              ['University', UNIVERSITY_PREFERENCES.find((u) => u.value === info.universityPreference)?.label ?? ''],
+              ['Notes', info.notes],
+          ]
+        : []
+    return (
+        <Dialog open onOpenChange={(open) => !open && onClose()}>
+            <DialogContent size="lg">
+                <DialogHeader>
+                    <DialogTitle>Student information from {parent.name}</DialogTitle>
+                    <DialogDescription>
+                        {info ? `Last updated ${new Date(info.submittedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.` : 'No details filled in yet.'}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogBody className="space-y-5">
+                    {info && (
+                        <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                            {rows.map(([label, value]) => (
+                                <div key={label} className={label === 'Notes' ? 'sm:col-span-2' : undefined}>
+                                    <dt className="text-xs text-muted-foreground">{label}</dt>
+                                    <dd className="mt-0.5 whitespace-pre-line text-pretty [overflow-wrap:anywhere]">{value || '—'}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    )}
+                    <div>
+                        <p className="text-sm font-medium">Documents</p>
+                        {parent.documents.length ? (
+                            <ul className="mt-2 divide-y divide-border rounded-control border border-border">
+                                {parent.documents.map((d) => (
+                                    <li key={d.id} className="flex items-center gap-3 px-3 py-2.5 text-sm">
+                                        <FileText className="size-4 shrink-0 text-muted-foreground" />
+                                        <a href={`/api/parent/documents/${d.id}`} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate font-medium underline-offset-4 hover:underline">
+                                            {d.fileName}
+                                        </a>
+                                        <span className="shrink-0 text-muted-foreground tabular-nums">{formatBytes(d.sizeBytes)}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="mt-1 text-sm text-muted-foreground">No documents uploaded.</p>
+                        )}
+                    </div>
+                </DialogBody>
+                <DialogFooter>
+                    <Button onClick={onClose}>Close</Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     )

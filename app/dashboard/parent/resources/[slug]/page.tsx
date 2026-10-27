@@ -1,15 +1,21 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { requireParent } from '@/lib/parent-dashboard'
-import { getParentGuide } from '@/lib/parent-resources'
+import { getGuide } from '@/lib/parent-resources'
 import { ParentGuideArticle } from '@/components/parent/parent-guide'
 
-/** One parent guide, read inside the portal. Parents only. */
+/**
+ * One guide, read inside the portal. Parents only. The guides written for
+ * students open once the family is enrolled (the parent is linked to their
+ * child's account); before that, the Resources page shows them locked and a
+ * direct link goes back there.
+ */
 export default async function ParentGuidePage({ params }: { params: Promise<{ slug: string }> }) {
     const supabase = await createClient()
-    await requireParent(supabase)
+    const ctx = await requireParent(supabase)
     const { slug } = await params
-    const guide = getParentGuide(slug)
-    if (!guide) notFound()
-    return <ParentGuideArticle guide={guide} />
+    const found = getGuide(slug)
+    if (!found) notFound()
+    if (found.forChild && !ctx.childId) redirect('/dashboard/parent/resources')
+    return <ParentGuideArticle guide={found.guide} />
 }

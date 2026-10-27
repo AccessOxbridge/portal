@@ -92,7 +92,7 @@ export function LockedCard({ title, summary, childFirstName }: { title: string; 
                         </div>
                         <DialogTitle>{title}</DialogTitle>
                         <DialogDescription>
-                            This guide is part of the full Access Oxbridge programme for {w.child}. Once {w.child} is onboarded, all of
+                            This guide is part of the full Access Oxbridge programme for {w.child}. Once {w.child} is enrolled, all of
                             these guides will open up.
                         </DialogDescription>
                     </DialogHeader>

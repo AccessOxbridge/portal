@@ -2,7 +2,7 @@
 -- parent accounts only. Administrators retain their existing access to every
 -- supported account type, including the new sales role.
 --
--- Requires 20261027120000_sales_role.sql. No existing rows are changed.
+-- Requires 20261027114218_sales_role.sql. No existing rows are changed.
 
 SET LOCAL lock_timeout = '2s';
 SET LOCAL statement_timeout = '10s';

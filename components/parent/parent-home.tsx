@@ -128,10 +128,10 @@ export function ParentHome({ data, onRequestHours }: { data: ParentHomeData; onR
                         <ConsultationCard w={w} />
                     </Rise>
                     <Rise i={i++}>
-                        <MentorCard data={data} w={w} />
+                        <SuccessManagerCard w={w} />
                     </Rise>
                     <Rise i={i++}>
-                        <SuccessManagerCard w={w} />
+                        <MentorCard data={data} w={w} />
                     </Rise>
                     {data.hoursLeft !== null && (
                         <Rise i={i++}>

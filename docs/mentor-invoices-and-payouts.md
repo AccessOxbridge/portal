@@ -51,11 +51,11 @@ Finance pays from invoices you send. You create a draft from unbilled sessions, 
 
 ### Step B — Select sessions
 
-<!-- SCREENSHOT: “Select sessions to invoice” panel — checked sessions, footer totals, Generate draft button (≥2 hours selected) -->
+<!-- SCREENSHOT: “Select sessions to invoice” panel — checked sessions, footer totals, Generate draft button (≥1 hour selected) -->
 
 1. Tick the sessions you want on this invoice (date, student, duration, and amount are shown).
 2. Check the footer: selected count, total hours, and total £.
-3. You must select **at least 2 hours** of sessions. If you are under 2 hours, you will see a warning and **Generate draft** stays disabled.
+3. You must select **at least 1 hour** of sessions. If you are under 1 hour, you will see a warning and **Generate draft** stays disabled.
 4. Click **Generate draft**.
 
 ### Step C — Review the draft
@@ -95,7 +95,7 @@ When paid, status shows **Paid**. You can download:
 
 ## Tips & common issues
 
-- **Minimum 2 hours per invoice** — Finance will not accept shorter invoices. Add more completed sessions, or wait until you have enough hours.
+- **Minimum 1 hour per invoice** — Finance will not accept shorter invoices. Add more completed sessions, or wait until you have enough hours.
 - **No unbilled sessions** — Sessions only appear after they are completed/ended and not already on another invoice.
 - **Wrong amount** — Check your hourly rate on the summary card and that the right sessions are selected.
 - **Payment problem** — At the bottom of **Payouts**, use **Contact Finance Team** / **Report a Payment Issue**.
@@ -107,6 +107,6 @@ When paid, status shows **Paid**. You can download:
 
 - [ ] Payment Status = **Connected**
 - [ ] Open **Payouts** and note **To Be Paid**
-- [ ] **Create invoice** → select ≥ **2 hours** → **Generate draft**
+- [ ] **Create invoice** → select ≥ **1 hour** → **Generate draft**
 - [ ] Review totals → **Send to Finance**
 - [ ] Keep the PDF; wait for **Paid** / remittance

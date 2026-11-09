@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { confirmDialog } from '@/components/ui/confirm'
 import { SelectField } from '@/components/ui/select'
 
-// Finance won't accept an invoice under 2 hours of sessions.
-const MIN_INVOICE_MINUTES = 120
+// Finance won't accept an invoice under 1 hour of sessions.
+const MIN_INVOICE_MINUTES = 60
 
 // Fixed BILL-TO party (spec §8.1).
 const BILL_TO = {
@@ -181,7 +181,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
         () => unbilled.filter(s => picked.has(s.id)).reduce((sum, s) => sum + s.amount_cents, 0),
         [unbilled, picked]
     )
-    // Finance requires at least 2 hours (120 min) per invoice.
+    // Finance requires at least 1 hour (60 min) per invoice.
     const pickedMinutes = useMemo(
         () => unbilled.filter(s => picked.has(s.id)).reduce((sum, s) => sum + (s.duration_minutes || 0), 0),
         [unbilled, picked]
@@ -307,7 +307,7 @@ export default function InvoicingPanel({ mentorName, mentorEmail }: { mentorName
                                 <p className="text-sm text-muted-foreground">
                                     {picked.size} selected · <span className="font-semibold text-foreground">{fmtDur(pickedMinutes)}</span> · <span className="font-semibold text-foreground">{fmtGBP(pickedTotal)}</span>
                                     {picked.size > 0 && belowMinimum && (
-                                        <span className="block text-warning mt-1">Select at least 2 hours of sessions to send an invoice to Finance.</span>
+                                        <span className="block text-warning mt-1">Select at least 1 hour of sessions to send an invoice to Finance.</span>
                                     )}
                                 </p>
                                 <button onClick={generateDraft} disabled={picked.size === 0 || busy || belowMinimum} className="relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium outline-none select-none transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out enabled:active:scale-[0.96] [&:is(a)]:active:scale-[0.96] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 text-sm">
@@ -507,7 +507,7 @@ function InvoiceDetail({ inv, mentorName, mentorEmail, busy, onSubmit, onDiscard
                             Discard
                         </button>
                         {inv.total_minutes < MIN_INVOICE_MINUTES && (
-                            <p className="w-full text-sm text-warning">This invoice totals {fmtDur(inv.total_minutes)}. Finance requires at least 2 hours. Discard it and select more sessions.</p>
+                            <p className="w-full text-sm text-warning">This invoice totals {fmtDur(inv.total_minutes)}. Finance requires at least 1 hour. Discard it and select more sessions.</p>
                         )}
                     </>
                 )}

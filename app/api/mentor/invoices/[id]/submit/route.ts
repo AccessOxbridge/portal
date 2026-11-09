@@ -52,10 +52,10 @@ export async function POST(
 
         const db = createAdminClient() as unknown as SupabaseClient
 
-        // 0. Enforce the 2-hour minimum before consuming a sequence number.
+        // 0. Enforce the 1-hour minimum before consuming a sequence number.
         //    Line items are frozen at draft creation, so a plain read is a safe
         //    pre-check; the atomic transition below still guards ownership/status.
-        const MIN_INVOICE_MINUTES = 120
+        const MIN_INVOICE_MINUTES = 60
         const { data: preItems, error: preErr } = await db
             .from('mentor_invoice_items')
             .select('duration_minutes')
@@ -68,7 +68,7 @@ export async function POST(
         if (totalMinutes < MIN_INVOICE_MINUTES) {
             return NextResponse.json(
                 {
-                    error: `Invoices must total at least 2 hours to send to Finance. This one is ${(totalMinutes / 60).toFixed(1)}h — add more completed sessions before submitting.`,
+                    error: `Invoices must total at least 1 hour to send to Finance. This one is ${(totalMinutes / 60).toFixed(1)}h. Add more completed sessions before submitting.`,
                 },
                 { status: 400 }
             )
